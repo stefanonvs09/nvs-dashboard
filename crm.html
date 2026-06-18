@@ -633,9 +633,6 @@ function renderPipeline(){
             onclick="cardClick(event,${a.id})"
             ondragstart="onDragStart(event,${a.id})"
             ondragend="onDragEnd(event)"
-            ontouchstart="touchStart(event,${a.id})"
-            ontouchmove="touchMove(event)"
-            ontouchend="touchEnd(event,'${s.key}')"
           >
             ${classYearBlock(a.start_year)}
             <div class="pc-name">${esc(a.nombre)}</div>
@@ -666,6 +663,7 @@ function renderPipeline(){
       </div>
     </div>`;
   }).join('');
+  bindTouchCards();
 }
 
 /* TABLE */
@@ -956,53 +954,91 @@ function quickNote(e,id){
 }
 
 /* ── DRAG & DROP (Mobile Touch) ── */
-let touchId=null, touchGhost=null, touchStartX=0, touchStartY=0, touchMoved=false;
+let _tId=null, _tDragging=false, _tX0=0, _tY0=0;
+const DRAG_THRESHOLD=10, DRAG_HOLD=120;
+let _tHoldTimer=null;
 
-function touchStart(e,id){
-  if(e.touches.length!==1) return;
-  touchMoved=false;
-  const t=e.touches[0];
-  touchStartX=t.clientX; touchStartY=t.clientY;
-  touchId=id;
-  const card=e.currentTarget;
-  const rect=card.getBoundingClientRect();
-  // Create ghost after a short hold
-  touchGhost=document.getElementById('touch-ghost');
-  touchGhost.innerHTML=card.innerHTML;
-  touchGhost.style.left=(rect.left)+'px';
-  touchGhost.style.top =(rect.top)+'px';
+function bindTouchCards(){
+  document.querySelectorAll('.pl-card').forEach(card=>{
+    const id=parseInt(card.dataset.id);
+    card.addEventListener('touchstart', e=>_tStart(e,card,id), {passive:true});
+    card.addEventListener('touchmove',  e=>_tMove(e),           {passive:false});
+    card.addEventListener('touchend',   e=>_tEnd(e),            {passive:true});
+    card.addEventListener('touchcancel',e=>_tCancel(),          {passive:true});
+  });
 }
-function touchMove(e){
-  if(!touchId) return;
+
+function _tStart(e,card,id){
+  if(e.touches.length!==1) return;
   const t=e.touches[0];
-  const dx=Math.abs(t.clientX-touchStartX), dy=Math.abs(t.clientY-touchStartY);
-  if(dx<6&&dy<6) return;
-  touchMoved=true; e.preventDefault();
+  _tX0=t.clientX; _tY0=t.clientY;
+  _tId=id; _tDragging=false;
+  // Pre-fill ghost with athlete name/sport
+  const a=data.find(x=>x.id===id);
+  const ghost=document.getElementById('touch-ghost');
+  ghost.innerHTML=`
+    <div style="font-family:'Anton',sans-serif;font-size:15px;color:var(--green);margin-bottom:2px">${classYearBlock(a?.start_year)||''}</div>
+    <div style="font-weight:700;font-size:13px;margin-bottom:2px">${esc(a?.nombre||'')}</div>
+    <div style="font-size:11px;color:var(--muted)">${esc(a?.deporte||'—')} · ${esc(a?.posicion||'—')}</div>`;
+  ghost.style.left=(t.clientX-105)+'px';
+  ghost.style.top =(t.clientY-50)+'px';
+  // Show ghost after a brief hold so taps still work
+  _tHoldTimer=setTimeout(()=>{
+    if(_tId) ghost.style.display='block';
+  }, DRAG_HOLD);
+}
+
+function _tMove(e){
+  if(!_tId) return;
+  const t=e.touches[0];
+  const dx=t.clientX-_tX0, dy=t.clientY-_tY0;
+  if(!_tDragging && Math.hypot(dx,dy)<DRAG_THRESHOLD) return;
+  _tDragging=true;
+  e.preventDefault(); // block page scroll during drag
+
   const ghost=document.getElementById('touch-ghost');
   ghost.style.display='block';
   ghost.style.left=(t.clientX-105)+'px';
-  ghost.style.top =(t.clientY-40)+'px';
-  // Highlight drop zone
+  ghost.style.top =(t.clientY-50)+'px';
+
+  // Highlight target column
   ghost.style.pointerEvents='none';
   const el=document.elementFromPoint(t.clientX,t.clientY);
+  ghost.style.pointerEvents='';
   document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
-  const zone=el?.closest('.pl-cards');
-  if(zone) zone.classList.add('drag-over');
+  el?.closest('.pl-cards')?.classList.add('drag-over');
 }
-async function touchEnd(e,origStatus){
+
+async function _tEnd(e){
+  clearTimeout(_tHoldTimer);
   const ghost=document.getElementById('touch-ghost');
-  if(ghost) ghost.style.display='none';
+  ghost.style.display='none';
   document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
-  if(!touchId||!touchMoved){touchId=null;touchMoved=false;return;}
+
+  if(!_tId||!_tDragging){_tId=null;_tDragging=false;return;}
+
   const t=e.changedTouches[0];
+  ghost.style.pointerEvents='none';
   const el=document.elementFromPoint(t.clientX,t.clientY);
-  const zone=el?.closest('.pl-cards');
-  const newStatus=zone?.dataset?.status;
-  if(newStatus&&newStatus!==origStatus){
-    const a=data.find(x=>x.id===touchId);
-    if(a){a.commit_status=newStatus;applyFilters();await _sb.from('placements').update({commit_status:newStatus}).eq('id',touchId);}
+  ghost.style.pointerEvents='';
+  const newStatus=el?.closest('.pl-cards')?.dataset?.status;
+
+  if(newStatus){
+    const a=data.find(x=>x.id===_tId);
+    if(a&&a.commit_status!==newStatus){
+      a.commit_status=newStatus;
+      applyFilters();
+      await _sb.from('placements').update({commit_status:newStatus}).eq('id',_tId);
+    }
   }
-  touchId=null; touchMoved=false;
+  _tId=null; _tDragging=false;
+}
+
+function _tCancel(){
+  clearTimeout(_tHoldTimer);
+  document.getElementById('touch-ghost').style.display='none';
+  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
+  _tId=null; _tDragging=false;
 }
 
 /* CLOSE ON BG CLICK */
