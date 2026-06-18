@@ -79,7 +79,9 @@ hr.sb-div{border:none;border-top:1px solid var(--border);margin:10px 10px;}
 .pl-card.dragging{opacity:0.35;cursor:grabbing;transform:rotate(1.5deg) scale(1.02);box-shadow:0 8px 28px rgba(0,0,0,.6);}
 .pl-cards.drag-over{background:rgba(138,213,0,0.05);outline:2px dashed rgba(138,213,0,0.35);outline-offset:-4px;border-radius:8px;}
 .pl-drop-ghost{height:70px;border-radius:8px;background:rgba(138,213,0,0.06);border:1.5px dashed rgba(138,213,0,0.3);flex-shrink:0;}
-.pc-name{font-weight:700;font-size:12px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-class{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.5px;margin-bottom:6px;line-height:1;}
+.pc-class small{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;opacity:.7;}
+.pc-name{font-weight:700;font-size:12px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .pc-sport{font-size:10px;color:var(--muted);margin-bottom:6px;}
 .pc-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
 .pc-uni{font-size:10px;color:#555;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -597,6 +599,7 @@ function renderPipeline(){
             ontouchmove="touchMove(event)"
             ontouchend="touchEnd(event,'${s.key}')"
           >
+            ${classYearBlock(a.start_year)}
             <div class="pc-name">${esc(a.nombre)}</div>
             <div class="pc-sport">${esc(a.deporte||'—')} · ${esc(a.posicion||'—')}</div>
             <div class="pc-badges">
@@ -786,6 +789,24 @@ function tipoCls(t){return t==='Boarding School'?'b-board':t==='Transfer'?'b-tra
 function tipoShort(t){return t==='Boarding School'?'Board':t==='College Placement'?'CPL':t||'—';}
 function progCls(p){return p==='Premium'?'b-prm':p==='Scholarship'?'b-sch':'b-std';}
 function stCls(s){return{  'In Process':'b-ip','Interested Schools':'b-int','Standby':'b-sta','Committed':'b-com','Closed':'b-cls'}[s]||'b-sta';}
+function classYearBlock(sy){
+  if(!sy) return '';
+  // Parse "Fall 2026" → season + year
+  const m=sy.match(/(fall|spring|summer|winter)/i);
+  const y=sy.match(/\d{4}/);
+  if(!y) return '';
+  const season=m?m[1].charAt(0).toUpperCase()+m[1].slice(1).toLowerCase():'';
+  const year=y[0];
+  const colors={
+    '2025':'#8AD500','2026':'#8AD500',
+    '2027':'#60a5fa',
+    '2028':'#fbbf24',
+    '2029':'#a78bfa',
+    '2030':'#f87171',
+  };
+  const c=colors[year]||'#9ca3af';
+  return `<div class="pc-class" style="color:${c}"><small style="color:${c}">${season}</small>${year}</div>`;
+}
 function agBadge(name){
   if(name.includes('Stefano')) return`<span class="badge b-sc">SC</span>`;
   if(name.includes('Julio'))   return`<span class="badge b-jb">JB</span>`;
