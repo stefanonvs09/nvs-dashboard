@@ -517,9 +517,8 @@ async function showPlatform(user){
   document.getElementById('tb-avatar').textContent=display.charAt(0).toUpperCase();
   // Greeting
   const h=new Date().getHours();
-  const greeting=h<12?'Buenos días':'h<18?\'Buenas tardes\'':'Buenas noches';
-  document.getElementById('hero-greeting').textContent=
-    (h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches')+', '+display;
+  const greeting=h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
+  document.getElementById('hero-greeting').textContent=greeting+', '+display;
   // Date
   updateClock();
   setInterval(updateClock,30000);
@@ -539,10 +538,10 @@ function updateClock(){
 async function loadStats(){
   // Placements stats
   const [{count:total},{count:committed},{count:inprocess},{count:financial}]=await Promise.all([
-    _sb.from('placements').select('*',{count:'exact',head:true}),
-    _sb.from('placements').select('*',{count:'exact',head:true}).eq('commit_status','Committed'),
-    _sb.from('placements').select('*',{count:'exact',head:true}).eq('commit_status','In Process'),
-    _sb.from('atletas').select('*',{count:'exact',head:true}).in('estado',['Activo','Pendiente']),
+    sb.from('placements').select('*',{count:'exact',head:true}),
+    sb.from('placements').select('*',{count:'exact',head:true}).eq('commit_status','Committed'),
+    sb.from('placements').select('*',{count:'exact',head:true}).eq('commit_status','In Process'),
+    sb.from('atletas').select('*',{count:'exact',head:true}).in('estado',['Activo','Pendiente']),
   ]);
   setS('s-total',    total      ?? '—');
   setS('s-committed',committed  ?? '—');
@@ -555,10 +554,6 @@ async function loadStats(){
   if(el2) el2.textContent=`${total??'—'} atletas · ${committed??'—'} committed`;
 }
 
-const _sb=supabase.createClient(
-  'https://mwefvjvvitsondqghgsx.supabase.co',
-  'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk'
-);
 
 function setS(id,val){
   const el=document.getElementById(id);
