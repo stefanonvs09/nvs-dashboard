@@ -260,6 +260,85 @@ label.fl { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 5
   .mnav-item span { font-size: 9.5px; }
 }
 
+/* ── FAB CENTER BUTTON ── */
+@media (max-width: 768px) {
+  .mnav-fab {
+    position: relative;
+    top: -16px;
+    background: #8AD500 !important;
+    color: #0a0a0a !important;
+    width: 54px; height: 54px;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 16px rgba(138,213,0,0.45);
+    padding: 0 !important;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+  .mnav-fab svg { width: 26px; height: 26px; stroke: #0a0a0a; }
+  .mnav-fab span { display: none; }
+}
+
+/* ── MODAL SLIDE-UP ANIMATION ── */
+@media (max-width: 768px) {
+  .overlay { transition: background 0.25s; }
+  .overlay.open .modal {
+    animation: slideUp 0.28s cubic-bezier(0.32,0.72,0,1) both;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+}
+
+/* ── MOBILE ATHLETE CARDS ── */
+.m-atleta-list { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+.m-atleta-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
+  cursor: pointer;
+  transition: box-shadow .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.m-atleta-card:active { box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+.m-ac-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.m-ac-name { font-weight: 700; font-size: 15px; line-height: 1.2; }
+.m-ac-sport { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.m-ac-mid { display: flex; gap: 16px; margin: 10px 0 10px; padding: 10px 0; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+.m-ac-stat { flex: 1; }
+.m-ac-stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+.m-ac-stat-val { font-size: 14px; font-weight: 700; margin-top: 2px; }
+.m-ac-payments { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.m-ac-actions { display: flex; gap: 8px; }
+.m-ac-actions .btn { flex: 1; justify-content: center; font-size: 12px; }
+
+/* ── MOBILE TRANSACTION CARDS ── */
+.m-trans-list { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
+.m-trans-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.m-tc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.m-tc-dot.ingreso { background: #8AD500; }
+.m-tc-dot.gasto   { background: var(--red); }
+.m-tc-body { flex: 1; min-width: 0; }
+.m-tc-concept { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-tc-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.m-tc-amt { font-size: 15px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+.m-tc-amt.ingreso { color: #8AD500; }
+.m-tc-amt.gasto   { color: var(--red); }
+
 /* ── LOGIN OVERLAY ── */
 #login-overlay { position:fixed; inset:0; background:#0a0a0a; display:none; align-items:center; justify-content:center; z-index:9999; }
 .login-box { background:#161616; border:1px solid #2a2a2a; border-radius:16px; padding:48px 40px; width:360px; max-width:90vw; text-align:center; }
@@ -1324,17 +1403,54 @@ function filterAtletasByTipo(v){aTipo=v;applyAtletasFilter();}
 
 function renderAtletasTable() {
   const start = (atletasPage-1)*PER_PAGE_A;
-  const page = filteredAtletas.slice(start, start+PER_PAGE_A);
+  const page  = filteredAtletas.slice(start, start+PER_PAGE_A);
   document.getElementById('atletas-count').textContent = atletasData.length;
-  document.getElementById('atletas-info').textContent = `${start+1}–${Math.min(start+PER_PAGE_A,filteredAtletas.length)} de ${filteredAtletas.length} atletas`;
-  document.getElementById('atletas-page').textContent = `Pág ${atletasPage} / ${Math.max(1,Math.ceil(filteredAtletas.length/PER_PAGE_A))}`;
+  document.getElementById('atletas-info').textContent  = `${start+1}–${Math.min(start+PER_PAGE_A,filteredAtletas.length)} de ${filteredAtletas.length} atletas`;
+  document.getElementById('atletas-page').textContent  = `Pág ${atletasPage} / ${Math.max(1,Math.ceil(filteredAtletas.length/PER_PAGE_A))}`;
+  const tbody = document.getElementById('atletas-tbody');
 
   if(page.length===0){
-    document.getElementById('atletas-tbody').innerHTML = '<tr><td colspan="11" class="empty"><p>No se encontraron atletas con esos filtros.</p></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="empty"><p>No se encontraron atletas con esos filtros.</p></td></tr>';
     return;
   }
 
-  document.getElementById('atletas-tbody').innerHTML = page.map((a,i)=>`
+  // ── Mobile: tarjetas ──
+  if(window.innerWidth <= 768) {
+    tbody.innerHTML = `<tr><td colspan="11" style="padding:0;border:none">
+      <div class="m-atleta-list">
+        ${page.map(a=>`
+          <div class="m-atleta-card" onclick="editAtleta(${a.id})">
+            <div class="m-ac-top">
+              <div>
+                <div class="m-ac-name">${esc(a.nombre)}</div>
+                <div class="m-ac-sport">${esc(a.deporte)} · ${badgeServicio(a.servicio)}</div>
+              </div>
+              ${badgeEstado(a.estado)}
+            </div>
+            <div class="m-ac-mid">
+              <div class="m-ac-stat">
+                <div class="m-ac-stat-label">Contrato</div>
+                <div class="m-ac-stat-val">${fmt(a.total)}</div>
+              </div>
+              <div class="m-ac-stat" style="flex:2">
+                <div class="m-ac-stat-label">Pagos</div>
+                <div class="m-ac-payments">${esc(a.pagosHechos)||'—'}</div>
+              </div>
+            </div>
+            <div class="m-ac-actions">
+              ${a.whatsapp&&a.whatsapp!=='—'?`<a href="https://wa.me/${a.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-outline btn-xs" onclick="event.stopPropagation()" style="flex:1;justify-content:center">📱 WhatsApp</a>`:''}
+              <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editAtleta(${a.id})" style="flex:1">✏️ Editar</button>
+              <button class="btn-del" onclick="event.stopPropagation();deleteAtleta(${a.id})" style="padding:4px 10px">✕</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  // ── Desktop: tabla ──
+  tbody.innerHTML = page.map((a,i)=>`
     <tr>
       <td style="color:var(--muted);font-size:12px">${start+i+1}</td>
       <td><strong>${esc(a.nombre)}</strong>${a.referido?`<div style="font-size:11px;color:var(--muted)">Ref: ${esc(a.referido)}</div>`:''}</td>
@@ -1344,9 +1460,9 @@ function renderAtletasTable() {
       <td><strong>${fmt(a.total)}</strong></td>
       <td style="font-size:12px;color:var(--muted)">${esc(a.pagosHechos)}</td>
       <td>${badgeEstado(a.estado)}</td>
-      <td style="font-size:12px;color:var(--muted)">${a.whatsapp&&a.whatsapp!=='—'?`<a href="https://wa.me/${a.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--green);text-decoration:none" title="${esc(a.deudor)}">📱 ${esc(a.whatsapp)}</a>`:esc(a.deudor)}</td>
+      <td style="font-size:12px;color:var(--muted)">${a.whatsapp&&a.whatsapp!=='—'?`<a href="https://wa.me/${a.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--green);text-decoration:none">📱 ${esc(a.whatsapp)}</a>`:esc(a.deudor)}</td>
       <td><button class="btn btn-outline btn-xs" onclick="editAtleta(${a.id})">✏️ Editar</button></td>
-      <td><button class="btn-del" onclick="deleteAtleta(${a.id})" title="Eliminar atleta">✕</button></td>
+      <td><button class="btn-del" onclick="deleteAtleta(${a.id})">✕</button></td>
     </tr>
   `).join('');
 }
@@ -1400,12 +1516,37 @@ function filterTransByMonth(v){tMonth=v;applyTransFilter();}
 function filterTransByType(v){tType=v;applyTransFilter();}
 
 function renderTransTable() {
-  const start = (transPage-1)*PER_PAGE_T;
-  const page = filteredTrans.slice(start, start+PER_PAGE_T);
+  const start  = (transPage-1)*PER_PAGE_T;
+  const page   = filteredTrans.slice(start, start+PER_PAGE_T);
   document.getElementById('trans-info').textContent = `${start+1}–${Math.min(start+PER_PAGE_T,filteredTrans.length)} de ${filteredTrans.length} transacciones`;
   document.getElementById('trans-page').textContent = `Pág ${transPage} / ${Math.max(1,Math.ceil(filteredTrans.length/PER_PAGE_T))}`;
+  const tbody = document.getElementById('trans-tbody');
 
-  document.getElementById('trans-tbody').innerHTML = page.map(t=>`
+  // ── Mobile: tarjetas ──
+  if(window.innerWidth <= 768) {
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:0;border:none">
+      <div class="m-trans-list">
+        ${page.map(t=>{
+          const esIngreso = t.ingreso > 0;
+          const amt = esIngreso ? t.ingreso : t.gasto;
+          return `
+          <div class="m-trans-card">
+            <div class="m-tc-dot ${esIngreso?'ingreso':'gasto'}"></div>
+            <div class="m-tc-body">
+              <div class="m-tc-concept">${esc(t.concepto)}</div>
+              <div class="m-tc-meta">${fmtDate(t.fecha)}${t.persona?' · '+esc(t.persona):''}</div>
+            </div>
+            <div class="m-tc-amt ${esIngreso?'ingreso':'gasto'}">${esIngreso?'+':'-'}${fmt(amt)}</div>
+            <button class="btn-del" onclick="deleteTrans(${t.id})" style="margin-left:4px">✕</button>
+          </div>`;
+        }).join('')}
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  // ── Desktop: tabla ──
+  tbody.innerHTML = page.map(t=>`
     <tr>
       <td style="white-space:nowrap">${fmtDate(t.fecha)}</td>
       <td style="max-width:280px">${esc(t.concepto)}</td>
@@ -1954,6 +2095,16 @@ document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('keydown', e => {
   if(e.key === 'Enter' && document.getElementById('login-overlay').style.display === 'flex') doLogin();
 });
+
+// Re-render tables on orientation change / resize
+let _resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    renderAtletasTable();
+    renderTransTable();
+  }, 200);
+});
 </script>
 
 <!-- ===== MOBILE BOTTOM NAV ===== -->
@@ -1974,8 +2125,8 @@ document.addEventListener('keydown', e => {
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     <span>Alertas</span>
   </button>
-  <button class="mnav-item" onclick="openAddModal()">
-    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+  <button class="mnav-item mnav-fab" onclick="openAddModal()">
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     <span>Agregar</span>
   </button>
 </nav>
