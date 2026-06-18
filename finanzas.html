@@ -897,6 +897,21 @@ async function initWithSupabase() {
   if(count === 0) await migrateToSupabase();
   await Promise.all([reloadAtletasFromSB(), reloadTransFromSB()]);
   renderAll();
+
+  // Realtime: re-render cuando Apps Script sincroniza desde Google Sheets
+  sb.channel('finanzas-realtime')
+    .on('postgres_changes', {event:'*', schema:'public', table:'transacciones'}, async () => {
+      await reloadTransFromSB();
+      renderDashboard();
+      renderTransacciones();
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'atletas'}, async () => {
+      await reloadAtletasFromSB();
+      renderDashboard();
+      renderAtletas();
+      renderDeudores();
+    })
+    .subscribe();
 }
 
 function renderAll() {
@@ -1291,13 +1306,8 @@ function openAddModal(){
 // DASHBOARD
 // ================================================================
 function renderDashboard() {
-  const baseI  = MONTHLY_BASE.reduce((s,m)=>s+m.ingresos,0);
-  const baseG  = MONTHLY_BASE.reduce((s,m)=>s+m.gastos,0);
-  // Include transactions added via the form on top of historical totals
-  const extraI = newTrans.reduce((s,t)=>s+(t.ingreso||0),0);
-  const extraG = newTrans.reduce((s,t)=>s+(t.gasto||0),0);
-  const totalI = baseI + extraI;
-  const totalG = baseG + extraG;
+  const totalI = transData.reduce((s,t)=>s+(t.ingreso||0),0);
+  const totalG = transData.reduce((s,t)=>s+(t.gasto||0),0);
   const balance = totalI - totalG;
   const activos = atletasData.filter(a=>a.estado==='Activo').length;
   const completados = atletasData.filter(a=>a.estado==='Completado').length;
@@ -1317,29 +1327,22 @@ function renderDashboard() {
 
 function renderMonthlyChart() {
   const range = parseInt(document.getElementById('chart-range').value) || 0;
-  let data = range > 0 ? MONTHLY_BASE.slice(-range) : [...MONTHLY_BASE];
-
-  // Merge newTrans into the chart — group by month label "Mmm YYYY"
   const MESES_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  if(newTrans.length > 0) {
-    const extras = {};
-    newTrans.forEach(t => {
-      if(!t.fecha) return;
-      const parts = t.fecha.split('-');
-      const label = `${MESES_SHORT[parseInt(parts[1])-1]} ${parts[0]}`;
-      if(!extras[label]) extras[label] = {mes:label, ingresos:0, gastos:0};
-      extras[label].ingresos += (t.ingreso||0);
-      extras[label].gastos   += (t.gasto||0);
-    });
-    Object.values(extras).forEach(ex => {
-      const idx = data.findIndex(m=>m.mes===ex.mes);
-      if(idx>=0) {
-        data[idx] = {...data[idx], ingresos:data[idx].ingresos+ex.ingresos, gastos:data[idx].gastos+ex.gastos};
-      } else {
-        data.push(ex);
-      }
-    });
-  }
+
+  // Build monthly totals directly from transData
+  const monthly = {};
+  transData.forEach(t => {
+    if(!t.fecha) return;
+    const parts = t.fecha.split('-');
+    if(parts.length < 2) return;
+    const key   = `${parts[0]}-${parts[1]}`;
+    const label = `${MESES_SHORT[parseInt(parts[1])-1]} ${parts[0]}`;
+    if(!monthly[key]) monthly[key] = {mes:label, key, ingresos:0, gastos:0};
+    monthly[key].ingresos += (t.ingreso||0);
+    monthly[key].gastos   += (t.gasto||0);
+  });
+  let data = Object.values(monthly).sort((a,b)=>a.key.localeCompare(b.key));
+  if(range > 0) data = data.slice(-range);
 
   const ctx = document.getElementById('monthlyChart').getContext('2d');
   if(monthlyChart) monthlyChart.destroy();
