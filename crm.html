@@ -85,6 +85,14 @@ hr.sb-div{border:none;border-top:1px solid var(--border);margin:10px 10px;}
 .pc-sport{font-size:10px;color:var(--muted);margin-bottom:6px;}
 .pc-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
 .pc-uni{font-size:10px;color:#555;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-note-area{margin-top:7px;border-top:1px solid rgba(255,255,255,0.05);padding-top:6px;cursor:text;}
+.pc-note-txt{font-size:10px;color:#555;line-height:1.35;word-break:break-word;}
+.pc-note-txt::before{content:'✎ ';opacity:.5;}
+.pc-note-empty{font-size:10px;color:#2d2d2d;font-style:italic;transition:color .15s;}
+.pc-note-area:hover .pc-note-empty{color:#444;}
+.pc-note-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(138,213,0,0.25);border-radius:6px;padding:6px 8px;color:#ccc;font-size:11px;font-family:'Montserrat',sans-serif;resize:none;outline:none;min-height:58px;line-height:1.4;}
+.pc-note-input:focus{border-color:rgba(138,213,0,0.5);}
+.pc-note-hint{font-size:9px;color:#333;margin-top:3px;}
 .pl-empty{text-align:center;padding:18px;color:#222;font-size:11px;}
 /* Touch drag ghost */
 #touch-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:0.85;width:210px;background:var(--card3);border:1px solid rgba(138,213,0,0.4);border-radius:9px;padding:10px 12px;box-shadow:0 12px 36px rgba(0,0,0,.7);display:none;}
@@ -629,6 +637,11 @@ function renderPipeline(){
               ${agBadges(a.working_with)}
             </div>
             ${a.committed_university?`<div class="pc-uni">✓ ${esc(a.committed_university)}</div>`:a.budget?`<div class="pc-uni" style="color:#444">${esc(a.budget)}</div>`:''}
+            <div class="pc-note-area" onclick="quickNote(event,${a.id})">
+              ${a.notas
+                ?`<div class="pc-note-txt">${esc(a.notas.length>70?a.notas.slice(0,70)+'…':a.notas)}</div>`
+                :`<div class="pc-note-empty">✎ Nota rápida…</div>`}
+            </div>
           </div>`).join('')
         :'<div class="pl-empty">—</div>'}
       </div>
@@ -879,10 +892,37 @@ async function onDrop(e,status){
   dragId=null;
 }
 
-/* Prevent click-to-open when finishing a drag */
+/* Prevent click-to-open when finishing a drag or clicking note area */
 function cardClick(e,id){
   if(dragMoved){dragMoved=false;return;}
+  if(e.target.closest('.pc-note-area')) return;
   openEdit(id);
+}
+
+/* ── QUICK NOTE ── */
+function quickNote(e,id){
+  e.stopPropagation();
+  const area=e.currentTarget;
+  area.onclick=null; // disable while editing
+  const a=data.find(x=>x.id===id);
+  area.innerHTML=`<textarea class="pc-note-input" placeholder="Escribir nota… (Enter para guardar, Shift+Enter para salto de línea)">${a?.notas||''}</textarea><div class="pc-note-hint">Enter · guardar &nbsp;·&nbsp; Esc · cancelar</div>`;
+  const ta=area.querySelector('textarea');
+  ta.addEventListener('click',ev=>ev.stopPropagation());
+  ta.addEventListener('mousedown',ev=>ev.stopPropagation());
+  ta.focus();
+  ta.setSelectionRange(ta.value.length,ta.value.length);
+  const cancel=()=>{if(a)a.notas=(a.notas||'');renderPipeline();};
+  ta.addEventListener('keydown',ev=>{
+    if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ta.blur();}
+    if(ev.key==='Escape'){ev.preventDefault();cancel();}
+  });
+  ta.addEventListener('blur',async()=>{
+    const val=ta.value.trim();
+    const prev=(a?.notas||'').trim();
+    if(a) a.notas=val;
+    renderPipeline();
+    if(a&&val!==prev) await _sb.from('placements').update({notas:val}).eq('id',id);
+  });
 }
 
 /* ── DRAG & DROP (Mobile Touch) ── */
