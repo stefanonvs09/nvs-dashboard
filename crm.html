@@ -9,160 +9,163 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --green:#8AD500;--green-dim:rgba(138,213,0,0.1);--green-dark:#6aaa00;
-  --bg:#0a0a0a;--sidebar:#0f0f0f;--card:#141414;--card2:#1a1a1a;
-  --border:rgba(255,255,255,0.07);--text:#fff;--muted:#666;--muted2:#333;
+  --green:#8AD500;--green-dim:rgba(138,213,0,0.1);--green-dk:#6aaa00;
+  --bg:#0a0a0a;--sb:#0f0f0f;--card:#141414;--card2:#1a1a1a;--card3:#1f1f1f;
+  --border:rgba(255,255,255,0.07);--text:#fff;--muted:#666;
+  --blue:#60a5fa;--amber:#fbbf24;--gray:#9ca3af;--red:#f87171;--purple:#a78bfa;
 }
 body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
 
 /* SIDEBAR */
-.sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;padding:24px 0;}
-.sb-logo{padding:0 20px 22px;border-bottom:1px solid var(--border);margin-bottom:18px;}
-.sb-logo-name{font-family:'Anton',sans-serif;font-size:28px;color:var(--green);letter-spacing:1px;}
-.sb-logo-tag{display:inline-block;background:rgba(139,92,246,0.2);color:#a78bfa;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:4px;padding:2px 8px;margin-top:4px;}
-.sb-nav{flex:1;padding:0 12px;}
-.sb-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;margin-bottom:4px;border:none;background:none;width:100%;text-align:left;}
+.sidebar{width:210px;min-height:100vh;background:var(--sb);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;padding:22px 0;}
+.sb-logo{padding:0 18px 18px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.sb-logo-name{font-family:'Anton',sans-serif;font-size:26px;color:var(--green);}
+.sb-logo-tag{display:inline-block;background:rgba(139,92,246,0.2);color:var(--purple);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:4px;padding:2px 7px;margin-top:3px;}
+.sb-section{padding:0 10px;margin-bottom:4px;}
+.sb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;padding:0 8px;margin-bottom:5px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;}
 .sb-item:hover{background:var(--card2);color:#fff;}
 .sb-item.active{background:var(--green-dim);color:var(--green);}
-.sb-footer{padding:0 12px;border-top:1px solid var(--border);padding-top:16px;margin-top:8px;}
-.sb-footer a{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;padding:10px 12px;border-radius:10px;transition:all .15s;}
-.sb-footer a:hover{color:#fff;background:var(--card2);}
+.sb-item .ic{width:18px;text-align:center;}
+hr.sb-div{border:none;border-top:1px solid var(--border);margin:10px 10px;}
+.ag-pill{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;border:none;background:none;width:100%;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#888;transition:all .15s;}
+.ag-pill:hover,.ag-pill.active{background:var(--card2);color:#fff;}
+.ag-dot{width:7px;height:7px;border-radius:50%;}
+.sb-foot{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border);}
+.sb-foot a{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;font-weight:600;text-decoration:none;padding:9px 10px;border-radius:9px;transition:all .15s;}
+.sb-foot a:hover{color:#fff;background:var(--card2);}
 
 /* MAIN */
-.main{margin-left:220px;flex:1;min-height:100vh;display:flex;flex-direction:column;}
-.topbar{padding:14px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,10,0.92);position:sticky;top:0;z-index:40;backdrop-filter:blur(10px);}
-.topbar-title{font-family:'Anton',sans-serif;font-size:22px;}
-.topbar-right{display:flex;gap:10px;align-items:center;}
-.btn-primary{background:var(--green);color:#0a0a0a;border:none;border-radius:9px;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:background .15s;white-space:nowrap;}
-.btn-primary:hover{background:var(--green-dark);}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:9px 16px;font-size:13px;font-family:'Montserrat',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;}
+.main{margin-left:210px;flex:1;display:flex;flex-direction:column;min-width:0;}
+
+/* TOPBAR */
+.topbar{padding:11px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:rgba(10,10,10,0.95);position:sticky;top:0;z-index:40;backdrop-filter:blur(12px);}
+.view-tabs{display:flex;background:var(--card2);border-radius:9px;padding:3px;gap:2px;}
+.vtab{padding:6px 15px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--muted);transition:all .15s;white-space:nowrap;}
+.vtab.active{background:var(--card3);color:#fff;}
+.tb-search{flex:1;min-width:0;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;font-family:'Montserrat',sans-serif;outline:none;}
+.tb-search:focus{border-color:rgba(255,255,255,0.2);}
+.btn-add{background:var(--green);color:#0a0a0a;border:none;border-radius:9px;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;cursor:pointer;flex-shrink:0;}
+.btn-add:hover{background:var(--green-dk);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 13px;font-size:12px;font-family:'Montserrat',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;flex-shrink:0;}
 .btn-ghost:hover{border-color:#444;color:#fff;}
-.content{padding:22px 28px;flex:1;}
+
+/* CONTENT */
+.content{padding:18px 22px;flex:1;}
 
 /* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border .15s;}
-.stat-card:hover{border-color:rgba(255,255,255,0.15);}
-.stat-card.sel{border-color:var(--green);}
-.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:5px;}
-.stat-val{font-family:'Anton',sans-serif;font-size:24px;}
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:14px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:11px 13px;cursor:pointer;transition:all .15s;}
+.stat-card:hover,.stat-card.sel{border-color:rgba(255,255,255,0.2);}
+.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:3px;}
+.stat-val{font-family:'Anton',sans-serif;font-size:21px;}
 
 /* FILTERS */
-.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
-.f-search{flex:1;min-width:180px;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 13px;color:#fff;font-size:13px;font-family:'Montserrat',sans-serif;outline:none;transition:border .2s;}
-.f-search:focus{border-color:var(--green);}
-.f-select{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:#fff;font-size:12px;font-family:'Montserrat',sans-serif;cursor:pointer;outline:none;}
+.filter-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.f-sel{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:#fff;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer;outline:none;}
+.f-count{font-size:11px;color:var(--muted);font-weight:600;margin-left:2px;}
 
 /* PIPELINE */
-.pipeline-wrap{overflow-x:auto;padding-bottom:12px;}
-.pipeline-board{display:flex;gap:14px;min-width:max-content;}
-.pl-col{width:240px;background:var(--card);border-radius:14px;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;}
-.pl-col-head{padding:12px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
-.pl-col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.pl-col-name{font-weight:700;font-size:12px;flex:1;}
-.pl-col-count{background:rgba(255,255,255,0.07);color:var(--muted);font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;}
-.pl-cards{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1;min-height:60px;}
-.pl-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:13px 14px;cursor:pointer;transition:all .15s;}
-.pl-card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.3);}
-.pc-name{font-weight:700;font-size:13px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pc-sport{font-size:11px;color:var(--muted);margin-bottom:8px;}
-.pc-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
-.pc-commit{font-size:10px;color:#aaa;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pl-empty{text-align:center;padding:24px 10px;color:#222;font-size:12px;}
+.pl-wrap{overflow-x:auto;padding-bottom:8px;}
+.pl-board{display:flex;gap:11px;min-width:max-content;}
+.pl-col{width:230px;background:var(--card);border-radius:12px;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;}
+.pl-head{padding:10px 13px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border);}
+.pl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pl-name{font-weight:800;font-size:10px;flex:1;text-transform:uppercase;letter-spacing:.6px;}
+.pl-cnt{background:rgba(255,255,255,0.06);color:var(--muted);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.pl-cards{padding:7px;display:flex;flex-direction:column;gap:6px;}
+.pl-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;}
+.pl-card:hover{border-color:rgba(255,255,255,0.13);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.pc-name{font-weight:700;font-size:12px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-sport{font-size:10px;color:var(--muted);margin-bottom:6px;}
+.pc-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.pc-uni{font-size:10px;color:#555;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pl-empty{text-align:center;padding:18px;color:#222;font-size:11px;}
 
-/* DIRECTORY */
-.dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
-.dir-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .15s;}
-.dir-card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.3);}
-.dc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-.dc-av{width:42px;height:42px;border-radius:11px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:17px;color:var(--green);flex-shrink:0;}
-.dc-name{font-weight:700;font-size:15px;margin-bottom:3px;}
-.dc-sport{font-size:12px;color:var(--muted);margin-bottom:10px;}
-.dc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
-.dc-uni{font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
+table.dt{width:100%;border-collapse:collapse;font-size:12px;}
+table.dt thead{background:var(--card2);position:sticky;top:0;z-index:5;}
+table.dt th{padding:9px 11px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);white-space:nowrap;cursor:pointer;border-bottom:1px solid var(--border);user-select:none;transition:color .15s;}
+table.dt th:hover,table.dt th.sorted{color:#fff;}
+.sort-ic{margin-left:3px;font-size:8px;opacity:.5;}
+table.dt td{padding:8px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;white-space:nowrap;}
+table.dt tr:last-child td{border-bottom:none;}
+table.dt tbody tr{cursor:pointer;transition:background .1s;}
+table.dt tbody tr:hover{background:rgba(255,255,255,0.025);}
+.td-n{font-weight:700;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;}
+.td-s{font-size:10px;color:var(--muted);}
+.td-num{font-size:10px;color:#333;font-weight:700;text-align:center;width:32px;}
 
 /* BADGES */
-.badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
-.b-cpl   {background:rgba(59,130,246,0.15);color:#60a5fa;}
-.b-board {background:rgba(139,92,246,0.15);color:#a78bfa;}
-.b-trans {background:rgba(249,115,22,0.15);color:#fb923c;}
-.b-std   {background:rgba(138,213,0,0.12);color:#8AD500;}
-.b-prm   {background:rgba(139,92,246,0.15);color:#a78bfa;}
-.b-sch   {background:rgba(245,158,11,0.15);color:#fbbf24;}
-/* commit status badges */
-.b-inprocess   {background:rgba(59,130,246,0.15);color:#60a5fa;}
-.b-interested  {background:rgba(245,158,11,0.15);color:#fbbf24;}
-.b-standby     {background:rgba(107,114,128,0.15);color:#9ca3af;}
-.b-committed   {background:rgba(138,213,0,0.15);color:#8AD500;}
-.b-closed      {background:rgba(239,68,68,0.12);color:#f87171;}
-/* family */
-.b-excellent{background:rgba(138,213,0,0.12);color:#8AD500;}
-.b-good     {background:rgba(59,130,246,0.12);color:#60a5fa;}
-.b-mid      {background:rgba(245,158,11,0.12);color:#fbbf24;}
-.b-bad      {background:rgba(239,68,68,0.1);color:#f87171;}
+.badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 6px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
+.b-cpl  {background:rgba(59,130,246,.13);color:var(--blue);}
+.b-board{background:rgba(139,92,246,.13);color:var(--purple);}
+.b-trans{background:rgba(249,115,22,.13);color:#fb923c;}
+.b-std  {background:rgba(138,213,0,.12);color:var(--green);}
+.b-prm  {background:rgba(139,92,246,.13);color:var(--purple);}
+.b-sch  {background:rgba(245,158,11,.13);color:var(--amber);}
+.b-ip   {background:rgba(59,130,246,.13);color:var(--blue);}
+.b-int  {background:rgba(245,158,11,.13);color:var(--amber);}
+.b-sta  {background:rgba(107,114,128,.13);color:var(--gray);}
+.b-com  {background:rgba(138,213,0,.13);color:var(--green);}
+.b-cls  {background:rgba(239,68,68,.1);color:var(--red);}
+.b-sc   {background:rgba(138,213,0,.15);color:var(--green);}
+.b-jb   {background:rgba(59,130,246,.15);color:var(--blue);}
+.b-ac   {background:rgba(139,92,246,.15);color:var(--purple);}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(5px);padding:16px;}
-.modal-overlay.open{display:flex;}
-.modal-box{background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:720px;max-width:100%;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;}
-.modal-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.modal-av{width:46px;height:46px;border-radius:12px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:18px;color:var(--green);flex-shrink:0;}
-.modal-head-info{flex:1;min-width:0;}
-.modal-name{font-family:'Anton',sans-serif;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.modal-sub{font-size:12px;color:var(--muted);margin-top:2px;}
-.modal-head-btns{display:flex;gap:8px;flex-wrap:wrap;}
-.modal-body{flex:1;overflow-y:auto;padding:20px 22px;}
-.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
-.msec{background:var(--card2);border-radius:12px;padding:14px 16px;}
-.msec-full{grid-column:1/-1;}
-.msec-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:12px;}
-.mf{margin-bottom:10px;}
-.mf label{display:block;font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;}
-.mf .val{font-size:13px;font-weight:600;color:#ddd;line-height:1.4;}
-.mf .val a{color:var(--green);text-decoration:none;}
-.mf .val a:hover{text-decoration:underline;}
-.mf select,.mf input,.mf textarea{width:100%;background:#222;border:1px solid #2a2a2a;border-radius:8px;padding:8px 11px;color:#fff;font-size:13px;font-family:'Montserrat',sans-serif;outline:none;transition:border .2s;}
-.mf select:focus,.mf input:focus,.mf textarea:focus{border-color:var(--green);}
-.mf textarea{resize:vertical;min-height:70px;}
-.uni-list{display:flex;flex-direction:column;gap:4px;}
-.uni-item{font-size:12px;padding:5px 10px;background:rgba(255,255,255,0.04);border-radius:6px;color:#ccc;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px);padding:16px;}
+.overlay.open{display:flex;}
+.modal{background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:18px;width:780px;max-width:100%;max-height:94vh;overflow:hidden;display:flex;flex-direction:column;}
+.mh{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.m-av{width:42px;height:42px;border-radius:10px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:16px;color:var(--green);flex-shrink:0;}
+.m-inf{flex:1;min-width:0;}
+.m-nm{font-family:'Anton',sans-serif;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.m-sb{font-size:11px;color:var(--muted);margin-top:1px;}
+.m-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.btn-save{background:var(--green);color:#0a0a0a;border:none;border-radius:8px;padding:7px 16px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;}
+.btn-save:hover{background:var(--green-dk);}
+.btn-del{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px 13px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;cursor:pointer;}
+.mb{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.m2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.mfull{grid-column:1/-1;}
+.msec{background:var(--card2);border-radius:11px;padding:13px 14px;}
+.ms-t{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:10px;}
+.mf{margin-bottom:8px;}
+.mf:last-child{margin-bottom:0;}
+.mf label{display:block;font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px;}
+.fi{width:100%;background:#222;border:1px solid #2a2a2a;border-radius:7px;padding:7px 10px;color:#fff;font-size:12px;font-family:'Montserrat',sans-serif;outline:none;transition:border .15s;}
+.fi:focus{border-color:rgba(255,255,255,0.2);}
+textarea.fi{resize:vertical;min-height:70px;}
+.agent-checks{display:flex;flex-direction:column;gap:6px;}
+.ag-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#222;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:border .15s;}
+.ag-row:hover{border-color:#333;}
+.ag-row input{accent-color:var(--green);width:14px;height:14px;cursor:pointer;flex-shrink:0;}
+.ag-row span{font-size:12px;font-weight:700;cursor:pointer;}
+.uni-list{display:flex;flex-direction:column;gap:3px;margin-top:7px;}
+.uni-item{font-size:11px;padding:4px 8px;background:rgba(255,255,255,0.04);border-radius:5px;color:#bbb;line-height:1.3;}
 .uni-item:first-child{color:var(--green);font-weight:700;background:var(--green-dim);}
-
-/* EMPTY */
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-icon{font-size:50px;margin-bottom:12px;opacity:.3;}
-
-/* ADD FORM */
-.form-grid{padding:20px 22px;display:grid;grid-template-columns:1fr 1fr;gap:13px;}
-.form-grid .full{grid-column:1/-1;}
-.flabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;display:block;margin-bottom:5px;}
-.finput{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;padding:9px 12px;color:#fff;font-size:13px;font-family:'Montserrat',sans-serif;outline:none;transition:border .2s;}
-.finput:focus{border-color:var(--green);}
-.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
 
 /* MOBILE */
 @media(max-width:768px){
   .sidebar{display:none;}
-  .main{margin-left:0;padding-bottom:80px;}
-  .content{padding:14px;}
-  .topbar{padding:12px 14px;}
-  .topbar-title{font-size:18px;}
-  .stats-row{grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px;}
-  .stat-val{font-size:20px;}
-  .stat-lbl{font-size:9px;}
-  .pl-col{width:200px;}
-  .dir-grid{grid-template-columns:1fr;}
-  .modal-grid{grid-template-columns:1fr;}
-  .form-grid{grid-template-columns:1fr;}
-  .modal-box{border-radius:20px 20px 0 0;max-height:94vh;width:100%;}
-  .modal-overlay{align-items:flex-end;padding:0;}
+  .main{margin-left:0;padding-bottom:74px;}
+  .content{padding:12px;}
+  .topbar{padding:9px 12px;gap:7px;}
+  .stats-row{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+  .stat-val{font-size:18px;}
+  .m2{grid-template-columns:1fr;}
+  .modal{border-radius:18px 18px 0 0;max-height:92vh;}
+  .overlay{align-items:flex-end;padding:0;}
   .mobile-nav{display:flex!important;}
+  .view-tabs{display:none;}
 }
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--border);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:100;justify-content:space-around;align-items:center;}
-.mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:9px;font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;padding:0 12px;-webkit-tap-highlight-color:transparent;}
-.mnav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;}
-.mnav-item.active{color:var(--green);}
-.mnav-fab{background:var(--green);border-radius:50%;width:52px;height:52px;color:#0a0a0a;font-size:26px;box-shadow:0 4px 18px rgba(138,213,0,.35);padding:0;display:flex;align-items:center;justify-content:center;}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--border);padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:100;justify-content:space-around;}
+.mn-i{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:9px;font-family:'Montserrat',sans-serif;font-weight:700;text-transform:uppercase;cursor:pointer;padding:0 10px;-webkit-tap-highlight-color:transparent;}
+.mn-i svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.mn-i.active{color:var(--green);}
+.mn-fab{background:var(--green);border-radius:50%;width:48px;height:48px;color:#0a0a0a;font-size:24px;box-shadow:0 4px 16px rgba(138,213,0,.3);padding:0;display:flex;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
@@ -173,15 +176,32 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
     <div class="sb-logo-name">NVS</div>
     <div class="sb-logo-tag">APL · Placements</div>
   </div>
-  <div class="sb-nav">
-    <button class="sb-item active" id="nav-pipeline" onclick="showView('pipeline')">
-      <span>⚡</span> Pipeline
+  <div class="sb-section">
+    <div class="sb-lbl">Vistas</div>
+    <button class="sb-item active" id="snav-pipeline" onclick="setView('pipeline')">
+      <span class="ic">⚡</span> Pipeline
     </button>
-    <button class="sb-item" id="nav-directorio" onclick="showView('directorio')">
-      <span>📋</span> Directorio
+    <button class="sb-item" id="snav-tabla" onclick="setView('tabla')">
+      <span class="ic">📊</span> Tabla
     </button>
   </div>
-  <div class="sb-footer">
+  <hr class="sb-div">
+  <div class="sb-section">
+    <div class="sb-lbl">Agentes</div>
+    <button class="ag-pill active" id="apill-" onclick="filterAgent('')">
+      <div class="ag-dot" style="background:#444"></div> Todos
+    </button>
+    <button class="ag-pill" id="apill-sc" onclick="filterAgent('Stefano Cano')">
+      <div class="ag-dot" style="background:var(--green)"></div> Stefano Cano
+    </button>
+    <button class="ag-pill" id="apill-jb" onclick="filterAgent('Julio Blanco')">
+      <div class="ag-dot" style="background:var(--blue)"></div> Julio Blanco
+    </button>
+    <button class="ag-pill" id="apill-ac" onclick="filterAgent('Andrea Castillo')">
+      <div class="ag-dot" style="background:var(--purple)"></div> Andrea Castillo
+    </button>
+  </div>
+  <div class="sb-foot">
     <a href="index.html">← Volver al Hub</a>
   </div>
 </nav>
@@ -189,450 +209,577 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title" id="view-title">Pipeline</div>
-    <div class="topbar-right">
-      <a href="index.html" class="btn-ghost" title="Hub">⌂ Hub</a>
-      <button class="btn-primary" onclick="openAdd()">+ Atleta</button>
+    <div class="view-tabs">
+      <button class="vtab active" id="tab-pipeline" onclick="setView('pipeline')">⚡ Pipeline</button>
+      <button class="vtab" id="tab-tabla" onclick="setView('tabla')">📊 Tabla</button>
     </div>
+    <input class="tb-search" id="f-q" placeholder="🔍  Buscar atleta, deporte, universidad…" oninput="applyFilters()">
+    <a href="index.html" class="btn-ghost">⌂</a>
+    <button class="btn-add" onclick="openAdd()">+ Atleta</button>
   </div>
 
   <div class="content">
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-card" onclick="filterStatus('')" id="sf-all">
-        <div class="stat-lbl">Total</div><div class="stat-val" id="s-total">—</div>
-      </div>
-      <div class="stat-card" onclick="filterStatus('Committed')" id="sf-committed">
-        <div class="stat-lbl">Committed</div><div class="stat-val" id="s-committed" style="color:var(--green)">—</div>
-      </div>
-      <div class="stat-card" onclick="filterStatus('In Process')" id="sf-inprocess">
-        <div class="stat-lbl">In Process</div><div class="stat-val" id="s-inprocess" style="color:#60a5fa">—</div>
-      </div>
-      <div class="stat-card" onclick="filterStatus('Interested Schools')" id="sf-interested">
-        <div class="stat-lbl">Int. Schools</div><div class="stat-val" id="s-interested" style="color:#fbbf24">—</div>
-      </div>
-      <div class="stat-card" onclick="filterStatus('Standby')" id="sf-standby">
-        <div class="stat-lbl">Standby</div><div class="stat-val" id="s-standby" style="color:#9ca3af">—</div>
-      </div>
+      <div class="stat-card" onclick="filterStatus('')"               id="sf-all"><div class="stat-lbl">Total</div><div class="stat-val" id="s-tot">—</div></div>
+      <div class="stat-card" onclick="filterStatus('Committed')"      id="sf-com"><div class="stat-lbl">Committed</div><div class="stat-val" id="s-com" style="color:var(--green)">—</div></div>
+      <div class="stat-card" onclick="filterStatus('In Process')"     id="sf-ip"> <div class="stat-lbl">In Process</div><div class="stat-val" id="s-ip"  style="color:var(--blue)">—</div></div>
+      <div class="stat-card" onclick="filterStatus('Interested Schools')" id="sf-int"><div class="stat-lbl">Int. Schools</div><div class="stat-val" id="s-int" style="color:var(--amber)">—</div></div>
+      <div class="stat-card" onclick="filterStatus('Standby')"        id="sf-sta"><div class="stat-lbl">Standby</div><div class="stat-val" id="s-sta" style="color:var(--gray)">—</div></div>
+      <div class="stat-card" onclick="filterStatus('Closed')"         id="sf-cls"><div class="stat-lbl">Closed</div><div class="stat-val" id="s-cls" style="color:var(--red)">—</div></div>
     </div>
 
-    <!-- Filter bar -->
+    <!-- Filters -->
     <div class="filter-bar">
-      <input class="f-search" id="f-q" placeholder="🔍  Buscar atleta…" oninput="applyFilters()">
-      <select class="f-select" id="f-sport" onchange="applyFilters()">
-        <option value="">Todos los deportes</option>
+      <select class="f-sel" id="f-sport"   onchange="applyFilters()"><option value="">🏅 Todos los deportes</option></select>
+      <select class="f-sel" id="f-tipo"    onchange="applyFilters()">
+        <option value="">📁 Todos los tipos</option>
+        <option>College Placement</option><option>Boarding School</option><option>Transfer</option>
       </select>
-      <select class="f-select" id="f-tipo" onchange="applyFilters()">
-        <option value="">Todos los tipos</option>
-        <option>College Placement</option>
-        <option>Boarding School</option>
-        <option>Transfer</option>
+      <select class="f-sel" id="f-program" onchange="applyFilters()">
+        <option value="">🎯 Todos los programas</option>
+        <option>Standard</option><option>Premium</option><option>Scholarship</option>
       </select>
-      <select class="f-select" id="f-agent" onchange="applyFilters()">
-        <option value="">Todos los agentes</option>
-      </select>
+      <span class="f-count" id="f-count"></span>
     </div>
 
-    <!-- Pipeline -->
+    <!-- PIPELINE -->
     <div id="view-pipeline">
-      <div class="pipeline-wrap">
-        <div class="pipeline-board" id="pipeline-board">
-          <div style="color:var(--muted);padding:40px;font-size:13px">Cargando…</div>
-        </div>
+      <div class="pl-wrap">
+        <div class="pl-board" id="pl-board"><div style="color:var(--muted);padding:30px;font-size:13px">Cargando…</div></div>
       </div>
     </div>
 
-    <!-- Directorio -->
-    <div id="view-directorio" style="display:none">
-      <div class="dir-grid" id="dir-grid"></div>
+    <!-- TABLE -->
+    <div id="view-tabla" style="display:none">
+      <div class="tbl-wrap">
+        <table class="dt">
+          <thead><tr id="tbl-head"></tr></thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ATHLETE MODAL -->
-<div class="modal-overlay" id="athlete-modal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-av" id="m-av">?</div>
-      <div class="modal-head-info">
-        <div class="modal-name" id="m-name">—</div>
-        <div class="modal-sub" id="m-sub">—</div>
+<!-- EDIT MODAL -->
+<div class="overlay" id="edit-modal">
+  <div class="modal">
+    <div class="mh">
+      <div class="m-av" id="m-av">?</div>
+      <div class="m-inf">
+        <div class="m-nm" id="m-nm">—</div>
+        <div class="m-sb" id="m-sb">—</div>
       </div>
-      <div class="modal-head-btns">
-        <a id="m-notion" href="#" target="_blank" class="btn-ghost" style="display:none">Notion ↗</a>
-        <a id="m-profile" href="#" target="_blank" class="btn-ghost" style="display:none">🎬 Perfil</a>
-        <button class="btn-primary" onclick="saveAthlete()">Guardar</button>
-        <button class="btn-ghost" onclick="closeModal()" style="padding:9px 12px">✕</button>
+      <div class="m-btns">
+        <a id="m-notion" href="#" target="_blank" class="btn-ghost" style="display:none;font-size:11px">Notion ↗</a>
+        <a id="m-profilebtn" href="#" target="_blank" class="btn-ghost" style="display:none;font-size:11px">🎬 Perfil</a>
+        <button class="btn-del" onclick="delAthlete()">Eliminar</button>
+        <button class="btn-save" onclick="saveAthlete()">Guardar</button>
+        <button class="btn-ghost" onclick="closeEdit()" style="padding:7px 11px">✕</button>
       </div>
     </div>
-    <div class="modal-body">
-      <div class="modal-grid">
+    <div class="mb">
+
+      <div class="m2">
         <!-- Proceso -->
         <div class="msec">
-          <div class="msec-title">Proceso</div>
-          <div class="mf"><label>Commit Status</label>
-            <select id="m-status">
+          <div class="ms-t">Proceso</div>
+          <div class="mf"><label>Status</label>
+            <select id="m-status" class="fi">
               <option>In Process</option><option>Interested Schools</option>
               <option>Standby</option><option>Committed</option><option>Closed</option>
             </select>
           </div>
           <div class="mf"><label>Tipo</label>
-            <select id="m-tipo">
+            <select id="m-tipo" class="fi">
               <option>College Placement</option><option>Boarding School</option><option>Transfer</option>
             </select>
           </div>
-          <div class="mf"><label>Budget</label><div class="val" id="m-budget">—</div></div>
-          <div class="mf"><label>NVS Program</label><div class="val" id="m-program">—</div></div>
-          <div class="mf"><label>Working With</label><div class="val" id="m-working">—</div></div>
-          <div class="mf"><label>Familia</label><div class="val" id="m-family">—</div></div>
+          <div class="mf"><label>NVS Program</label>
+            <select id="m-prog" class="fi">
+              <option>Standard</option><option>Premium</option><option>Scholarship</option><option>Transfer</option>
+            </select>
+          </div>
+          <div class="mf"><label>Budget</label>
+            <select id="m-budget" class="fi">
+              <option value="">—</option>
+              <option>0-5K</option><option>5-10K</option><option>10-15K</option>
+              <option>15-20K</option><option>20-25K</option><option>25-30K</option><option>30K+</option>
+            </select>
+          </div>
+          <div class="mf"><label>Universidad Comprometida</label>
+            <input id="m-uni-com" class="fi" placeholder="—">
+          </div>
+        </div>
+        <!-- Personal -->
+        <div class="msec">
+          <div class="ms-t">Información Personal</div>
+          <div class="mf"><label>Nombre</label><input id="m-nombre" class="fi" placeholder="Nombre completo"></div>
+          <div class="mf"><label>Deporte</label><input id="m-deporte" class="fi" placeholder="Soccer…"></div>
+          <div class="mf"><label>Posición</label><input id="m-posicion" class="fi" placeholder="CM, GK…"></div>
+          <div class="mf"><label>Nacionalidad</label><input id="m-nac" class="fi" placeholder="Panamá…"></div>
+          <div class="mf"><label>Fecha de nacimiento</label><input id="m-dob" class="fi" placeholder="MM/DD/YYYY"></div>
+          <div class="mf"><label>Equipo actual</label><input id="m-team" class="fi" placeholder="—"></div>
+        </div>
+      </div>
+
+      <div class="m2">
+        <!-- Agentes -->
+        <div class="msec">
+          <div class="ms-t">Agentes Asignados</div>
+          <div class="agent-checks">
+            <label class="ag-row">
+              <input type="checkbox" id="ag-sc" value="Stefano Cano">
+              <div class="ag-dot" style="background:var(--green)"></div>
+              <span style="color:var(--green)">Stefano Cano</span>
+            </label>
+            <label class="ag-row">
+              <input type="checkbox" id="ag-jb" value="Julio Blanco">
+              <div class="ag-dot" style="background:var(--blue)"></div>
+              <span style="color:var(--blue)">Julio Blanco</span>
+            </label>
+            <label class="ag-row">
+              <input type="checkbox" id="ag-ac" value="Andrea Castillo">
+              <div class="ag-dot" style="background:var(--purple)"></div>
+              <span style="color:var(--purple)">Andrea Castillo</span>
+            </label>
+          </div>
+          <div class="mf" style="margin-top:11px"><label>Relación Familiar</label>
+            <select id="m-family" class="fi">
+              <option value="">—</option><option>Excellent</option><option>Good</option><option>Mid</option><option>Bad</option>
+            </select>
+          </div>
         </div>
         <!-- Académico -->
         <div class="msec">
-          <div class="msec-title">Académico / Personal</div>
-          <div class="mf"><label>Deporte · Posición</label><div class="val" id="m-sport">—</div></div>
-          <div class="mf"><label>GPA</label><div class="val" id="m-gpa">—</div></div>
-          <div class="mf"><label>Major deseado</label><div class="val" id="m-major">—</div></div>
-          <div class="mf"><label>Nacionalidad</label><div class="val" id="m-nac">—</div></div>
-          <div class="mf"><label>Fecha de nacimiento</label><div class="val" id="m-dob">—</div></div>
-          <div class="mf"><label>Equipo actual</label><div class="val" id="m-team">—</div></div>
-          <div class="mf"><label>Perfil digital</label>
-            <div class="val" id="m-profile-txt">—</div>
-          </div>
-        </div>
-        <!-- Timeline -->
-        <div class="msec" style="padding:12px 16px;">
-          <div class="msec-title">Timeline</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:13px;font-weight:700;color:var(--green)" id="m-start">—</span>
-            <span style="color:var(--muted);font-size:20px;">→</span>
-            <span style="font-size:13px;font-weight:700;color:#aaa" id="m-end">—</span>
-          </div>
-        </div>
-        <!-- Universidades -->
-        <div class="msec">
-          <div class="msec-title">Universidades</div>
-          <div class="mf"><label>Comprometida</label><div class="val" id="m-committed-uni" style="color:var(--green)">—</div></div>
-        </div>
-        <!-- Lista universidades -->
-        <div class="msec msec-full">
-          <div class="msec-title">Universidades Interesadas</div>
-          <div class="uni-list" id="m-unis"></div>
-        </div>
-        <!-- Notas -->
-        <div class="msec msec-full">
-          <div class="msec-title">Notas del proceso</div>
-          <div class="mf"><textarea id="m-notas" rows="3" placeholder="Notas internas…"></textarea></div>
+          <div class="ms-t">Académico</div>
+          <div class="mf"><label>GPA</label><input id="m-gpa" class="fi" placeholder="3.5"></div>
+          <div class="mf"><label>Major deseado</label><input id="m-major" class="fi" placeholder="Business…"></div>
+          <div class="mf"><label>Start Year</label><input id="m-start" class="fi" placeholder="Fall 2026"></div>
+          <div class="mf"><label>Target End</label><input id="m-end" class="fi" placeholder="Spring 2030"></div>
+          <div class="mf"><label>Perfil Digital</label><input id="m-profile" class="fi" placeholder="https://…"></div>
         </div>
       </div>
+
+      <div class="m2">
+        <!-- Universidades -->
+        <div class="msec">
+          <div class="ms-t">Universidades Interesadas</div>
+          <div class="mf"><textarea id="m-unis" class="fi" rows="5" placeholder="Una universidad por línea…" oninput="previewUnis()"></textarea></div>
+          <div class="uni-list" id="unis-preview"></div>
+        </div>
+        <!-- Notas -->
+        <div class="msec">
+          <div class="ms-t">Notas Internas</div>
+          <div class="mf"><textarea id="m-notas" class="fi" rows="5" placeholder="Notas del proceso…"></textarea></div>
+          <div class="mf"><label>Notion URL</label><input id="m-notion-url" class="fi" placeholder="https://notion.so/…"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
 <!-- ADD MODAL -->
-<div class="modal-overlay" id="add-modal">
-  <div class="modal-box" style="max-width:540px">
-    <div class="modal-head">
+<div class="overlay" id="add-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="mh">
       <div style="font-family:'Anton',sans-serif;font-size:20px;flex:1">Nuevo Atleta</div>
-      <button class="btn-ghost" onclick="closeAdd()" style="padding:9px 12px">✕</button>
+      <button class="btn-ghost" onclick="closeAdd()" style="padding:7px 10px">✕</button>
     </div>
-    <div class="form-grid">
-      <div class="full"><label class="flabel">Nombre *</label><input class="finput" id="a-nombre" placeholder="Nombre completo"></div>
-      <div><label class="flabel">Deporte</label><input class="finput" id="a-deporte" placeholder="Soccer, Basketball…"></div>
-      <div><label class="flabel">Posición</label><input class="finput" id="a-posicion" placeholder="CM, GK, PG…"></div>
-      <div><label class="flabel">Tipo</label>
-        <select class="finput" id="a-tipo">
-          <option>College Placement</option><option>Boarding School</option><option>Transfer</option>
-        </select>
+    <div class="mb">
+      <div class="msec">
+        <div class="mf"><label>Nombre *</label><input class="fi" id="a-nombre" placeholder="Nombre completo"></div>
       </div>
-      <div><label class="flabel">Estado</label>
-        <select class="finput" id="a-status">
-          <option>In Process</option><option>Interested Schools</option><option>Standby</option><option>Committed</option><option>Closed</option>
-        </select>
+      <div class="m2">
+        <div class="msec">
+          <div class="ms-t">Deporte</div>
+          <div class="mf"><label>Deporte</label><input class="fi" id="a-deporte" placeholder="Soccer…"></div>
+          <div class="mf"><label>Posición</label><input class="fi" id="a-pos" placeholder="CM, GK…"></div>
+          <div class="mf"><label>Equipo actual</label><input class="fi" id="a-team" placeholder="—"></div>
+        </div>
+        <div class="msec">
+          <div class="ms-t">Proceso</div>
+          <div class="mf"><label>Tipo</label>
+            <select class="fi" id="a-tipo"><option>College Placement</option><option>Boarding School</option><option>Transfer</option></select>
+          </div>
+          <div class="mf"><label>Status</label>
+            <select class="fi" id="a-status"><option>In Process</option><option>Interested Schools</option><option>Standby</option><option>Committed</option><option>Closed</option></select>
+          </div>
+          <div class="mf"><label>Budget</label>
+            <select class="fi" id="a-budget"><option value="">—</option><option>0-5K</option><option>5-10K</option><option>10-15K</option><option>15-20K</option><option>20-25K</option><option>25-30K</option><option>30K+</option></select>
+          </div>
+          <div class="mf"><label>NVS Program</label>
+            <select class="fi" id="a-prog"><option>Standard</option><option>Premium</option><option>Scholarship</option></select>
+          </div>
+        </div>
       </div>
-      <div><label class="flabel">Budget</label>
-        <select class="finput" id="a-budget">
-          <option value="">—</option><option>0-5K</option><option>5-10K</option><option>10-15K</option><option>15-20K</option><option>20-25K</option><option>25-30K</option><option>30K+</option>
-        </select>
+      <div class="msec">
+        <div class="ms-t">Agentes</div>
+        <div class="agent-checks">
+          <label class="ag-row"><input type="checkbox" id="aa-sc" value="Stefano Cano">
+            <div class="ag-dot" style="background:var(--green)"></div><span style="color:var(--green)">Stefano Cano</span></label>
+          <label class="ag-row"><input type="checkbox" id="aa-jb" value="Julio Blanco">
+            <div class="ag-dot" style="background:var(--blue)"></div><span style="color:var(--blue)">Julio Blanco</span></label>
+          <label class="ag-row"><input type="checkbox" id="aa-ac" value="Andrea Castillo">
+            <div class="ag-dot" style="background:var(--purple)"></div><span style="color:var(--purple)">Andrea Castillo</span></label>
+        </div>
       </div>
-      <div><label class="flabel">NVS Program</label>
-        <select class="finput" id="a-program">
-          <option>Standard</option><option>Premium</option><option>Scholarship</option><option>Transfer</option>
-        </select>
+      <div class="msec">
+        <div class="mf"><label>Notas</label><textarea class="fi" id="a-notas" rows="2" placeholder="Notas…"></textarea></div>
       </div>
-      <div><label class="flabel">Start Year</label><input class="finput" id="a-start" placeholder="Fall 2026"></div>
-      <div><label class="flabel">Working With</label><input class="finput" id="a-working" placeholder="Julio New, Andy…"></div>
-      <div class="full"><label class="flabel">Notas</label><textarea class="finput" id="a-notas" rows="2" style="resize:vertical"></textarea></div>
     </div>
-    <div class="modal-footer">
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;">
       <button class="btn-ghost" onclick="closeAdd()">Cancelar</button>
-      <button class="btn-primary" onclick="saveNew()">Crear atleta</button>
+      <button class="btn-save" onclick="saveNew()">Crear atleta</button>
     </div>
   </div>
 </div>
 
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
-  <button class="mnav-item active" id="mnav-pipeline" onclick="showView('pipeline')">
+  <button class="mn-i active" id="mn-pipeline" onclick="setView('pipeline')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1.5"/><rect x="10" y="7" width="5" height="14" rx="1.5"/><rect x="17" y="10" width="4" height="11" rx="1.5"/></svg>
     Pipeline
   </button>
-  <button class="mnav-fab mnav-item" onclick="openAdd()">+</button>
-  <button class="mnav-item" id="mnav-directorio" onclick="showView('directorio')">
-    <svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6v.01M4.5 12v.01M4.5 18v.01" stroke-linecap="round"/></svg>
-    Directorio
+  <button class="mn-fab mn-i" onclick="openAdd()">+</button>
+  <button class="mn-i" id="mn-tabla" onclick="setView('tabla')">
+    <svg viewBox="0 0 24 24"><path d="M3 5h18M3 10h18M3 15h18M3 20h18M8 5v15M16 5v15" stroke-linecap="round"/></svg>
+    Tabla
   </button>
 </nav>
 
 <script>
-const SUPABASE_URL = 'https://mwefvjvvitsondqghgsx.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _sb = supabase.createClient(
+  'https://mwefvjvvitsondqghgsx.supabase.co',
+  'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk'
+);
 
-const PIPELINE_STAGES = [
-  {key:'In Process',    label:'In Process',       dot:'#60a5fa'},
-  {key:'Interested Schools', label:'Int. Schools', dot:'#fbbf24'},
-  {key:'Standby',       label:'Standby',           dot:'#9ca3af'},
-  {key:'Committed',     label:'Committed',         dot:'#8AD500'},
-  {key:'Closed',        label:'Closed',            dot:'#f87171'},
+const STAGES = [
+  {key:'In Process',         dot:'#60a5fa'},
+  {key:'Interested Schools', dot:'#fbbf24'},
+  {key:'Standby',            dot:'#9ca3af'},
+  {key:'Committed',          dot:'#8AD500'},
+  {key:'Closed',             dot:'#f87171'},
 ];
 
-let data = [], filtered = [], currentId = null, activeFilter = '';
+const TBL_COLS = [
+  {k:'nombre',               lbl:'Atleta',        w:'150px'},
+  {k:'deporte',              lbl:'Deporte / Pos',  w:'110px'},
+  {k:'tipo',                 lbl:'Tipo',           w:'85px'},
+  {k:'commit_status',        lbl:'Status',         w:'110px'},
+  {k:'working_with',         lbl:'Agente',         w:'130px'},
+  {k:'budget',               lbl:'Budget',         w:'75px'},
+  {k:'gpa',                  lbl:'GPA',            w:'50px'},
+  {k:'start_year',           lbl:'Start',          w:'80px'},
+  {k:'committed_university', lbl:'Universidad',    w:'155px'},
+  {k:'nvs_program',          lbl:'Programa',       w:'85px'},
+  {k:'nacionalidad',         lbl:'País',           w:'75px'},
+];
 
-/* ── INIT ── */
-async function init() {
-  const {data:{session}} = await sb.auth.getSession();
-  if(!session){ window.location.href='index.html'; return; }
-  await load();
-  renderAll();
+let data=[], filtered=[], currentId=null;
+let statusFilter='', agentFilter='';
+let sortK='nombre', sortD=1, curView='pipeline';
+
+/* INIT */
+async function init(){
+  const {data:{session}} = await _sb.auth.getSession();
+  if(!session){window.location.href='index.html';return;}
+  await loadData();
 }
 
-async function load() {
-  const {data:rows} = await sb.from('placements').select('*').order('nombre');
-  data = rows || [];
-  filtered = [...data];
-  populateFilters();
-}
-
-/* ── FILTERS ── */
-function populateFilters() {
-  const sports  = [...new Set(data.map(a=>a.deporte).filter(Boolean))].sort();
-  const agents  = [...new Set(data.flatMap(a=>(a.working_with||'').split(',').map(s=>s.trim())).filter(Boolean))].sort();
-  const fSport  = document.getElementById('f-sport');
-  const fAgent  = document.getElementById('f-agent');
-  while(fSport.options.length>1) fSport.remove(1);
-  while(fAgent.options.length>1) fAgent.remove(1);
-  sports.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;fSport.appendChild(o);});
-  agents.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;fAgent.appendChild(o);});
-}
-
-function filterStatus(status) {
-  activeFilter = status;
-  document.querySelectorAll('.stat-card').forEach(el=>el.classList.remove('sel'));
-  if(status) {
-    const map={Committed:'sf-committed','In Process':'sf-inprocess','Interested Schools':'sf-interested',Standby:'sf-standby'};
-    if(map[status]) document.getElementById(map[status])?.classList.add('sel');
-  } else {
-    document.getElementById('sf-all')?.classList.add('sel');
-  }
+async function loadData(){
+  const {data:rows} = await _sb.from('placements').select('*').order('nombre');
+  data = rows||[];
+  populateSports();
   applyFilters();
 }
 
-function applyFilters() {
-  const q     = (document.getElementById('f-q').value||'').toLowerCase();
-  const sport = document.getElementById('f-sport').value;
-  const tipo  = document.getElementById('f-tipo').value;
-  const agent = document.getElementById('f-agent').value;
-  filtered = data.filter(a => {
-    if(activeFilter && a.commit_status !== activeFilter) return false;
-    if(q && !(a.nombre||'').toLowerCase().includes(q) && !(a.deporte||'').toLowerCase().includes(q)) return false;
-    if(sport && a.deporte !== sport) return false;
-    if(tipo && a.tipo !== tipo) return false;
-    if(agent && !(a.working_with||'').includes(agent)) return false;
+/* SPORTS FILTER */
+function populateSports(){
+  const sel=document.getElementById('f-sport');
+  [...new Set(data.map(a=>a.deporte).filter(Boolean))].sort()
+    .forEach(s=>{const o=document.createElement('option');o.textContent=s;sel.appendChild(o);});
+}
+
+/* STATUS FILTER */
+function filterStatus(s){
+  statusFilter=s;
+  document.querySelectorAll('.stat-card').forEach(el=>el.classList.remove('sel'));
+  const m={'':'sf-all','Committed':'sf-com','In Process':'sf-ip','Interested Schools':'sf-int','Standby':'sf-sta','Closed':'sf-cls'};
+  document.getElementById(m[s]||'sf-all')?.classList.add('sel');
+  applyFilters();
+}
+
+/* AGENT FILTER */
+function filterAgent(a){
+  agentFilter=a;
+  document.querySelectorAll('.ag-pill').forEach(el=>el.classList.remove('active'));
+  const id='apill-'+(a==='Stefano Cano'?'sc':a==='Julio Blanco'?'jb':a==='Andrea Castillo'?'ac':'');
+  document.getElementById(id)?.classList.add('active');
+  applyFilters();
+}
+
+/* APPLY FILTERS */
+function applyFilters(){
+  const q     =(document.getElementById('f-q')?.value||'').toLowerCase();
+  const sport =(document.getElementById('f-sport')?.value||'');
+  const tipo  =(document.getElementById('f-tipo')?.value||'');
+  const prog  =(document.getElementById('f-program')?.value||'');
+
+  filtered=data.filter(a=>{
+    if(statusFilter && a.commit_status!==statusFilter) return false;
+    if(agentFilter  && !(a.working_with||'').includes(agentFilter)) return false;
+    if(q && !['nombre','deporte','committed_university','notas'].some(f=>(a[f]||'').toLowerCase().includes(q))) return false;
+    if(sport && a.deporte!==sport) return false;
+    if(tipo  && a.tipo!==tipo) return false;
+    if(prog  && a.nvs_program!==prog) return false;
     return true;
   });
-  renderPipeline();
-  renderDirectory();
-  renderStats();
+
+  if(curView==='tabla'){
+    filtered.sort((a,b)=>{
+      const av=(a[sortK]||'').toLowerCase(), bv=(b[sortK]||'').toLowerCase();
+      return av<bv?-sortD:av>bv?sortD:0;
+    });
+  }
+
+  const cnt=document.getElementById('f-count');
+  if(cnt) cnt.textContent=filtered.length!==data.length?`${filtered.length} de ${data.length}`:`${data.length} atletas`;
+
+  renderStats(); renderPipeline(); renderTable();
 }
 
-/* ── RENDER ── */
-function renderAll() { renderStats(); renderPipeline(); renderDirectory(); }
-
-function renderStats() {
-  document.getElementById('s-total').textContent     = data.length;
-  document.getElementById('s-committed').textContent = data.filter(a=>a.commit_status==='Committed').length;
-  document.getElementById('s-inprocess').textContent = data.filter(a=>a.commit_status==='In Process').length;
-  document.getElementById('s-interested').textContent= data.filter(a=>a.commit_status==='Interested Schools').length;
-  document.getElementById('s-standby').textContent   = data.filter(a=>a.commit_status==='Standby').length;
+/* STATS */
+function renderStats(){
+  document.getElementById('s-tot').textContent=data.length;
+  document.getElementById('s-com').textContent=data.filter(a=>a.commit_status==='Committed').length;
+  document.getElementById('s-ip').textContent =data.filter(a=>a.commit_status==='In Process').length;
+  document.getElementById('s-int').textContent=data.filter(a=>a.commit_status==='Interested Schools').length;
+  document.getElementById('s-sta').textContent=data.filter(a=>a.commit_status==='Standby').length;
+  document.getElementById('s-cls').textContent=data.filter(a=>a.commit_status==='Closed').length;
 }
 
-function renderPipeline() {
-  const board = document.getElementById('pipeline-board');
-  board.innerHTML = PIPELINE_STAGES.map(s => {
-    const cards = filtered.filter(a => a.commit_status === s.key);
+/* PIPELINE */
+function renderPipeline(){
+  if(curView!=='pipeline') return;
+  document.getElementById('pl-board').innerHTML=STAGES.map(s=>{
+    const cards=filtered.filter(a=>a.commit_status===s.key);
     return `<div class="pl-col">
-      <div class="pl-col-head">
-        <div class="pl-col-dot" style="background:${s.dot}"></div>
-        <div class="pl-col-name">${s.label}</div>
-        <div class="pl-col-count">${cards.length}</div>
+      <div class="pl-head">
+        <div class="pl-dot" style="background:${s.dot}"></div>
+        <div class="pl-name">${s.key}</div>
+        <div class="pl-cnt">${cards.length}</div>
       </div>
-      <div class="pl-cards">
-        ${cards.length===0 ? '<div class="pl-empty">—</div>' : cards.map(a=>`
-        <div class="pl-card" onclick="openAthlete(${a.id})">
-          <div class="pc-name">${esc(a.nombre)}</div>
-          <div class="pc-sport">${esc(a.deporte||'—')} · ${esc(a.posicion||'—')}</div>
-          <div class="pc-tags">
-            <span class="badge ${tipoCls(a.tipo)}">${tipoShort(a.tipo)}</span>
-            ${a.nvs_program?`<span class="badge ${progCls(a.nvs_program)}">${esc(a.nvs_program)}</span>`:''}
-          </div>
-          ${a.commit_status==='Committed'&&a.committed_university?`<div class="pc-commit">✓ ${esc(a.committed_university)}</div>`:''}
-          ${a.budget?`<div class="pc-commit" style="color:#555">${esc(a.budget)}</div>`:''}
-        </div>`).join('')}
+      <div class="pl-cards">${cards.length
+        ?cards.map(a=>`<div class="pl-card" onclick="openEdit(${a.id})">
+            <div class="pc-name">${esc(a.nombre)}</div>
+            <div class="pc-sport">${esc(a.deporte||'—')} · ${esc(a.posicion||'—')}</div>
+            <div class="pc-badges">
+              <span class="badge ${tipoCls(a.tipo)}">${tipoShort(a.tipo)}</span>
+              ${agBadges(a.working_with)}
+            </div>
+            ${a.committed_university?`<div class="pc-uni">✓ ${esc(a.committed_university)}</div>`:a.budget?`<div class="pc-uni" style="color:#444">${esc(a.budget)}</div>`:''}
+          </div>`).join('')
+        :'<div class="pl-empty">—</div>'}
       </div>
     </div>`;
   }).join('');
 }
 
-function renderDirectory() {
-  const grid = document.getElementById('dir-grid');
-  if(!filtered.length){ grid.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div><div>Sin resultados</div></div>'; return; }
-  grid.innerHTML = filtered.map(a=>`
-    <div class="dir-card" onclick="openAthlete(${a.id})">
-      <div class="dc-top">
-        <div class="dc-av">${initials(a.nombre)}</div>
-        <span class="badge ${statusCls(a.commit_status)}">${esc(a.commit_status)}</span>
-      </div>
-      <div class="dc-name">${esc(a.nombre)}</div>
-      <div class="dc-sport">${esc(a.deporte||'—')} · ${esc(a.posicion||'—')}</div>
-      <div class="dc-tags">
-        <span class="badge ${tipoCls(a.tipo)}">${tipoShort(a.tipo)}</span>
-        ${a.nvs_program?`<span class="badge ${progCls(a.nvs_program)}">${esc(a.nvs_program)}</span>`:''}
-        ${a.budget?`<span class="badge b-standby">${esc(a.budget)}</span>`:''}
-      </div>
-      ${a.committed_university?`<div class="dc-uni">✓ ${esc(a.committed_university)}</div>`:''}
-    </div>`).join('');
+/* TABLE */
+function renderTable(){
+  if(curView!=='tabla') return;
+  document.getElementById('tbl-head').innerHTML=
+    `<th style="width:32px">#</th>`+
+    TBL_COLS.map(c=>`<th onclick="sortBy('${c.k}')" style="min-width:${c.w}" class="${sortK===c.k?'sorted':''}">${c.lbl}<span class="sort-ic">${sortK===c.k?(sortD===1?'↑':'↓'):'↕'}</span></th>`).join('');
+
+  const tb=document.getElementById('tbl-body');
+  if(!filtered.length){
+    tb.innerHTML=`<tr><td colspan="${TBL_COLS.length+1}" style="text-align:center;padding:40px;color:var(--muted)">Sin resultados</td></tr>`;
+    return;
+  }
+  tb.innerHTML=filtered.map((a,i)=>
+    `<tr onclick="openEdit(${a.id})">
+      <td class="td-num">${i+1}</td>
+      ${TBL_COLS.map(c=>`<td>${cellVal(c.k,a)}</td>`).join('')}
+    </tr>`).join('');
 }
 
-/* ── VIEWS ── */
-function showView(v) {
-  ['pipeline','directorio'].forEach(t=>{
-    document.getElementById('view-'+t).style.display=t===v?'':'none';
-    document.getElementById('nav-'+t).classList.toggle('active',t===v);
-    const mn=document.getElementById('mnav-'+t); if(mn) mn.classList.toggle('active',t===v);
-  });
-  document.getElementById('view-title').textContent = v==='pipeline'?'Pipeline':'Directorio';
+function sortBy(k){
+  if(sortK===k) sortD*=-1; else {sortK=k;sortD=1;}
+  applyFilters();
 }
 
-/* ── ATHLETE MODAL ── */
-function openAthlete(id) {
-  const a = data.find(x=>x.id===id); if(!a) return;
-  currentId = id;
-  document.getElementById('m-av').textContent   = initials(a.nombre);
-  document.getElementById('m-name').textContent = a.nombre;
-  document.getElementById('m-sub').textContent  = `${a.deporte||'—'} · ${a.posicion||'—'} · ${a.tipo||'—'}`;
-  document.getElementById('m-status').value     = a.commit_status||'In Process';
-  document.getElementById('m-tipo').value       = a.tipo||'College Placement';
-  document.getElementById('m-budget').textContent   = a.budget||'—';
-  document.getElementById('m-program').textContent  = a.nvs_program||'—';
-  document.getElementById('m-working').textContent  = a.working_with||'—';
-  document.getElementById('m-family').innerHTML     = a.family_status?`<span class="badge ${familyCls(a.family_status)}">${a.family_status}</span>`:'—';
-  document.getElementById('m-sport').textContent    = `${a.deporte||'—'} · ${a.posicion||'—'}`;
-  document.getElementById('m-gpa').textContent      = a.gpa||'—';
-  document.getElementById('m-major').textContent    = a.desired_major||'—';
-  document.getElementById('m-nac').textContent      = a.nacionalidad||'—';
-  document.getElementById('m-dob').textContent      = a.fecha_nacimiento||'—';
-  document.getElementById('m-team').textContent     = a.current_team||'—';
-  document.getElementById('m-start').textContent    = a.start_year||'—';
-  document.getElementById('m-end').textContent      = a.target_end_year||'—';
-  document.getElementById('m-committed-uni').textContent = a.committed_university||'Sin universidad comprometida';
-  document.getElementById('m-notas').value           = a.notas||'';
-
-  // Profile link
-  const pBtn = document.getElementById('m-profile');
-  const pTxt = document.getElementById('m-profile-txt');
-  if(a.digital_profile) {
-    pBtn.href=a.digital_profile; pBtn.style.display='';
-    pTxt.innerHTML=`<a href="${esc(a.digital_profile)}" target="_blank">Ver perfil ↗</a>`;
-  } else { pBtn.style.display='none'; pTxt.textContent='—'; }
-
-  // Notion link
-  const nBtn = document.getElementById('m-notion');
-  if(a.notion_url){ nBtn.href=a.notion_url; nBtn.style.display=''; } else { nBtn.style.display='none'; }
-
-  // Universities
-  const uniList = document.getElementById('m-unis');
-  const unis = (a.universities_interested||'').split('|').map(s=>s.trim()).filter(Boolean);
-  if(unis.length) { uniList.innerHTML = unis.map((u,i)=>`<div class="uni-item">${i===0&&u?'→ ':'• '}${esc(u)}</div>`).join(''); }
-  else { uniList.innerHTML='<div style="color:var(--muted);font-size:13px">Sin universidades listadas</div>'; }
-
-  document.getElementById('athlete-modal').classList.add('open');
-}
-
-function closeModal() { document.getElementById('athlete-modal').classList.remove('open'); currentId=null; }
-
-async function saveAthlete() {
-  if(!currentId) return;
-  const updates = {
-    commit_status: document.getElementById('m-status').value,
-    tipo: document.getElementById('m-tipo').value,
-    notas: document.getElementById('m-notas').value,
-  };
-  const {error} = await sb.from('placements').update(updates).eq('id',currentId);
-  if(!error) {
-    Object.assign(data.find(a=>a.id===currentId), updates);
-    applyFilters();
-    closeModal();
+function cellVal(k,a){
+  switch(k){
+    case 'nombre':
+      return `<div class="td-n">${esc(a.nombre)}</div>`;
+    case 'deporte':
+      return `<div class="td-n" style="font-size:11px">${esc(a.deporte||'—')}</div><div class="td-s">${esc(a.posicion||'')}</div>`;
+    case 'tipo':
+      return `<span class="badge ${tipoCls(a.tipo)}">${tipoShort(a.tipo)}</span>`;
+    case 'commit_status':
+      return `<span class="badge ${stCls(a.commit_status)}">${esc(a.commit_status||'—')}</span>`;
+    case 'working_with':
+      return agBadges(a.working_with)||'<span style="color:#2a2a2a">—</span>';
+    case 'committed_university':
+      return a.committed_university
+        ?`<span style="color:var(--green);font-size:11px;font-weight:700">${esc(a.committed_university)}</span>`
+        :'<span style="color:#2a2a2a">—</span>';
+    case 'nvs_program':
+      return `<span class="badge ${progCls(a.nvs_program)}">${esc(a.nvs_program||'—')}</span>`;
+    default:
+      return `<span style="font-size:11px;color:#bbb">${esc(a[k]||'—')}</span>`;
   }
 }
 
-/* ── ADD MODAL ── */
-function openAdd()  { document.getElementById('add-modal').classList.add('open'); }
-function closeAdd() { document.getElementById('add-modal').classList.remove('open'); }
+/* VIEWS */
+function setView(v){
+  curView=v;
+  ['pipeline','tabla'].forEach(t=>{
+    document.getElementById('view-'+t).style.display=t===v?'':'none';
+    document.getElementById('tab-'+t)?.classList.toggle('active',t===v);
+    document.getElementById('snav-'+t)?.classList.toggle('active',t===v);
+    document.getElementById('mn-'+t)?.classList.toggle('active',t===v);
+  });
+  applyFilters();
+}
 
-async function saveNew() {
-  const nombre = document.getElementById('a-nombre').value.trim();
-  if(!nombre){ alert('El nombre es obligatorio'); return; }
-  const row = {
-    nombre, deporte:document.getElementById('a-deporte').value.trim(),
-    posicion:document.getElementById('a-posicion').value.trim(),
-    tipo:document.getElementById('a-tipo').value,
-    commit_status:document.getElementById('a-status').value,
-    budget:document.getElementById('a-budget').value,
-    nvs_program:document.getElementById('a-program').value,
-    start_year:document.getElementById('a-start').value.trim(),
-    working_with:document.getElementById('a-working').value.trim(),
-    notas:document.getElementById('a-notas').value.trim(),
+/* EDIT MODAL */
+function openEdit(id){
+  const a=data.find(x=>x.id===id); if(!a) return;
+  currentId=id;
+  document.getElementById('m-av').textContent =initials(a.nombre);
+  document.getElementById('m-nm').textContent =a.nombre;
+  document.getElementById('m-sb').textContent =`${a.deporte||'—'} · ${a.posicion||'—'} · ${a.nacionalidad||'—'}`;
+  setV('m-status',a.commit_status||'In Process');
+  setV('m-tipo',a.tipo||'College Placement');
+  setV('m-prog',a.nvs_program||'Standard');
+  setV('m-budget',a.budget||'');
+  setV('m-family',a.family_status||'');
+  setFi('m-uni-com',a.committed_university);
+  setFi('m-nombre',a.nombre);
+  setFi('m-deporte',a.deporte);
+  setFi('m-posicion',a.posicion);
+  setFi('m-nac',a.nacionalidad);
+  setFi('m-dob',a.fecha_nacimiento);
+  setFi('m-team',a.current_team);
+  setFi('m-gpa',a.gpa);
+  setFi('m-major',a.desired_major);
+  setFi('m-start',a.start_year);
+  setFi('m-end',a.target_end_year);
+  setFi('m-profile',a.digital_profile);
+  setFi('m-notas',a.notas);
+  setFi('m-notion-url',a.notion_url);
+
+  const uniTxt=(a.universities_interested||'').replace(/\s*\|\s*/g,'\n');
+  setFi('m-unis',uniTxt); previewUnis();
+
+  const aw=a.working_with||'';
+  document.getElementById('ag-sc').checked=aw.includes('Stefano Cano');
+  document.getElementById('ag-jb').checked=aw.includes('Julio Blanco');
+  document.getElementById('ag-ac').checked=aw.includes('Andrea Castillo');
+
+  const nb=document.getElementById('m-notion');
+  nb.style.display=a.notion_url?'':'none'; nb.href=a.notion_url||'#';
+  const pb=document.getElementById('m-profilebtn');
+  pb.style.display=a.digital_profile?'':'none'; pb.href=a.digital_profile||'#';
+
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function previewUnis(){
+  const txt=document.getElementById('m-unis')?.value||'';
+  const unis=txt.split('\n').map(s=>s.trim()).filter(Boolean);
+  document.getElementById('unis-preview').innerHTML=
+    unis.map((u,i)=>`<div class="uni-item">${i===0?'→':'•'} ${esc(u)}</div>`).join('');
+}
+
+function closeEdit(){document.getElementById('edit-modal').classList.remove('open');currentId=null;}
+
+async function saveAthlete(){
+  if(!currentId) return;
+  const agents=['ag-sc','ag-jb','ag-ac']
+    .filter(id=>document.getElementById(id)?.checked)
+    .map(id=>document.getElementById(id).value).join(', ');
+  const unis=document.getElementById('m-unis').value
+    .split('\n').map(s=>s.trim()).filter(Boolean).join(' | ');
+  const upd={
+    nombre:gv('m-nombre'), commit_status:gv('m-status'), tipo:gv('m-tipo'),
+    nvs_program:gv('m-prog'), budget:gv('m-budget'), committed_university:gv('m-uni-com'),
+    deporte:gv('m-deporte'), posicion:gv('m-posicion'), nacionalidad:gv('m-nac'),
+    fecha_nacimiento:gv('m-dob'), current_team:gv('m-team'), gpa:gv('m-gpa'),
+    desired_major:gv('m-major'), start_year:gv('m-start'), target_end_year:gv('m-end'),
+    digital_profile:gv('m-profile'), family_status:gv('m-family'),
+    notas:gv('m-notas'), notion_url:gv('m-notion-url'),
+    universities_interested:unis, working_with:agents,
   };
-  const {error} = await sb.from('placements').insert(row);
+  const {error}=await _sb.from('placements').update(upd).eq('id',currentId);
+  if(!error){Object.assign(data.find(a=>a.id===currentId),upd);applyFilters();closeEdit();}
+  else alert('Error: '+error.message);
+}
+
+async function delAthlete(){
+  if(!currentId) return;
+  const a=data.find(x=>x.id===currentId);
+  if(!confirm(`¿Eliminar a ${a?.nombre}? Esta acción no se puede deshacer.`)) return;
+  const {error}=await _sb.from('placements').delete().eq('id',currentId);
+  if(!error){data=data.filter(x=>x.id!==currentId);applyFilters();closeEdit();}
+  else alert('Error: '+error.message);
+}
+
+/* ADD MODAL */
+function openAdd(){document.getElementById('add-modal').classList.add('open');}
+function closeAdd(){document.getElementById('add-modal').classList.remove('open');}
+
+async function saveNew(){
+  const nombre=document.getElementById('a-nombre').value.trim();
+  if(!nombre){alert('El nombre es obligatorio');return;}
+  const agents=['aa-sc','aa-jb','aa-ac']
+    .filter(id=>document.getElementById(id)?.checked)
+    .map(id=>document.getElementById(id).value).join(', ');
+  const {error}=await _sb.from('placements').insert({
+    nombre, deporte:gv('a-deporte'), posicion:gv('a-pos'),
+    current_team:gv('a-team'), tipo:gv('a-tipo'),
+    commit_status:gv('a-status'), budget:gv('a-budget'),
+    nvs_program:gv('a-prog'), working_with:agents, notas:gv('a-notas'),
+  });
   if(!error){
-    await load(); renderAll(); closeAdd();
-    ['a-nombre','a-deporte','a-posicion','a-start','a-working','a-notas'].forEach(id=>document.getElementById(id).value='');
-  } else { alert('Error: '+error.message); }
+    await loadData(); closeAdd();
+    ['a-nombre','a-deporte','a-pos','a-team','a-notas'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['aa-sc','aa-jb','aa-ac'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
+  } else alert('Error: '+error.message);
 }
 
-/* ── HELPERS ── */
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function initials(n){return (n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';}
+/* HELPERS */
+function gv(id){return(document.getElementById(id)?.value||'').trim();}
+function setV(id,v){const el=document.getElementById(id);if(el)el.value=v;}
+function setFi(id,v){setV(id,v||'');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function initials(n){return(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';}
 function tipoCls(t){return t==='Boarding School'?'b-board':t==='Transfer'?'b-trans':'b-cpl';}
-function tipoShort(t){return t==='Boarding School'?'Boarding':t==='College Placement'?'CPL':t||'—';}
+function tipoShort(t){return t==='Boarding School'?'Board':t==='College Placement'?'CPL':t||'—';}
 function progCls(p){return p==='Premium'?'b-prm':p==='Scholarship'?'b-sch':'b-std';}
-function statusCls(s){
-  if(s==='In Process') return 'b-inprocess';
-  if(s==='Interested Schools') return 'b-interested';
-  if(s==='Standby') return 'b-standby';
-  if(s==='Committed') return 'b-committed';
-  if(s==='Closed') return 'b-closed';
-  return 'b-standby';
+function stCls(s){return{  'In Process':'b-ip','Interested Schools':'b-int','Standby':'b-sta','Committed':'b-com','Closed':'b-cls'}[s]||'b-sta';}
+function agBadge(name){
+  if(name.includes('Stefano')) return`<span class="badge b-sc">SC</span>`;
+  if(name.includes('Julio'))   return`<span class="badge b-jb">JB</span>`;
+  if(name.includes('Andrea'))  return`<span class="badge b-ac">AC</span>`;
+  return`<span class="badge b-sta" style="font-size:8px">${esc(name.substring(0,4))}</span>`;
 }
-function familyCls(f){
-  if(f==='Excellent') return 'b-excellent';
-  if(f==='Good') return 'b-good';
-  if(f==='Mid') return 'b-mid';
-  if(f==='Bad') return 'b-bad';
-  return 'b-standby';
-}
+function agBadges(w){return w?(w.split(',').map(s=>s.trim()).filter(Boolean).map(agBadge).join(' ')):''}
 
-document.addEventListener('DOMContentLoaded', init);
+/* CLOSE ON BG CLICK */
+document.querySelectorAll('.overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el){closeEdit();closeAdd();}});
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  filterStatus(''); filterAgent('');
+  init();
+});
 </script>
 </body>
 </html>
