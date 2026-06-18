@@ -352,10 +352,11 @@ function _updateDots() {
   }
 }
 
-async function _verifyPin() {
-  const { data, error } = await sb.from('configuracion').select('valor').eq('clave', _pinKey).single();
-  if(error || !data) { _pinError('Error al verificar'); return; }
-  if(_pinValue === data.valor) {
+const MODULE_PINS = { pin_finanzas: '0000' };
+
+function _verifyPin() {
+  const correct = MODULE_PINS[_pinKey] || '';
+  if(_pinValue === correct) {
     sessionStorage.setItem('pin_ok_' + _pinKey, '1');
     closePin();
     window.location.href = _pinTarget;
