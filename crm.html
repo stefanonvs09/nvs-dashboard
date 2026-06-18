@@ -74,13 +74,18 @@ hr.sb-div{border:none;border-top:1px solid var(--border);margin:10px 10px;}
 .pl-name{font-weight:800;font-size:10px;flex:1;text-transform:uppercase;letter-spacing:.6px;}
 .pl-cnt{background:rgba(255,255,255,0.06);color:var(--muted);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
 .pl-cards{padding:7px;display:flex;flex-direction:column;gap:6px;}
-.pl-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;}
+.pl-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:grab;transition:border .15s,box-shadow .15s,opacity .15s,transform .15s;}
 .pl-card:hover{border-color:rgba(255,255,255,0.13);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.pl-card.dragging{opacity:0.35;cursor:grabbing;transform:rotate(1.5deg) scale(1.02);box-shadow:0 8px 28px rgba(0,0,0,.6);}
+.pl-cards.drag-over{background:rgba(138,213,0,0.05);outline:2px dashed rgba(138,213,0,0.35);outline-offset:-4px;border-radius:8px;}
+.pl-drop-ghost{height:70px;border-radius:8px;background:rgba(138,213,0,0.06);border:1.5px dashed rgba(138,213,0,0.3);flex-shrink:0;}
 .pc-name{font-weight:700;font-size:12px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .pc-sport{font-size:10px;color:var(--muted);margin-bottom:6px;}
 .pc-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
 .pc-uni{font-size:10px;color:#555;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .pl-empty{text-align:center;padding:18px;color:#222;font-size:11px;}
+/* Touch drag ghost */
+#touch-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:0.85;width:210px;background:var(--card3);border:1px solid rgba(138,213,0,0.4);border-radius:9px;padding:10px 12px;box-shadow:0 12px 36px rgba(0,0,0,.7);display:none;}
 
 /* TABLE */
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
@@ -437,6 +442,9 @@ textarea.fi{resize:vertical;min-height:70px;}
   </div>
 </div>
 
+<!-- TOUCH DRAG GHOST -->
+<div id="touch-ghost"></div>
+
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <button class="mn-i active" id="mn-pipeline" onclick="setView('pipeline')">
@@ -572,8 +580,23 @@ function renderPipeline(){
         <div class="pl-name">${s.key}</div>
         <div class="pl-cnt">${cards.length}</div>
       </div>
-      <div class="pl-cards">${cards.length
-        ?cards.map(a=>`<div class="pl-card" onclick="openEdit(${a.id})">
+      <div class="pl-cards"
+        data-status="${s.key}"
+        ondragover="onDragOver(event)"
+        ondragenter="onDragEnter(event)"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event,'${s.key}')"
+      >${cards.length
+        ?cards.map(a=>`<div class="pl-card"
+            draggable="true"
+            data-id="${a.id}"
+            onclick="cardClick(event,${a.id})"
+            ondragstart="onDragStart(event,${a.id})"
+            ondragend="onDragEnd(event)"
+            ontouchstart="touchStart(event,${a.id})"
+            ontouchmove="touchMove(event)"
+            ontouchend="touchEnd(event,'${s.key}')"
+          >
             <div class="pc-name">${esc(a.nombre)}</div>
             <div class="pc-sport">${esc(a.deporte||'—')} · ${esc(a.posicion||'—')}</div>
             <div class="pc-badges">
@@ -770,6 +793,104 @@ function agBadge(name){
   return`<span class="badge b-sta" style="font-size:8px">${esc(name.substring(0,4))}</span>`;
 }
 function agBadges(w){return w?(w.split(',').map(s=>s.trim()).filter(Boolean).map(agBadge).join(' ')):''}
+
+/* ── DRAG & DROP (Desktop) ── */
+let dragId=null, dragMoved=false;
+
+function onDragStart(e,id){
+  dragId=id; dragMoved=false;
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',id);
+  setTimeout(()=>e.target.classList.add('dragging'),0);
+}
+function onDragEnd(e){
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
+  document.querySelectorAll('.pl-drop-ghost').forEach(g=>g.remove());
+}
+function onDragOver(e){
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  const zone=e.currentTarget;
+  if(!zone.querySelector('.pl-drop-ghost')){
+    const gh=document.createElement('div'); gh.className='pl-drop-ghost'; zone.appendChild(gh);
+  }
+}
+function onDragEnter(e){e.preventDefault(); e.currentTarget.classList.add('drag-over');}
+function onDragLeave(e){
+  if(!e.currentTarget.contains(e.relatedTarget)){
+    e.currentTarget.classList.remove('drag-over');
+    e.currentTarget.querySelector('.pl-drop-ghost')?.remove();
+  }
+}
+async function onDrop(e,status){
+  e.preventDefault(); dragMoved=true;
+  const zone=e.currentTarget;
+  zone.classList.remove('drag-over');
+  zone.querySelector('.pl-drop-ghost')?.remove();
+  if(!dragId) return;
+  const a=data.find(x=>x.id===dragId);
+  if(!a||a.commit_status===status){dragId=null;return;}
+  a.commit_status=status;
+  applyFilters();
+  await _sb.from('placements').update({commit_status:status}).eq('id',dragId);
+  dragId=null;
+}
+
+/* Prevent click-to-open when finishing a drag */
+function cardClick(e,id){
+  if(dragMoved){dragMoved=false;return;}
+  openEdit(id);
+}
+
+/* ── DRAG & DROP (Mobile Touch) ── */
+let touchId=null, touchGhost=null, touchStartX=0, touchStartY=0, touchMoved=false;
+
+function touchStart(e,id){
+  if(e.touches.length!==1) return;
+  touchMoved=false;
+  const t=e.touches[0];
+  touchStartX=t.clientX; touchStartY=t.clientY;
+  touchId=id;
+  const card=e.currentTarget;
+  const rect=card.getBoundingClientRect();
+  // Create ghost after a short hold
+  touchGhost=document.getElementById('touch-ghost');
+  touchGhost.innerHTML=card.innerHTML;
+  touchGhost.style.left=(rect.left)+'px';
+  touchGhost.style.top =(rect.top)+'px';
+}
+function touchMove(e){
+  if(!touchId) return;
+  const t=e.touches[0];
+  const dx=Math.abs(t.clientX-touchStartX), dy=Math.abs(t.clientY-touchStartY);
+  if(dx<6&&dy<6) return;
+  touchMoved=true; e.preventDefault();
+  const ghost=document.getElementById('touch-ghost');
+  ghost.style.display='block';
+  ghost.style.left=(t.clientX-105)+'px';
+  ghost.style.top =(t.clientY-40)+'px';
+  // Highlight drop zone
+  ghost.style.pointerEvents='none';
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
+  const zone=el?.closest('.pl-cards');
+  if(zone) zone.classList.add('drag-over');
+}
+async function touchEnd(e,origStatus){
+  const ghost=document.getElementById('touch-ghost');
+  if(ghost) ghost.style.display='none';
+  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
+  if(!touchId||!touchMoved){touchId=null;touchMoved=false;return;}
+  const t=e.changedTouches[0];
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  const zone=el?.closest('.pl-cards');
+  const newStatus=zone?.dataset?.status;
+  if(newStatus&&newStatus!==origStatus){
+    const a=data.find(x=>x.id===touchId);
+    if(a){a.commit_status=newStatus;applyFilters();await _sb.from('placements').update({commit_status:newStatus}).eq('id',touchId);}
+  }
+  touchId=null; touchMoved=false;
+}
 
 /* CLOSE ON BG CLICK */
 document.querySelectorAll('.overlay').forEach(el=>{
