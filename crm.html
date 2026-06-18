@@ -238,6 +238,7 @@ textarea.fi{resize:vertical;min-height:70px;}
 
     <!-- Filters -->
     <div class="filter-bar">
+      <select class="f-sel" id="f-class"   onchange="applyFilters()"><option value="">📅 Todas las clases</option></select>
       <select class="f-sel" id="f-sport"   onchange="applyFilters()"><option value="">🏅 Todos los deportes</option></select>
       <select class="f-sel" id="f-tipo"    onchange="applyFilters()">
         <option value="">📁 Todos los tipos</option>
@@ -503,6 +504,7 @@ async function loadData(){
   const {data:rows} = await _sb.from('placements').select('*').order('nombre');
   data = rows||[];
   populateSports();
+  populateClasses();
   applyFilters();
 }
 
@@ -511,6 +513,24 @@ function populateSports(){
   const sel=document.getElementById('f-sport');
   [...new Set(data.map(a=>a.deporte).filter(Boolean))].sort()
     .forEach(s=>{const o=document.createElement('option');o.textContent=s;sel.appendChild(o);});
+}
+
+function populateClasses(){
+  const sel=document.getElementById('f-class');
+  const years=[...new Set(data.map(a=>a.start_year).filter(Boolean))]
+    .sort((a,b)=>{
+      const ya=parseInt(a.match(/\d{4}/)?.[0]||0), yb=parseInt(b.match(/\d{4}/)?.[0]||0);
+      if(ya!==yb) return ya-yb;
+      // Fall before Spring within same year
+      const sa=a.toLowerCase().includes('spring')?1:0, sb=b.toLowerCase().includes('spring')?1:0;
+      return sa-sb;
+    });
+  years.forEach(y=>{
+    const o=document.createElement('option');
+    o.value=y; o.textContent=y;
+    // Color hint in option text
+    sel.appendChild(o);
+  });
 }
 
 /* STATUS FILTER */
@@ -533,14 +553,16 @@ function filterAgent(a){
 
 /* APPLY FILTERS */
 function applyFilters(){
-  const q     =(document.getElementById('f-q')?.value||'').toLowerCase();
-  const sport =(document.getElementById('f-sport')?.value||'');
-  const tipo  =(document.getElementById('f-tipo')?.value||'');
-  const prog  =(document.getElementById('f-program')?.value||'');
+  const q      =(document.getElementById('f-q')?.value||'').toLowerCase();
+  const cls    =(document.getElementById('f-class')?.value||'');
+  const sport  =(document.getElementById('f-sport')?.value||'');
+  const tipo   =(document.getElementById('f-tipo')?.value||'');
+  const prog   =(document.getElementById('f-program')?.value||'');
 
   filtered=data.filter(a=>{
     if(statusFilter && a.commit_status!==statusFilter) return false;
     if(agentFilter  && !(a.working_with||'').includes(agentFilter)) return false;
+    if(cls   && a.start_year!==cls) return false;
     if(q && !['nombre','deporte','committed_university','notas'].some(f=>(a[f]||'').toLowerCase().includes(q))) return false;
     if(sport && a.deporte!==sport) return false;
     if(tipo  && a.tipo!==tipo) return false;
