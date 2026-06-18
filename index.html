@@ -166,25 +166,25 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 
 /* STATS */
 .stats-section{padding:0 28px;margin-bottom:32px;animation:fadeUp .5s .2s both;}
-.stats-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
-  background:var(--border);border-radius:14px;overflow:hidden;
-  border:1px solid var(--border);
+.stat-banner{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:22px 28px;display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;
 }
-.stat-cell{
-  background:var(--card);padding:18px 20px;position:relative;overflow:hidden;
-}
-.stat-cell::before{
+.stat-banner::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:var(--stat-color,var(--muted2));
+  background:linear-gradient(90deg,var(--green),transparent);
 }
-.stat-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:6px;}
-.stat-val{font-family:'Anton',sans-serif;font-size:28px;color:var(--stat-color,#fff);line-height:1;}
-.stat-sub{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;}
+.stat-banner-left{display:flex;align-items:baseline;gap:14px;}
+.stat-big{font-family:'Anton',sans-serif;font-size:52px;color:var(--green);line-height:1;}
+.stat-big-label{font-size:13px;color:#aaa;font-weight:700;}
+.stat-big-sub{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600;}
+.stat-banner-right{display:flex;align-items:center;gap:8px;}
+.stat-live{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--green);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
 .stat-val.loading{
   background:linear-gradient(90deg,#222 25%,#2a2a2a 50%,#222 75%);
   background-size:200% 100%;animation:shimmer 1.5s infinite;
-  border-radius:6px;width:40px;height:28px;display:inline-block;
+  border-radius:6px;width:60px;height:52px;display:inline-block;
 }
 
 /* MODULES */
@@ -290,7 +290,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
   .hero-title{font-size:34px;}
   .hero-bg-text{font-size:80px;}
   .stats-section{padding:0 16px;margin-bottom:24px;}
-  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .stat-big{font-size:38px;}
+  .stat-banner{padding:18px 16px;}
   .modules-section{padding:0 16px 36px;}
   .modules-grid{grid-template-columns:1fr 1fr;gap:10px;}
   .mod-card{padding:18px 16px;}
@@ -354,26 +355,16 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 
   <!-- Stats -->
   <div class="stats-section">
-    <div class="stats-grid">
-      <div class="stat-cell" style="--stat-color:var(--green)">
-        <div class="stat-label">Total Atletas APL</div>
-        <div class="stat-val" id="s-total"><span class="loading"></span></div>
-        <div class="stat-sub">en CRM de placements</div>
+    <div class="stat-banner">
+      <div>
+        <div class="stat-big" id="s-total"><span class="loading"></span></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+          <div class="stat-big-label">Atletas APL</div>
+          <div class="stat-big-sub">en el sistema de placements</div>
+        </div>
       </div>
-      <div class="stat-cell" style="--stat-color:#8AD500">
-        <div class="stat-label">Committed</div>
-        <div class="stat-val" id="s-committed"><span class="loading"></span></div>
-        <div class="stat-sub">colocados en universidades</div>
-      </div>
-      <div class="stat-cell" style="--stat-color:#60a5fa">
-        <div class="stat-label">In Process</div>
-        <div class="stat-val" id="s-inprocess"><span class="loading"></span></div>
-        <div class="stat-sub">activos en el pipeline</div>
-      </div>
-      <div class="stat-cell" style="--stat-color:#a78bfa">
-        <div class="stat-label">Atletas Financiero</div>
-        <div class="stat-val" id="s-financial"><span class="loading"></span></div>
-        <div class="stat-sub">contratos activos</div>
+      <div class="stat-live">
+        <div class="live-dot"></div> En vivo
       </div>
     </div>
   </div>
@@ -395,7 +386,6 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
         <div class="card-icon-wrap">💰</div>
         <div class="card-name">Dashboard Financiero</div>
         <div class="card-desc">Ingresos, pagos, contratos y balance de la agencia.</div>
-        <div class="card-stat" id="mod-fin-stat">— atletas</div>
         <div class="card-cta">
           <span class="card-cta-text">🔒 Acceso con PIN</span>
           <div class="card-cta-arrow">→</div>
@@ -522,8 +512,9 @@ async function showPlatform(user){
   // Date
   updateClock();
   setInterval(updateClock,30000);
-  // Stats
+  // Stats — load once + subscribe for real-time updates
   loadStats();
+  subscribeStats();
 }
 
 function updateClock(){
@@ -536,22 +527,16 @@ function updateClock(){
 }
 
 async function loadStats(){
-  // Placements stats
-  const [{count:total},{count:committed},{count:inprocess},{count:financial}]=await Promise.all([
-    sb.from('placements').select('*',{count:'exact',head:true}),
-    sb.from('placements').select('*',{count:'exact',head:true}).eq('commit_status','Committed'),
-    sb.from('placements').select('*',{count:'exact',head:true}).eq('commit_status','In Process'),
-    sb.from('atletas').select('*',{count:'exact',head:true}).in('estado',['Activo','Pendiente']),
-  ]);
-  setS('s-total',    total      ?? '—');
-  setS('s-committed',committed  ?? '—');
-  setS('s-inprocess',inprocess  ?? '—');
-  setS('s-financial',financial  ?? '—');
-  // Module cards stats
-  const el1=document.getElementById('mod-fin-stat');
-  const el2=document.getElementById('mod-crm-stat');
-  if(el1) el1.textContent=`${financial??'—'} atletas activos`;
-  if(el2) el2.textContent=`${total??'—'} atletas · ${committed??'—'} committed`;
+  const {count:total}=await sb.from('placements').select('*',{count:'exact',head:true});
+  setS('s-total', total ?? '—');
+  const el=document.getElementById('mod-crm-stat');
+  if(el) el.textContent=`${total??'—'} atletas`;
+}
+
+function subscribeStats(){
+  sb.channel('placements-live')
+    .on('postgres_changes',{event:'*',schema:'public',table:'placements'},()=>loadStats())
+    .subscribe();
 }
 
 
