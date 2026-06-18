@@ -92,6 +92,28 @@ body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--te
 .hub-stat-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
 .hub-stat-val { font-family:'Anton',sans-serif; font-size:22px; color:var(--green); margin-top:4px; }
 
+/* ── PIN MODAL ── */
+#pin-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.88); display:none; align-items:center; justify-content:center; z-index:600; backdrop-filter:blur(8px); }
+#pin-overlay.open { display:flex; }
+.pin-box { background:#141414; border:1px solid rgba(255,255,255,0.1); border-radius:22px; padding:34px 28px 24px; width:300px; max-width:92vw; text-align:center; }
+.pin-module-lbl { font-size:10px; color:#555; text-transform:uppercase; letter-spacing:2.5px; margin-bottom:6px; }
+.pin-title { font-family:'Anton',sans-serif; font-size:22px; color:#fff; margin-bottom:26px; }
+.pin-dots { display:flex; gap:16px; justify-content:center; margin-bottom:28px; }
+.pin-dot { width:13px; height:13px; border-radius:50%; background:#252525; border:2px solid #333; transition:all .12s; }
+.pin-dot.filled { background:#8AD500; border-color:#8AD500; box-shadow:0 0 8px rgba(138,213,0,0.4); }
+.pin-dot.error  { background:#e53e3e; border-color:#e53e3e; animation:pinshake .3s; }
+@keyframes pinshake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+.pin-pad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
+.pin-key { background:#1e1e1e; border:1px solid #2a2a2a; border-radius:12px; padding:17px 8px; font-family:'Anton',sans-serif; font-size:22px; color:#fff; cursor:pointer; transition:all .12s; -webkit-tap-highlight-color:transparent; user-select:none; }
+.pin-key:hover  { background:#2a2a2a; border-color:#3a3a3a; }
+.pin-key:active { transform:scale(0.92); background:#333; }
+.pin-key.zero   { grid-column:2; }
+.pin-key.del    { font-family:'Montserrat',sans-serif; font-size:18px; color:#555; }
+.pin-key.del:hover { color:#fff; }
+.pin-error-msg  { color:#e53e3e; font-size:12px; height:18px; margin-bottom:10px; }
+.pin-cancel     { background:none; border:none; color:#444; font-size:12.5px; font-family:'Montserrat',sans-serif; cursor:pointer; padding:8px 16px; transition:color .15s; }
+.pin-cancel:hover { color:#888; }
+
 /* Mobile */
 @media (max-width: 640px) {
   .hub-top { padding:12px 16px; }
@@ -170,12 +192,12 @@ body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--te
   <div class="hub-section-label">Módulos</div>
   <div class="modules-grid">
 
-    <a class="module-card active" href="finanzas.html" style="--accent:#8AD500">
+    <div class="module-card active" onclick="openModule('Dashboard Financiero','pin_finanzas','finanzas.html')" style="--accent:#8AD500;cursor:pointer">
       <div class="module-icon">💰</div>
       <div class="module-name">Dashboard Financiero</div>
       <div class="module-desc">Ingresos, gastos, balance, transacciones y contratos de atletas.</div>
-      <span class="module-badge badge-open">Abrir módulo →</span>
-    </a>
+      <span class="module-badge badge-open">🔒 Abrir módulo →</span>
+    </div>
 
     <div class="module-card coming-soon" style="--accent:#3b82f6">
       <div class="module-icon">👥</div>
@@ -198,6 +220,35 @@ body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--te
       <span class="module-badge badge-soon">Próximamente</span>
     </div>
 
+  </div>
+</div>
+
+<!-- PIN MODAL -->
+<div id="pin-overlay">
+  <div class="pin-box">
+    <div class="pin-module-lbl" id="pin-module-lbl">Módulo</div>
+    <div class="pin-title">Ingresa tu PIN</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key zero" onclick="pinKey('0')">0</button>
+      <button class="pin-key del"  onclick="pinDel()">⌫</button>
+    </div>
+    <div class="pin-error-msg" id="pin-error-msg"></div>
+    <button class="pin-cancel" onclick="closePin()">Cancelar</button>
   </div>
 </div>
 
@@ -252,9 +303,72 @@ async function init() {
 
 document.addEventListener('keydown', e => {
   if(e.key==='Enter' && document.getElementById('login-overlay').style.display==='flex') doLogin();
+  if(document.getElementById('pin-overlay').classList.contains('open')) {
+    if(e.key>='0' && e.key<='9') pinKey(e.key);
+    if(e.key==='Backspace') pinDel();
+    if(e.key==='Escape') closePin();
+  }
 });
 
 document.addEventListener('DOMContentLoaded', init);
+
+/* ── PIN logic ── */
+let _pinValue = '', _pinTarget = '', _pinKey = '';
+
+function openModule(label, configKey, url) {
+  if(sessionStorage.getItem('pin_ok_' + configKey) === '1') { window.location.href = url; return; }
+  _pinValue = ''; _pinTarget = url; _pinKey = configKey;
+  document.getElementById('pin-module-lbl').textContent = label;
+  document.getElementById('pin-error-msg').textContent = '';
+  _updateDots();
+  document.getElementById('pin-overlay').classList.add('open');
+}
+
+function closePin() {
+  document.getElementById('pin-overlay').classList.remove('open');
+  _pinValue = '';
+  _updateDots();
+}
+
+function pinKey(d) {
+  if(_pinValue.length >= 4) return;
+  _pinValue += d;
+  _updateDots();
+  if(_pinValue.length === 4) _verifyPin();
+}
+
+function pinDel() {
+  _pinValue = _pinValue.slice(0,-1);
+  _updateDots();
+  document.getElementById('pin-error-msg').textContent = '';
+  document.querySelectorAll('.pin-dot').forEach(el => el.classList.remove('error'));
+}
+
+function _updateDots() {
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('pd'+i);
+    d.classList.toggle('filled', i < _pinValue.length);
+    d.classList.remove('error');
+  }
+}
+
+async function _verifyPin() {
+  const { data, error } = await sb.from('configuracion').select('valor').eq('clave', _pinKey).single();
+  if(error || !data) { _pinError('Error al verificar'); return; }
+  if(_pinValue === data.valor) {
+    sessionStorage.setItem('pin_ok_' + _pinKey, '1');
+    closePin();
+    window.location.href = _pinTarget;
+  } else {
+    _pinError('PIN incorrecto');
+  }
+}
+
+function _pinError(msg) {
+  document.getElementById('pin-error-msg').textContent = msg;
+  document.querySelectorAll('.pin-dot').forEach(el => { el.classList.remove('filled'); el.classList.add('error'); });
+  setTimeout(() => { _pinValue = ''; _updateDots(); document.getElementById('pin-error-msg').textContent = ''; }, 900);
+}
 </script>
 </body>
 </html>
