@@ -3,2132 +3,258 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NVS Dashboard Financiero</title>
+<title>NVS Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --sidebar-bg: #0a0a0a;
-  --bg: #f4f4f4;
-  --card: #ffffff;
-  --text: #0a0a0a;
-  --muted: #5a5a5a;
-  --border: #e0e0e0;
   --green: #8AD500;
   --green-dark: #6aaa00;
-  --red: #e53e3e;
-  --yellow: #d97706;
-  --blue: #8AD500;
-  --purple: #6366f1;
+  --bg: #0a0a0a;
+  --card: #141414;
+  --card2: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
+  --text: #ffffff;
+  --muted: #666;
 }
-body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
-/* SIDEBAR */
-.sidebar { width: 230px; background: var(--sidebar-bg); position: fixed; height: 100vh; overflow-y: auto; z-index: 100; display: flex; flex-direction: column; }
-.sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.sidebar-logo h1 { color: #fff; font-family: 'Anton', sans-serif; font-size: 28px; font-weight: 400; letter-spacing: 1px; }
-.sidebar-logo h1 span { color: #8AD500; }
-.sidebar-logo p { color: #888; font-size: 10px; margin-top: 2px; letter-spacing: 2px; text-transform: uppercase; }
-.sidebar-section { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.25); padding: 18px 20px 6px; }
-.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: #94a3b8; text-decoration: none; font-size: 13.5px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; margin: 1px 0; }
-.sidebar-nav a:hover { color: #fff; background: rgba(255,255,255,0.05); }
-.sidebar-nav a.active { color: #fff; background: rgba(138,213,0,0.15); border-left-color: #8AD500; }
-.sidebar-nav a svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
-.sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); color: #475569; font-size: 11px; }
+/* ── LOGIN ── */
+#login-overlay { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:999; }
+.login-box { width:380px; max-width:92vw; text-align:center; padding:0 20px; }
+.login-logo { font-family:'Anton',sans-serif; font-size:52px; color:var(--green); letter-spacing:2px; margin-bottom:4px; }
+.login-sub { color:var(--muted); font-size:11px; letter-spacing:4px; text-transform:uppercase; margin-bottom:40px; }
+.login-field { width:100%; background:#161616; border:1px solid #2a2a2a; border-radius:10px; padding:14px 16px; color:#fff; font-size:14px; font-family:'Montserrat',sans-serif; margin-bottom:12px; outline:none; transition:border .2s; }
+.login-field:focus { border-color:var(--green); }
+.login-btn { width:100%; background:var(--green); color:#0a0a0a; border:none; border-radius:10px; padding:14px; font-family:'Anton',sans-serif; font-size:18px; letter-spacing:1px; cursor:pointer; transition:background .2s; margin-top:4px; }
+.login-btn:hover { background:var(--green-dark); }
+.login-error { color:#e53e3e; font-size:12px; margin-top:10px; min-height:16px; }
+.login-loading { color:var(--muted); font-size:12px; margin-top:10px; display:none; }
 
-/* MAIN */
-.main { margin-left: 230px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-.topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-.topbar-left h2 { font-size: 20px; font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
-.topbar-left .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
-.topbar-right { display: flex; gap: 8px; align-items: center; }
+/* ── PLATFORM ── */
+#platform { display:none; min-height:100vh; }
 
-/* BUTTONS */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; }
-.btn-primary { background: #8AD500; color: #0a0a0a; font-weight: 700; }
-.btn-primary:hover { background: #6aaa00; }
-.btn-success { background: #10b981; color: #fff; }
-.btn-success:hover { background: #059669; }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-.btn-outline:hover { background: var(--bg); }
-.btn-ghost { background: transparent; color: var(--muted); padding: 6px 10px; }
-.btn-ghost:hover { background: var(--bg); color: var(--text); }
-.btn-sm { padding: 5px 10px; font-size: 12px; }
-.btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 6px; }
-.btn-del { background: transparent; border: none; color: #bbb; font-size: 13px; padding: 2px 6px; border-radius: 5px; cursor: pointer; line-height: 1; transition: color .15s, background .15s; }
-.btn-del:hover { color: var(--red); background: rgba(229,62,62,.08); }
-
-/* CONTENT */
-.content { padding: 24px 28px; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* KPI GRID */
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-.kpi-card { background: var(--card); border-radius: 12px; padding: 18px 20px; border: 1px solid var(--border); position: relative; overflow: hidden; }
-.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-.kpi-card.green::before { background: #8AD500; }
-.kpi-card.blue::before { background: #0a0a0a; }
-.kpi-card.red::before { background: var(--red); }
-.kpi-card.purple::before { background: var(--purple); }
-.kpi-card.yellow::before { background: var(--yellow); }
-.kpi-label { font-size: 11px; color: var(--muted); font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-.kpi-value { font-size: 26px; font-family: 'Anton', sans-serif; font-weight: 400; margin: 8px 0 3px; letter-spacing: 0.5px; }
-.kpi-card.green .kpi-value { color: #8AD500; }
-.kpi-card.blue .kpi-value { color: #0a0a0a; }
-.kpi-card.red .kpi-value { color: var(--red); }
-.kpi-card.purple .kpi-value { color: var(--purple); }
-.kpi-card.yellow .kpi-value { color: var(--yellow); }
-.kpi-sub { font-size: 11.5px; color: var(--muted); }
-
-/* CHARTS */
-.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 20px; }
-.card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); }
-.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
-.card-title { font-size: 14px; font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: 0.5px; }
-.card-body { padding: 16px 20px; }
-.chart-wrap { position: relative; height: 240px; }
-
-/* TABLE CARD */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead th { background: #f8fafc; padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-tbody td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
-tbody tr:hover td { background: #fafbfc; }
-tbody tr:last-child td { border-bottom: none; }
-.table-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
-
-/* SEARCH BAR */
-.table-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.search-box { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; width: 200px; }
-.search-box:focus { border-color: #8AD500; outline: none; }
-.filter-sel { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; outline: none; cursor: pointer; background: #fff; color: var(--text); }
-
-/* BADGES */
-.badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-.badge-green { background: #dcfce7; color: #166534; }
-.badge-red { background: #fee2e2; color: #991b1b; }
-.badge-yellow { background: #fef9c3; color: #854d0e; }
-.badge-blue { background: #dbeafe; color: #1e40af; }
-.badge-purple { background: #ede9fe; color: #5b21b6; }
-.badge-gray { background: #f1f5f9; color: #475569; }
-.badge-orange { background: #ffedd5; color: #9a3412; }
-.badge-closed { background: #1a1a1a; color: #aaa; }
-
-/* AMOUNTS */
-.amt-in { color: #8AD500; font-weight: 700; }
-.amt-out { color: var(--red); font-weight: 700; }
-
-/* MODAL */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-.overlay.open { display: flex; }
-.modal { background: #fff; border-radius: 16px; padding: 26px 28px; width: 540px; max-width: 95vw; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.modal-title { font-size: 17px; font-weight: 700; }
-.modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
-.modal-close:hover { background: var(--bg); }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-group { margin-bottom: 14px; }
-label.fl { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
-.fc { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13.5px; outline: none; transition: border 0.15s; }
-.fc:focus { border-color: #8AD500; box-shadow: 0 0 0 3px rgba(138,213,0,0.15); }
-.form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 6px; }
-
-/* TOAST */
-.toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; z-index: 400; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
-.toast.show { opacity: 1; transform: translateY(0); }
-
-/* STAT ROW */
-.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
-
-/* EMPTY STATE */
-.empty { text-align: center; padding: 40px 20px; color: var(--muted); }
-.empty p { font-size: 14px; margin-top: 8px; }
-
-/* ── SMART TRANSACTION MODAL ── */
-.trans-mode-row { display: flex; gap: 10px; margin-bottom: 20px; }
-.mode-btn { flex: 1; padding: 14px 12px; border: 2px solid var(--border); border-radius: 10px; background: #fff; cursor: pointer; text-align: left; transition: all 0.15s; display: flex; flex-direction: column; gap: 3px; }
-.mode-btn:hover { border-color: #8AD500; }
-.mode-btn.active { border-color: #8AD500; background: rgba(138,213,0,0.06); }
-.mode-icon { font-size: 22px; line-height: 1; }
-.mode-label { font-family: 'Anton', sans-serif; font-size: 14px; color: #0a0a0a; letter-spacing: 0.3px; }
-.mode-sub { font-size: 11px; color: var(--muted); }
-.suggestions-box { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 500; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,0.13); max-height: 230px; overflow-y: auto; margin-top: 4px; }
-.suggestions-box.open { display: block; }
-.sug-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f8fafc; display: flex; align-items: center; gap: 10px; }
-.sug-item:hover { background: #f8fafc; }
-.sug-item:last-child { border-bottom: none; }
-.sug-left { flex: 1; min-width: 0; }
-.sug-name { font-weight: 700; font-size: 13px; color: var(--text); }
-.sug-detail { font-size: 11px; color: var(--muted); margin-top: 1px; }
-.ta-card { background: linear-gradient(135deg, #0d0d0d, #1a1a1a); color: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; border-left: 4px solid #8AD500; }
-.ta-card-name { font-family: 'Anton', sans-serif; font-size: 19px; color: #8AD500; }
-.ta-card-meta { display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
-.ta-card-meta span { font-size: 12px; color: #aaa; }
-.ta-card-meta span strong { color: #fff; }
-.ta-prog-wrap { margin-top: 10px; }
-.ta-prog-label { font-size: 11px; color: #aaa; margin-bottom: 4px; display: flex; justify-content: space-between; }
-.ta-prog-bar { background: #333; border-radius: 999px; height: 5px; }
-.ta-prog-fill { background: #8AD500; border-radius: 999px; height: 5px; transition: width 0.4s; }
-.ta-preview { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px 16px; margin-top: 8px; }
-.ta-prev-title { font-family: 'Anton', sans-serif; font-size: 12px; color: #166534; margin-bottom: 8px; letter-spacing: 0.3px; }
-.ta-prev-row { display: flex; justify-content: space-between; font-size: 12.5px; color: #166534; padding: 3px 0; border-bottom: 1px solid rgba(134,239,172,0.3); }
-.ta-prev-row:last-child { border-bottom: none; }
-.ta-prev-row .old { color: #aaa; text-decoration: line-through; font-size: 11px; }
-.ta-prev-row .new { font-weight: 700; }
-
-/* ══════════════════════════════════════════
-   MOBILE RESPONSIVE  (≤ 768px)
-══════════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* Layout */
-  .sidebar { display: none; }
-  .main { margin-left: 0; }
-  .content { padding: 12px 12px 90px; }
-
-  /* Topbar */
-  .topbar { padding: 10px 14px; }
-  .topbar-left h2 { font-size: 16px; }
-  .topbar-left .sub { display: none; }
-  #logout-btn { padding: 5px 10px; font-size: 11px; }
-
-  /* KPIs: 2 columnas */
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-  .kpi-card { padding: 12px 14px; }
-  .kpi-value { font-size: 21px; }
-  .kpi-label { font-size: 10px; }
-
-  /* Charts: apilados */
-  .charts-row { grid-template-columns: 1fr; gap: 12px; }
-  .chart-wrap { height: 190px; }
-
-  /* Stat row: 2 col */
-  .stat-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-
-  /* Tablas */
-  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  thead th { padding: 7px 10px; font-size: 10.5px; }
-  tbody td { padding: 9px 10px; font-size: 12px; }
-  .table-footer { flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 14px; }
-
-  /* Toolbar búsqueda */
-  .table-toolbar { gap: 6px; }
-  .search-box { width: 100%; flex: 1 1 100%; }
-  .filter-sel { flex: 1; }
-
-  /* Modal: sube desde abajo */
-  .overlay { align-items: flex-end; padding: 0; }
-  .modal { width: 100%; max-width: 100%; border-radius: 20px 20px 0 0; max-height: 92vh; padding: 20px 16px 28px; }
-
-  /* Formularios: 1 columna */
-  .form-row { grid-template-columns: 1fr; }
-
-  /* Toast: arriba del nav */
-  .toast { bottom: 74px; right: 12px; left: 12px; text-align: center; }
-
-  /* Card body: menos padding */
-  .card-body { padding: 12px 14px; }
-  .card-header { padding: 12px 16px 10px; }
+/* Topbar */
+.hub-top {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 28px; border-bottom:1px solid var(--border);
+  position:sticky; top:0; background:rgba(10,10,10,0.95);
+  backdrop-filter:blur(10px); z-index:100;
 }
+.hub-brand { display:flex; align-items:center; gap:12px; }
+.hub-brand-name { font-family:'Anton',sans-serif; font-size:24px; color:var(--green); letter-spacing:1px; }
+.hub-brand-sub { font-size:10px; color:var(--muted); letter-spacing:3px; text-transform:uppercase; margin-top:1px; }
+.hub-top-right { display:flex; align-items:center; gap:12px; }
+.hub-user { font-size:13px; color:var(--muted); }
+.hub-user strong { color:#fff; }
+.btn-logout { background:transparent; border:1px solid #2a2a2a; color:var(--muted); border-radius:8px; padding:7px 14px; font-size:12px; font-family:'Montserrat',sans-serif; cursor:pointer; transition:all .2s; }
+.btn-logout:hover { border-color:#555; color:#fff; }
 
-/* ── MOBILE BOTTOM NAV ── */
-.mobile-nav { display: none; }
+/* Hero */
+.hub-hero { padding:48px 28px 32px; }
+.hub-greeting { font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
+.hub-title { font-family:'Anton',sans-serif; font-size:38px; letter-spacing:0.5px; line-height:1.1; }
+.hub-title span { color:var(--green); }
 
-@media (max-width: 768px) {
-  .mobile-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: #0a0a0a;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    z-index: 150;
-    padding: 4px 0 env(safe-area-inset-bottom, 4px);
-  }
-  .mnav-item {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; gap: 2px; padding: 6px 4px;
-    color: #555; cursor: pointer; background: none;
-    border: none; font-family: 'Montserrat', sans-serif;
-    font-size: 10px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.3px;
-    transition: color 0.15s;
-  }
-  .mnav-item svg { width: 20px; height: 20px; }
-  .mnav-item.active { color: #8AD500; }
-  .mnav-item span { font-size: 9.5px; }
+/* Modules grid */
+.hub-section-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:2px; font-weight:700; padding:0 28px; margin-bottom:16px; margin-top:8px; }
+.modules-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px; padding:0 28px 40px; }
+
+.module-card {
+  background:var(--card); border:1px solid var(--border); border-radius:18px;
+  padding:28px 26px; cursor:pointer; transition:all .2s; position:relative; overflow:hidden;
+  text-decoration:none; color:inherit; display:block;
 }
-
-/* ── FAB CENTER BUTTON ── */
-@media (max-width: 768px) {
-  .mnav-fab {
-    position: relative;
-    top: -16px;
-    background: #8AD500 !important;
-    color: #0a0a0a !important;
-    width: 54px; height: 54px;
-    border-radius: 50% !important;
-    box-shadow: 0 4px 16px rgba(138,213,0,0.45);
-    padding: 0 !important;
-    flex-direction: column;
-    gap: 0;
-    align-items: center;
-    justify-content: center;
-    font-size: 0;
-  }
-  .mnav-fab svg { width: 26px; height: 26px; stroke: #0a0a0a; }
-  .mnav-fab span { display: none; }
+.module-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--accent, #333); transition:opacity .2s;
 }
+.module-card:hover { border-color:rgba(255,255,255,0.15); transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+.module-card.active:hover { box-shadow:0 12px 40px rgba(138,213,0,0.12); }
+.module-card.coming-soon { cursor:default; opacity:0.55; }
+.module-card.coming-soon:hover { transform:none; box-shadow:none; }
 
-/* ── MODAL SLIDE-UP ANIMATION ── */
-@media (max-width: 768px) {
-  .overlay { transition: background 0.25s; }
-  .overlay.open .modal {
-    animation: slideUp 0.28s cubic-bezier(0.32,0.72,0,1) both;
-  }
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-  }
+.module-icon { font-size:34px; margin-bottom:16px; line-height:1; }
+.module-name { font-family:'Anton',sans-serif; font-size:20px; letter-spacing:0.5px; margin-bottom:6px; }
+.module-desc { font-size:13px; color:var(--muted); line-height:1.5; }
+.module-badge {
+  display:inline-block; margin-top:16px; padding:5px 12px;
+  border-radius:999px; font-size:11px; font-weight:700; letter-spacing:0.5px;
 }
+.badge-open { background:rgba(138,213,0,0.15); color:var(--green); }
+.badge-soon { background:rgba(255,255,255,0.06); color:#555; }
 
-/* ── MOBILE ATHLETE CARDS ── */
-.m-atleta-list { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
-.m-atleta-card {
-  background: #fff;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  padding: 14px 16px;
-  box-shadow: 0 1px 6px rgba(0,0,0,.05);
-  cursor: pointer;
-  transition: box-shadow .15s;
-  -webkit-tap-highlight-color: transparent;
+/* Stats strip */
+.hub-stats { display:flex; gap:0; margin:0 28px 28px; background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.hub-stat { flex:1; padding:18px 20px; border-right:1px solid var(--border); }
+.hub-stat:last-child { border-right:none; }
+.hub-stat-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+.hub-stat-val { font-family:'Anton',sans-serif; font-size:22px; color:var(--green); margin-top:4px; }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .hub-top { padding:12px 16px; }
+  .hub-brand-sub { display:none; }
+  .hub-hero { padding:28px 16px 20px; }
+  .hub-title { font-size:28px; }
+  .hub-section-label { padding:0 16px; }
+  .modules-grid { grid-template-columns:1fr 1fr; gap:10px; padding:0 16px 32px; }
+  .module-card { padding:18px 16px; }
+  .module-icon { font-size:26px; margin-bottom:10px; }
+  .module-name { font-size:15px; }
+  .module-desc { display:none; }
+  .hub-stats { margin:0 16px 20px; }
+  .hub-stat { padding:12px 14px; }
+  .hub-stat-val { font-size:18px; }
+  .hub-stat-label { font-size:9px; }
+  .hub-user { display:none; }
 }
-.m-atleta-card:active { box-shadow: 0 2px 12px rgba(0,0,0,.1); }
-.m-ac-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-.m-ac-name { font-weight: 700; font-size: 15px; line-height: 1.2; }
-.m-ac-sport { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.m-ac-mid { display: flex; gap: 16px; margin: 10px 0 10px; padding: 10px 0; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
-.m-ac-stat { flex: 1; }
-.m-ac-stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
-.m-ac-stat-val { font-size: 14px; font-weight: 700; margin-top: 2px; }
-.m-ac-payments { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
-.m-ac-actions { display: flex; gap: 8px; }
-.m-ac-actions .btn { flex: 1; justify-content: center; font-size: 12px; }
-
-/* ── MOBILE TRANSACTION CARDS ── */
-.m-trans-list { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
-.m-trans-card {
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.04);
-}
-.m-tc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.m-tc-dot.ingreso { background: #8AD500; }
-.m-tc-dot.gasto   { background: var(--red); }
-.m-tc-body { flex: 1; min-width: 0; }
-.m-tc-concept { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m-tc-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.m-tc-amt { font-size: 15px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
-.m-tc-amt.ingreso { color: #8AD500; }
-.m-tc-amt.gasto   { color: var(--red); }
-
-/* ── LOGIN OVERLAY ── */
-#login-overlay { position:fixed; inset:0; background:#0a0a0a; display:none; align-items:center; justify-content:center; z-index:9999; }
-.login-box { background:#161616; border:1px solid #2a2a2a; border-radius:16px; padding:48px 40px; width:360px; max-width:90vw; text-align:center; }
-.login-box h1 { font-family:'Anton',sans-serif; font-size:32px; color:#8AD500; letter-spacing:1px; margin-bottom:6px; }
-.login-box p { color:#666; font-size:13px; margin-bottom:32px; }
-.login-field { width:100%; background:#1e1e1e; border:1px solid #333; border-radius:8px; padding:12px 14px; color:#fff; font-size:14px; font-family:'Montserrat',sans-serif; margin-bottom:12px; outline:none; transition:border .2s; }
-.login-field:focus { border-color:#8AD500; }
-.login-btn { width:100%; background:#8AD500; color:#0a0a0a; border:none; border-radius:8px; padding:13px; font-family:'Anton',sans-serif; font-size:16px; letter-spacing:0.5px; cursor:pointer; margin-top:8px; transition:background .2s; }
-.login-btn:hover { background:#6aaa00; }
-.login-error { color:#e53e3e; font-size:12px; margin-top:8px; min-height:18px; }
-#login-loading { color:#666; font-size:13px; margin-top:16px; display:none; }
 </style>
 </head>
 <body>
 
-<!-- ===== LOGIN OVERLAY ===== -->
+<!-- LOGIN -->
 <div id="login-overlay">
   <div class="login-box">
-    <h1>NVS</h1>
-    <p>New Vision Sports — Dashboard Financiero</p>
-    <input id="login-email" class="login-field" type="email" placeholder="Email" autocomplete="email">
+    <div class="login-logo">NVS</div>
+    <div class="login-sub">New Vision Sports Platform</div>
+    <input id="login-email"    class="login-field" type="email"    placeholder="Email" autocomplete="email">
     <input id="login-password" class="login-field" type="password" placeholder="Contraseña" autocomplete="current-password">
     <button class="login-btn" onclick="doLogin()">ENTRAR</button>
-    <div class="login-error" id="login-error"></div>
-    <div id="login-loading">Cargando datos...</div>
+    <div class="login-error"   id="login-error"></div>
+    <div class="login-loading" id="login-loading">Cargando plataforma…</div>
   </div>
 </div>
 
-<!-- ===== SIDEBAR ===== -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <h1>NV<span>S</span></h1>
-    <p>NEW VISION SPORTS</p>
-  </div>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Principal</div>
-    <a class="active" onclick="showTab('dashboard')" id="nav-dashboard">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      Dashboard
-    </a>
-    <a onclick="showTab('atletas')" id="nav-atletas">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-      Atletas
-    </a>
-    <a onclick="showTab('transacciones')" id="nav-transacciones">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-      Transacciones
-    </a>
-    <div class="sidebar-section">Herramientas</div>
-    <a onclick="showTab('deudores')" id="nav-deudores">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-      Deudores / Alertas
-    </a>
-  </div>
-  <div class="sidebar-footer">
-    NVS Dashboard v1.0<br>
-    <span id="footer-date"></span>
-  </div>
-</aside>
+<!-- PLATFORM HUB -->
+<div id="platform">
 
-<!-- ===== MAIN ===== -->
-<main class="main">
-  <div class="topbar">
-    <div class="topbar-left">
-      <h2 id="page-title">Dashboard</h2>
-      <div class="sub" id="page-sub">Resumen financiero general</div>
+  <!-- Topbar -->
+  <div class="hub-top">
+    <div class="hub-brand">
+      <div>
+        <div class="hub-brand-name">NVS</div>
+        <div class="hub-brand-sub">New Vision Sports</div>
+      </div>
     </div>
-    <div class="topbar-right">
-      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Exportar</button>
-      <button class="btn btn-primary" id="topbar-btn" onclick="openAddModal()">+ Agregar</button>
-      <button class="btn btn-outline btn-sm" id="logout-btn" onclick="doLogout()" style="display:none" title="Cerrar sesión">⎋ Salir</button>
+    <div class="hub-top-right">
+      <div class="hub-user">Bienvenido, <strong id="user-name">—</strong></div>
+      <button class="btn-logout" onclick="doLogout()">⎋ Salir</button>
     </div>
   </div>
 
-  <div class="content">
+  <!-- Hero -->
+  <div class="hub-hero">
+    <div class="hub-greeting">Panel de control</div>
+    <div class="hub-title">NVS <span>Platform</span></div>
+  </div>
 
-    <!-- ========== DASHBOARD ========== -->
-    <div id="tab-dashboard" class="tab-content active">
-      <div class="kpi-grid">
-        <div class="kpi-card green">
-          <div class="kpi-label">Balance Total</div>
-          <div class="kpi-value" id="kpi-balance">—</div>
-          <div class="kpi-sub">Ingresos menos Gastos</div>
-        </div>
-        <div class="kpi-card blue">
-          <div class="kpi-label">Total Ingresos</div>
-          <div class="kpi-value" id="kpi-ingresos">—</div>
-          <div class="kpi-sub">Nov 2024 → Jun 2026</div>
-        </div>
-        <div class="kpi-card red">
-          <div class="kpi-label">Total Gastos</div>
-          <div class="kpi-value" id="kpi-gastos">—</div>
-          <div class="kpi-sub">Nov 2024 → Jun 2026</div>
-        </div>
-        <div class="kpi-card purple">
-          <div class="kpi-label">Atletas Activos</div>
-          <div class="kpi-value" id="kpi-atletas">—</div>
-          <div class="kpi-sub"><span id="kpi-completados">—</span> completados · <span id="kpi-deudores">—</span> deudores</div>
-        </div>
-      </div>
+  <!-- Stats strip -->
+  <div class="hub-stats" id="hub-stats">
+    <div class="hub-stat">
+      <div class="hub-stat-label">Atletas activos</div>
+      <div class="hub-stat-val" id="stat-atletas">—</div>
+    </div>
+    <div class="hub-stat">
+      <div class="hub-stat-label">Módulos activos</div>
+      <div class="hub-stat-val">1</div>
+    </div>
+    <div class="hub-stat">
+      <div class="hub-stat-label">Próximos módulos</div>
+      <div class="hub-stat-val">3</div>
+    </div>
+  </div>
 
-      <div class="charts-row">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Ingresos vs Gastos por Mes</span>
-            <select class="filter-sel" id="chart-range" onchange="updateMonthlyChart()">
-              <option value="12">Últimos 12 meses</option>
-              <option value="6">Últimos 6 meses</option>
-              <option value="0" selected>Todos</option>
-            </select>
-          </div>
-          <div class="card-body">
-            <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">Atletas por Deporte</span></div>
-          <div class="card-body">
-            <div class="chart-wrap"><canvas id="sportChart"></canvas></div>
-          </div>
-        </div>
-      </div>
+  <!-- Modules -->
+  <div class="hub-section-label">Módulos</div>
+  <div class="modules-grid">
 
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Transacciones Recientes</span>
-          <button class="btn btn-ghost btn-sm" onclick="showTab('transacciones')">Ver todas →</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Fecha</th><th>Concepto</th><th>Forma de Pago</th><th>Persona</th><th>Gasto</th><th>Ingreso</th></tr></thead>
-            <tbody id="recent-trans-body"></tbody>
-          </table>
-        </div>
-      </div>
+    <a class="module-card active" href="finanzas.html" style="--accent:#8AD500">
+      <div class="module-icon">💰</div>
+      <div class="module-name">Dashboard Financiero</div>
+      <div class="module-desc">Ingresos, gastos, balance, transacciones y contratos de atletas.</div>
+      <span class="module-badge badge-open">Abrir módulo →</span>
+    </a>
+
+    <div class="module-card coming-soon" style="--accent:#3b82f6">
+      <div class="module-icon">👥</div>
+      <div class="module-name">CRM Atletas</div>
+      <div class="module-desc">Gestión completa de atletas, contratos, seguimiento y comunicación.</div>
+      <span class="module-badge badge-soon">Próximamente</span>
     </div>
 
-    <!-- ========== ATLETAS ========== -->
-    <div id="tab-atletas" class="tab-content">
-      <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
-        <div class="kpi-card blue"><div class="kpi-label">Total</div><div class="kpi-value" id="at-total" style="font-size:22px">—</div><div class="kpi-sub">atletas registrados</div></div>
-        <div class="kpi-card green"><div class="kpi-label">Activos</div><div class="kpi-value" id="at-activos" style="font-size:22px;color:var(--green)">—</div></div>
-        <div class="kpi-card purple"><div class="kpi-label">Completados</div><div class="kpi-value" id="at-completados" style="font-size:22px;color:var(--purple)">—</div></div>
-        <div class="kpi-card red"><div class="kpi-label">Deudores</div><div class="kpi-value" id="at-deudores" style="font-size:22px;color:var(--red)">—</div></div>
-        <div class="kpi-card yellow"><div class="kpi-label">Pendientes</div><div class="kpi-value" id="at-pendientes" style="font-size:22px;color:var(--yellow)">—</div></div>
-        <div class="kpi-card" style="border-top:3px solid #333"><div class="kpi-label">Cerrados</div><div class="kpi-value" id="at-cerrados" style="font-size:22px;color:#555">—</div></div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Todos los Atletas (<span id="atletas-count">0</span>)</span>
-          <div class="table-toolbar">
-            <input type="text" class="search-box" placeholder="Buscar atleta..." oninput="filterAtletas(this.value)">
-            <select class="filter-sel" onchange="filterAtletasByStatus(this.value)">
-              <option value="">Todos los estados</option>
-              <option>Activo</option><option>Completado</option><option>Deudor</option><option>Pendiente</option><option>Cerrado</option>
-            </select>
-            <select class="filter-sel" id="sport-filter" onchange="filterAtletasBySport(this.value)">
-              <option value="">Todos los deportes</option>
-            </select>
-            <select class="filter-sel" onchange="filterAtletasByTipo(this.value)">
-              <option value="">Todos los planes</option>
-              <option>1 PAYMENT</option><option>2 PAYMENTS</option><option>3 PAYMENTS</option>
-              <option>4 PAYMENTS</option><option>QUARTERLY</option><option>MONTHLY</option><option>ABONO + MENSUALIDAD</option>
-            </select>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>#</th><th>Atleta</th><th>Deporte</th><th>Servicio</th><th>Plan</th><th>Total</th><th>Pagos</th><th>Estado</th><th>Contacto</th><th></th><th></th></tr></thead>
-            <tbody id="atletas-tbody"></tbody>
-          </table>
-        </div>
-        <div class="table-footer">
-          <span id="atletas-info">—</span>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-outline btn-xs" onclick="changePage(-1)">← Anterior</button>
-            <span id="atletas-page" style="padding:3px 8px;font-size:12px">Pág 1</span>
-            <button class="btn btn-outline btn-xs" onclick="changePage(1)">Siguiente →</button>
-          </div>
-        </div>
-      </div>
+    <div class="module-card coming-soon" style="--accent:#f59e0b">
+      <div class="module-icon">📅</div>
+      <div class="module-name">Calendario Marketing</div>
+      <div class="module-desc">Planificación de campañas, publicaciones y eventos de la agencia.</div>
+      <span class="module-badge badge-soon">Próximamente</span>
     </div>
 
-    <!-- ========== TRANSACCIONES ========== -->
-    <div id="tab-transacciones" class="tab-content">
-      <div class="kpi-grid">
-        <div class="kpi-card blue"><div class="kpi-label">Mes Actual</div><div class="kpi-value" id="t-mes-label" style="font-size:16px;margin-top:8px">—</div></div>
-        <div class="kpi-card green"><div class="kpi-label">Ingresos del Mes</div><div class="kpi-value" id="t-ingresos-mes">—</div></div>
-        <div class="kpi-card red"><div class="kpi-label">Gastos del Mes</div><div class="kpi-value" id="t-gastos-mes">—</div></div>
-        <div class="kpi-card green"><div class="kpi-label">Balance del Mes</div><div class="kpi-value" id="t-balance-mes">—</div></div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Historial de Transacciones</span>
-          <div class="table-toolbar">
-            <input type="text" class="search-box" placeholder="Buscar..." oninput="filterTrans(this.value)">
-            <select class="filter-sel" id="month-filter" onchange="filterTransByMonth(this.value)">
-              <option value="">Todos los meses</option>
-            </select>
-            <select class="filter-sel" onchange="filterTransByType(this.value)">
-              <option value="">Ingresos y Gastos</option>
-              <option value="ingreso">Solo Ingresos</option>
-              <option value="gasto">Solo Gastos</option>
-            </select>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Fecha</th><th>Concepto</th><th>Forma de Pago</th><th>Persona</th><th>Gasto</th><th>Ingreso</th><th></th></tr></thead>
-            <tbody id="trans-tbody"></tbody>
-          </table>
-        </div>
-        <div class="table-footer">
-          <span id="trans-info">—</span>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-outline btn-xs" onclick="changeTransPage(-1)">← Anterior</button>
-            <span id="trans-page" style="padding:3px 8px;font-size:12px">Pág 1</span>
-            <button class="btn btn-outline btn-xs" onclick="changeTransPage(1)">Siguiente →</button>
-          </div>
-        </div>
-      </div>
+    <div class="module-card coming-soon" style="--accent:#8b5cf6">
+      <div class="module-icon">📊</div>
+      <div class="module-name">Reportes</div>
+      <div class="module-desc">Informes avanzados de rendimiento financiero y métricas de atletas.</div>
+      <span class="module-badge badge-soon">Próximamente</span>
     </div>
 
-    <!-- ========== DEUDORES ========== -->
-    <div id="tab-deudores" class="tab-content">
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-header"><span class="card-title" style="color:var(--red)">⚠ Atletas con Deuda o Pendientes</span></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Atleta</th><th>Deporte</th><th>Servicio</th><th>Total Contrato</th><th>Plan</th><th>Pagos</th><th>Estado</th><th>Deudor Legal</th><th>WhatsApp</th></tr></thead>
-            <tbody id="deudores-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">Atletas con Mensualidades Próximas (Activos)</span></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Atleta</th><th>Deporte</th><th>Plan</th><th>Total</th><th>Pagos Realizados</th><th>Estado</th><th>WhatsApp</th></tr></thead>
-            <tbody id="proximos-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /content -->
-</main>
-
-<!-- ===== MODAL: AGREGAR ATLETA ===== -->
-<div class="overlay" id="modal-atleta">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" id="modal-atleta-title">Agregar Atleta</span>
-      <button class="modal-close" onclick="closeModal('modal-atleta')">×</button>
-    </div>
-    <form onsubmit="saveAtleta(event)">
-      <input type="hidden" id="a-id">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Nombre completo *</label>
-          <input type="text" class="fc" id="a-nombre" required placeholder="Ej: Juan Pérez">
-        </div>
-        <div class="form-group">
-          <label class="fl">Deporte *</label>
-          <select class="fc" id="a-deporte" required>
-            <option value="">Seleccionar...</option>
-            <option>Soccer</option><option>Basketball</option><option>Baseball</option>
-            <option>Volleyball</option><option>Flag Football</option><option>Tennis</option>
-            <option>Football Americano</option><option>Gimnasia</option><option>Track & Field</option><option>Otros</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Servicio *</label>
-          <select class="fc" id="a-servicio" required>
-            <option value="">Seleccionar...</option>
-            <option>ESTANDAR</option><option>PREMIUM</option><option>TRANSFER</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="fl">Tipo de Plan *</label>
-          <select class="fc" id="a-tipopago" required>
-            <option value="">Seleccionar...</option>
-            <option>1 PAYMENT</option><option>2 PAYMENTS</option><option>3 PAYMENTS</option>
-            <option>4 PAYMENTS</option><option>QUARTERLY</option><option>MONTHLY</option>
-            <option>ABONO + MENSUALIDAD</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Total del Contrato ($) *</label>
-          <input type="number" class="fc" id="a-total" step="0.01" min="0" required placeholder="0.00">
-        </div>
-        <div class="form-group">
-          <label class="fl">Monto por Pago ($)</label>
-          <input type="number" class="fc" id="a-pago" step="0.01" min="0" placeholder="0.00">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Pagos Realizados</label>
-          <input type="text" class="fc" id="a-hechos" placeholder="Ej: 1 out of 2">
-        </div>
-        <div class="form-group">
-          <label class="fl">Estado</label>
-          <select class="fc" id="a-estado">
-            <option>Activo</option><option>Completado</option><option>Deudor</option><option>Pendiente</option><option>Cerrado</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Referido Por</label>
-          <input type="text" class="fc" id="a-referido" placeholder="Nombre del referidor">
-        </div>
-        <div class="form-group">
-          <label class="fl">Deudor Legal / Contacto Pago</label>
-          <input type="text" class="fc" id="a-deudor" placeholder="Padre/Madre/Tutor">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="fl">WhatsApp de Cobro</label>
-        <input type="text" class="fc" id="a-whatsapp" placeholder="507 6000-0000">
-      </div>
-      <div class="form-group">
-        <label class="fl">Notas adicionales</label>
-        <textarea class="fc" id="a-notas" rows="2" placeholder="Observaciones, fechas especiales, etc."></textarea>
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal('modal-atleta')">Cancelar</button>
-        <button type="submit" class="btn btn-primary" id="btn-save-atleta">Guardar Atleta</button>
-      </div>
-    </form>
   </div>
 </div>
-
-<!-- ===== MODAL: SMART TRANSACTION ===== -->
-<div class="overlay" id="modal-trans">
-  <div class="modal" style="width:580px;max-width:97vw">
-    <div class="modal-header">
-      <span class="modal-title">Nueva Transacción</span>
-      <button class="modal-close" onclick="closeModal('modal-trans')">×</button>
-    </div>
-
-    <!-- Selector de modo -->
-    <div class="trans-mode-row">
-      <button class="mode-btn active" id="mbtn-atleta" onclick="setTransMode('atleta')">
-        <span class="mode-icon">🏅</span>
-        <span class="mode-label">Pago de Atleta</span>
-        <span class="mode-sub">Mensualidad, Sign, Commit, Abono...</span>
-      </button>
-      <button class="mode-btn" id="mbtn-general" onclick="setTransMode('general')">
-        <span class="mode-icon">💸</span>
-        <span class="mode-label">Gasto / Ingreso General</span>
-        <span class="mode-sub">Operacional, marketing, equipos...</span>
-      </button>
-    </div>
-
-    <!-- ── MODO ATLETA ── -->
-    <div id="trans-mode-atleta">
-      <div class="form-group" style="position:relative">
-        <label class="fl">Buscar Atleta *</label>
-        <input type="text" class="fc" id="ta-search"
-          placeholder="Escribe el nombre del atleta..."
-          oninput="buscarAtleta(this.value)"
-          autocomplete="off">
-        <div id="ta-suggestions" class="suggestions-box"></div>
-      </div>
-      <input type="hidden" id="ta-atleta-id">
-
-      <div id="ta-card" class="ta-card" style="display:none"></div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Tipo de Pago *</label>
-          <select class="fc" id="ta-tipo" onchange="onTipoPagoChange()">
-            <option value="">Seleccionar tipo...</option>
-            <option value="mensualidad">📅 Mensualidad</option>
-            <option value="abono">💰 Abono Inicial</option>
-            <option value="sign">✍️ Sign (Firma)</option>
-            <option value="commit">🤝 Commit (Compromiso)</option>
-            <option value="unico">1️⃣ Pago Único</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="fl">Monto ($) *</label>
-          <input type="number" class="fc" id="ta-monto" step="0.01" min="0" placeholder="0.00">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="fl">Concepto (auto-generado)</label>
-        <input type="text" class="fc" id="ta-concepto" placeholder="Se genera automáticamente">
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Fecha *</label>
-          <input type="date" class="fc" id="ta-fecha">
-        </div>
-        <div class="form-group">
-          <label class="fl">Forma de Pago *</label>
-          <select class="fc" id="ta-forma">
-            <option value="">Seleccionar...</option>
-            <option>Transferencia Bancaria</option>
-            <option>Yappy</option><option>Yappy Comercial</option>
-            <option>Pay Pal</option><option>Visa Banco General</option>
-            <option>Cash</option><option>Stripe</option><option>Otros</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="ta-preview" class="ta-preview" style="display:none"></div>
-    </div>
-
-    <!-- ── MODO GENERAL ── -->
-    <div id="trans-mode-general" style="display:none">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Fecha *</label>
-          <input type="date" class="fc" id="t-fecha">
-        </div>
-        <div class="form-group">
-          <label class="fl">Forma de Pago *</label>
-          <select class="fc" id="t-forma">
-            <option value="">Seleccionar...</option>
-            <option>Transferencia Bancaria</option><option>Yappy</option><option>Pay Pal</option>
-            <option>Visa Banco General</option><option>Visa Cash Back Stefano</option>
-            <option>Cash</option><option>Stripe</option><option>Yappy Comercial</option><option>Otros</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="fl">Concepto *</label>
-        <input type="text" class="fc" id="t-concepto" placeholder="Descripción de la transacción">
-      </div>
-      <div class="form-group">
-        <label class="fl">Persona / Empresa</label>
-        <input type="text" class="fc" id="t-persona" placeholder="Nombre de quien paga/cobra">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="fl">Gasto ($)</label>
-          <input type="number" class="fc" id="t-gasto" step="0.01" min="0" placeholder="0.00" oninput="lockField('t-ingreso',this.value)">
-        </div>
-        <div class="form-group">
-          <label class="fl">Ingreso ($)</label>
-          <input type="number" class="fc" id="t-ingreso" step="0.01" min="0" placeholder="0.00" oninput="lockField('t-gasto',this.value)">
-        </div>
-      </div>
-    </div>
-
-    <div class="form-actions" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
-      <button type="button" class="btn btn-outline" onclick="closeModal('modal-trans')">Cancelar</button>
-      <button type="button" class="btn btn-success" onclick="saveSmartTrans()">✓ Guardar Transacción</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-// ================================================================
-// SUPABASE CONFIG  ←  reemplaza con tus credenciales
-// ================================================================
 const SUPABASE_URL      = 'https://mwefvjvvitsondqghgsx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
-const USE_SUPABASE = !SUPABASE_URL.startsWith('TU_');
-const sb = USE_SUPABASE ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── Mappers: DB (snake_case) ↔ JS (camelCase) ──
-function mapAtleta(r){ return { id:r.id, nombre:r.nombre||'', deporte:r.deporte||'', servicio:r.servicio||'', tipoPago:r.tipo_pago||'', total:r.total||0, pago:r.pago||0, pagosHechos:r.pagos_hechos||'', estado:r.estado||'Activo', referido:r.referido||'', deudor:r.deudor||'', whatsapp:r.whatsapp||'', notas:r.notas||'' }; }
-function unmapAtleta(a){ return { nombre:a.nombre, deporte:a.deporte, servicio:a.servicio, tipo_pago:a.tipoPago, total:a.total, pago:a.pago, pagos_hechos:a.pagosHechos, estado:a.estado, referido:a.referido, deudor:a.deudor, whatsapp:a.whatsapp, notas:a.notas }; }
-function mapTrans(r){ return { id:r.id, fecha:r.fecha, concepto:r.concepto||'', formaPago:r.forma_pago||'', persona:r.persona||'', gasto:r.gasto||0, ingreso:r.ingreso||0 }; }
-function unmapTrans(t){ return { fecha:t.fecha, concepto:t.concepto, forma_pago:t.formaPago, persona:t.persona, gasto:t.gasto, ingreso:t.ingreso }; }
-
-// ── Reload helpers (Supabase mode) ──
-async function reloadAtletasFromSB() {
-  const { data, error } = await sb.from('atletas').select('*').order('nombre');
-  if(!error) atletasData = data.map(mapAtleta);
-}
-async function reloadTransFromSB() {
-  const { data, error } = await sb.from('transacciones').select('*').order('fecha', {ascending:false});
-  if(!error) transData = data.map(mapTrans);
-}
-
-// ── Auth functions ──
 async function doLogin() {
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   const errEl    = document.getElementById('login-error');
   const loadEl   = document.getElementById('login-loading');
   errEl.textContent = '';
-  if(!email || !password){ errEl.textContent = 'Ingresa email y contraseña.'; return; }
+  if(!email||!password){ errEl.textContent='Ingresa email y contraseña.'; return; }
   loadEl.style.display = 'block';
-  const { error } = await sb.auth.signInWithPassword({ email, password });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
   loadEl.style.display = 'none';
-  if(error){ errEl.textContent = 'Credenciales incorrectas.'; return; }
-  document.getElementById('login-overlay').style.display = 'none';
-  await initWithSupabase();
+  if(error){ errEl.textContent='Credenciales incorrectas.'; return; }
+  showPlatform(data.user);
 }
 
 async function doLogout() {
   await sb.auth.signOut();
-  atletasData = []; transData = [];
+  document.getElementById('platform').style.display = 'none';
   document.getElementById('login-overlay').style.display = 'flex';
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
-  document.getElementById('logout-btn').style.display = 'none';
 }
 
-// ── First-time migration: hardcoded arrays → Supabase ──
-async function migrateToSupabase() {
-  showToast('Primera conexión: migrando datos al servidor…');
-  const atletasRows = ATLETAS_BASE.map(a => ({...unmapAtleta(a), id: a.id}));
-  await sb.from('atletas').insert(atletasRows);
-  const transRows = TRANS_BASE.map(t => unmapTrans({...t, formaPago: t.formaPago||t.forma_pago||''}));
-  for(let i=0;i<transRows.length;i+=100){
-    await sb.from('transacciones').insert(transRows.slice(i,i+100));
-  }
-  showToast('✅ Migración completa');
-}
+async function showPlatform(user) {
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('platform').style.display = 'block';
+  const name = user.email.split('@')[0];
+  document.getElementById('user-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
 
-// ── Supabase init ──
-async function initWithSupabase() {
-  document.getElementById('logout-btn').style.display = 'inline-flex';
-  const { count } = await sb.from('atletas').select('*', {count:'exact', head:true});
-  if(count === 0) await migrateToSupabase();
-  await Promise.all([reloadAtletasFromSB(), reloadTransFromSB()]);
-  renderAll();
-}
-
-function renderAll() {
-  renderDashboard();
-  renderAtletas();
-  renderTransacciones();
-  renderDeudores();
-}
-
-// ================================================================
-// DATOS BASE
-// ================================================================
-
-const MONTHLY_BASE = [
-  {mes:"Nov 2024",  key:"2024-11", gastos:568.18,  ingresos:0},
-  {mes:"Dic 2024",  key:"2024-12", gastos:726.72,  ingresos:423.33},
-  {mes:"Ene 2025",  key:"2025-01", gastos:171.65,  ingresos:223.33},
-  {mes:"Feb 2025",  key:"2025-02", gastos:821.05,  ingresos:778.55},
-  {mes:"Mar 2025",  key:"2025-03", gastos:2406.18, ingresos:3119.75},
-  {mes:"Abr 2025",  key:"2025-04", gastos:1472.37, ingresos:2878.97},
-  {mes:"May 2025",  key:"2025-05", gastos:1677.24, ingresos:840.38},
-  {mes:"Jun 2025",  key:"2025-06", gastos:773.37,  ingresos:917.84},
-  {mes:"Jul 2025",  key:"2025-07", gastos:1183.75, ingresos:1742.89},
-  {mes:"Ago 2025",  key:"2025-08", gastos:1329.89, ingresos:1969.99},
-  {mes:"Sep 2025",  key:"2025-09", gastos:1492.26, ingresos:4313.40},
-  {mes:"Oct 2025",  key:"2025-10", gastos:1449.40, ingresos:1863.90},
-  {mes:"Nov 2025",  key:"2025-11", gastos:1185.10, ingresos:1669.44},
-  {mes:"Dic 2025",  key:"2025-12", gastos:1624.70, ingresos:3415.06},
-  {mes:"Ene 2026",  key:"2026-01", gastos:1656.00, ingresos:3917.60},
-  {mes:"Feb 2026",  key:"2026-02", gastos:4593.45, ingresos:5457.77},
-  {mes:"Mar 2026",  key:"2026-03", gastos:3773.14, ingresos:5314.73},
-  {mes:"Abr 2026",  key:"2026-04", gastos:6813.07, ingresos:4998.25},
-  {mes:"May 2026",  key:"2026-05", gastos:3816.19, ingresos:6077.14},
-];
-
-const ATLETAS_BASE = [
-  // ── GRUPO A — 2 PAYMENTS ──
-  {id:1,  nombre:"Ryan Carrillo",        deporte:"Basketball",       servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:1000,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"Diego Julio",      deudor:"Rocio Cedeño",         whatsapp:"507 6987-9575"},
-  {id:2,  nombre:"Jose Ignacio Jovane",  deporte:"Basketball",       servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:1000,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"",                 deudor:"Juan Carlos Jovane",   whatsapp:"507 6613-7214"},
-  {id:3,  nombre:"Luca Giugno",          deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:500,    pagosHechos:"1 out of 2", estado:"Activo",     referido:"",                 deudor:"Fabian Giugno",        whatsapp:"507 6618-0033"},
-  {id:4,  nombre:"Alejandro Vasconez",   deporte:"Soccer",           servicio:"TRANSFER", tipoPago:"2 PAYMENTS",        total:1000,    pago:500,    pagosHechos:"2 out of 2", estado:"Completado", referido:"",                 deudor:"Juan Carlos Vasconez", whatsapp:"507 6674-4971"},
-  {id:5,  nombre:"Diorkis Nuñez",        deporte:"Baseball",         servicio:"PREMIUM",  tipoPago:"2 PAYMENTS",        total:3000,    pago:1500,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"Diego Julio",      deudor:"Isel Iveth Espinosa",  whatsapp:"507 6678-9893"},
-  {id:6,  nombre:"Jose Luna",            deporte:"Baseball",         servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:1000,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"",                 deudor:"Sylvia Crespo",        whatsapp:"507 6937-4898"},
-  {id:7,  nombre:"Isabella Shimizu",     deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:1000,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"",                 deudor:"Carolina Villareal",   whatsapp:"507 6824-3620"},
-  {id:8,  nombre:"Maria Goretti",        deporte:"Flag Football",    servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:1000,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"",                 deudor:"Irlanda Valdes",       whatsapp:"52 1 844 277 3031"},
-  {id:9,  nombre:"Alan Ramirez",         deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:1000,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"",                 deudor:"Elly Robert Ramirez",  whatsapp:"1 (809) 355-9726"},
-  {id:10, nombre:"Lucas Birbuet",        deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:2000,    pago:1000,   pagosHechos:"1 out of 2", estado:"Activo",     referido:"",                 deudor:"Carlos Alberto Birbuet",whatsapp:"1 (809) 723-4537"},
-  {id:11, nombre:"Santiago Magana",      deporte:"Soccer",           servicio:"TRANSFER", tipoPago:"2 PAYMENTS",        total:1000,    pago:509.30, pagosHechos:"1 out of 2", estado:"Activo",     referido:"Ariel Ching",      deudor:"Santiago Magana",      whatsapp:"1 (575) 937-4018"},
-  {id:12, nombre:"Augusto Samudio",      deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"2 PAYMENTS",        total:739.99,  pago:739.99, pagosHechos:"Cerrado — no completó", estado:"Cerrado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:13, nombre:"Cesar Estevez",        deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"2 PAYMENTS",        total:1000,    pago:1000,   pagosHechos:"Cerrado — no completó", estado:"Cerrado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  // ── GRUPO A — 3 PAYMENTS ──
-  {id:14, nombre:"Mike Ratner",          deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"3 PAYMENTS",        total:3000,    pago:1000,   pagosHechos:"1 out of 3", estado:"Activo",     referido:"Diego Julio",      deudor:"Ronen Ratner",         whatsapp:"507 6679-0069"},
-  // ── GRUPO A — 4 PAYMENTS ──
-  {id:15, nombre:"Maximo Muñoz",         deporte:"Basketball",       servicio:"ESTANDAR", tipoPago:"4 PAYMENTS",        total:1479.99, pago:369.99, pagosHechos:"4 out of 4", estado:"Completado", referido:"",                 deudor:"Geraldina Marcos",     whatsapp:"507 6285-0294"},
-  {id:16, nombre:"Jose Benavidez",       deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"4 PAYMENTS",        total:1240.40, pago:310.10, pagosHechos:"3 out of 4", estado:"Activo",     referido:"Propraxis FC",     deudor:"Javier Benavides",     whatsapp:"593 99 886 4704"},
-  // ── GRUPO A — 1 PAYMENT ──
-  {id:17, nombre:"Sebastian Sanjur",     deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"1 PAYMENT",         total:2232.71, pago:2232.71,pagosHechos:"1 out of 1", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:18, nombre:"Noah Gonzales",        deporte:"Flag Football",    servicio:"ESTANDAR", tipoPago:"1 PAYMENT",         total:805.49,  pago:805.49, pagosHechos:"1 out of 1", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:19, nombre:"Ian Cangas",           deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"1 PAYMENT",         total:1479.99, pago:1479.99,pagosHechos:"1 out of 1", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:20, nombre:"Peter Fernandez",      deporte:"Basketball",       servicio:"ESTANDAR", tipoPago:"1 PAYMENT",         total:990,     pago:990,    pagosHechos:"1 out of 1", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:21, nombre:"Elian Ramos",          deporte:"Volleyball",       servicio:"ESTANDAR", tipoPago:"1 PAYMENT",         total:800,     pago:800,    pagosHechos:"1 out of 1", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  // ── QUARTERLY ──
-  {id:22, nombre:"Jean Paul Cruvelier",  deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"QUARTERLY",         total:750,     pago:450,    pagosHechos:"Cerrado — no completó", estado:"Cerrado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:23, nombre:"Martin Torres",        deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"QUARTERLY",         total:369.99,  pago:369.99, pagosHechos:"Cerrado — no completó", estado:"Cerrado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:24, nombre:"Lucas Montino",        deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"QUARTERLY",         total:2050,    pago:1025,   pagosHechos:"2 out of 2", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:25, nombre:"Sebastian Montino",    deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"QUARTERLY",         total:2050,    pago:1025,   pagosHechos:"2 out of 2", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:26, nombre:"David Garces",         deporte:"Tennis",           servicio:"ESTANDAR", tipoPago:"QUARTERLY",         total:732.25,  pago:374.99, pagosHechos:"2 out of 2", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:27, nombre:"Camilo Tacuri",        deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"QUARTERLY",         total:1116.36, pago:558.18, pagosHechos:"2 out of 2", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  // ── ABONO + MENSUALIDAD ──
-  {id:28, nombre:"Cata Pazmiño",         deporte:"Flag Football",    servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:250,    pagosHechos:"ABONO 1/2 + MONTHLY", estado:"Activo",referido:"Andrea Castillo",deudor:"Pedro Pazmiño",       whatsapp:"507 6628-5969"},
-  {id:29, nombre:"Josy Gabay",           deporte:"Volleyball",       servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY",  estado:"Activo",referido:"",             deudor:"Gladys Gabay",         whatsapp:"507 6983-9944"},
-  {id:30, nombre:"Ian Pinzon",           deporte:"Baseball",         servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(2)",estado:"Activo",referido:"Diego Julio", deudor:"Abdel Pinzon",         whatsapp:"507 6672-3444"},
-  {id:31, nombre:"Juan Diego Ramos",     deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(2)",estado:"Activo",referido:"",             deudor:"Ariosto Ramos",        whatsapp:"507 6059-7042"},
-  {id:32, nombre:"Valentina Rodrigues",  deporte:"Flag Football",    servicio:"PREMIUM",  tipoPago:"ABONO + MENSUALIDAD",total:3000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(1)",estado:"Activo",referido:"Andrea Castillo",deudor:"Lorena Mutis",       whatsapp:"507 6677-5620"},
-  {id:33, nombre:"Luis Fernandes",       deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"ABONO + MENSUALIDAD",total:3000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(2)",estado:"Activo",referido:"",             deudor:"Franklin Fernandes",   whatsapp:"507 6327-1864"},
-  {id:34, nombre:"Thais Pardo",          deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"ABONO + MENSUALIDAD",total:3000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(0)",estado:"Activo",referido:"",             deudor:"Patricia Gutierrez",   whatsapp:"507 6353-9123"},
-  {id:35, nombre:"Nicko Martinez",       deporte:"Football Americano",servicio:"PREMIUM", tipoPago:"ABONO + MENSUALIDAD",total:3000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(1)",estado:"Activo",referido:"Juan Diego Julio",deudor:"Sareis Pineda",     whatsapp:"507 6920-8496"},
-  {id:36, nombre:"Caylee Rios",          deporte:"Volleyball",       servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(1)",estado:"Activo",referido:"",             deudor:"Jose Rios",            whatsapp:"507 6378-2626"},
-  {id:37, nombre:"Isabella Scarfone",    deporte:"Volleyball",       servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(0)",estado:"Activo",referido:"",             deudor:"Jose Scarfone",        whatsapp:"507 6393-9879"},
-  {id:38, nombre:"Fabiana Jimenez",      deporte:"Gimnasia",         servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(0)",estado:"Activo",referido:"",             deudor:"Veronica Castro",      whatsapp:"507 6438-9828"},
-  {id:39, nombre:"Fabricio Turner",      deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(3)",estado:"Completado",referido:"",         deudor:"Yoli Sandoval",        whatsapp:"507 6090-2817"},
-  {id:40, nombre:"Andy Guillen",         deporte:"Flag Football",    servicio:"ESTANDAR", tipoPago:"ABONO + MENSUALIDAD",total:2000,   pago:500,    pagosHechos:"ABONO 0/1 + MONTHLY(0)",estado:"Activo",referido:"Andrea Castillo",deudor:"Farah Suhail",       whatsapp:"507 6006-0494"},
-  {id:41, nombre:"Alberto Adams",        deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"ABONO + MENSUALIDAD",total:3000,   pago:500,    pagosHechos:"ABONO 1/1 + MONTHLY(0)",estado:"Activo",referido:"",             deudor:"Marilyn Bermudez",     whatsapp:"507 6151-1177"},
-  {id:42, nombre:"Jesus Arosemena",      deporte:"Baseball",         servicio:"PREMIUM",  tipoPago:"ABONO + MENSUALIDAD",total:3000,   pago:500,    pagosHechos:"ABONO 0/1 + MONTHLY(0)",estado:"Activo",referido:"",             deudor:"Lelis Lasso",          whatsapp:"507 6150-9136"},
-  // ── MONTHLY ──
-  {id:43, nombre:"Ian Anaya",            deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:2000,    pago:150,    pagosHechos:"MONTHLY (1)",  estado:"Activo",     referido:"",                 deudor:"Michela Janeth Miranda",whatsapp:"507 6920-5668"},
-  {id:44, nombre:"Alejandro Ochoa",      deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"MONTHLY",           total:3000,    pago:100,    pagosHechos:"MONTHLY (1)",  estado:"Activo",     referido:"Ariel Ching",      deudor:"Lourdes Franco",       whatsapp:"507 460513442"},
-  {id:45, nombre:"Manuel Tapia",         deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1479.99, pago:123.33, pagosHechos:"8 out of 12",  estado:"Pendiente",  referido:"",                 deudor:"Anileyda",             whatsapp:"58 424-4705015"},
-  {id:46, nombre:"Maria Baloy",          deporte:"Flag Football",    servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1479.99, pago:123.33, pagosHechos:"8 out of 12",  estado:"Pendiente",  referido:"Andrea Castillo",  deudor:"Eliana Galeano",       whatsapp:"507 6694-6302"},
-  {id:47, nombre:"Ariel Ortega",         deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1479.99, pago:123.33, pagosHechos:"9 out of 12",  estado:"Activo",     referido:"",                 deudor:"Johana Vergara",       whatsapp:"507 6930-2007"},
-  {id:48, nombre:"Sofia Centella",       deporte:"Volleyball",       servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1979.99, pago:123.33, pagosHechos:"8 out of 12",  estado:"Activo",     referido:"",                 deudor:"Carlos Centella",      whatsapp:"34 695 03 08 19"},
-  {id:49, nombre:"Taide Quiroz",         deporte:"Volleyball",       servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1479.99, pago:123.33, pagosHechos:"9 out of 12",  estado:"Activo",     referido:"",                 deudor:"Luanda Vergara",       whatsapp:"507 6670-6671"},
-  {id:50, nombre:"Zara Vega",            deporte:"Volleyball",       servicio:"PREMIUM",  tipoPago:"MONTHLY",           total:1612.51, pago:806.25, pagosHechos:"1 out of 2",   estado:"Activo",     referido:"",                 deudor:"Pedro Vega",           whatsapp:"507 6678-0361"},
-  {id:51, nombre:"Kendrieck Newby",      deporte:"Volleyball",       servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:739.99,  pago:61.66,  pagosHechos:"4 out of 12",  estado:"Deudor",     referido:"",                 deudor:"Rogelio Newby",        whatsapp:"507 6521-7448"},
-  {id:52, nombre:"Nicolette Mass",       deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:3000,    pago:200,    pagosHechos:"3 out of 15",  estado:"Activo",     referido:"",                 deudor:"Doris Vargas",         whatsapp:"507 6535-3090"},
-  {id:53, nombre:"Matthew Turner",       deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1479.99, pago:123.33, pagosHechos:"12 out of 12", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:54, nombre:"Alvin Madrid",         deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:310,     pago:180.90, pagosHechos:"Cerrado — no completó", estado:"Cerrado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:55, nombre:"Ariel Ching",          deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1479.99, pago:123.33, pagosHechos:"12 out of 12", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:56, nombre:"Fernando Garcia",      deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:351.66,  pago:123.33, pagosHechos:"Cerrado — no completó", estado:"Cerrado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:57, nombre:"Fabian Fuentes",       deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1479.99, pago:123.33, pagosHechos:"12 out of 12", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:58, nombre:"Gabriel Puerta",       deporte:"Soccer",           servicio:"PREMIUM",  tipoPago:"MONTHLY",           total:2480.79, pago:206.73, pagosHechos:"12 out of 12", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:59, nombre:"Lenin Flores",         deporte:"Soccer",           servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1000,    pago:100,    pagosHechos:"10 out of 10", estado:"Completado", referido:"",                 deudor:"—",                    whatsapp:"—"},
-  {id:60, nombre:"Maria Fernanda Peralba",deporte:"Volleyball",      servicio:"ESTANDAR", tipoPago:"MONTHLY",           total:1257.99, pago:100,    pagosHechos:"7 out of 10",  estado:"Activo",     referido:"",                 deudor:"Tania Morales",        whatsapp:"507 6070-7311"},
-];
-
-const TRANS_BASE = [
-  // Nov 2024
-  {fecha:"2024-11-10",concepto:"Pagina Web: Demo para modificar",formaPago:"Pay Pal",persona:"Mazzarriol",gasto:25,ingreso:0},
-  {fecha:"2024-11-11",concepto:"Viaje Lamoni - Pagina Web en persona",formaPago:"Tarjeta de Crédito",persona:"Stefano",gasto:118.18,ingreso:0},
-  {fecha:"2024-11-12",concepto:"Pagina Web Primer Pago de Diseño",formaPago:"Pay Pal",persona:"Mazzarriol",gasto:250,ingreso:0},
-  {fecha:"2024-11-16",concepto:"Notaria",formaPago:"Cash",persona:"Ivan Cano",gasto:100,ingreso:0},
-  {fecha:"2024-11-16",concepto:"Derechos de registro de la Sociedad",formaPago:"Cash",persona:"Ivan Cano",gasto:75,ingreso:0},
-  // Dic 2024
-  {fecha:"2024-12-03",concepto:"Primer Paga de Jean Paul Cruvelier",formaPago:"Transferencia Bancaria",persona:"Jean Paul",gasto:0,ingreso:300},
-  {fecha:"2024-12-03",concepto:"Abrigos de New Vision",formaPago:"Yappy",persona:"Ximena",gasto:114.97,ingreso:0},
-  {fecha:"2024-12-10",concepto:"Pagina Web Finalización",formaPago:"Pay Pal",persona:"Mazzarriol",gasto:250,ingreso:0},
-  {fecha:"2024-12-13",concepto:"Primer Paga de Matthew Turner",formaPago:"Transferencia Bancaria",persona:"Ivan Turner",gasto:0,ingreso:123.33},
-  {fecha:"2024-12-17",concepto:"Pago de ADS de IG",formaPago:"Pay Pal",persona:"Stefano",gasto:142.85,ingreso:0},
-  // Feb 2025
-  {fecha:"2025-02-03",concepto:"Pago de ADS de IG",formaPago:"Pay Pal",persona:"Stefano",gasto:225.30,ingreso:0},
-  {fecha:"2025-02-04",concepto:"Primera y segunda paga de Alvin Madrid",formaPago:"Transferencia Bancaria",persona:"Yamilteh Navarro",gasto:0,ingreso:310},
-  {fecha:"2025-02-08",concepto:"Tercera paga de Matthew Turner",formaPago:"Transferencia Bancaria",persona:"Ivan Turner",gasto:0,ingreso:123.33},
-  {fecha:"2025-02-13",concepto:"Segunda Paga de Lenin Flores",formaPago:"Transferencia Bancaria",persona:"Lenin",gasto:0,ingreso:100},
-  {fecha:"2025-02-25",concepto:"Primera Paga de Manuel Tapia",formaPago:"Pay Pal",persona:"Anileyda",gasto:0,ingreso:123.33},
-  // Mar 2025
-  {fecha:"2025-03-05",concepto:"Primer paga de Ariel Ching",formaPago:"Yappy",persona:"Ariel",gasto:0,ingreso:123.33},
-  {fecha:"2025-03-06",concepto:"Primera paga Lucas y Sebastian Montino",formaPago:"Transferencia Bancaria",persona:"Daniel Montino",gasto:0,ingreso:2050},
-  {fecha:"2025-03-06",concepto:"Pago de celular de Trabajo Iphone 15 Pro",formaPago:"Transferencia Bancaria",persona:"EcoSystem",gasto:690,ingreso:0},
-  {fecha:"2025-03-13",concepto:"Cuarta Paga de Matthew Turner",formaPago:"Transferencia Bancaria",persona:"Ivan Turner",gasto:0,ingreso:123.33},
-  {fecha:"2025-03-31",concepto:"Primer paga de Martin Torres",formaPago:"Yappy",persona:"Martin",gasto:0,ingreso:369.99},
-  // Abr 2025
-  {fecha:"2025-04-12",concepto:"Segunda paga de Lucas y Sebas Montino",formaPago:"Transferencia Bancaria",persona:"Daniel Montino",gasto:0,ingreso:2050},
-  {fecha:"2025-04-15",concepto:"Segunda Paga de Ariel Ching",formaPago:"Yappy",persona:"Ariel",gasto:0,ingreso:123.33},
-  {fecha:"2025-04-17",concepto:"Pago de IPAD 10th 256 GB",formaPago:"Transferencia Bancaria",persona:"Cell Phone Pty",gasto:468,ingreso:0},
-  {fecha:"2025-04-27",concepto:"Primera paga de David Garces",formaPago:"Pay Pal",persona:"David Garces",gasto:0,ingreso:358.15},
-  // May 2025
-  {fecha:"2025-05-13",concepto:"Cuarta paga de Manuel Tapia",formaPago:"Pay Pal",persona:"Anileyda",gasto:0,ingreso:123.73},
-  {fecha:"2025-05-19",concepto:"Primera paga de Maximo Munoz",formaPago:"Transferencia Bancaria",persona:"Geraldina",gasto:0,ingreso:369.99},
-  {fecha:"2025-05-14",concepto:"Mesas para oficina",formaPago:"Visa Banco General",persona:"Tandor",gasto:175.48,ingreso:0},
-  {fecha:"2025-05-15",concepto:"Sillas de oficina x4",formaPago:"Visa Banco General",persona:"EP Domestics",gasto:149.80,ingreso:0},
-  // Jun 2025
-  {fecha:"2025-06-02",concepto:"Septima Paga de Matthew Turner",formaPago:"Transferencia Bancaria",persona:"Ivan Turner",gasto:0,ingreso:123.33},
-  {fecha:"2025-06-02",concepto:"Primera paga de Fabian Fuentes",formaPago:"Pay Pal",persona:"Fuentes",gasto:0,ingreso:117.79},
-  {fecha:"2025-06-16",concepto:"Primera paga de Gabriel Puerta",formaPago:"Transferencia Bancaria",persona:"Jorge Puerta",gasto:0,ingreso:206.73},
-  {fecha:"2025-06-17",concepto:"Primera paga de Maria Baloy",formaPago:"Yappy",persona:"Eliana Baloy",gasto:0,ingreso:123.33},
-  // Sep 2025
-  {fecha:"2025-09-21",concepto:"Pago unico de Sebastian Sanjur",formaPago:"Transferencia Bancaria",persona:"Estela Sanjur",gasto:0,ingreso:2232.71},
-  {fecha:"2025-09-18",concepto:"Pago camarografo SHOWCASE VOLLEY",formaPago:"Transferencia Bancaria",persona:"Abdiel Soto",gasto:220,ingreso:0},
-  {fecha:"2025-09-30",concepto:"One time payment Peter Fernandez",formaPago:"Bank of the Plains Wire",persona:"Rick Fernandez",gasto:0,ingreso:990},
-  // Oct 2025
-  {fecha:"2025-10-08",concepto:"Pago boleto avion Ximena - WICHITA WORK",formaPago:"Visa Banco General",persona:"United Airlines",gasto:296.11,ingreso:0},
-  {fecha:"2025-10-29",concepto:"Registro de 43 personas showcase NVS",formaPago:"Yappy",persona:"NVS PROJECT",gasto:0,ingreso:575.73},
-  // Nov 2025
-  {fecha:"2025-11-03",concepto:"Pago sueteres Showcase",formaPago:"Yappy",persona:"M Deportes",gasto:300.94,ingreso:0},
-  {fecha:"2025-11-03",concepto:"Sexta paga de Fabian Fuentes",formaPago:"Pay Pal",persona:"Fuentes",gasto:0,ingreso:117.79},
-  {fecha:"2025-11-16",concepto:"Tercera paga de Maximo Munoz",formaPago:"Transferencia Bancaria",persona:"Geraldina",gasto:0,ingreso:369.99},
-  {fecha:"2025-11-10",concepto:"Vuelo de Avion Panama Stefano Thanksgiving",formaPago:"Visa Banco General",persona:"United Airlines",gasto:373.25,ingreso:0},
-  // Dic 2025
-  {fecha:"2025-12-04",concepto:"Boletos de Avion MLS NEXT FEST CUP",formaPago:"Visa Banco General",persona:"American Airlines",gasto:697.92,ingreso:0},
-  {fecha:"2025-12-06",concepto:"Pago Unico de Elian Ramos",formaPago:"Transferencia Bancaria",persona:"Elian Ramos",gasto:0,ingreso:800},
-  {fecha:"2025-12-15",concepto:"Primera paga de Zara Vega",formaPago:"Transferencia Bancaria",persona:"Pedro Vega",gasto:0,ingreso:806.26},
-  {fecha:"2025-12-15",concepto:"Segunda Paga de Jose Benavidez",formaPago:"Pay Pal",persona:"Javier Benavidez",gasto:0,ingreso:296.18},
-  {fecha:"2025-12-18",concepto:"Pago Comisiones Mensuales (Dic)",formaPago:"Varios",persona:"Equipo NVS",gasto:692.78,ingreso:0},
-  // Ene 2026
-  {fecha:"2026-01-07",concepto:"Pago unico de Ian Cangas",formaPago:"Transferencia Bancaria",persona:"",gasto:0,ingreso:1479.99},
-  {fecha:"2026-01-15",concepto:"Pago del SEO Pagina Web",formaPago:"Stripe",persona:"Mazzarriol",gasto:599,ingreso:0},
-  {fecha:"2026-01-15",concepto:"Pago a Film Coordinator NVS",formaPago:"Transferencia Bancaria",persona:"Mateo Soto",gasto:400,ingreso:0},
-  {fecha:"2026-01-26",concepto:"Segunda paga Camilo Tacuri",formaPago:"Yappy",persona:"Tacuri",gasto:0,ingreso:533.12},
-  {fecha:"2026-01-28",concepto:"Primera/Segunda paga de Augusto Samudio",formaPago:"Transferencia Bancaria",persona:"Samudio",gasto:0,ingreso:739.99},
-  // Feb 2026
-  {fecha:"2026-02-10",concepto:"Pago Ryan Carrillo SIGN",formaPago:"Transferencia Bancaria",persona:"Rocio Cedeño",gasto:0,ingreso:1000},
-  {fecha:"2026-02-11",concepto:"Pago Jose Ignacio Jovane SIGN",formaPago:"Transferencia Bancaria",persona:"Juan Carlos Jovane",gasto:0,ingreso:1000},
-  {fecha:"2026-02-11",concepto:"Pago Luca Giugno SIGN",formaPago:"Transferencia Bancaria",persona:"Fabian Giugno",gasto:0,ingreso:500},
-  {fecha:"2026-02-10",concepto:"Boletos Avion Santo Domingo - Showcase",formaPago:"Transferencia Bancaria",persona:"Delta",gasto:1428.54,ingreso:0},
-  {fecha:"2026-02-25",concepto:"Pago de Jose Luna SIGN",formaPago:"Transferencia Bancaria",persona:"Sylvia Crespo",gasto:0,ingreso:1000},
-  // Mar 2026
-  {fecha:"2026-03-06",concepto:"Pago Diorkis Nuñez SIGN",formaPago:"Transferencia Bancaria",persona:"Isel",gasto:0,ingreso:1500},
-  {fecha:"2026-03-18",concepto:"Pago EVENTO SHOWCASE",formaPago:"Transferencia Bancaria",persona:"Daniel Lou",gasto:1900,ingreso:0},
-  {fecha:"2026-03-18",concepto:"Pago Sign Cesar Estevez",formaPago:"Transferencia Bancaria",persona:"Irma",gasto:0,ingreso:1000},
-  {fecha:"2026-03-27",concepto:"Pago Sign Isabella Shimizu",formaPago:"Transferencia Bancaria",persona:"Carolina Villarreal",gasto:0,ingreso:1000},
-  {fecha:"2026-03-28",concepto:"Tercera paga de Jose Benavidez",formaPago:"Pay Pal",persona:"Javier Benavidez",gasto:0,ingreso:296.18},
-  // Abr 2026
-  {fecha:"2026-04-14",concepto:"Boletos Avion Jaime, Michael, Alex",formaPago:"Pay Pal",persona:"Pay Pal",gasto:2437.80,ingreso:0},
-  {fecha:"2026-04-15",concepto:"Pago SEO Pagina Web + Perfiles Digitales",formaPago:"Stripe",persona:"Mazzarriol",gasto:936.31,ingreso:0},
-  {fecha:"2026-04-17",concepto:"Pago Sign Maria Goretti",formaPago:"Pay Pal",persona:"Irlada Valdes",gasto:0,ingreso:955.10},
-  {fecha:"2026-04-23",concepto:"Pago Sign Alan Ramirez",formaPago:"Pay Pal",persona:"Elly Ramirez",gasto:0,ingreso:997.98},
-  {fecha:"2026-04-23",concepto:"Pago Sign Mike Ratner",formaPago:"Transferencia Bancaria",persona:"Ronen",gasto:0,ingreso:1000},
-  {fecha:"2026-04-16",concepto:"Abono Ian Pinzon SIGN",formaPago:"Transferencia Bancaria",persona:"Abdel Pinzon",gasto:0,ingreso:500},
-  // May 2026
-  {fecha:"2026-05-04",concepto:"Pago Sign Juan Diego Ramos",formaPago:"Transferencia Bancaria",persona:"Ariosto Ramos",gasto:0,ingreso:500},
-  {fecha:"2026-05-05",concepto:"Pago Sign Valentina Rodrigues",formaPago:"Transferencia Bancaria",persona:"Lorena",gasto:0,ingreso:500},
-  {fecha:"2026-05-05",concepto:"Pago Sign Josy Gabay",formaPago:"Transferencia Bancaria",persona:"Gladys Gabay",gasto:0,ingreso:500},
-  {fecha:"2026-05-08",concepto:"Pago Sign Luis Fernandes",formaPago:"Transferencia Bancaria",persona:"Franlink Fernandes",gasto:0,ingreso:500},
-  {fecha:"2026-05-15",concepto:"Pago Sign Nicko Martinez",formaPago:"Transferencia Bancaria",persona:"Sareis Pineda",gasto:0,ingreso:500},
-  {fecha:"2026-05-15",concepto:"Pago a equipo servicios profesionales (May)",formaPago:"Varios",persona:"Equipo NVS",gasto:1767,ingreso:0},
-  {fecha:"2026-05-18",concepto:"Pago SEO Pagina Web",formaPago:"Stripe",persona:"Mazzarriol",gasto:616.37,ingreso:0},
-  {fecha:"2026-05-19",concepto:"Pago Sign Santiago Magana",formaPago:"Pay Pal",persona:"Santiago Magana",gasto:0,ingreso:509.30},
-  {fecha:"2026-05-21",concepto:"Pago Sign Caylee Rios",formaPago:"Transferencia Bancaria",persona:"Jose Rios",gasto:0,ingreso:500},
-  {fecha:"2026-05-30",concepto:"Pago Abono Cata Pazmiño",formaPago:"Transferencia Bancaria",persona:"Pedro Pazmiño",gasto:0,ingreso:250},
-  {fecha:"2026-05-26",concepto:"Highlights Maria Duarte",formaPago:"Transferencia Bancaria",persona:"Sandra de Oliveira",gasto:0,ingreso:200},
-  // Jun 2026
-  {fecha:"2026-06-01",concepto:"Pago Sign Isabella Scarfone",formaPago:"Transferencia Bancaria",persona:"Jose Scarfone",gasto:0,ingreso:500},
-  {fecha:"2026-06-04",concepto:"Abono Software Atletas NVS - Guarapo Media",formaPago:"Visa Cash Back Stefano",persona:"Guarapo Media",gasto:939,ingreso:0},
-  {fecha:"2026-06-05",concepto:"Pago Sign Lucas Birbuet",formaPago:"Transferencia Bancaria",persona:"",gasto:0,ingreso:1000},
-  {fecha:"2026-06-11",concepto:"Octavo pago de Maria Baloy",formaPago:"Transferencia Bancaria",persona:"Eliana Baloy",gasto:0,ingreso:123.33},
-  {fecha:"2026-06-15",concepto:"Pagos mensuales atletas activos (Jun 15)",formaPago:"Varios",persona:"Varios atletas",gasto:0,ingreso:1220},
-  {fecha:"2026-06-15",concepto:"Pago a equipo servicios profesionales (Jun 15)",formaPago:"Varios",persona:"Equipo NVS",gasto:2484,ingreso:0},
-  {fecha:"2026-06-15",concepto:"Pago SEO Pagina Web",formaPago:"Stripe",persona:"Mazzarriol",gasto:616.37,ingreso:0},
-  {fecha:"2026-06-16",concepto:"Tercera Paga de Nicolette Mas",formaPago:"Transferencia Bancaria",persona:"Doris Vargas",gasto:0,ingreso:200},
-  {fecha:"2026-06-16",concepto:"Pago Sign Thais Pardo",formaPago:"Yappy Comercial",persona:"Juan Pardo",gasto:0,ingreso:500},
-  {fecha:"2026-06-17",concepto:"Pago Commit Fabricio Turner",formaPago:"Transferencia Bancaria",persona:"Yoli Sandoval",gasto:0,ingreso:1200},
-  {fecha:"2026-06-17",concepto:"Pago Sign Fabiana Jimenez",formaPago:"Transferencia Bancaria",persona:"Veronica Castro",gasto:0,ingreso:500},
-  {fecha:"2026-06-18",concepto:"Pago Sign Alberto Adams",formaPago:"Transferencia Bancaria",persona:"Marilyn Bermudez",gasto:0,ingreso:500},
-  {fecha:"2026-06-18",concepto:"Pago de CLAUDE",formaPago:"Visa Banco General",persona:"Anthropic",gasto:94.72,ingreso:0},
-];
-
-// ================================================================
-// STATE
-// ================================================================
-let atletasData = [];
-let transData = [];
-let newAtletas = [];
-let newTrans = [];
-let deletedTransIds   = new Set();
-let deletedAtletaIds  = new Set();
-
-let filteredAtletas = [];
-let atletasPage = 1;
-const PER_PAGE_A = 15;
-
-let filteredTrans = [];
-let transPage = 1;
-const PER_PAGE_T = 20;
-
-// Modifications map: { athleteId: { field: newValue, ... } }
-// Persists changes to base athletes across page reloads
-let atletasModifications = {};
-
-let monthlyChart = null;
-let sportChart = null;
-let editingAtletaId = null;
-
-// Filter state
-let aSearch='', aStatus='', aSport='', aTipo='';
-let tSearch='', tMonth='', tType='';
-
-// ================================================================
-// INIT
-// ================================================================
-// ── Persist a modification to a base athlete ──
-function guardarModAtleta(id, updates) {
-  if(!atletasModifications[id]) atletasModifications[id] = {};
-  Object.assign(atletasModifications[id], updates);
-  try{ localStorage.setItem('nvs_atletasmods', JSON.stringify(atletasModifications)); }catch(e){}
-}
-
-// ── Centralized data rebuilds (respect deleted sets) ──
-function rebuildAtletasData() {
-  atletasData = [...ATLETAS_BASE, ...newAtletas].filter(a => !deletedAtletaIds.has(String(a.id)));
-}
-function rebuildTransData() {
-  transData = [...TRANS_BASE, ...newTrans].filter(t => !deletedTransIds.has(String(t.id)));
-}
-
-// ── Delete a transaction ──
-async function deleteTrans(id) {
-  if(!confirm('¿Eliminar esta transacción?')) return;
-  if(USE_SUPABASE) {
-    const { error } = await sb.from('transacciones').delete().eq('id', id);
-    if(error){ showToast('Error: '+error.message); return; }
-    await reloadTransFromSB();
-  } else {
-    const idStr = String(id);
-    const idx = newTrans.findIndex(t => String(t.id) === idStr);
-    if(idx >= 0) {
-      newTrans.splice(idx, 1);
-      try{ localStorage.setItem('nvs_extra_trans', JSON.stringify(newTrans)); }catch(e){}
-    } else {
-      deletedTransIds.add(idStr);
-      try{ localStorage.setItem('nvs_del_trans', JSON.stringify([...deletedTransIds])); }catch(e){}
-    }
-    rebuildTransData();
-  }
-  renderTransacciones();
-  renderRecentTrans();
-  renderDashboard();
-  showToast('Transacción eliminada');
-}
-
-// ── Delete an athlete ──
-async function deleteAtleta(id) {
-  if(!confirm('¿Eliminar este atleta? Esta acción no se puede deshacer.')) return;
-  if(USE_SUPABASE) {
-    const { error } = await sb.from('atletas').delete().eq('id', id);
-    if(error){ showToast('Error: '+error.message); return; }
-    await reloadAtletasFromSB();
-  } else {
-    const idStr = String(id);
-    const idx = newAtletas.findIndex(a => String(a.id) === idStr);
-    if(idx >= 0) {
-      newAtletas.splice(idx, 1);
-      try{ localStorage.setItem('nvs_extra_atletas', JSON.stringify(newAtletas)); }catch(e){}
-    } else {
-      deletedAtletaIds.add(idStr);
-      try{ localStorage.setItem('nvs_del_atletas', JSON.stringify([...deletedAtletaIds])); }catch(e){}
-    }
-    rebuildAtletasData();
-  }
-  renderAtletas();
-  renderDashboard();
-  showToast('Atleta eliminado');
-}
-
-// ── Apply saved modifications to ATLETAS_BASE on load ──
-function aplicarModificaciones() {
-  Object.entries(atletasModifications).forEach(([id, mods]) => {
-    const idNum = parseInt(id);
-    const idxBase = ATLETAS_BASE.findIndex(x => x.id === idNum);
-    if(idxBase >= 0) ATLETAS_BASE[idxBase] = {...ATLETAS_BASE[idxBase], ...mods};
-    const idxNew = newAtletas.findIndex(x => x.id === idNum);
-    if(idxNew >= 0) newAtletas[idxNew] = {...newAtletas[idxNew], ...mods};
-  });
+  // Load quick stats
+  try {
+    const { count } = await sb.from('atletas').select('*', { count:'exact', head:true }).in('estado', ['Activo','Pendiente']);
+    document.getElementById('stat-atletas').textContent = count ?? '—';
+  } catch(e) {}
 }
 
 async function init() {
-  document.getElementById('footer-date').textContent = new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});
-
-  if(USE_SUPABASE) {
-    // ── Supabase mode ──
-    const { data: { session } } = await sb.auth.getSession();
-    if(!session) {
-      document.getElementById('login-overlay').style.display = 'flex';
-    } else {
-      await initWithSupabase();
-    }
-    return;
-  }
-
-  // ── Legacy localStorage mode (no Supabase configured) ──
-  TRANS_BASE.forEach((t, i) => { if(!t.id) t.id = 'b' + i; });
-  try {
-    const sa  = localStorage.getItem('nvs_extra_atletas');
-    const st  = localStorage.getItem('nvs_extra_trans');
-    const sm  = localStorage.getItem('nvs_atletasmods');
-    const sdt = localStorage.getItem('nvs_del_trans');
-    const sda = localStorage.getItem('nvs_del_atletas');
-    if(sa)  newAtletas           = JSON.parse(sa);
-    if(st)  newTrans             = JSON.parse(st);
-    if(sm)  atletasModifications = JSON.parse(sm);
-    if(sdt) deletedTransIds      = new Set(JSON.parse(sdt));
-    if(sda) deletedAtletaIds     = new Set(JSON.parse(sda));
-  } catch(e){}
-  aplicarModificaciones();
-  rebuildAtletasData();
-  rebuildTransData();
-  renderAll();
-}
-
-// ================================================================
-// TAB NAVIGATION
-// ================================================================
-function showTab(tab) {
-  ['dashboard','atletas','transacciones','deudores'].forEach(t => {
-    document.getElementById('tab-'+t).classList.remove('active');
-    document.getElementById('nav-'+t).classList.remove('active');
-    const mn = document.getElementById('mnav-'+t);
-    if(mn) mn.classList.remove('active');
-  });
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('nav-'+tab).classList.add('active');
-  const mn = document.getElementById('mnav-'+tab);
-  if(mn) mn.classList.add('active');
-
-  const titles = {dashboard:'Dashboard', atletas:'Atletas', transacciones:'Transacciones', deudores:'Deudores / Alertas'};
-  const subs = {dashboard:'Resumen financiero general', atletas:'Gestión de atletas y contratos', transacciones:'Historial de ingresos y gastos', deudores:'Atletas con alertas de pago'};
-  document.getElementById('page-title').textContent = titles[tab];
-  document.getElementById('page-sub').textContent = subs[tab];
-
-  const btn = document.getElementById('topbar-btn');
-  if(tab==='atletas'){btn.textContent='+ Nuevo Atleta';btn.onclick=()=>openAtletaModal();}
-  else if(tab==='transacciones'){btn.textContent='+ Nueva Transacción';btn.onclick=()=>openTransModal();}
-  else{btn.textContent='+ Agregar';btn.onclick=openAddModal;}
-}
-
-function openAddModal(){
-  const active = document.querySelector('.tab-content.active');
-  if(active&&active.id==='tab-atletas') openAtletaModal();
-  else openTransModal();
-}
-
-// ================================================================
-// DASHBOARD
-// ================================================================
-function renderDashboard() {
-  const baseI  = MONTHLY_BASE.reduce((s,m)=>s+m.ingresos,0);
-  const baseG  = MONTHLY_BASE.reduce((s,m)=>s+m.gastos,0);
-  // Include transactions added via the form on top of historical totals
-  const extraI = newTrans.reduce((s,t)=>s+(t.ingreso||0),0);
-  const extraG = newTrans.reduce((s,t)=>s+(t.gasto||0),0);
-  const totalI = baseI + extraI;
-  const totalG = baseG + extraG;
-  const balance = totalI - totalG;
-  const activos = atletasData.filter(a=>a.estado==='Activo').length;
-  const completados = atletasData.filter(a=>a.estado==='Completado').length;
-  const deudores = atletasData.filter(a=>a.estado==='Deudor').length;
-
-  document.getElementById('kpi-balance').textContent = fmt(balance);
-  document.getElementById('kpi-ingresos').textContent = fmt(totalI);
-  document.getElementById('kpi-gastos').textContent = fmt(totalG);
-  document.getElementById('kpi-atletas').textContent = activos;
-  document.getElementById('kpi-completados').textContent = completados;
-  document.getElementById('kpi-deudores').textContent = deudores;
-
-  renderMonthlyChart();
-  renderSportChart();
-  renderRecentTrans();
-}
-
-function renderMonthlyChart() {
-  const range = parseInt(document.getElementById('chart-range').value) || 0;
-  let data = range > 0 ? MONTHLY_BASE.slice(-range) : [...MONTHLY_BASE];
-
-  // Merge newTrans into the chart — group by month label "Mmm YYYY"
-  const MESES_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  if(newTrans.length > 0) {
-    const extras = {};
-    newTrans.forEach(t => {
-      if(!t.fecha) return;
-      const parts = t.fecha.split('-');
-      const label = `${MESES_SHORT[parseInt(parts[1])-1]} ${parts[0]}`;
-      if(!extras[label]) extras[label] = {mes:label, ingresos:0, gastos:0};
-      extras[label].ingresos += (t.ingreso||0);
-      extras[label].gastos   += (t.gasto||0);
-    });
-    Object.values(extras).forEach(ex => {
-      const idx = data.findIndex(m=>m.mes===ex.mes);
-      if(idx>=0) {
-        data[idx] = {...data[idx], ingresos:data[idx].ingresos+ex.ingresos, gastos:data[idx].gastos+ex.gastos};
-      } else {
-        data.push(ex);
-      }
-    });
-  }
-
-  const ctx = document.getElementById('monthlyChart').getContext('2d');
-  if(monthlyChart) monthlyChart.destroy();
-  monthlyChart = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels: data.map(m=>m.mes),
-      datasets:[
-        {label:'Ingresos', data:data.map(m=>m.ingresos), backgroundColor:'rgba(16,185,129,0.8)', borderRadius:4},
-        {label:'Gastos',   data:data.map(m=>m.gastos),   backgroundColor:'rgba(239,68,68,0.75)',  borderRadius:4},
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{position:'top',labels:{font:{size:12}}}},
-      scales:{y:{beginAtZero:true, ticks:{callback:v=>'$'+v.toLocaleString('en-US')}}}
-    }
-  });
-}
-
-function updateMonthlyChart(){renderMonthlyChart();}
-
-function renderSportChart() {
-  const counts = {};
-  atletasData.forEach(a=>{counts[a.deporte]=(counts[a.deporte]||0)+1;});
-  const sports = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
-  const colors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16','#ec4899'];
-  const ctx = document.getElementById('sportChart').getContext('2d');
-  if(sportChart) sportChart.destroy();
-  sportChart = new Chart(ctx,{
-    type:'doughnut',
-    data:{labels:sports, datasets:[{data:sports.map(s=>counts[s]), backgroundColor:colors, borderWidth:2}]},
-    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}}}}
-  });
-}
-
-function renderRecentTrans() {
-  const sorted = [...transData].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).slice(0,10);
-  document.getElementById('recent-trans-body').innerHTML = sorted.map(t=>`
-    <tr>
-      <td>${fmtDate(t.fecha)}</td>
-      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.concepto)}">${esc(t.concepto)}</td>
-      <td><span class="badge badge-gray">${esc(t.formaPago)}</span></td>
-      <td style="color:var(--muted)">${esc(t.persona)}</td>
-      <td>${t.gasto>0?`<span class="amt-out">-${fmt(t.gasto)}</span>`:'—'}</td>
-      <td>${t.ingreso>0?`<span class="amt-in">+${fmt(t.ingreso)}</span>`:'—'}</td>
-    </tr>
-  `).join('');
-}
-
-// ================================================================
-// ATLETAS
-// ================================================================
-function renderAtletas() {
-  // KPIs
-  document.getElementById('at-total').textContent = atletasData.length;
-  document.getElementById('at-activos').textContent = atletasData.filter(a=>a.estado==='Activo').length;
-  document.getElementById('at-completados').textContent = atletasData.filter(a=>a.estado==='Completado').length;
-  document.getElementById('at-deudores').textContent = atletasData.filter(a=>a.estado==='Deudor').length;
-  document.getElementById('at-pendientes').textContent = atletasData.filter(a=>a.estado==='Pendiente').length;
-  document.getElementById('at-cerrados').textContent = atletasData.filter(a=>a.estado==='Cerrado').length;
-
-  // Populate sport filter
-  const sports = [...new Set(atletasData.map(a=>a.deporte))].sort();
-  const sf = document.getElementById('sport-filter');
-  sf.innerHTML = '<option value="">Todos los deportes</option>'+sports.map(s=>`<option value="${s}">${s}</option>`).join('');
-
-  applyAtletasFilter();
-}
-
-function applyAtletasFilter() {
-  filteredAtletas = atletasData.filter(a=>{
-    const ms = !aSearch || a.nombre.toLowerCase().includes(aSearch.toLowerCase()) || a.deporte.toLowerCase().includes(aSearch.toLowerCase());
-    const mst = !aStatus || a.estado===aStatus;
-    const msp = !aSport || a.deporte===aSport;
-    const mt = !aTipo || a.tipoPago===aTipo;
-    return ms&&mst&&msp&&mt;
-  });
-  atletasPage = 1;
-  renderAtletasTable();
-}
-
-function filterAtletas(v){aSearch=v;applyAtletasFilter();}
-function filterAtletasByStatus(v){aStatus=v;applyAtletasFilter();}
-function filterAtletasBySport(v){aSport=v;applyAtletasFilter();}
-function filterAtletasByTipo(v){aTipo=v;applyAtletasFilter();}
-
-function renderAtletasTable() {
-  const start = (atletasPage-1)*PER_PAGE_A;
-  const page  = filteredAtletas.slice(start, start+PER_PAGE_A);
-  document.getElementById('atletas-count').textContent = atletasData.length;
-  document.getElementById('atletas-info').textContent  = `${start+1}–${Math.min(start+PER_PAGE_A,filteredAtletas.length)} de ${filteredAtletas.length} atletas`;
-  document.getElementById('atletas-page').textContent  = `Pág ${atletasPage} / ${Math.max(1,Math.ceil(filteredAtletas.length/PER_PAGE_A))}`;
-  const tbody = document.getElementById('atletas-tbody');
-
-  if(page.length===0){
-    tbody.innerHTML = '<tr><td colspan="11" class="empty"><p>No se encontraron atletas con esos filtros.</p></td></tr>';
-    return;
-  }
-
-  // ── Mobile: tarjetas ──
-  if(window.innerWidth <= 768) {
-    tbody.innerHTML = `<tr><td colspan="11" style="padding:0;border:none">
-      <div class="m-atleta-list">
-        ${page.map(a=>`
-          <div class="m-atleta-card" onclick="editAtleta(${a.id})">
-            <div class="m-ac-top">
-              <div>
-                <div class="m-ac-name">${esc(a.nombre)}</div>
-                <div class="m-ac-sport">${esc(a.deporte)} · ${badgeServicio(a.servicio)}</div>
-              </div>
-              ${badgeEstado(a.estado)}
-            </div>
-            <div class="m-ac-mid">
-              <div class="m-ac-stat">
-                <div class="m-ac-stat-label">Contrato</div>
-                <div class="m-ac-stat-val">${fmt(a.total)}</div>
-              </div>
-              <div class="m-ac-stat" style="flex:2">
-                <div class="m-ac-stat-label">Pagos</div>
-                <div class="m-ac-payments">${esc(a.pagosHechos)||'—'}</div>
-              </div>
-            </div>
-            <div class="m-ac-actions">
-              ${a.whatsapp&&a.whatsapp!=='—'?`<a href="https://wa.me/${a.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-outline btn-xs" onclick="event.stopPropagation()" style="flex:1;justify-content:center">📱 WhatsApp</a>`:''}
-              <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editAtleta(${a.id})" style="flex:1">✏️ Editar</button>
-              <button class="btn-del" onclick="event.stopPropagation();deleteAtleta(${a.id})" style="padding:4px 10px">✕</button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </td></tr>`;
-    return;
-  }
-
-  // ── Desktop: tabla ──
-  tbody.innerHTML = page.map((a,i)=>`
-    <tr>
-      <td style="color:var(--muted);font-size:12px">${start+i+1}</td>
-      <td><strong>${esc(a.nombre)}</strong>${a.referido?`<div style="font-size:11px;color:var(--muted)">Ref: ${esc(a.referido)}</div>`:''}</td>
-      <td>${esc(a.deporte)}</td>
-      <td>${badgeServicio(a.servicio)}</td>
-      <td><span style="font-size:11.5px;color:var(--muted)">${esc(a.tipoPago)}</span></td>
-      <td><strong>${fmt(a.total)}</strong></td>
-      <td style="font-size:12px;color:var(--muted)">${esc(a.pagosHechos)}</td>
-      <td>${badgeEstado(a.estado)}</td>
-      <td style="font-size:12px;color:var(--muted)">${a.whatsapp&&a.whatsapp!=='—'?`<a href="https://wa.me/${a.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--green);text-decoration:none">📱 ${esc(a.whatsapp)}</a>`:esc(a.deudor)}</td>
-      <td><button class="btn btn-outline btn-xs" onclick="editAtleta(${a.id})">✏️ Editar</button></td>
-      <td><button class="btn-del" onclick="deleteAtleta(${a.id})">✕</button></td>
-    </tr>
-  `).join('');
-}
-
-function changePage(d) {
-  const max = Math.max(1,Math.ceil(filteredAtletas.length/PER_PAGE_A));
-  atletasPage = Math.max(1,Math.min(max,atletasPage+d));
-  renderAtletasTable();
-}
-
-// ================================================================
-// TRANSACCIONES
-// ================================================================
-function renderTransacciones() {
-  // Current month KPIs (Jun 2026)
-  const curKey = '2026-06';
-  const curMonth = transData.filter(t=>t.fecha.startsWith(curKey));
-  const mI = curMonth.reduce((s,t)=>s+t.ingreso,0);
-  const mG = curMonth.reduce((s,t)=>s+t.gasto,0);
-  document.getElementById('t-mes-label').textContent = 'Junio 2026';
-  document.getElementById('t-ingresos-mes').textContent = fmt(mI);
-  document.getElementById('t-gastos-mes').textContent = fmt(mG);
-  const mb = mI-mG;
-  const el = document.getElementById('t-balance-mes');
-  el.textContent = fmt(mb);
-  el.style.color = mb>=0 ? 'var(--green)' : 'var(--red)';
-
-  // Month filter
-  const months = [...new Set(transData.map(t=>t.fecha.substring(0,7)))].sort().reverse();
-  const mNames = {jan:'Enero',feb:'Febrero','01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio','07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
-  document.getElementById('month-filter').innerHTML = '<option value="">Todos los meses</option>' + months.map(m=>{
-    const[y,mo]=m.split('-'); return `<option value="${m}">${mNames[mo]||mo} ${y}</option>`;
-  }).join('');
-
-  applyTransFilter();
-}
-
-function applyTransFilter() {
-  filteredTrans = transData.filter(t=>{
-    const ms = !tSearch || t.concepto.toLowerCase().includes(tSearch.toLowerCase()) || t.persona.toLowerCase().includes(tSearch.toLowerCase());
-    const mm = !tMonth || t.fecha.startsWith(tMonth);
-    const mt = !tType || (tType==='ingreso'?t.ingreso>0:t.gasto>0);
-    return ms&&mm&&mt;
-  }).sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-  transPage = 1;
-  renderTransTable();
-}
-
-function filterTrans(v){tSearch=v;applyTransFilter();}
-function filterTransByMonth(v){tMonth=v;applyTransFilter();}
-function filterTransByType(v){tType=v;applyTransFilter();}
-
-function renderTransTable() {
-  const start  = (transPage-1)*PER_PAGE_T;
-  const page   = filteredTrans.slice(start, start+PER_PAGE_T);
-  document.getElementById('trans-info').textContent = `${start+1}–${Math.min(start+PER_PAGE_T,filteredTrans.length)} de ${filteredTrans.length} transacciones`;
-  document.getElementById('trans-page').textContent = `Pág ${transPage} / ${Math.max(1,Math.ceil(filteredTrans.length/PER_PAGE_T))}`;
-  const tbody = document.getElementById('trans-tbody');
-
-  // ── Mobile: tarjetas ──
-  if(window.innerWidth <= 768) {
-    tbody.innerHTML = `<tr><td colspan="7" style="padding:0;border:none">
-      <div class="m-trans-list">
-        ${page.map(t=>{
-          const esIngreso = t.ingreso > 0;
-          const amt = esIngreso ? t.ingreso : t.gasto;
-          return `
-          <div class="m-trans-card">
-            <div class="m-tc-dot ${esIngreso?'ingreso':'gasto'}"></div>
-            <div class="m-tc-body">
-              <div class="m-tc-concept">${esc(t.concepto)}</div>
-              <div class="m-tc-meta">${fmtDate(t.fecha)}${t.persona?' · '+esc(t.persona):''}</div>
-            </div>
-            <div class="m-tc-amt ${esIngreso?'ingreso':'gasto'}">${esIngreso?'+':'-'}${fmt(amt)}</div>
-            <button class="btn-del" onclick="deleteTrans(${t.id})" style="margin-left:4px">✕</button>
-          </div>`;
-        }).join('')}
-      </div>
-    </td></tr>`;
-    return;
-  }
-
-  // ── Desktop: tabla ──
-  tbody.innerHTML = page.map(t=>`
-    <tr>
-      <td style="white-space:nowrap">${fmtDate(t.fecha)}</td>
-      <td style="max-width:280px">${esc(t.concepto)}</td>
-      <td><span class="badge badge-gray" style="font-size:10.5px">${esc(t.formaPago)}</span></td>
-      <td style="color:var(--muted);font-size:12px">${esc(t.persona)}</td>
-      <td>${t.gasto>0?`<span class="amt-out">-${fmt(t.gasto)}</span>`:'—'}</td>
-      <td>${t.ingreso>0?`<span class="amt-in">+${fmt(t.ingreso)}</span>`:'—'}</td>
-      <td><button class="btn-del" onclick="deleteTrans(${t.id})" title="Eliminar">✕</button></td>
-    </tr>
-  `).join('');
-}
-
-function changeTransPage(d) {
-  const max = Math.max(1,Math.ceil(filteredTrans.length/PER_PAGE_T));
-  transPage = Math.max(1,Math.min(max,transPage+d));
-  renderTransTable();
-}
-
-// ================================================================
-// DEUDORES
-// ================================================================
-function renderDeudores() {
-  const deudores = atletasData.filter(a=>a.estado==='Deudor'||a.estado==='Pendiente');
-  document.getElementById('deudores-tbody').innerHTML = deudores.length===0
-    ? '<tr><td colspan="9" class="empty"><p>No hay atletas con deuda registrada.</p></td></tr>'
-    : deudores.map(a=>`
-      <tr>
-        <td><strong>${esc(a.nombre)}</strong></td>
-        <td>${esc(a.deporte)}</td>
-        <td>${badgeServicio(a.servicio)}</td>
-        <td><strong>${fmt(a.total)}</strong></td>
-        <td>${esc(a.tipoPago)}</td>
-        <td style="font-size:12px">${esc(a.pagosHechos)}</td>
-        <td>${badgeEstado(a.estado)}</td>
-        <td>${esc(a.deudor)}</td>
-        <td style="font-size:12px">${esc(a.whatsapp)}</td>
-      </tr>
-    `).join('');
-
-  const proximos = atletasData.filter(a=>a.estado==='Activo'&&(a.tipoPago==='MONTHLY'||a.tipoPago.includes('MENSUALIDAD')));
-  document.getElementById('proximos-tbody').innerHTML = proximos.length===0
-    ? '<tr><td colspan="7" class="empty"><p>Sin mensualidades activas.</p></td></tr>'
-    : proximos.map(a=>`
-      <tr>
-        <td><strong>${esc(a.nombre)}</strong></td>
-        <td>${esc(a.deporte)}</td>
-        <td><span style="font-size:11px;color:var(--muted)">${esc(a.tipoPago)}</span></td>
-        <td>${fmt(a.total)}</td>
-        <td style="font-size:12px">${esc(a.pagosHechos)}</td>
-        <td>${badgeEstado(a.estado)}</td>
-        <td style="font-size:12px">${a.whatsapp&&a.whatsapp!=='—'?`<a href="https://wa.me/${a.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--green);text-decoration:none">📱 ${esc(a.whatsapp)}</a>`:esc(a.whatsapp)}</td>
-      </tr>
-    `).join('');
-}
-
-// ================================================================
-// MODALS
-// ================================================================
-function openAtletaModal(prefill) {
-  editingAtletaId = prefill ? prefill.id : null;
-  document.getElementById('modal-atleta-title').textContent = prefill ? 'Editar Atleta' : 'Agregar Atleta';
-  document.getElementById('btn-save-atleta').textContent = prefill ? 'Actualizar' : 'Guardar Atleta';
-  const fields = ['nombre','deporte','servicio','tipopago','total','pago','hechos','estado','referido','deudor','whatsapp','notas'];
-  const keys   = ['nombre','deporte','servicio','tipoPago','total','pago','pagosHechos','estado','referido','deudor','whatsapp','notas'];
-  fields.forEach((f,i)=>{ document.getElementById('a-'+f).value = prefill ? (prefill[keys[i]]||'') : ''; });
-  document.getElementById('modal-atleta').classList.add('open');
-}
-
-function editAtleta(id) {
-  const a = atletasData.find(x=>x.id===id);
-  if(a) openAtletaModal(a);
-}
-
-let currentTransMode = 'atleta';
-let selectedAtleta = null;
-
-function openTransModal() {
-  // Reset
-  currentTransMode = 'atleta';
-  selectedAtleta = null;
-  document.getElementById('ta-search').value = '';
-  document.getElementById('ta-atleta-id').value = '';
-  document.getElementById('ta-card').style.display = 'none';
-  document.getElementById('ta-tipo').value = '';
-  document.getElementById('ta-monto').value = '';
-  document.getElementById('ta-concepto').value = '';
-  document.getElementById('ta-fecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('ta-forma').value = '';
-  document.getElementById('ta-preview').style.display = 'none';
-  document.getElementById('ta-suggestions').classList.remove('open');
-  document.getElementById('t-fecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('t-gasto').value = '';
-  document.getElementById('t-ingreso').value = '';
-  document.getElementById('t-concepto').value = '';
-  document.getElementById('t-persona').value = '';
-  document.getElementById('t-forma').value = '';
-  setTransMode('atleta');
-  document.getElementById('modal-trans').classList.add('open');
-}
-
-// ── Mode toggle ──
-function setTransMode(mode) {
-  currentTransMode = mode;
-  document.getElementById('trans-mode-atleta').style.display = mode==='atleta' ? 'block' : 'none';
-  document.getElementById('trans-mode-general').style.display = mode==='general' ? 'block' : 'none';
-  document.getElementById('mbtn-atleta').classList.toggle('active', mode==='atleta');
-  document.getElementById('mbtn-general').classList.toggle('active', mode==='general');
-}
-
-// ── Athlete search autocomplete ──
-function buscarAtleta(query) {
-  const box = document.getElementById('ta-suggestions');
-  if(!query || query.length < 2) { box.classList.remove('open'); return; }
-
-  const matches = atletasData.filter(a =>
-    a.nombre.toLowerCase().includes(query.toLowerCase()) ||
-    a.deporte.toLowerCase().includes(query.toLowerCase())
-  ).slice(0, 8);
-
-  if(matches.length === 0) { box.classList.remove('open'); return; }
-
-  box.innerHTML = matches.map(a => `
-    <div class="sug-item" onclick="seleccionarAtleta(${a.id})">
-      <div class="sug-left">
-        <div class="sug-name">${esc(a.nombre)}</div>
-        <div class="sug-detail">${esc(a.deporte)} · ${esc(a.servicio)} · ${esc(a.tipoPago)} · Total: ${fmt(a.total)}</div>
-      </div>
-      ${badgeEstado(a.estado)}
-    </div>
-  `).join('');
-  box.classList.add('open');
-}
-
-// ── Select athlete and fill card ──
-function seleccionarAtleta(id) {
-  const a = atletasData.find(x => x.id === id);
-  if(!a) return;
-  selectedAtleta = a;
-  document.getElementById('ta-atleta-id').value = id;
-  document.getElementById('ta-search').value = a.nombre;
-  document.getElementById('ta-suggestions').classList.remove('open');
-
-  // Calculate progress %
-  const pct = calcularPorcentajePago(a);
-
-  document.getElementById('ta-card').style.display = 'block';
-  document.getElementById('ta-card').innerHTML = `
-    <div class="ta-card-name">${esc(a.nombre)}</div>
-    <div class="ta-card-meta">
-      <span>🏅 <strong>${esc(a.deporte)}</strong></span>
-      <span>📋 <strong>${esc(a.servicio)}</strong></span>
-      <span>💳 <strong>${esc(a.tipoPago)}</strong></span>
-      <span>💰 Total: <strong>${fmt(a.total)}</strong></span>
-      <span>📌 Estado: ${badgeEstado(a.estado)}</span>
-    </div>
-    ${a.deudor && a.deudor!=='—' ? `<div style="font-size:12px;color:#888;margin-top:6px">👤 Contacto pago: <strong style="color:#ccc">${esc(a.deudor)}</strong></div>` : ''}
-    <div class="ta-prog-wrap">
-      <div class="ta-prog-label">
-        <span>Progreso de pagos: ${esc(a.pagosHechos)}</span>
-        <span>${pct}%</span>
-      </div>
-      <div class="ta-prog-bar"><div class="ta-prog-fill" style="width:${pct}%"></div></div>
-    </div>
-  `;
-
-  // Auto-fill amount from athlete's payment amount
-  if(a.pago > 0) document.getElementById('ta-monto').value = a.pago;
-
-  // Reset tipo and preview
-  document.getElementById('ta-tipo').value = '';
-  document.getElementById('ta-preview').style.display = 'none';
-  document.getElementById('ta-concepto').value = '';
-}
-
-// ── Calculate payment percentage ──
-function calcularPorcentajePago(a) {
-  const match = a.pagosHechos.match(/(\d+)\s+out\s+of\s+(\d+)/i);
-  if(match) return Math.round((parseInt(match[1]) / parseInt(match[2])) * 100);
-  // For monthly, estimate from total/pago
-  const matchM = a.pagosHechos.match(/MONTHLY\s*\((\d+)\)/i) || a.pagosHechos.match(/MONTHLY\((\d+)\)/i);
-  if(matchM && a.total > 0 && a.pago > 0) {
-    const done = parseInt(matchM[1]);
-    const totalPayments = Math.ceil(a.total / a.pago);
-    return Math.round((done / totalPayments) * 100);
-  }
-  if(a.estado === 'Completado') return 100;
-  if(a.estado === 'Cerrado') return 0;
-  return 0;
-}
-
-// ── Auto-generate concept and preview when payment type selected ──
-function onTipoPagoChange() {
-  if(!selectedAtleta) return;
-  const tipo = document.getElementById('ta-tipo').value;
-  const a = selectedAtleta;
-  const monto = parseFloat(document.getElementById('ta-monto').value) || a.pago;
-  const numPago = calcularNumPagoSiguiente(a);
-
-  let concepto = '';
-  let nuevoPagosHechos = a.pagosHechos;
-  let nuevoEstado = a.estado;
-  let previewLines = [];
-
-  if(tipo === 'mensualidad') {
-    const ordinal = numOrdinal(numPago);
-    concepto = `${ordinal} Paga de ${a.nombre}`;
-    nuevoPagosHechos = incrementarContadorPago(a.pagosHechos);
-    // Check if complete
-    if(esUltimoPago(a, nuevoPagosHechos)) nuevoEstado = 'Completado';
-    previewLines = [
-      {label:'Pagos', old: a.pagosHechos, new: nuevoPagosHechos},
-      {label:'Estado', old: a.estado, new: nuevoEstado},
-    ];
-  } else if(tipo === 'abono') {
-    concepto = `Abono Inicial de ${a.nombre}`;
-    nuevoPagosHechos = incrementarAbono(a.pagosHechos);
-    previewLines = [{label:'Pagos', old: a.pagosHechos, new: nuevoPagosHechos}];
-  } else if(tipo === 'sign') {
-    concepto = `Pago Sign de ${a.nombre}`;
-    previewLines = [{label:'Nota', old: '—', new: 'Se registra pago Sign (Firma)'}];
-  } else if(tipo === 'commit') {
-    concepto = `Pago Commit de ${a.nombre}`;
-    previewLines = [{label:'Nota', old: '—', new: 'Se registra Commit (compromiso de servicio)'}];
-  } else if(tipo === 'unico') {
-    concepto = `Pago Único de ${a.nombre}`;
-    nuevoPagosHechos = '1 out of 1';
-    nuevoEstado = 'Completado';
-    previewLines = [
-      {label:'Pagos', old: a.pagosHechos, new: nuevoPagosHechos},
-      {label:'Estado', old: a.estado, new: nuevoEstado},
-    ];
-  }
-
-  document.getElementById('ta-concepto').value = concepto;
-
-  // Show preview
-  const preview = document.getElementById('ta-preview');
-  if(previewLines.length > 0) {
-    preview.style.display = 'block';
-    preview.innerHTML = `
-      <div class="ta-prev-title">✅ CAMBIOS QUE SE APLICARÁN AL ATLETA</div>
-      ${previewLines.map(r=>`
-        <div class="ta-prev-row">
-          <span>${r.label}</span>
-          <span>
-            ${r.old !== r.new ? `<span class="old">${esc(r.old)}</span> → ` : ''}
-            <span class="new" style="color:${r.label==='Estado'&&r.new==='Completado'?'#8AD500':'#166534'}">${esc(r.new)}</span>
-          </span>
-        </div>
-      `).join('')}
-    `;
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session) {
+    showPlatform(session.user);
   } else {
-    preview.style.display = 'none';
+    document.getElementById('login-overlay').style.display = 'flex';
   }
 }
 
-// ── Payment counter helpers ──
-function calcularNumPagoSiguiente(a) {
-  const match = a.pagosHechos.match(/(\d+)\s+out\s+of\s+(\d+)/i);
-  if(match) return parseInt(match[1]) + 1;
-  const matchM = a.pagosHechos.match(/MONTHLY\s*[\(\[]?(\d+)[\)\]]?/i);
-  if(matchM) return parseInt(matchM[1]) + 1;
-  return 1;
-}
-
-function incrementarContadorPago(pagosHechos) {
-  // "X out of Y"
-  const m1 = pagosHechos.match(/(\d+)\s+(out\s+of)\s+(\d+)/i);
-  if(m1) {
-    const next = parseInt(m1[1]) + 1;
-    return pagosHechos.replace(m1[0], `${next} out of ${m1[3]}`);
-  }
-  // "MONTHLY (X)" or "MONTHLY(X)"
-  const m2 = pagosHechos.match(/(MONTHLY\s*\()(\d+)(\))/i);
-  if(m2) return pagosHechos.replace(m2[0], `${m2[1]}${parseInt(m2[2])+1}${m2[3]}`);
-  // "ABONO x/y + MONTHLY(Z)"
-  const m3 = pagosHechos.match(/(MONTHLY\()(\d+)(\))/i);
-  if(m3) return pagosHechos.replace(m3[0], `${m3[1]}${parseInt(m3[2])+1}${m3[3]}`);
-  return pagosHechos + ' (+1)';
-}
-
-function incrementarAbono(pagosHechos) {
-  const m = pagosHechos.match(/ABONO\s*(\d+)\/(\d+)/i);
-  if(m) {
-    const next = parseInt(m[1]) + 1;
-    return pagosHechos.replace(m[0], `ABONO ${next}/${m[2]}`);
-  }
-  return pagosHechos + ' +ABONO';
-}
-
-function esUltimoPago(a, nuevoPagosHechos) {
-  const m = nuevoPagosHechos.match(/(\d+)\s+out\s+of\s+(\d+)/i);
-  if(m) return parseInt(m[1]) >= parseInt(m[2]);
-  return false;
-}
-
-const ORDINALS = ['Primera','Segunda','Tercera','Cuarta','Quinta','Sexta','Séptima','Octava','Novena','Décima','Onceava','Doceava','Treceava','Catorceava','Quinceava'];
-function numOrdinal(n) { return ORDINALS[n-1] || `${n}ra`; }
-
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
-function lockField(targetId, value){
-  if(parseFloat(value)>0) document.getElementById(targetId).value='';
-}
-
-// Close on backdrop click
-document.querySelectorAll('.overlay').forEach(o=>{
-  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
-});
-
-// Close suggestions when clicking outside
-document.addEventListener('click', e=>{
-  if(!e.target.closest('#ta-search') && !e.target.closest('#ta-suggestions')) {
-    const box = document.getElementById('ta-suggestions');
-    if(box) box.classList.remove('open');
-  }
-});
-
-// ================================================================
-// SAVE FORMS
-// ================================================================
-async function saveAtleta(e) {
-  e.preventDefault();
-  const obj = {
-    id: editingAtletaId || Date.now(),
-    nombre:   document.getElementById('a-nombre').value.trim(),
-    deporte:  document.getElementById('a-deporte').value,
-    servicio: document.getElementById('a-servicio').value,
-    tipoPago: document.getElementById('a-tipopago').value,
-    total:    parseFloat(document.getElementById('a-total').value)||0,
-    pago:     parseFloat(document.getElementById('a-pago').value)||0,
-    pagosHechos: document.getElementById('a-hechos').value.trim(),
-    estado:   document.getElementById('a-estado').value,
-    referido: document.getElementById('a-referido').value.trim(),
-    deudor:   document.getElementById('a-deudor').value.trim(),
-    whatsapp: document.getElementById('a-whatsapp').value.trim(),
-    notas:    document.getElementById('a-notas').value.trim(),
-  };
-
-  if(USE_SUPABASE) {
-    if(editingAtletaId) {
-      const { error } = await sb.from('atletas').update(unmapAtleta(obj)).eq('id', editingAtletaId);
-      if(error){ showToast('Error: '+error.message); return; }
-      showToast('✅ Atleta actualizado');
-    } else {
-      const { error } = await sb.from('atletas').insert(unmapAtleta(obj));
-      if(error){ showToast('Error: '+error.message); return; }
-      showToast('✅ Atleta agregado correctamente');
-    }
-    await reloadAtletasFromSB();
-  } else {
-    if(editingAtletaId) {
-      const idxBase = ATLETAS_BASE.findIndex(a=>a.id===editingAtletaId);
-      if(idxBase>=0) ATLETAS_BASE[idxBase]={...ATLETAS_BASE[idxBase],...obj};
-      const idxNew = newAtletas.findIndex(a=>a.id===editingAtletaId);
-      if(idxNew>=0) newAtletas[idxNew]={...newAtletas[idxNew],...obj};
-      guardarModAtleta(editingAtletaId, obj);
-      showToast('✅ Atleta actualizado');
-    } else {
-      newAtletas.push(obj);
-      showToast('✅ Atleta agregado correctamente');
-    }
-    try{ localStorage.setItem('nvs_extra_atletas', JSON.stringify(newAtletas)); }catch(e){}
-    rebuildAtletasData();
-  }
-
-  closeModal('modal-atleta');
-  renderAtletas();
-  renderDeudores();
-  renderDashboard();
-}
-
-async function saveSmartTrans() {
-  if(currentTransMode === 'atleta') {
-    // ── Validate atleta mode ──
-    const aid = document.getElementById('ta-atleta-id').value;
-    const tipo = document.getElementById('ta-tipo').value;
-    const monto = parseFloat(document.getElementById('ta-monto').value)||0;
-    const fecha = document.getElementById('ta-fecha').value;
-    const forma = document.getElementById('ta-forma').value;
-    const concepto = document.getElementById('ta-concepto').value.trim();
-
-    if(!aid){ showToast('⚠ Selecciona un atleta'); return; }
-    if(!tipo){ showToast('⚠ Selecciona el tipo de pago'); return; }
-    if(monto <= 0){ showToast('⚠ Ingresa el monto'); return; }
-    if(!fecha){ showToast('⚠ Ingresa la fecha'); return; }
-
-    const a = atletasData.find(x => x.id === parseInt(aid));
-    if(!a) return;
-
-    // Build transaction
-    const trans = {
-      id: Date.now(),
-      fecha, concepto: concepto || `Pago ${tipo} de ${a.nombre}`,
-      formaPago: forma || 'Transferencia Bancaria',
-      persona: a.deudor && a.deudor!=='—' ? a.deudor : a.nombre,
-      gasto: 0, ingreso: monto,
-    };
-
-    // Update athlete record
-    const updates = {};
-    if(tipo === 'mensualidad') {
-      updates.pagosHechos = incrementarContadorPago(a.pagosHechos);
-      if(esUltimoPago(a, updates.pagosHechos)) updates.estado = 'Completado';
-    } else if(tipo === 'abono') {
-      updates.pagosHechos = incrementarAbono(a.pagosHechos);
-    } else if(tipo === 'unico') {
-      updates.pagosHechos = '1 out of 1';
-      updates.estado = 'Completado';
-    }
-
-    if(USE_SUPABASE) {
-      if(Object.keys(updates).length > 0) {
-        const sbUpdates = {};
-        if(updates.pagosHechos) sbUpdates.pagos_hechos = updates.pagosHechos;
-        if(updates.estado)      sbUpdates.estado       = updates.estado;
-        const { error: ue } = await sb.from('atletas').update(sbUpdates).eq('id', a.id);
-        if(ue){ showToast('Error actualizando atleta: '+ue.message); return; }
-      }
-      const { error: te } = await sb.from('transacciones').insert(unmapTrans(trans));
-      if(te){ showToast('Error guardando transacción: '+te.message); return; }
-      await Promise.all([reloadAtletasFromSB(), reloadTransFromSB()]);
-    } else {
-      if(Object.keys(updates).length > 0) {
-        const idxBase = ATLETAS_BASE.findIndex(x => x.id === a.id);
-        if(idxBase >= 0) ATLETAS_BASE[idxBase] = {...ATLETAS_BASE[idxBase], ...updates};
-        const idxNew = newAtletas.findIndex(x => x.id === a.id);
-        if(idxNew >= 0) newAtletas[idxNew] = {...newAtletas[idxNew], ...updates};
-        guardarModAtleta(a.id, updates);
-        try{ localStorage.setItem('nvs_extra_atletas', JSON.stringify(newAtletas)); }catch(ex){}
-        rebuildAtletasData();
-      }
-      newTrans.push(trans);
-      try{ localStorage.setItem('nvs_extra_trans', JSON.stringify(newTrans)); }catch(ex){}
-      rebuildTransData();
-    }
-    selectedAtleta = atletasData.find(x => x.id === a.id) || null;
-    closeModal('modal-trans');
-    renderAtletas();
-    renderTransacciones();
-    renderRecentTrans();
-    renderDeudores();
-    renderDashboard();
-    showToast(`✅ Pago de ${a.nombre} registrado${Object.keys(updates).length>0?' · Atleta actualizado':''}`)
-
-  } else {
-    // ── General mode ──
-    const g = parseFloat(document.getElementById('t-gasto').value)||0;
-    const i = parseFloat(document.getElementById('t-ingreso').value)||0;
-    if(g===0&&i===0){ showToast('⚠ Ingresa un monto de gasto o ingreso'); return; }
-    const fecha = document.getElementById('t-fecha').value;
-    if(!fecha){ showToast('⚠ Ingresa la fecha'); return; }
-
-    const trans = {
-      id: Date.now(),
-      fecha,
-      concepto: document.getElementById('t-concepto').value.trim() || 'Sin concepto',
-      formaPago: document.getElementById('t-forma').value || 'Otros',
-      persona: document.getElementById('t-persona').value.trim(),
-      gasto: g, ingreso: i,
-    };
-    if(USE_SUPABASE) {
-      const { error } = await sb.from('transacciones').insert(unmapTrans(trans));
-      if(error){ showToast('Error: '+error.message); return; }
-      await reloadTransFromSB();
-    } else {
-      newTrans.push(trans);
-      try{ localStorage.setItem('nvs_extra_trans', JSON.stringify(newTrans)); }catch(e){}
-      rebuildTransData();
-    }
-    closeModal('modal-trans');
-    renderTransacciones();
-    renderRecentTrans();
-    renderDashboard();
-    showToast('✅ Transacción guardada');
-  }
-}
-
-// Legacy alias (kept for compatibility)
-function saveTrans(e) { if(e) e.preventDefault(); saveSmartTrans(); }
-
-// ================================================================
-// EXPORT CSV
-// ================================================================
-function exportCSV() {
-  const tab = document.querySelector('.tab-content.active').id;
-  let csv = '', filename = '';
-
-  if(tab==='tab-atletas'||tab==='tab-dashboard') {
-    filename = 'nvs_atletas.csv';
-    csv = 'Nombre,Deporte,Servicio,Plan,Total,Pago,Pagos Realizados,Estado,Referido,Deudor Legal,WhatsApp\n';
-    csv += atletasData.map(a=>[a.nombre,a.deporte,a.servicio,a.tipoPago,a.total,a.pago,a.pagosHechos,a.estado,a.referido,a.deudor,a.whatsapp].map(v=>`"${v}"`).join(',')).join('\n');
-  } else if(tab==='tab-transacciones') {
-    filename = 'nvs_transacciones.csv';
-    csv = 'Fecha,Concepto,Forma de Pago,Persona,Gasto,Ingreso\n';
-    csv += filteredTrans.map(t=>[t.fecha,t.concepto,t.formaPago,t.persona,t.gasto||'',t.ingreso||''].map(v=>`"${v}"`).join(',')).join('\n');
-  } else { showToast('Cambia a Atletas o Transacciones para exportar'); return; }
-
-  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  showToast('⬇ Exportando '+filename);
-}
-
-// ================================================================
-// HELPERS
-// ================================================================
-function fmt(n) {
-  return '$'+parseFloat(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-
-function fmtDate(d) {
-  if(!d) return '—';
-  const [y,m,day] = d.split('-');
-  return `${day}/${m}/${y}`;
-}
-
-function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function badgeEstado(e) {
-  const m={Activo:'badge-blue',Completado:'badge-green',Deudor:'badge-red',Pendiente:'badge-yellow',Cerrado:'badge-closed'};
-  return `<span class="badge ${m[e]||'badge-gray'}">${e}</span>`;
-}
-
-function badgeServicio(s) {
-  const m={PREMIUM:'badge-purple',ESTANDAR:'badge-blue',TRANSFER:'badge-orange'};
-  return `<span class="badge ${m[s]||'badge-gray'}">${s}</span>`;
-}
-
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-// ================================================================
-// START
-// ================================================================
-document.addEventListener('DOMContentLoaded', init);
-
-document.addEventListener('DOMContentLoaded', init);
-
-// Enter key on login fields
 document.addEventListener('keydown', e => {
-  if(e.key === 'Enter' && document.getElementById('login-overlay').style.display === 'flex') doLogin();
+  if(e.key==='Enter' && document.getElementById('login-overlay').style.display==='flex') doLogin();
 });
 
-// Re-render tables on orientation change / resize
-let _resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(_resizeTimer);
-  _resizeTimer = setTimeout(() => {
-    renderAtletasTable();
-    renderTransTable();
-  }, 200);
-});
+document.addEventListener('DOMContentLoaded', init);
 </script>
-
-<!-- ===== MOBILE BOTTOM NAV ===== -->
-<nav class="mobile-nav" id="mobile-nav">
-  <button class="mnav-item active" id="mnav-dashboard" onclick="showTab('dashboard')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    <span>Inicio</span>
-  </button>
-  <button class="mnav-item" id="mnav-atletas" onclick="showTab('atletas')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
-    <span>Atletas</span>
-  </button>
-  <button class="mnav-item" id="mnav-transacciones" onclick="showTab('transacciones')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-    <span>Finanzas</span>
-  </button>
-  <button class="mnav-item" id="mnav-deudores" onclick="showTab('deudores')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <span>Alertas</span>
-  </button>
-  <button class="mnav-item mnav-fab" onclick="openAddModal()">
-    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    <span>Agregar</span>
-  </button>
-</nav>
 </body>
 </html>
