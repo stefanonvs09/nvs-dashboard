@@ -367,8 +367,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
       <div class="stat" id="sf-int" onclick="sfClick('Interesado')" style="--c:var(--amber)"><div class="stat-n" id="st-int" style="color:var(--amber)">—</div><div class="stat-l">Interesados</div></div>
       <div class="stat" id="sf-neg" onclick="sfClick('En Negociacion')" style="--c:var(--purple)"><div class="stat-n" id="st-neg" style="color:var(--purple)">—</div><div class="stat-l">En Negociación</div></div>
       <div class="stat" id="sf-con2" onclick="sfClick('Contract Sent')" style="--c:var(--teal)"><div class="stat-n" id="st-con2" style="color:var(--teal)">—</div><div class="stat-l">Contract Sent</div></div>
-      <div class="stat" id="sf-del" onclick="sfClick('Delayed Sign Up')" style="--c:var(--orange)"><div class="stat-n" id="st-del" style="color:var(--orange)">—</div><div class="stat-l">Delayed</div></div>
       <div class="stat" id="sf-fir" onclick="sfClick('Firmado')" style="--c:var(--green)"><div class="stat-n" id="st-fir" style="color:var(--green)">—</div><div class="stat-l">Firmados</div></div>
+      <div class="stat" id="sf-del" onclick="sfClick('Delayed Sign Up')" style="--c:var(--orange)"><div class="stat-n" id="st-del" style="color:var(--orange)">—</div><div class="stat-l">Delayed</div></div>
       <div class="stat" id="sf-per" onclick="sfClick('Perdido')" style="--c:var(--red)"><div class="stat-n" id="st-per" style="color:var(--red)">—</div><div class="stat-l">Perdidos</div></div>
     </div>
 
@@ -505,8 +505,8 @@ const STAGES = [
   {k:'Interesado',     c:'#fbbf24', av:'rgba(251,191,36,0.85)'},
   {k:'En Negociacion', c:'#a78bfa', av:'rgba(167,139,250,0.85)'},
   {k:'Contract Sent',  c:'#2dd4bf', av:'rgba(45,212,191,0.85)'},
-  {k:'Delayed Sign Up',c:'#fb923c', av:'rgba(251,146,60,0.85)'},
   {k:'Firmado',        c:'#AAFF00', av:'rgba(170,255,0,0.85)'},
+  {k:'Delayed Sign Up',c:'#fb923c', av:'rgba(251,146,60,0.85)'},
   {k:'Perdido',        c:'#f87171', av:'rgba(248,113,113,0.85)'},
 ];
 const S2C  = Object.fromEntries(STAGES.map(s=>[s.k,s.c]));
