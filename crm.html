@@ -543,7 +543,7 @@ let sortK='nombre', sortD=1, curView='pipeline';
 .rem-pay{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--card2);border-radius:8px;font-size:12px;}
 .rem-pay-lbl{color:var(--muted);font-weight:600;}
 .rem-pay-val{font-weight:800;color:#fff;}
-.rem-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.rem-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 .rem-prog{font-size:11px;color:var(--muted);font-weight:600;}
 .btn-wa{display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .15s;}
 .btn-wa:hover{opacity:.85;}
@@ -770,16 +770,48 @@ function setView(v){
 
 /* RECORDATORIO — atletas con pago mensual/abono */
 let atletasRem = [];
+let pagosEsteMes = new Set(); // nombres que ya pagaron este mes
+
+function curMes(){
+  const n=new Date();
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+}
+
 async function loadAtletasRem(){
-  const {data:rows} = await _sb.from('atletas')
-    .select('nombre,deporte,tipo_pago,pago,total,pagos_hechos,estado,whatsapp,referido')
-    .in('tipo_pago',['MONTHLY','ABONO + MENSUALIDAD'])
-    .eq('estado','Activo')
-    .order('nombre');
-  atletasRem = rows||[];
-  // badge en sidebar
+  const [resAtletas, resPagos] = await Promise.all([
+    _sb.from('atletas')
+      .select('nombre,deporte,tipo_pago,pago,total,pagos_hechos,estado,whatsapp,referido')
+      .in('tipo_pago',['MONTHLY','ABONO + MENSUALIDAD'])
+      .eq('estado','Activo')
+      .order('nombre'),
+    _sb.from('pagos_mensuales')
+      .select('atleta_nombre')
+      .eq('mes', curMes())
+  ]);
+  atletasRem = resAtletas.data||[];
+  pagosEsteMes = new Set((resPagos.data||[]).map(p=>p.atleta_nombre));
+  // badge: muestra pendientes
+  const pendientes = atletasRem.filter(a=>!pagosEsteMes.has(a.nombre)).length;
   const badge = document.getElementById('rem-badge-count');
-  if(atletasRem.length>0){badge.textContent=atletasRem.length;badge.style.display='inline';}
+  if(pendientes>0){badge.textContent=pendientes+' pendientes';badge.style.display='inline';}
+  else badge.style.display='none';
+}
+
+async function togglePago(nombre){
+  const mes = curMes();
+  if(pagosEsteMes.has(nombre)){
+    await _sb.from('pagos_mensuales').delete().eq('atleta_nombre',nombre).eq('mes',mes);
+    pagosEsteMes.delete(nombre);
+  } else {
+    await _sb.from('pagos_mensuales').insert({atleta_nombre:nombre, mes});
+    pagosEsteMes.add(nombre);
+  }
+  // badge update
+  const pendientes = atletasRem.filter(a=>!pagosEsteMes.has(a.nombre)).length;
+  const badge = document.getElementById('rem-badge-count');
+  if(pendientes>0){badge.textContent=pendientes+' pendientes';badge.style.display='inline';}
+  else badge.style.display='none';
+  renderRecordatorio();
 }
 
 function renderRecordatorio(){
@@ -817,40 +849,60 @@ function renderRecordatorio(){
       <div><div class="rem-title">${bannerTitle}</div><div class="rem-sub">${bannerSub}</div></div>
     </div>`;
 
-  const mkCards = list => list.map(a=>{
-    const ini = (a.nombre||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
-    const tipoCls = a.tipo_pago==='MONTHLY'?'monthly':'abono';
-    const tipoLabel = a.tipo_pago==='MONTHLY'?'Monthly':'Abono + Mensualidad';
-    const waNum = (a.whatsapp||'').replace(/\D/g,'');
-    const waLink = waNum ? `https://wa.me/${waNum}` : '#';
-    const fmtAmt = n => n ? '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0}) : '—';
-    return `
-    <div class="rem-card">
-      <div class="rem-top">
-        <div class="rem-av">${ini}</div>
-        <div>
-          <div class="rem-name">${esc(a.nombre)}</div>
-          <div class="rem-sport">${esc(a.deporte||'—')}</div>
+  const mesLabel = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+  const fmtAmt = n => n ? '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0}) : '—';
+
+  const mkCards = list => {
+    // unpaid first, then paid
+    const sorted = [...list].sort((a,b)=>{
+      const ap=pagosEsteMes.has(a.nombre), bp=pagosEsteMes.has(b.nombre);
+      if(ap!==bp) return ap?1:-1;
+      return (a.nombre||'').localeCompare(b.nombre||'');
+    });
+    return sorted.map(a=>{
+      const ini = (a.nombre||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+      const tipoCls = a.tipo_pago==='MONTHLY'?'monthly':'abono';
+      const tipoLabel = a.tipo_pago==='MONTHLY'?'Monthly':'Abono + Mensualidad';
+      const waNum = (a.whatsapp||'').replace(/\D/g,'');
+      const waLink = waNum ? `https://wa.me/${waNum}` : '#';
+      const pagado = pagosEsteMes.has(a.nombre);
+      const cardBorder = pagado ? 'border-color:rgba(138,213,0,0.3)' : 'border-color:rgba(248,113,113,0.25)';
+      return `
+      <div class="rem-card" style="${cardBorder}">
+        <div class="rem-top">
+          <div class="rem-av" style="${pagado?'background:linear-gradient(135deg,#8AD500,#6aaa00)':'background:linear-gradient(135deg,#f87171,#dc2626)'}">${ini}</div>
+          <div style="flex:1">
+            <div class="rem-name">${esc(a.nombre)}</div>
+            <div class="rem-sport">${esc(a.deporte||'—')}</div>
+          </div>
+          <div style="font-size:20px">${pagado?'✅':'❌'}</div>
         </div>
-      </div>
-      <div class="rem-badges">
-        <span class="rem-badge ${tipoCls}">${tipoLabel}</span>
-        <span class="rem-badge activo">Activo</span>
-      </div>
-      <div class="rem-pay">
-        <span class="rem-pay-lbl">Cuota mensual</span>
-        <span class="rem-pay-val">${fmtAmt(a.pago)}</span>
-      </div>
-      <div class="rem-pay" style="margin-top:-4px">
-        <span class="rem-pay-lbl">Pagos realizados</span>
-        <span class="rem-pay-val" style="color:var(--muted);font-size:11px">${esc(a.pagos_hechos||'—')}</span>
-      </div>
-      <div class="rem-footer">
-        <span class="rem-prog">Ref: ${esc(a.referido||'—')}</span>
-        ${waNum ? `<a class="btn-wa" href="${waLink}" target="_blank">💬 WhatsApp</a>` : '<span style="color:var(--muted);font-size:11px">Sin WhatsApp</span>'}
-      </div>
-    </div>`;
-  }).join('');
+        <div class="rem-badges">
+          <span class="rem-badge ${tipoCls}">${tipoLabel}</span>
+          ${pagado
+            ? `<span class="rem-badge activo">Pagó ${mesLabel}</span>`
+            : `<span class="rem-badge" style="background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.25)">Pendiente ${mesLabel}</span>`}
+        </div>
+        <div class="rem-pay">
+          <span class="rem-pay-lbl">Cuota mensual</span>
+          <span class="rem-pay-val">${fmtAmt(a.pago)}</span>
+        </div>
+        <div class="rem-pay" style="margin-top:-4px">
+          <span class="rem-pay-lbl">Pagos realizados</span>
+          <span class="rem-pay-val" style="color:var(--muted);font-size:11px">${esc(a.pagos_hechos||'—')}</span>
+        </div>
+        <div class="rem-footer">
+          ${waNum ? `<a class="btn-wa" href="${waLink}" target="_blank">💬 WhatsApp</a>` : '<span style="color:var(--muted);font-size:11px">Sin WhatsApp</span>'}
+          <button onclick="togglePago('${esc(a.nombre)}')" style="
+            border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;
+            background:${pagado?'rgba(248,113,113,0.15)':'rgba(138,213,0,0.15)'};
+            color:${pagado?'var(--red)':'var(--green)'};
+            border:1px solid ${pagado?'rgba(248,113,113,0.3)':'rgba(138,213,0,0.3)'};
+          ">${pagado?'↩ Quitar pago':'✓ Marcar pagado'}</button>
+        </div>
+      </div>`;
+    }).join('');
+  };
 
   const monthly = atletasRem.filter(a=>a.tipo_pago==='MONTHLY');
   const abono   = atletasRem.filter(a=>a.tipo_pago==='ABONO + MENSUALIDAD');
