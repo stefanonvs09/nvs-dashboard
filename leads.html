@@ -525,7 +525,7 @@ function renderStats(){
   q('#st-per').textContent=cn('Perdido');
 }
 
-function render(){curView==='kanban'?renderKanban():renderList();}
+function render(){if(curView==='web'){renderWeb();return;}curView==='kanban'?renderKanban():renderList();}
 
 /* KANBAN */
 function renderKanban(){
