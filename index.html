@@ -9,10 +9,10 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --green:#AAFF00;--green-dim:rgba(170,255,0,0.06);--green-dk:#88CC00;
-  --bg:#08090a;--card:#111318;--card2:#161820;--card3:#1c1f28;
-  --border:rgba(255,255,255,0.07);--muted:#5a6070;--muted2:#2e3240;
-  --txt:#e2e4ea;
+  --green:#AAFF00;--green-dim:rgba(170,255,0,0.12);--green-dk:#88CC00;
+  --bg:#f8fafc;--card:#ffffff;--card2:#f1f5f9;--card3:#e2e8f0;
+  --border:rgba(0,0,0,0.08);--muted:#64748b;--muted2:#334155;
+  --txt:#0f172a;
 }
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
 
@@ -299,6 +299,80 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-he
   .card-desc{display:none;}
   .card-name{font-size:15px;}
 }
+
+/* LIGHT THEME */
+body{background:#f8fafc;color:#0f172a;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);}
+
+/* Login overlay */
+#login-overlay{background:#f8fafc;}
+.login-bg{background:radial-gradient(ellipse 70% 60% at 15% 50%,rgba(170,255,0,0.06) 0%,transparent 60%);}
+.login-grid{background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04) 1px,transparent 1px);}
+.login-logo{color:#0f172a;animation:none;}
+.login-logo::first-letter{color:#AAFF00;}
+.login-tagline{color:#64748b;}
+.login-card{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.login-field{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;}
+.login-field::placeholder{color:#94a3b8;}
+.login-field:focus{border-color:#AAFF00;background:#f1f5f9;}
+.login-btn{background:#AAFF00;color:#0f172a;box-shadow:none;}
+.login-btn:hover{background:#99ee00;box-shadow:none;}
+.login-error{color:#dc2626;}
+.login-spinner{border:2px solid rgba(15,23,42,0.15);border-top-color:#0f172a;}
+
+/* Topbar */
+.topbar{background:#ffffff;box-shadow:0 1px 0 rgba(0,0,0,0.07);backdrop-filter:none;}
+.tb-logo{color:#0f172a;}
+.tb-divider{background:rgba(0,0,0,0.10);}
+.tb-name{color:#64748b;}
+.tb-user{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);}
+.tb-avatar{background:rgba(170,255,0,0.15);color:#3a6b00;}
+.tb-uname{color:#0f172a;}
+.btn-logout{border:1px solid rgba(0,0,0,0.08);color:#64748b;}
+.btn-logout:hover{border-color:rgba(0,0,0,0.18);color:#0f172a;}
+
+/* Hero */
+.hero-bg{background:radial-gradient(ellipse 60% 80% at -10% 50%,rgba(170,255,0,0.06) 0%,transparent 60%);}
+.hero-bg-text{color:rgba(0,0,0,0.04);}
+.hero-greeting{color:#3a6b00;}
+.hero-title .dim{color:#94a3b8;}
+.hero-date{color:#64748b;}
+.hero-live{color:#3a6b00;}
+.live-dot{background:#AAFF00;}
+
+/* Stats banner */
+.stat-banner{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+.stat-big-label{color:#334155;}
+.stat-big-sub{color:#64748b;}
+.stat-live{color:#3a6b00;}
+.stat-val.loading{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;}
+
+/* Section */
+.section-label{color:#64748b;}
+.section-count{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#64748b;}
+
+/* Module cards */
+.mod-card{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.mod-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.card-name{color:#0f172a;}
+.card-desc{color:#64748b;}
+.card-soon-badge{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#64748b;}
+
+/* Pin modal */
+#pin-overlay{background:rgba(15,23,42,0.5);}
+.pin-box{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 4px 16px rgba(0,0,0,0.12);}
+.pin-module-lbl{color:#64748b;}
+.pin-title{color:#0f172a;}
+.pin-dot{background:#f1f5f9;border:2px solid rgba(0,0,0,0.12);}
+.pin-dot.filled{background:#AAFF00;border-color:#AAFF00;box-shadow:none;}
+.pin-key{background:#f8fafc;border:1px solid rgba(0,0,0,0.10);color:#0f172a;}
+.pin-key:hover{background:#f1f5f9;border-color:rgba(0,0,0,0.16);}
+.pin-key:active{background:#e2e8f0;}
+.pin-key.del{color:#64748b;}
+.pin-key.del:hover{color:#0f172a;}
+.pin-error-msg{color:#dc2626;}
+.pin-cancel{color:#94a3b8;}
+.pin-cancel:hover{color:#64748b;}
 </style>
 </head>
 <body>
