@@ -178,7 +178,29 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .toast.ok{color:var(--green);}
 .toast.err{color:var(--red);}
 
-@media(max-width:768px){.sidebar{display:none;}.stats-bar{flex-wrap:wrap;}.stat{flex:0 0 33.33%;}.kol{width:240px;}.dp{width:100%;right:-100%;}.dp.open{right:0;}}
+/* MOBILE */
+.sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49;backdrop-filter:blur(2px);}
+.sb-ov.open{display:block;}
+.hbg{display:none;background:rgba(255,255,255,0.05);border:1px solid var(--b);border-radius:9px;padding:7px 10px;font-size:17px;cursor:pointer;line-height:1;color:var(--m3);flex-shrink:0;}
+@media(max-width:768px){
+  .hbg{display:flex;align-items:center;}
+  .sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:50;width:240px;transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:8px 0 32px rgba(0,0,0,.6);}
+  .sidebar.mob-open{left:0;}
+  .topbar{padding:10px 12px;gap:7px;flex-wrap:nowrap;}
+  .tsearch{font-size:12px;padding:8px 11px;}
+  .tcnt{display:none;}
+  .btn-add{padding:8px 13px;font-size:11px;}
+  .stats-bar{overflow-x:auto;flex-wrap:nowrap;}
+  .stat{flex:0 0 auto;min-width:72px;padding:10px 6px;}
+  .stat-n{font-size:20px;}
+  .stat-l{font-size:7px;}
+  .kol{width:85vw;max-width:340px;}
+  .dp{width:100%;right:-100%;border-radius:0;}
+  .dp.open{right:0;}
+  .modal{top:auto;bottom:0;left:0;right:0;transform:none;width:100%;max-width:100%;max-height:92vh;border-radius:20px 20px 0 0;}
+  .mf-2,.mf-3{grid-template-columns:1fr;}
+  .lbox{width:94vw;padding:36px 24px;}
+}
 </style>
 </head>
 <body>
@@ -221,7 +243,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <input class="tsearch" id="search" placeholder="🔍  Buscar lead, deporte, país..." oninput="applyFilters()">
+      <button class="hbg" onclick="toggleSidebar()" title="Filtros">☰</button>
+      <input class="tsearch" id="search" placeholder="🔍  Buscar lead..." oninput="applyFilters()">
       <span class="tcnt" id="cnt"></span>
       <div class="view-btns">
         <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')" title="Kanban">⬛</button>
@@ -260,6 +283,9 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
     </div>
   </div>
 </div>
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sb-ov" id="sb-ov" onclick="toggleSidebar()"></div>
 
 <!-- DETAIL PANEL -->
 <div class="dp-ov" id="dp-ov" onclick="closeDP()"></div>
@@ -553,6 +579,7 @@ function openDP(id){
   q('#dp').classList.add('open');q('#dp-ov').classList.add('open');
 }
 function closeDP(){q('#dp').classList.remove('open');q('#dp-ov').classList.remove('open');editId=null;}
+function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').classList.toggle('open');}
 
 async function updateEst(id,ne){
   const {error}=await sb.from('leads').update({estado:ne,updated_at:new Date().toISOString()}).eq('id',id);
