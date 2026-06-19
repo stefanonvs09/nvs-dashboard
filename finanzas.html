@@ -398,6 +398,177 @@ label.fl { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px
 .login-btn:hover { background:#6aaa00; }
 .login-error { color:#e53e3e; font-size:12px; margin-top:8px; min-height:18px; }
 #login-loading { color:#666; font-size:13px; margin-top:16px; display:none; }
+
+/* ═══════════════════════════════════════
+   LIGHT THEME OVERRIDES
+══════════════════════════════════════════ */
+:root{
+  --sidebar-bg:#ffffff;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --card2:#f1f5f9;
+  --card3:#e8edf2;
+  --text:#0f172a;
+  --muted:#64748b;
+  --muted2:#cbd5e1;
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.05);
+  --green:#AAFF00;
+  --green-dark:#88CC00;
+  --green-dim:rgba(170,255,0,0.08);
+  --red:#dc2626;
+  --red-dim:rgba(220,38,38,0.08);
+  --yellow:#d97706;
+  --yellow-dim:rgba(217,119,6,0.08);
+  --blue:#3b82f6;
+  --blue-dim:rgba(59,130,246,0.08);
+  --purple:#7c3aed;
+  --purple-dim:rgba(124,58,237,0.08);
+}
+body{background:var(--bg);color:var(--text);}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12) !important;}
+
+/* Sidebar */
+.sidebar{background:#ffffff;border-right:1px solid rgba(0,0,0,0.08);}
+.sidebar-logo h1{color:#0f172a;}
+.sidebar-logo p{color:#64748b;}
+.sidebar-section{color:#94a3b8;}
+.sidebar-nav a{color:#64748b;}
+.sidebar-nav a:hover{color:#0f172a;background:rgba(0,0,0,0.04);}
+.sidebar-nav a.active{color:#0f172a;background:rgba(170,255,0,0.10);border-left-color:#AAFF00;}
+.sidebar-footer{color:#94a3b8;border-top-color:rgba(0,0,0,0.07);}
+
+/* Topbar */
+.topbar{background:rgba(255,255,255,0.97);backdrop-filter:none;border-bottom:1px solid rgba(0,0,0,0.07);box-shadow:0 1px 0 rgba(0,0,0,0.06);}
+.topbar-left h2{color:#0f172a;}
+.topbar-left .sub{color:#64748b;}
+
+/* Buttons */
+.btn-primary{background:#AAFF00;color:#0f172a;box-shadow:none;}
+.btn-primary:hover{background:#99ee00;box-shadow:none;}
+.btn-success{background:rgba(170,255,0,0.10);color:#3a6b00;border-color:rgba(170,255,0,0.25);}
+.btn-success:hover{background:rgba(170,255,0,0.18);}
+.btn-outline{border-color:rgba(0,0,0,0.10);color:#64748b;}
+.btn-outline:hover{border-color:rgba(0,0,0,0.20);color:#0f172a;background:rgba(0,0,0,0.03);}
+.btn-ghost{color:#64748b;}
+.btn-ghost:hover{background:#f1f5f9;color:#334155;}
+.btn-del{color:#94a3b8;}
+.btn-del:hover{color:var(--red);background:var(--red-dim);}
+
+/* KPI Cards */
+.kpi-card{background:#ffffff;border-color:rgba(0,0,0,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.kpi-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.kpi-label{color:#64748b;}
+.kpi-sub{color:#64748b;}
+.kpi-card.green .kpi-value{color:#3a6b00;}
+.kpi-card.blue  .kpi-value{color:#3b82f6;}
+.kpi-card.red   .kpi-value{color:#dc2626;}
+.kpi-card.purple.kpi-value{color:#7c3aed;}
+.kpi-card.yellow.kpi-value{color:#d97706;}
+
+/* Cards */
+.card{background:#ffffff;border-color:rgba(0,0,0,0.08);}
+.card-header{border-bottom-color:rgba(0,0,0,0.07);}
+.card-title{color:#0f172a;}
+
+/* Table */
+thead th{background:#f8fafc;color:#64748b;border-bottom-color:rgba(0,0,0,0.08);}
+tbody td{border-bottom-color:rgba(0,0,0,0.05);color:#334155;}
+tbody tr:hover td{background:rgba(0,0,0,0.02);color:#0f172a;}
+.table-footer{border-top-color:rgba(0,0,0,0.07);color:#64748b;}
+
+/* Search & filters */
+.search-box{background:#f8fafc;border-color:rgba(0,0,0,0.09);color:#0f172a;}
+.search-box::placeholder{color:#94a3b8;}
+.search-box:focus{border-color:#AAFF00;background:#fff;box-shadow:0 0 0 3px rgba(170,255,0,0.10);}
+.filter-sel{background:#f8fafc;border-color:rgba(0,0,0,0.09);color:#334155;}
+.filter-sel:focus{border-color:#AAFF00;}
+
+/* Badges */
+.badge-green{background:rgba(170,255,0,0.10);color:#3a6b00;border-color:rgba(170,255,0,0.25);}
+.badge-red{background:rgba(220,38,38,0.08);color:#dc2626;border-color:rgba(220,38,38,0.18);}
+.badge-yellow{background:rgba(217,119,6,0.08);color:#d97706;border-color:rgba(217,119,6,0.18);}
+.badge-blue{background:rgba(59,130,246,0.08);color:#3b82f6;border-color:rgba(59,130,246,0.18);}
+.badge-purple{background:rgba(124,58,237,0.08);color:#7c3aed;border-color:rgba(124,58,237,0.18);}
+.badge-gray{background:rgba(0,0,0,0.04);color:#64748b;border-color:rgba(0,0,0,0.08);}
+.badge-orange{background:rgba(234,88,12,0.08);color:#ea580c;border-color:rgba(234,88,12,0.18);}
+.badge-closed{background:rgba(0,0,0,0.04);color:#94a3b8;}
+
+/* Amounts */
+.amt-in{color:#3a6b00;}
+.amt-out{color:#dc2626;}
+
+/* Modal */
+.overlay{background:rgba(15,23,42,0.5);backdrop-filter:none;}
+.modal{background:#ffffff;border-color:rgba(0,0,0,0.09);box-shadow:0 8px 40px rgba(0,0,0,0.12);}
+.modal-header{border-bottom:1px solid rgba(0,0,0,0.07);}
+.modal-title{color:#0f172a;}
+.modal-close{background:#f1f5f9;border-color:rgba(0,0,0,0.08);color:#64748b;}
+.modal-close:hover{background:#e2e8f0;color:#0f172a;}
+label.fl{color:#64748b;}
+.fc{background:#f8fafc;border-color:rgba(0,0,0,0.09);color:#0f172a;}
+.fc::placeholder{color:#94a3b8;}
+.fc:focus{border-color:#AAFF00;background:#fff;box-shadow:0 0 0 3px rgba(170,255,0,0.10);}
+.form-actions{border-top-color:rgba(0,0,0,0.07);}
+
+/* Toast */
+.toast{background:#ffffff;border-color:rgba(0,0,0,0.10);color:#0f172a;box-shadow:0 4px 16px rgba(0,0,0,0.10);}
+
+/* Transaction mode buttons */
+.mode-btn{background:#f8fafc;border-color:rgba(0,0,0,0.09);}
+.mode-btn:hover{border-color:rgba(170,255,0,0.35);background:rgba(170,255,0,0.04);}
+.mode-btn.active{border-color:rgba(170,255,0,0.5);background:rgba(170,255,0,0.08);}
+.mode-label{color:#0f172a;}
+.mode-sub{color:#64748b;}
+
+/* Suggestions */
+.suggestions-box{background:#ffffff;border-color:rgba(0,0,0,0.10);box-shadow:0 8px 32px rgba(0,0,0,0.10);}
+.sug-item{border-bottom-color:rgba(0,0,0,0.05);}
+.sug-item:hover{background:rgba(170,255,0,0.05);}
+.sug-name{color:#0f172a;}
+.sug-detail{color:#64748b;}
+
+/* Athlete card in transaction */
+.ta-card{background:#f8fafc;border-color:rgba(170,255,0,0.20);color:#0f172a;}
+.ta-card-name{color:#3a6b00;}
+.ta-card-meta span{color:#64748b;}
+.ta-card-meta span strong{color:#334155;}
+.ta-prog-bar{background:#e2e8f0;}
+.ta-prog-fill{box-shadow:none;}
+.ta-preview{background:rgba(170,255,0,0.05);border-color:rgba(170,255,0,0.18);}
+.ta-prev-title{color:#3a6b00;}
+.ta-prev-row{color:#64748b;border-bottom-color:rgba(0,0,0,0.06);}
+.ta-prev-row .old{color:#94a3b8;}
+.ta-prev-row .new{color:#3a6b00;}
+
+/* Mobile cards */
+.m-atleta-card{background:#ffffff;border-color:rgba(0,0,0,0.08);}
+.m-ac-name{color:#0f172a;}
+.m-ac-sport{color:#64748b;}
+.m-ac-mid{border-color:rgba(0,0,0,0.07);}
+.m-ac-stat-label{color:#64748b;}
+.m-ac-stat-val{color:#0f172a;}
+.m-ac-payments{color:#64748b;}
+.m-trans-card{background:#ffffff;border-color:rgba(0,0,0,0.08);}
+.m-tc-dot.ingreso{box-shadow:none;}
+.m-tc-dot.gasto{box-shadow:none;}
+.m-tc-concept{color:#0f172a;}
+.m-tc-meta{color:#64748b;}
+.m-tc-amt.ingreso{color:#3a6b00;}
+.m-tc-amt.gasto{color:#dc2626;}
+
+/* Login overlay */
+#login-overlay{background:#f8fafc;}
+.login-box{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.08);}
+.login-box h1{color:#0f172a;}
+.login-box p{color:#64748b;}
+.login-field{background:#f8fafc;border-color:rgba(0,0,0,0.10);color:#0f172a;}
+.login-field::placeholder{color:#94a3b8;}
+.login-field:focus{border-color:#AAFF00;background:#fff;box-shadow:0 0 0 3px rgba(170,255,0,0.10);}
+.login-btn{background:#AAFF00;color:#0f172a;}
+.login-btn:hover{background:#99ee00;}
+.login-error{color:#dc2626;}
+#login-loading{color:#64748b;}
 </style>
 </head>
 <body>
