@@ -285,7 +285,7 @@ body{background:#f8fafc;color:#0f172a;}
 .lf label{color:#64748b;}
 .fi{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;}
 .fi::placeholder{color:#94a3b8;}
-.fi:focus{border-color:rgba(0,0,0,0.18);background:#f1f5f9;}
+.fi:focus{border-color:#AAFF00;background:#fff;box-shadow:0 0 0 3px rgba(170,255,0,0.12);}
 .btn-g{background:#AAFF00;color:#0f172a;box-shadow:none;}
 .btn-g:hover{background:#99ee00;box-shadow:none;}
 
@@ -332,8 +332,8 @@ body{background:#f8fafc;color:#0f172a;}
 .btn-web{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);color:#3b82f6;}
 .btn-web:hover,.btn-web.active{background:rgba(59,130,246,0.12);border-color:rgba(59,130,246,0.3);}
 .btn-web span{background:rgba(59,130,246,0.12);color:#3b82f6;}
-.tsearch{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;}
-.tsearch:focus{border-color:rgba(0,0,0,0.18);background:#f1f5f9;}
+.tsearch{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;transition:border .15s,box-shadow .15s;}
+.tsearch:focus{border-color:#AAFF00;background:#fff;box-shadow:0 0 0 3px rgba(170,255,0,0.10);}
 .tcnt{color:#64748b;}
 .vbtn{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);}
 .vbtn.active{background:rgba(170,255,0,0.12);border-color:rgba(170,255,0,0.3);}
@@ -372,7 +372,13 @@ body{background:#f8fafc;color:#0f172a;}
 .tag-dup{background:rgba(217,119,6,0.08);color:#d97706;border:1px solid rgba(217,119,6,0.18);}
 
 /* WhatsApp btn */
-.btn-wa{color:#ffffff;}
+.btn-wa{color:#22c55e;}
+/* Seguimiento inputs */
+.dp-inp{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;border-radius:8px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;outline:none;}
+.dp-inp:focus{border-color:rgba(170,255,0,0.5);background:#fff;}
+/* Modal form inputs */
+.msel,.minp,.mtarea{background:#f8fafc !important;border:1px solid rgba(0,0,0,0.09) !important;color:#0f172a !important;}
+.msel:focus,.minp:focus,.mtarea:focus{border-color:rgba(170,255,0,0.5) !important;}
 
 /* List view */
 .list-table th{background:#f8fafc;backdrop-filter:none;color:#64748b;border-bottom:1px solid rgba(0,0,0,0.08);}
