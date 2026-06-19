@@ -207,6 +207,9 @@ textarea.fi{resize:vertical;min-height:70px;}
     <button class="sb-item" id="snav-tabla" onclick="setView('tabla')">
       <span class="ic">📊</span> Tabla
     </button>
+    <button class="sb-item" id="snav-recordatorio" onclick="setView('recordatorio')">
+      <span class="ic">🔔</span> Recordatorio <span id="rem-badge-count" style="display:none;background:var(--amber);color:#000;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-left:auto;"></span>
+    </button>
   </div>
   <hr class="sb-div">
   <div class="sb-section">
@@ -235,6 +238,7 @@ textarea.fi{resize:vertical;min-height:70px;}
     <div class="view-tabs">
       <button class="vtab active" id="tab-pipeline" onclick="setView('pipeline')">⚡ Pipeline</button>
       <button class="vtab" id="tab-tabla" onclick="setView('tabla')">📊 Tabla</button>
+      <button class="vtab" id="tab-recordatorio" onclick="setView('recordatorio')">🔔 Recordatorio</button>
     </div>
     <input class="tb-search" id="f-q" placeholder="🔍  Buscar atleta, deporte, universidad…" oninput="applyFilters()">
     <a href="index.html" class="btn-ghost">⌂</a>
@@ -282,6 +286,13 @@ textarea.fi{resize:vertical;min-height:70px;}
           <tbody id="tbl-body"></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- RECORDATORIO -->
+    <div id="view-recordatorio" style="display:none">
+      <div id="rem-banner-wrap"></div>
+      <div id="rem-section-monthly"></div>
+      <div id="rem-section-abono"></div>
     </div>
   </div>
 </div>
@@ -509,6 +520,36 @@ let data=[], filtered=[], currentId=null;
 let statusFilter='', agentFilter='';
 let sortK='nombre', sortD=1, curView='pipeline';
 
+/* RECORDATORIO */
+.rem-banner{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;margin-bottom:18px;font-weight:700;font-size:14px;}
+.rem-banner.today{background:rgba(138,213,0,0.12);border:1.5px solid var(--green);color:var(--green);}
+.rem-banner.soon{background:rgba(251,191,36,0.1);border:1.5px solid var(--amber);color:var(--amber);}
+.rem-banner.normal{background:var(--card);border:1px solid var(--border);color:var(--muted);}
+.rem-banner .rem-icon{font-size:24px;flex-shrink:0;}
+.rem-banner .rem-title{font-size:15px;font-family:'Anton',sans-serif;letter-spacing:.5px;}
+.rem-banner .rem-sub{font-size:12px;font-weight:500;opacity:.8;margin-top:2px;}
+.rem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.rem-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:border .15s;}
+.rem-card:hover{border-color:rgba(255,255,255,0.15);}
+.rem-top{display:flex;align-items:center;gap:10px;}
+.rem-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#8AD500,#6aaa00);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#000;flex-shrink:0;}
+.rem-name{font-weight:700;font-size:13px;line-height:1.2;}
+.rem-sport{font-size:11px;color:var(--muted);margin-top:2px;}
+.rem-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.rem-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.4px;text-transform:uppercase;}
+.rem-badge.monthly{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.25);}
+.rem-badge.abono{background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.25);}
+.rem-badge.activo{background:rgba(138,213,0,0.1);color:var(--green);border:1px solid rgba(138,213,0,0.2);}
+.rem-pay{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--card2);border-radius:8px;font-size:12px;}
+.rem-pay-lbl{color:var(--muted);font-weight:600;}
+.rem-pay-val{font-weight:800;color:#fff;}
+.rem-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.rem-prog{font-size:11px;color:var(--muted);font-weight:600;}
+.btn-wa{display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .15s;}
+.btn-wa:hover{opacity:.85;}
+.rem-section-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin:16px 0 8px;}
+.rem-empty{padding:30px;text-align:center;color:var(--muted);font-size:13px;}
+
 /* INIT */
 async function init(){
   const {data:{session}} = await _sb.auth.getSession();
@@ -522,6 +563,7 @@ async function loadData(){
   populateSports();
   populateClasses();
   applyFilters();
+  loadAtletasRem();
 }
 
 /* SPORTS FILTER */
@@ -716,13 +758,115 @@ function cellVal(k,a){
 /* VIEWS */
 function setView(v){
   curView=v;
-  ['pipeline','tabla'].forEach(t=>{
+  ['pipeline','tabla','recordatorio'].forEach(t=>{
     document.getElementById('view-'+t).style.display=t===v?'':'none';
     document.getElementById('tab-'+t)?.classList.toggle('active',t===v);
     document.getElementById('snav-'+t)?.classList.toggle('active',t===v);
     document.getElementById('mn-'+t)?.classList.toggle('active',t===v);
   });
-  applyFilters();
+  if(v==='recordatorio') renderRecordatorio();
+  else applyFilters();
+}
+
+/* RECORDATORIO — atletas con pago mensual/abono */
+let atletasRem = [];
+async function loadAtletasRem(){
+  const {data:rows} = await _sb.from('atletas')
+    .select('nombre,deporte,tipo_pago,pago,total,pagos_hechos,estado,whatsapp,referido')
+    .in('tipo_pago',['MONTHLY','ABONO + MENSUALIDAD'])
+    .eq('estado','Activo')
+    .order('nombre');
+  atletasRem = rows||[];
+  // badge en sidebar
+  const badge = document.getElementById('rem-badge-count');
+  if(atletasRem.length>0){badge.textContent=atletasRem.length;badge.style.display='inline';}
+}
+
+function renderRecordatorio(){
+  const now = new Date();
+  const day = now.getDate();
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  // Calcular días hasta el próximo 15
+  let daysTo15;
+  if(day <= 15) daysTo15 = 15 - day;
+  else {
+    const next15 = new Date(now.getFullYear(), now.getMonth()+1, 15);
+    daysTo15 = Math.round((next15 - now)/(1000*60*60*24));
+  }
+
+  // Banner
+  let bannerCls, bannerIcon, bannerTitle, bannerSub;
+  if(daysTo15 === 0){
+    bannerCls='today'; bannerIcon='🟢';
+    bannerTitle='HOY ES DÍA 15 — COBROS PENDIENTES';
+    bannerSub=`${atletasRem.length} atletas con pago mensual/abono vencen hoy`;
+  } else if(daysTo15 <= 3){
+    bannerCls='soon'; bannerIcon='⚠️';
+    bannerTitle=`EN ${daysTo15} DÍA${daysTo15>1?'S':''} ES EL DÍA 15`;
+    bannerSub=`${atletasRem.length} atletas pendientes de cobro`;
+  } else {
+    bannerCls='normal'; bannerIcon='🔔';
+    bannerTitle=`PRÓXIMO COBRO: 15 DE ${monthNames[daysTo15<=15?now.getMonth():(now.getMonth()+1)%12].toUpperCase()}`;
+    bannerSub=`${daysTo15} días · ${atletasRem.length} atletas en plan mensual/abono`;
+  }
+
+  document.getElementById('rem-banner-wrap').innerHTML=`
+    <div class="rem-banner ${bannerCls}">
+      <span class="rem-icon">${bannerIcon}</span>
+      <div><div class="rem-title">${bannerTitle}</div><div class="rem-sub">${bannerSub}</div></div>
+    </div>`;
+
+  const mkCards = list => list.map(a=>{
+    const ini = (a.nombre||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+    const tipoCls = a.tipo_pago==='MONTHLY'?'monthly':'abono';
+    const tipoLabel = a.tipo_pago==='MONTHLY'?'Monthly':'Abono + Mensualidad';
+    const waNum = (a.whatsapp||'').replace(/\D/g,'');
+    const waLink = waNum ? `https://wa.me/${waNum}` : '#';
+    const fmtAmt = n => n ? '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0}) : '—';
+    return `
+    <div class="rem-card">
+      <div class="rem-top">
+        <div class="rem-av">${ini}</div>
+        <div>
+          <div class="rem-name">${esc(a.nombre)}</div>
+          <div class="rem-sport">${esc(a.deporte||'—')}</div>
+        </div>
+      </div>
+      <div class="rem-badges">
+        <span class="rem-badge ${tipoCls}">${tipoLabel}</span>
+        <span class="rem-badge activo">Activo</span>
+      </div>
+      <div class="rem-pay">
+        <span class="rem-pay-lbl">Cuota mensual</span>
+        <span class="rem-pay-val">${fmtAmt(a.pago)}</span>
+      </div>
+      <div class="rem-pay" style="margin-top:-4px">
+        <span class="rem-pay-lbl">Pagos realizados</span>
+        <span class="rem-pay-val" style="color:var(--muted);font-size:11px">${esc(a.pagos_hechos||'—')}</span>
+      </div>
+      <div class="rem-footer">
+        <span class="rem-prog">Ref: ${esc(a.referido||'—')}</span>
+        ${waNum ? `<a class="btn-wa" href="${waLink}" target="_blank">💬 WhatsApp</a>` : '<span style="color:var(--muted);font-size:11px">Sin WhatsApp</span>'}
+      </div>
+    </div>`;
+  }).join('');
+
+  const monthly = atletasRem.filter(a=>a.tipo_pago==='MONTHLY');
+  const abono   = atletasRem.filter(a=>a.tipo_pago==='ABONO + MENSUALIDAD');
+
+  const secM = document.getElementById('rem-section-monthly');
+  secM.innerHTML = monthly.length
+    ? `<div class="rem-section-title">📅 Plan Monthly (${monthly.length})</div><div class="rem-grid">${mkCards(monthly)}</div>`
+    : '';
+
+  const secA = document.getElementById('rem-section-abono');
+  secA.innerHTML = abono.length
+    ? `<div class="rem-section-title">📋 Abono + Mensualidad (${abono.length})</div><div class="rem-grid">${mkCards(abono)}</div>`
+    : '';
+
+  if(!atletasRem.length)
+    secM.innerHTML='<div class="rem-empty">No hay atletas activos con plan mensual o abono.</div>';
 }
 
 /* EDIT MODAL */
@@ -1050,6 +1194,95 @@ document.addEventListener('DOMContentLoaded',()=>{
   filterStatus(''); filterAgent('');
   init();
 });
+</script>
+
+<!-- CALCULADORA FLOTANTE -->
+<style>
+.calc-fab{position:fixed;bottom:24px;right:24px;width:48px;height:48px;background:var(--card2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:200;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+.calc-fab:hover{background:var(--card3);border-color:#444;transform:scale(1.08);}
+.calc-panel{position:fixed;bottom:82px;right:24px;width:240px;background:#161616;border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.7);z-index:199;overflow:hidden;display:none;}
+.calc-panel.open{display:block;animation:calcIn .18s ease;}
+@keyframes calcIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.calc-screen{padding:12px 14px 8px;text-align:right;}
+.calc-expr{font-size:11px;color:var(--muted);min-height:16px;word-break:break-all;}
+.calc-val{font-family:'Anton',sans-serif;font-size:30px;color:#fff;word-break:break-all;line-height:1.1;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
+.calc-btn{background:#1a1a1a;border:none;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;padding:14px 0;cursor:pointer;transition:background .1s;text-align:center;}
+.calc-btn:hover{background:#252525;}
+.calc-btn.op{color:var(--amber);}
+.calc-btn.eq{background:var(--green);color:#000;}
+.calc-btn.eq:hover{background:var(--green-dk);}
+.calc-btn.clr{color:var(--red);}
+.calc-btn.zero{grid-column:span 2;}
+</style>
+
+<button class="calc-fab" onclick="toggleCalc()" title="Calculadora">🧮</button>
+<div class="calc-panel" id="calc-panel">
+  <div class="calc-screen">
+    <div class="calc-expr" id="calc-expr"></div>
+    <div class="calc-val" id="calc-val">0</div>
+  </div>
+  <div class="calc-grid">
+    <button class="calc-btn clr" onclick="calcAC()">AC</button>
+    <button class="calc-btn op" onclick="calcSign()">+/-</button>
+    <button class="calc-btn op" onclick="calcPct()">%</button>
+    <button class="calc-btn op" onclick="calcOp('/')">÷</button>
+    <button class="calc-btn" onclick="calcNum('7')">7</button>
+    <button class="calc-btn" onclick="calcNum('8')">8</button>
+    <button class="calc-btn" onclick="calcNum('9')">9</button>
+    <button class="calc-btn op" onclick="calcOp('*')">×</button>
+    <button class="calc-btn" onclick="calcNum('4')">4</button>
+    <button class="calc-btn" onclick="calcNum('5')">5</button>
+    <button class="calc-btn" onclick="calcNum('6')">6</button>
+    <button class="calc-btn op" onclick="calcOp('-')">−</button>
+    <button class="calc-btn" onclick="calcNum('1')">1</button>
+    <button class="calc-btn" onclick="calcNum('2')">2</button>
+    <button class="calc-btn" onclick="calcNum('3')">3</button>
+    <button class="calc-btn op" onclick="calcOp('+')">+</button>
+    <button class="calc-btn zero" onclick="calcNum('0')">0</button>
+    <button class="calc-btn" onclick="calcDot()">.</button>
+    <button class="calc-btn eq" onclick="calcEq()">=</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  let cur='0', prev='', op=null, fresh=false;
+  function upd(){
+    document.getElementById('calc-val').textContent=cur;
+    document.getElementById('calc-expr').textContent=prev&&op?prev+' '+opSym(op):'';
+  }
+  function opSym(o){return o==='/'?'÷':o==='*'?'×':o;}
+  window.toggleCalc=()=>document.getElementById('calc-panel').classList.toggle('open');
+  window.calcNum=d=>{
+    if(cur==='0'||fresh){cur=d;fresh=false;}
+    else if(cur.length<12) cur+=d;
+    upd();
+  };
+  window.calcDot=()=>{
+    if(fresh){cur='0.';fresh=false;}
+    else if(!cur.includes('.')) cur+='.';
+    upd();
+  };
+  window.calcOp=o=>{
+    if(op&&!fresh) calcEq();
+    prev=cur; op=o; fresh=true; upd();
+  };
+  window.calcEq=()=>{
+    if(!op||!prev) return;
+    const a=parseFloat(prev), b=parseFloat(cur);
+    let r;
+    switch(op){
+      case '+': r=a+b; break; case '-': r=a-b; break;
+      case '*': r=a*b; break; case '/': r=b===0?'Error':a/b; break;
+    }
+    cur=r==='Error'?'Error':String(parseFloat(r.toFixed(8)));
+    prev=''; op=null; fresh=true; upd();
+  };
+  window.calcAC=()=>{cur='0';prev='';op=null;fresh=false;upd();};
+  window.calcSign=()=>{if(cur!=='0')cur=String(-parseFloat(cur));upd();};
+  window.calcPct=()=>{cur=String(parseFloat(cur)/100);upd();};
+})();
 </script>
 </body>
 </html>
