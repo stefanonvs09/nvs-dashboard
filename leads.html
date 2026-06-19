@@ -9,11 +9,11 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --green:#AAFF00;--green-bg:rgba(85,136,0,0.08);--green-dk:#4a7a00;--green-glow:rgba(85,136,0,0.2);
-  --bg:#f6f9fc;--sb:#ffffff;--card:#ffffff;--card2:#f6f9fc;--card3:#eef1f6;
-  --b:rgba(0,0,0,0.07);--b2:rgba(0,0,0,0.13);
-  --txt:#1a1f36;--m:#b0b8c8;--m2:#697386;--m3:#1a1f36;
-  --blue:#3b82f6;--amber:#f59e0b;--purple:#8b5cf6;--red:#ef4444;--teal:#14b8a6;--pink:#ec4899;--orange:#f97316;
+  --green:#AAFF00;--green-bg:rgba(170,255,0,0.06);--green-dk:#88CC00;--green-glow:rgba(170,255,0,0.15);
+  --bg:#08090a;--sb:#0d0e10;--card:#111318;--card2:#161820;--card3:#1c1f28;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.12);
+  --txt:#e2e4ea;--m:#2e3240;--m2:#5a6070;--m3:#9aa0b0;
+  --blue:#60a5fa;--amber:#fbbf24;--purple:#a78bfa;--red:#f87171;--teal:#2dd4bf;--pink:#f472b6;--orange:#fb923c;
 }
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);display:flex;}
@@ -265,65 +265,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
   .mf-2,.mf-3{grid-template-columns:1fr;}
   .lbox{width:94vw;padding:36px 24px;}
 }
-/* ══ LIGHT MODE ══ */
-#login-ov{background:radial-gradient(ellipse at 50% -10%,rgba(85,136,0,.07) 0%,var(--bg) 55%);}
-.lbox{background:#fff;border-color:rgba(0,0,0,.09);box-shadow:0 8px 40px rgba(0,0,0,.09);}
-.lbox-logo span{color:#4a7a00;}
-.lbox-sub{color:var(--m2);}
-.fi{background:#f8fafc;border-color:rgba(0,0,0,.1);color:var(--txt);}
-.fi:focus{border-color:rgba(0,0,0,.2);background:#fff;}
-.fi::placeholder{color:#aab0bc;}
-.sidebar{background:#fff;border-color:rgba(0,0,0,.07);}
-.sb-top{border-color:rgba(0,0,0,.06);}
-.sb-logo span{color:#4a7a00;}
-.sb-logo-tag{color:var(--m2);}
-.sb-lbl{color:var(--m);}
-.fsel{background:#f8fafc;border-color:rgba(0,0,0,.08);color:var(--txt);}
-.rec-tag{color:var(--m2);}
-.rec-tag:hover{background:rgba(0,0,0,.04);color:var(--txt);}
-.rec-tag.active{background:var(--green-bg);color:#4a7a00;}
-.sb-foot{border-color:rgba(0,0,0,.06);}
-.sb-foot a{color:var(--m2);}
-.topbar{background:rgba(255,255,255,.97);border-color:rgba(0,0,0,.07);box-shadow:0 1px 0 rgba(0,0,0,.05);}
-.tsearch{background:#f8fafc;border-color:rgba(0,0,0,.09);color:var(--txt);}
-.tsearch:focus{background:#fff;border-color:rgba(0,0,0,.18);}
-.vbtn{background:#f1f5f9;border-color:rgba(0,0,0,.08);color:var(--txt);}
-.vbtn.active{background:rgba(85,136,0,.1);border-color:rgba(85,136,0,.25);color:#4a7a00;}
-.btn-add{background:#1a1f36;color:#fff;box-shadow:none;}
-.btn-add:hover{background:#2d3555;box-shadow:none;}
-.btn-web{background:rgba(59,130,246,.07);border-color:rgba(59,130,246,.18);color:var(--blue);}
-.btn-web.active,.btn-web:hover{background:rgba(59,130,246,.13);border-color:rgba(59,130,246,.3);}
-.stats-bar{background:#fff;border-color:rgba(0,0,0,.06);}
-.stat{border-color:rgba(0,0,0,.05);}
-.stat:hover{background:rgba(0,0,0,.02);}
-.kboard-wrap{background:var(--bg);}
-.kol{background:#fff;border-color:rgba(0,0,0,.07);box-shadow:0 1px 6px rgba(0,0,0,.04);}
-.kol-hd{background:#f8fafc;border-color:rgba(0,0,0,.05);}
-.kol-nm{color:var(--txt);}
-.card{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.card:hover{box-shadow:0 6px 24px rgba(0,0,0,.1);}
-.tag{background:rgba(0,0,0,.05);color:var(--m2);border-color:rgba(0,0,0,.08);}
-.list-table{background:#fff;}
-.list-table th{background:#f8fafc;color:var(--m2);border-color:rgba(0,0,0,.07);}
-.list-table td{border-color:rgba(0,0,0,.05);color:var(--txt);}
-.list-table tr:hover td{background:rgba(0,0,0,.02);}
-.dp{background:#fff;border-color:rgba(0,0,0,.09);box-shadow:-8px 0 40px rgba(0,0,0,.1);}
-.dp-sec-lbl{color:var(--m2);}
-.dp-sel,.dp-inp{background:#f8fafc;border-color:rgba(0,0,0,.09);color:var(--txt);}
-.dp-btn{background:#f1f5f9;border-color:rgba(0,0,0,.08);color:var(--m2);}
-.dp-btn:hover{background:#e8edf2;color:var(--txt);}
-.modal-ov{background:rgba(0,0,0,.4);}
-.modal{background:#fff;border-color:rgba(0,0,0,.09);box-shadow:0 24px 64px rgba(0,0,0,.15);}
-.m-hd{border-color:rgba(0,0,0,.06);}
-.m-ft{border-color:rgba(0,0,0,.06);}
-.mf label{color:var(--m2);}
-.msel,.minp{background:#f8fafc;border-color:rgba(0,0,0,.09);color:var(--txt);}
-.btn-cancel{background:#f1f5f9;border-color:rgba(0,0,0,.08);color:var(--m2);}
-.btn-cancel:hover{background:#e8edf2;color:var(--txt);}
-.web-col{background:#fff;border-color:rgba(0,0,0,.07);}
-.web-col-hd{background:#f8fafc;border-color:rgba(0,0,0,.05);}
-.web-card{background:#fff;border-color:rgba(0,0,0,.08);border-left-color:var(--blue);}
-.assign-btn{background:#f8fafc;border-color:rgba(0,0,0,.08);color:var(--txt);}
+/* ══ SEGUIMIENTO ══ */
+.seg-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:4px;}
+.seg-badge.overdue{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.2);}
+.seg-badge.today{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);}
+.seg-badge.upcoming{background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.18);}
 </style>
 </head>
 <body>
@@ -716,6 +662,7 @@ function mkCard(a){
       ${a.presupuesto?`<span class="tag tag-pais">💰 ${esc(a.presupuesto)}</span>`:''}
       ${a.duplicate_with?`<span class="tag tag-dup" title="También en: ${esc(a.duplicate_with)}">⚠ También: ${esc(a.duplicate_with)}</span>`:''}
     </div>
+    ${segBadge(a)}
     <div class="card-ft">
       <span class="card-notas">${a.notas?'📝 '+esc(a.notas):a.edad?'Edad: '+a.edad:''}</span>
       ${waN?`<a class="btn-wa" href="https://wa.me/${waN}" target="_blank" onclick="event.stopPropagation()">💬</a>`:''}
@@ -790,6 +737,13 @@ function openDP(id){
         <div class="dp-row"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="color:var(--purple)">${esc(a.recruiter)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Fuente</span><span class="dp-rv">${esc(a.fuente)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Agregado</span><span class="dp-rv" style="color:var(--m2)">${(a.created_at||'').substring(0,10)}</span></div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">📅 Seguimiento</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" class="dp-inp" id="dp-seg-fecha" value="${a.seguimiento_fecha||''}" onchange="saveSeg(${id})" style="flex:1;min-width:130px">
+          <input type="text" class="dp-inp" id="dp-seg-nota" value="${esc(a.seguimiento_nota||'')}" placeholder="Nota del seguimiento..." onblur="saveSeg(${id})" style="flex:2;min-width:160px">
+        </div>
       </div>
       <div class="dp-sec">
         <div class="dp-sec-lbl">Notas</div>
@@ -892,6 +846,21 @@ async function saveNotas(id){
   const val=q('#dp-notas-ta')?.value||'';
   await sb.from('leads').update({notas:val,updated_at:new Date().toISOString()}).eq('id',id);
   const a=ALL.find(x=>x.id===id);if(a)a.notas=val;
+}
+async function saveSeg(id){
+  const fecha=q('#dp-seg-fecha')?.value||null;
+  const nota=q('#dp-seg-nota')?.value||'';
+  const {error}=await sb.from('leads').update({seguimiento_fecha:fecha||null,seguimiento_nota:nota,updated_at:new Date().toISOString()}).eq('id',id);
+  if(!error){const a=ALL.find(x=>x.id===id);if(a){a.seguimiento_fecha=fecha;a.seguimiento_nota=nota;}applyFilters();toast('Seguimiento guardado ✓','ok');}
+  else toast('Error: agrega las columnas en Supabase primero','err');
+}
+function segBadge(a){
+  if(!a.seguimiento_fecha)return '';
+  const today=new Date().toISOString().slice(0,10);
+  const f=a.seguimiento_fecha;
+  if(f<today)return `<div class="seg-badge overdue">⚠ Atrasado · ${f}</div>`;
+  if(f===today)return `<div class="seg-badge today">📅 Hoy · ${f}</div>`;
+  return `<div class="seg-badge upcoming">📅 ${f}</div>`;
 }
 
 /* MODAL */
