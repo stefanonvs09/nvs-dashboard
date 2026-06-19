@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVS · Guía Scrum & Agile</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#AAFF00;--green-bg:rgba(170,255,0,0.08);
+  --bg:#0a0a0a;--card:#111;--card2:#161616;--card3:#1c1c1c;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.12);
+  --txt:#fff;--m:#555;--m2:#888;--m3:#aaa;
+  --blue:#60a5fa;--amber:#fbbf24;--purple:#a78bfa;--red:#f87171;--teal:#2dd4bf;
+}
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px;}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(170,255,0,.15)}50%{box-shadow:0 0 50px rgba(170,255,0,.35)}}
+
+/* ── HEADER ── */
+.hdr{
+  background:linear-gradient(180deg,rgba(170,255,0,0.04) 0%,transparent 100%);
+  border-bottom:1px solid var(--b);padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;height:62px;
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background-color:rgba(10,10,10,.92);
+}
+.hdr-logo{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:1px;}
+.hdr-logo span{color:var(--green);}
+.hdr-nav{display:flex;align-items:center;gap:10px;}
+.hdr-chip{background:var(--card2);border:1px solid var(--b2);border-radius:20px;padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--m3);}
+.hdr-back{text-decoration:none;color:var(--m2);font-size:11px;font-weight:700;transition:color .15s;}
+.hdr-back:hover{color:var(--txt);}
+
+/* ── HERO ── */
+.hero{padding:72px 32px 56px;text-align:center;animation:fadeUp .6s ease both;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-bg);border:1px solid rgba(170,255,0,0.2);border-radius:20px;padding:5px 14px;font-size:10px;font-weight:700;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;}
+.hero-title{font-family:'Anton',sans-serif;font-size:clamp(40px,7vw,72px);line-height:1.05;letter-spacing:1px;margin-bottom:16px;}
+.hero-title span{color:var(--green);animation:glow 3s ease-in-out infinite;display:inline-block;}
+.hero-sub{font-size:15px;color:var(--m3);max-width:560px;margin:0 auto;line-height:1.7;font-weight:500;}
+.hero-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:28px;}
+.hero-tag{background:var(--card2);border:1px solid var(--b2);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;color:var(--m3);}
+
+/* ── LAYOUT ── */
+.content{max-width:1060px;margin:0 auto;padding:0 24px 80px;}
+.section{margin-bottom:64px;animation:fadeUp .5s ease both;}
+.section-hd{display:flex;align-items:center;gap:14px;margin-bottom:32px;}
+.section-ic{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.section-title{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:.5px;}
+.section-sub{font-size:12px;color:var(--m2);margin-top:4px;font-weight:600;}
+
+/* ── CARDS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.gc{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:20px;transition:border-color .2s,transform .15s;}
+.gc:hover{border-color:var(--b2);transform:translateY(-2px);}
+.gc-ic{font-size:28px;margin-bottom:12px;}
+.gc-title{font-weight:800;font-size:14px;margin-bottom:6px;}
+.gc-body{font-size:12px;color:var(--m3);line-height:1.65;}
+.gc-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;margin-top:10px;text-transform:uppercase;letter-spacing:.4px;}
+
+/* ── SCRUM CYCLE ── */
+.cycle{display:flex;align-items:center;gap:0;overflow-x:auto;padding:4px 0 14px;margin-bottom:28px;}
+.cycle-step{
+  flex-shrink:0;background:var(--card);border:1px solid var(--b);border-radius:12px;
+  padding:16px 18px;text-align:center;min-width:130px;position:relative;
+}
+.cycle-step + .cycle-step::before{
+  content:'→';color:var(--m);font-size:18px;flex-shrink:0;
+  position:absolute;left:-16px;top:50%;transform:translateY(-50%);
+}
+.cycle-arr{color:var(--m);font-size:20px;padding:0 6px;flex-shrink:0;margin:0 2px;}
+.cs-num{font-family:'Anton',sans-serif;font-size:11px;color:var(--m2);margin-bottom:6px;letter-spacing:.8px;}
+.cs-icon{font-size:24px;margin-bottom:8px;}
+.cs-name{font-weight:800;font-size:12px;margin-bottom:4px;}
+.cs-time{font-size:10px;color:var(--m2);font-weight:600;}
+
+/* ── JIRA ── */
+.jira-issue-types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.jit{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:14px;text-align:center;}
+.jit-ic{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;margin:0 auto 8px;}
+.jit-nm{font-size:11px;font-weight:800;margin-bottom:3px;}
+.jit-ds{font-size:10px;color:var(--m2);line-height:1.4;}
+.jira-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.jf{background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+.jf-ic{font-size:20px;flex-shrink:0;margin-top:1px;}
+.jf-nm{font-weight:800;font-size:12px;margin-bottom:4px;}
+.jf-ds{font-size:11px;color:var(--m3);line-height:1.5;}
+
+/* ── KANBAN BOARD ── */
+.kboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.kcol{background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden;}
+.kcol-hd{padding:10px 12px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--b);}
+.kcol-dot{width:7px;height:7px;border-radius:50%;}
+.kcol-nm{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;flex:1;}
+.kcol-cnt{font-size:9px;font-weight:700;background:rgba(255,255,255,0.05);padding:1px 6px;border-radius:10px;color:var(--m2);}
+.kcol-bd{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:120px;}
+.ktask{background:var(--card2);border:1px solid var(--b);border-radius:7px;padding:8px 10px;}
+.kt-nm{font-size:11px;font-weight:700;margin-bottom:5px;line-height:1.3;}
+.kt-ft{display:flex;align-items:center;gap:6px;}
+.kt-av{width:18px;height:18px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--green);}
+.kt-pts{font-size:9px;color:var(--m2);font-weight:700;}
+.kt-pr{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;}
+
+/* ── STANDUP ── */
+.standup-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.sq{border-radius:14px;padding:22px;border:1px solid var(--b);}
+.sq-n{font-family:'Anton',sans-serif;font-size:42px;margin-bottom:6px;}
+.sq-q{font-size:14px;font-weight:800;margin-bottom:10px;}
+.sq-body{font-size:12px;color:var(--m3);line-height:1.6;}
+.sq-ex{margin-top:12px;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--m3);font-style:italic;line-height:1.5;}
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tip{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:14px;display:flex;gap:10px;}
+.tip-ic{font-size:18px;flex-shrink:0;}
+.tip-body{font-size:11px;color:var(--m3);line-height:1.55;}
+.tip-body strong{color:var(--txt);display:block;margin-bottom:3px;font-size:12px;}
+
+/* ── ROLES TABLE ── */
+.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.role{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:20px;}
+.role-ic{font-size:32px;margin-bottom:12px;}
+.role-nm{font-weight:800;font-size:15px;margin-bottom:4px;}
+.role-lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:12px;}
+.role-list{list-style:none;}
+.role-list li{font-size:11px;color:var(--m3);padding:5px 0;border-bottom:1px solid var(--b);line-height:1.45;}
+.role-list li:last-child{border:none;}
+.role-list li::before{content:'→ ';color:var(--green);}
+
+/* ── CEREMONIES TABLE ── */
+.cer-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--b);}
+.cer-table th{background:var(--card2);padding:11px 16px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--m2);}
+.cer-table td{padding:12px 16px;font-size:12px;border-top:1px solid var(--b);}
+.cer-table td:first-child{font-weight:700;color:var(--txt);}
+.cer-table td.dur{color:var(--amber);font-weight:700;font-size:11px;white-space:nowrap;}
+.cer-table td.who{color:var(--m3);font-size:11px;}
+.cer-table tr:hover td{background:rgba(255,255,255,0.02);}
+
+/* ── DIVIDER ── */
+.divider{border:none;border-top:1px solid var(--b);margin:60px 0;}
+
+/* ── GLOSSARY ── */
+.glos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.gt{background:var(--card);border:1px solid var(--b);border-radius:9px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;}
+.gt-key{font-size:11px;font-weight:800;color:var(--green);min-width:110px;flex-shrink:0;}
+.gt-val{font-size:11px;color:var(--m3);line-height:1.5;}
+
+/* ── BADGES ── */
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(170,255,0,0.2);}
+.badge-blue {background:rgba(96,165,250,0.08);color:var(--blue);border:1px solid rgba(96,165,250,0.2);}
+.badge-amber{background:rgba(251,191,36,0.08);color:var(--amber);border:1px solid rgba(251,191,36,0.2);}
+.badge-red  {background:rgba(248,113,113,0.08);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+.badge-teal {background:rgba(45,212,191,0.08);color:var(--teal);border:1px solid rgba(45,212,191,0.2);}
+.badge-purple{background:rgba(167,139,250,0.08);color:var(--purple);border:1px solid rgba(167,139,250,0.2);}
+
+/* MOBILE */
+@media(max-width:768px){
+  .hero{padding:48px 16px 36px;}
+  .content{padding:0 14px 60px;}
+  .grid-2,.grid-3,.grid-4,.jira-issue-types,.jira-features,.standup-3,.roles-grid,.tips-grid,.glos-grid{grid-template-columns:1fr;}
+  .kboard{grid-template-columns:1fr 1fr;}
+  .cycle{flex-wrap:wrap;justify-content:center;}
+  .cer-table{font-size:11px;}
+  .hdr{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">NV<span>S</span></div>
+  <div class="hdr-nav">
+    <span class="hdr-chip">📘 Guía Agile</span>
+    <a href="index.html" class="hdr-back">← Hub</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">📘 Módulo Educativo</div>
+  <h1 class="hero-title">Ciclo de Vida <span>Ágil</span></h1>
+  <p class="hero-sub">Scrum, Kanban, Jira y Standups — todo lo que necesitas para gestionar proyectos como un equipo de élite.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">⚡ Scrum</span>
+    <span class="hero-tag">📋 Kanban</span>
+    <span class="hero-tag">🔵 Jira</span>
+    <span class="hero-tag">☀️ Daily Standup</span>
+    <span class="hero-tag">🔄 Agile</span>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════
+     SECTION 1: SCRUM LIFECYCLE
+═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hd">
+    <div class="section-ic badge-green">⚡</div>
+    <div>
+      <div class="section-title">Ciclo de Vida Scrum</div>
+      <div class="section-sub">Marco ágil para entregar valor en iteraciones cortas llamadas Sprints</div>
+    </div>
+  </div>
+
+  <!-- Sprint Cycle Flow -->
+  <div style="overflow-x:auto;margin-bottom:28px;">
+    <div style="display:flex;align-items:stretch;gap:0;min-width:700px;">
+      <div class="cycle-step" style="border-color:rgba(170,255,0,0.3);">
+        <div class="cs-num">PASO 1</div>
+        <div class="cs-icon">📋</div>
+        <div class="cs-name">Product Backlog</div>
+        <div class="cs-time">Lista de requerimientos priorizados</div>
+      </div>
+      <div class="cycle-arr">→</div>
+      <div class="cycle-step" style="border-color:rgba(96,165,250,0.3);">
+        <div class="cs-num">PASO 2</div>
+        <div class="cs-icon">🎯</div>
+        <div class="cs-name">Sprint Planning</div>
+        <div class="cs-time">2–4 hrs · Inicio de sprint</div>
+      </div>
+      <div class="cycle-arr">→</div>
+      <div class="cycle-step" style="border-color:rgba(251,191,36,0.3);">
+        <div class="cs-num">PASO 3</div>
+        <div class="cs-icon">⚙️</div>
+        <div class="cs-name">Sprint</div>
+        <div class="cs-time">1–4 semanas · Desarrollo</div>
+      </div>
+      <div class="cycle-arr">→</div>
+      <div class="cycle-step" style="border-color:rgba(45,212,191,0.3);">
+        <div class="cs-num">PASO 4</div>
+        <div class="cs-icon">☀️</div>
+        <div class="cs-name">Daily Scrum</div>
+        <div class="cs-time">15 min · Cada día</div>
+      </div>
+      <div class="cycle-arr">→</div>
+      <div class="cycle-step" style="border-color:rgba(167,139,250,0.3);">
+        <div class="cs-num">PASO 5</div>
+        <div class="cs-icon">👥</div>
+        <div class="cs-name">Sprint Review</div>
+        <div class="cs-time">Demo al cliente · Final</div>
+      </div>
+      <div class="cycle-arr">→</div>
+      <div class="cycle-step" style="border-color:rgba(248,113,113,0.3);">
+        <div class="cs-num">PASO 6</div>
+        <div class="cs-icon">🔄</div>
+        <div class="cs-name">Retrospectiva</div>
+        <div class="cs-time">Mejora continua · Final</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roles -->
+  <div class="roles-grid" style="margin-bottom:24px;">
+    <div class="role">
+      <div class="role-ic">🧑‍💼</div>
+      <div class="role-nm">Product Owner</div>
+      <span class="role-lbl badge-green gc-tag">Visión del producto</span>
+      <ul class="role-list">
+        <li>Define y prioriza el Product Backlog</li>
+        <li>Representa al cliente y stakeholders</li>
+        <li>Acepta o rechaza el incremento</li>
+        <li>Maximiza el valor del producto</li>
+        <li>Comunica la visión al equipo</li>
+      </ul>
+    </div>
+    <div class="role">
+      <div class="role-ic">🧑‍🏫</div>
+      <div class="role-nm">Scrum Master</div>
+      <span class="role-lbl badge-blue gc-tag">Facilitador</span>
+      <ul class="role-list">
+        <li>Guarda y protege el proceso Scrum</li>
+        <li>Elimina impedimentos del equipo</li>
+        <li>Facilita las ceremonias Scrum</li>
+        <li>Protege al equipo de interrupciones</li>
+        <li>Coach del equipo en agilidad</li>
+      </ul>
+    </div>
+    <div class="role">
+      <div class="role-ic">👨‍💻</div>
+      <div class="role-nm">Development Team</div>
+      <span class="role-lbl badge-amber gc-tag">Constructores</span>
+      <ul class="role-list">
+        <li>Auto-organizado y cross-functional</li>
+        <li>Estima el trabajo con Story Points</li>
+        <li>Entrega incrementos potencialmente shippable</li>
+        <li>3–9 personas (tamaño óptimo)</li>
+        <li>Responsable de la calidad</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Ceremonies Table -->
+  <table class="cer-table">
+    <thead>
+      <tr>
+        <th>Ceremonia</th>
+        <th>Objetivo</th>
+        <th>Duración</th>
+        <th>Participantes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Sprint Planning</td>
+        <td style="color:var(--m3)">Seleccionar ítems del backlog y crear el Sprint Backlog</td>
+        <td class="dur">2–4 hrs / sprint</td>
+        <td class="who">PO + SM + Dev Team</td>
+      </tr>
+      <tr>
+        <td>Daily Scrum</td>
+        <td style="color:var(--m3)">Sincronizar el equipo y detectar bloqueos</td>
+        <td class="dur">15 min / día</td>
+        <td class="who">Dev Team (SM opcional)</td>
+      </tr>
+      <tr>
+        <td>Sprint Review</td>
+        <td style="color:var(--m3)">Demostrar el incremento y obtener feedback</td>
+        <td class="dur">1–2 hrs / sprint</td>
+        <td class="who">Todo el equipo + stakeholders</td>
+      </tr>
+      <tr>
+        <td>Sprint Retrospective</td>
+        <td style="color:var(--m3)">Inspeccionar el proceso y crear plan de mejora</td>
+        <td class="dur">1–1.5 hrs / sprint</td>
+        <td class="who">SM + Dev Team</td>
+      </tr>
+      <tr>
+        <td>Backlog Refinement</td>
+        <td style="color:var(--m3)">Estimar y clarificar ítems del backlog</td>
+        <td class="dur">1–2 hrs / semana</td>
+        <td class="who">PO + Dev Team</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════
+     SECTION 2: JIRA
+═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hd">
+    <div class="section-ic badge-blue">🔵</div>
+    <div>
+      <div class="section-title">Jira</div>
+      <div class="section-sub">Herramienta de gestión de proyectos ágiles más usada en la industria</div>
+    </div>
+  </div>
+
+  <!-- Issue Types -->
+  <div style="margin-bottom:24px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--m2);text-transform:uppercase;margin-bottom:12px;">Tipos de Issues</div>
+    <div class="jira-issue-types">
+      <div class="jit">
+        <div class="jit-ic" style="background:rgba(248,113,113,0.1);">🏔️</div>
+        <div class="jit-nm" style="color:var(--red)">Epic</div>
+        <div class="jit-ds">Gran cuerpo de trabajo que engloba múltiples stories. Puede durar varios sprints.</div>
+      </div>
+      <div class="jit">
+        <div class="jit-ic" style="background:rgba(96,165,250,0.1);">📖</div>
+        <div class="jit-nm" style="color:var(--blue)">Story</div>
+        <div class="jit-ds">Requerimiento desde perspectiva del usuario. Cabe en un sprint. Estimado en Story Points.</div>
+      </div>
+      <div class="jit">
+        <div class="jit-ic" style="background:rgba(251,191,36,0.1);">✅</div>
+        <div class="jit-nm" style="color:var(--amber)">Task</div>
+        <div class="jit-ds">Trabajo técnico sin valor directo para el usuario. Subitem de una story o epic.</div>
+      </div>
+      <div class="jit">
+        <div class="jit-ic" style="background:rgba(248,113,113,0.1);">🐛</div>
+        <div class="jit-nm" style="color:var(--red)">Bug</div>
+        <div class="jit-ds">Defecto o error en el software. Se prioriza según impacto en el usuario.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Story Point Guide -->
+  <div style="margin-bottom:24px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--m2);text-transform:uppercase;margin-bottom:12px;">Story Points — Escala Fibonacci</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="background:var(--card);border:1px solid rgba(170,255,0,0.2);border-radius:10px;padding:12px 16px;text-align:center;min-width:80px;">
+        <div style="font-family:'Anton',sans-serif;font-size:28px;color:var(--green)">1</div>
+        <div style="font-size:9px;color:var(--m2);margin-top:2px">Trivial</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;padding:12px 16px;text-align:center;min-width:80px;">
+        <div style="font-family:'Anton',sans-serif;font-size:28px;color:var(--teal)">2</div>
+        <div style="font-size:9px;color:var(--m2);margin-top:2px">Fácil</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;padding:12px 16px;text-align:center;min-width:80px;">
+        <div style="font-family:'Anton',sans-serif;font-size:28px;color:var(--blue)">3</div>
+        <div style="font-size:9px;color:var(--m2);margin-top:2px">Pequeño</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;padding:12px 16px;text-align:center;min-width:80px;">
+        <div style="font-family:'Anton',sans-serif;font-size:28px;color:var(--blue)">5</div>
+        <div style="font-size:9px;color:var(--m2);margin-top:2px">Medio</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;padding:12px 16px;text-align:center;min-width:80px;">
+        <div style="font-family:'Anton',sans-serif;font-size:28px;color:var(--amber)">8</div>
+        <div style="font-size:9px;color:var(--m2);margin-top:2px">Grande</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;padding:12px 16px;text-align:center;min-width:80px;">
+        <div style="font-family:'Anton',sans-serif;font-size:28px;color:var(--amber)">13</div>
+        <div style="font-size:9px;color:var(--m2);margin-top:2px">XL</div>
+      </div>
+      <div style="background:var(--card);border:1px solid rgba(248,113,113,0.25);border-radius:10px;padding:12px 16px;text-align:center;min-width:80px;">
+        <div style="font-family:'Anton',sans-serif;font-size:28px;color:var(--red)">21+</div>
+        <div style="font-size:9px;color:var(--red);margin-top:2px">Dividir</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--m2);margin-top:10px;padding:10px 14px;background:var(--card2);border-radius:8px;border-left:3px solid var(--green)">
+      💡 Una story con 21+ points debe dividirse en stories más pequeñas antes de planificar.
+    </div>
+  </div>
+
+  <!-- Jira Features -->
+  <div class="jira-features">
+    <div class="jf"><div class="jf-ic">🏃</div><div><div class="jf-nm">Sprint Board</div><div class="jf-ds">Vista Kanban del sprint activo. Mueve tickets entre To Do, In Progress y Done con drag & drop.</div></div></div>
+    <div class="jf"><div class="jf-ic">📊</div><div><div class="jf-nm">Burndown Chart</div><div class="jf-ds">Gráfica que muestra el trabajo restante vs. el ideal. Permite detectar si el sprint está en riesgo.</div></div></div>
+    <div class="jf"><div class="jf-ic">⚡</div><div><div class="jf-nm">Velocity</div><div class="jf-ds">Promedio de story points completados por sprint. Sirve para planificar capacidad futura del equipo.</div></div></div>
+    <div class="jf"><div class="jf-ic">📅</div><div><div class="jf-nm">Roadmap</div><div class="jf-ds">Vista de Epics y Stories en una línea de tiempo. Ayuda a comunicar el plan de producto a stakeholders.</div></div></div>
+    <div class="jf"><div class="jf-ic">🔗</div><div><div class="jf-nm">Issue Linking</div><div class="jf-ds">Relaciona tickets entre sí (blocks, duplicates, relates to) para entender dependencias y bloqueos.</div></div></div>
+    <div class="jf"><div class="jf-ic">🏷️</div><div><div class="jf-nm">Labels & Components</div><div class="jf-ds">Agrupa issues por área (frontend, backend, infra) o tipo de trabajo para filtrar y reportar.</div></div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════
+     SECTION 3: KANBAN BOARD
+═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hd">
+    <div class="section-ic badge-purple">📋</div>
+    <div>
+      <div class="section-title">Kanban Board</div>
+      <div class="section-sub">Sistema visual de flujo continuo — sin sprints, con límites WIP</div>
+    </div>
+  </div>
+
+  <!-- Visual Board -->
+  <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--m2);text-transform:uppercase;margin-bottom:12px;">Ejemplo de Tablero</div>
+  <div class="kboard" style="margin-bottom:28px;">
+    <!-- TO DO -->
+    <div class="kcol">
+      <div class="kcol-hd">
+        <div class="kcol-dot" style="background:#6b7280"></div>
+        <div class="kcol-nm" style="color:#9ca3af">To Do</div>
+        <div class="kcol-cnt">3</div>
+      </div>
+      <div class="kcol-bd">
+        <div class="ktask">
+          <div class="kt-nm">Diseñar pantalla de login</div>
+          <div class="kt-ft">
+            <div class="kt-av">JS</div>
+            <span class="kt-pts">5 pts</span>
+            <span class="kt-pr" style="background:rgba(251,191,36,.1);color:var(--amber)">Media</span>
+          </div>
+        </div>
+        <div class="ktask">
+          <div class="kt-nm">Setup base de datos</div>
+          <div class="kt-ft">
+            <div class="kt-av">MR</div>
+            <span class="kt-pts">3 pts</span>
+            <span class="kt-pr" style="background:rgba(248,113,113,.1);color:var(--red)">Alta</span>
+          </div>
+        </div>
+        <div class="ktask">
+          <div class="kt-nm">Documentar API endpoints</div>
+          <div class="kt-ft">
+            <div class="kt-av">AL</div>
+            <span class="kt-pts">2 pts</span>
+            <span class="kt-pr" style="background:rgba(96,165,250,.1);color:var(--blue)">Baja</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- IN PROGRESS -->
+    <div class="kcol">
+      <div class="kcol-hd">
+        <div class="kcol-dot" style="background:var(--amber)"></div>
+        <div class="kcol-nm" style="color:var(--amber)">In Progress</div>
+        <div class="kcol-cnt" style="color:var(--amber)">2 / WIP:3</div>
+      </div>
+      <div class="kcol-bd">
+        <div class="ktask" style="border-color:rgba(251,191,36,0.2);">
+          <div class="kt-nm">Integrar pagos con Stripe</div>
+          <div class="kt-ft">
+            <div class="kt-av" style="background:rgba(251,191,36,.15);color:var(--amber)">CR</div>
+            <span class="kt-pts">8 pts</span>
+            <span class="kt-pr" style="background:rgba(248,113,113,.1);color:var(--red)">Alta</span>
+          </div>
+        </div>
+        <div class="ktask" style="border-color:rgba(251,191,36,0.2);">
+          <div class="kt-nm">Dashboard analytics v2</div>
+          <div class="kt-ft">
+            <div class="kt-av" style="background:rgba(251,191,36,.15);color:var(--amber)">SN</div>
+            <span class="kt-pts">5 pts</span>
+            <span class="kt-pr" style="background:rgba(251,191,36,.1);color:var(--amber)">Media</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- REVIEW -->
+    <div class="kcol">
+      <div class="kcol-hd">
+        <div class="kcol-dot" style="background:var(--blue)"></div>
+        <div class="kcol-nm" style="color:var(--blue)">Review</div>
+        <div class="kcol-cnt">1</div>
+      </div>
+      <div class="kcol-bd">
+        <div class="ktask" style="border-color:rgba(96,165,250,0.2);">
+          <div class="kt-nm">Autenticación con Google OAuth</div>
+          <div class="kt-ft">
+            <div class="kt-av" style="background:rgba(96,165,250,.15);color:var(--blue)">PL</div>
+            <span class="kt-pts">3 pts</span>
+            <span class="kt-pr" style="background:rgba(251,191,36,.1);color:var(--amber)">Media</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- DONE -->
+    <div class="kcol">
+      <div class="kcol-hd">
+        <div class="kcol-dot" style="background:var(--green)"></div>
+        <div class="kcol-nm" style="color:var(--green)">Done</div>
+        <div class="kcol-cnt">4</div>
+      </div>
+      <div class="kcol-bd">
+        <div class="ktask" style="opacity:.55;border-color:rgba(170,255,0,0.15);">
+          <div class="kt-nm">Setup del repositorio</div>
+          <div class="kt-ft"><div class="kt-av" style="background:rgba(170,255,0,.1);color:var(--green)">MR</div><span class="kt-pts">1 pt</span></div>
+        </div>
+        <div class="ktask" style="opacity:.55;border-color:rgba(170,255,0,0.15);">
+          <div class="kt-nm">Configurar CI/CD pipeline</div>
+          <div class="kt-ft"><div class="kt-av" style="background:rgba(170,255,0,.1);color:var(--green)">AL</div><span class="kt-pts">3 pts</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kanban vs Scrum & Principles -->
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div class="gc">
+      <div class="gc-ic">⚡</div>
+      <div class="gc-title">Principios Kanban</div>
+      <ul style="list-style:none;margin-top:8px;">
+        <li style="font-size:12px;color:var(--m3);padding:5px 0;border-bottom:1px solid var(--b)">→ Visualiza el flujo de trabajo</li>
+        <li style="font-size:12px;color:var(--m3);padding:5px 0;border-bottom:1px solid var(--b)">→ Limita el trabajo en progreso (WIP)</li>
+        <li style="font-size:12px;color:var(--m3);padding:5px 0;border-bottom:1px solid var(--b)">→ Gestiona el flujo activamente</li>
+        <li style="font-size:12px;color:var(--m3);padding:5px 0;border-bottom:1px solid var(--b)">→ Mejora de forma continua</li>
+        <li style="font-size:12px;color:var(--m3);padding:5px 0;">→ Respeta los roles actuales del equipo</li>
+      </ul>
+    </div>
+    <div class="gc">
+      <div class="gc-ic">⚖️</div>
+      <div class="gc-title">Kanban vs Scrum</div>
+      <div style="margin-top:8px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;">
+          <div style="font-weight:700;color:var(--m2);border-bottom:1px solid var(--b);padding-bottom:6px;">Kanban</div>
+          <div style="font-weight:700;color:var(--m2);border-bottom:1px solid var(--b);padding-bottom:6px;">Scrum</div>
+          <div style="color:var(--m3);padding:3px 0">Sin sprints fijos</div><div style="color:var(--m3);padding:3px 0">Sprints 1–4 sem</div>
+          <div style="color:var(--m3);padding:3px 0">Flujo continuo</div><div style="color:var(--m3);padding:3px 0">Iterativo</div>
+          <div style="color:var(--m3);padding:3px 0">WIP limits</div><div style="color:var(--m3);padding:3px 0">Sprint backlog</div>
+          <div style="color:var(--m3);padding:3px 0">Métricas: Cycle time</div><div style="color:var(--m3);padding:3px 0">Métricas: Velocity</div>
+          <div style="color:var(--m3);padding:3px 0">Ideal: soporte/ops</div><div style="color:var(--m3);padding:3px 0">Ideal: nuevo producto</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:14px 18px;background:var(--card2);border:1px solid rgba(170,255,0,0.15);border-radius:10px;border-left:3px solid var(--green);font-size:12px;color:var(--m3);">
+    <strong style="color:var(--green)">WIP Limit:</strong> Número máximo de tareas permitidas en una columna al mismo tiempo. Si la columna está llena, el equipo debe terminar tareas antes de empezar nuevas. Reduce multitasking y aumenta el enfoque. Regla práctica: <strong style="color:var(--txt)">1.5× el tamaño del equipo</strong>.
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════
+     SECTION 4: STANDUP MEETINGS
+═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hd">
+    <div class="section-ic badge-amber">☀️</div>
+    <div>
+      <div class="section-title">Daily Standup</div>
+      <div class="section-sub">15 minutos que mantienen al equipo sincronizado y enfocado</div>
+    </div>
+  </div>
+
+  <!-- 3 Questions -->
+  <div class="standup-3" style="margin-bottom:28px;">
+    <div class="sq" style="background:var(--card);border-color:rgba(170,255,0,0.2);">
+      <div class="sq-n" style="color:var(--green)">01</div>
+      <div class="sq-q">¿Qué hiciste ayer?</div>
+      <div class="sq-body">Comparte el trabajo completado desde el último standup. Sé específico con los tickets o tareas.</div>
+      <div class="sq-ex">"Ayer terminé la integración del login con Google OAuth (JIRA-142) y lo subí a review."</div>
+    </div>
+    <div class="sq" style="background:var(--card);border-color:rgba(96,165,250,0.2);">
+      <div class="sq-n" style="color:var(--blue)">02</div>
+      <div class="sq-q">¿Qué harás hoy?</div>
+      <div class="sq-body">Plan concreto del día. Qué tickets o tareas vas a trabajar. Ayuda a sincronizar con el equipo.</div>
+      <div class="sq-ex">"Hoy voy a empezar el dashboard de métricas (JIRA-158) y revisar el PR de Ana."</div>
+    </div>
+    <div class="sq" style="background:var(--card);border-color:rgba(248,113,113,0.2);">
+      <div class="sq-n" style="color:var(--red)">03</div>
+      <div class="sq-q">¿Algún bloqueo?</div>
+      <div class="sq-body">Impedimentos que te frenan. No se resuelven en el standup — se agenda conversación aparte.</div>
+      <div class="sq-ex">"Estoy bloqueado esperando acceso al ambiente de staging. Lo hablo con el Scrum Master después."</div>
+    </div>
+  </div>
+
+  <!-- Tips & Anti-patterns -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--green);text-transform:uppercase;margin-bottom:12px;">✅ Buenas Prácticas</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="tip"><div class="tip-ic">⏱️</div><div class="tip-body"><strong>Máximo 15 minutos</strong>Si se necesita más tiempo, cita reunión separada después del standup.</div></div>
+        <div class="tip"><div class="tip-ic">🕙</div><div class="tip-body"><strong>Misma hora, mismo lugar</strong>La consistencia reduce fricción. Parado (de pie) aumenta la energía.</div></div>
+        <div class="tip"><div class="tip-ic">👀</div><div class="tip-body"><strong>Habla al equipo, no al SM</strong>El standup es de y para el equipo. No es un reporte al jefe.</div></div>
+        <div class="tip"><div class="tip-ic">🎯</div><div class="tip-body"><strong>Enfócate en el Sprint Goal</strong>Todo lo que no contribuya al objetivo del sprint es ruido.</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--red);text-transform:uppercase;margin-bottom:12px;">❌ Anti-patterns</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="tip" style="border-color:rgba(248,113,113,0.15)"><div class="tip-ic">🛑</div><div class="tip-body"><strong style="color:var(--red)">Status meeting</strong>No es para actualizar al manager. El equipo se auto-gestiona.</div></div>
+        <div class="tip" style="border-color:rgba(248,113,113,0.15)"><div class="tip-ic">🐢</div><div class="tip-body"><strong style="color:var(--red)">Resolver problemas en vivo</strong>Si surge un bloqueo complejo, agéndalo después. No pares el flujo.</div></div>
+        <div class="tip" style="border-color:rgba(248,113,113,0.15)"><div class="tip-ic">📵</div><div class="tip-body"><strong style="color:var(--red)">Llegadas tarde o ausencias</strong>Erosiona la confianza del equipo y el valor del ritual.</div></div>
+        <div class="tip" style="border-color:rgba(248,113,113,0.15)"><div class="tip-ic">🌀</div><div class="tip-body"><strong style="color:var(--red)">Reportar tareas genéricas</strong>"Hoy sigo trabajando en lo mismo" no aporta valor ni visibilidad.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════
+     GLOSARIO
+═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hd">
+    <div class="section-ic" style="background:rgba(255,255,255,0.05);">📖</div>
+    <div>
+      <div class="section-title">Glosario Agile</div>
+      <div class="section-sub">Términos esenciales que todo el equipo debe conocer</div>
+    </div>
+  </div>
+  <div class="glos-grid">
+    <div class="gt"><span class="gt-key">Sprint</span><span class="gt-val">Iteración de tiempo fijo (1–4 semanas) donde el equipo entrega valor.</span></div>
+    <div class="gt"><span class="gt-key">Backlog</span><span class="gt-val">Lista priorizada de todo el trabajo pendiente del producto.</span></div>
+    <div class="gt"><span class="gt-key">Story Point</span><span class="gt-val">Unidad relativa de estimación de esfuerzo/complejidad (no tiempo).</span></div>
+    <div class="gt"><span class="gt-key">Velocity</span><span class="gt-val">Story points promedio completados por sprint. Mide capacidad del equipo.</span></div>
+    <div class="gt"><span class="gt-key">Definition of Done</span><span class="gt-val">Criterios que debe cumplir una tarea para considerarse terminada.</span></div>
+    <div class="gt"><span class="gt-key">Acceptance Criteria</span><span class="gt-val">Condiciones que debe cumplir una User Story para ser aceptada.</span></div>
+    <div class="gt"><span class="gt-key">Epic</span><span class="gt-val">Feature grande que contiene múltiples User Stories y puede durar meses.</span></div>
+    <div class="gt"><span class="gt-key">User Story</span><span class="gt-val">"Como [usuario], quiero [acción], para [beneficio]." Unidad mínima de valor.</span></div>
+    <div class="gt"><span class="gt-key">Impedimento</span><span class="gt-val">Bloqueo externo al equipo que el Scrum Master debe eliminar.</span></div>
+    <div class="gt"><span class="gt-key">Incremento</span><span class="gt-val">Versión funcional y potencialmente shippable del producto al final del sprint.</span></div>
+    <div class="gt"><span class="gt-key">WIP Limit</span><span class="gt-val">Máximo de tareas simultáneas en una columna del tablero Kanban.</span></div>
+    <div class="gt"><span class="gt-key">Cycle Time</span><span class="gt-val">Tiempo desde que inicia una tarea hasta que se completa. Métrica clave Kanban.</span></div>
+    <div class="gt"><span class="gt-key">Retrospectiva</span><span class="gt-val">Reunión de mejora continua: ¿Qué fue bien? ¿Qué mejorar? ¿Qué probar?</span></div>
+    <div class="gt"><span class="gt-key">Refinement</span><span class="gt-val">Sesión para estimar, clarificar y priorizar ítems del backlog antes del sprint.</span></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</body>
+</html>
