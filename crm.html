@@ -3,1085 +3,705 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NVS APL — College Placement CRM</title>
+<title>NVS · Athlete Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --green:#AAFF00;--green-dim:rgba(170,255,0,0.1);--green-dk:#6aaa00;
-  --bg:#0a0a0a;--sb:#0f0f0f;--card:#141414;--card2:#1a1a1a;--card3:#1f1f1f;
-  --border:rgba(255,255,255,0.07);--text:#fff;--muted:#666;
-  --blue:#60a5fa;--amber:#fbbf24;--gray:#9ca3af;--red:#f87171;--purple:#a78bfa;
+  --green:#AAFF00;--green-bg:rgba(170,255,0,0.09);--green-dk:#88CC00;
+  --bg:#0a0a0a;--sb:#0d0d0d;--card:#111111;--card2:#161616;--card3:#1c1c1c;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.12);
+  --txt:#fff;--m:#555;--m2:#888;
+  --red:#f87171;--amber:#fbbf24;--blue:#60a5fa;--gray:#6b7280;--purple:#a78bfa;
+  --red-bg:rgba(248,113,113,0.08);--amber-bg:rgba(251,191,36,0.08);
+  --blue-bg:rgba(96,165,250,0.08);--gray-bg:rgba(107,114,128,0.08);
 }
-body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);display:flex;}
 
-/* SIDEBAR */
-.sidebar{width:210px;min-height:100vh;background:var(--sb);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;padding:22px 0;}
-.sb-logo{padding:0 18px 18px;border-bottom:1px solid var(--border);margin-bottom:14px;}
-.sb-logo-name{font-family:'Anton',sans-serif;font-size:26px;color:var(--green);}
-.sb-logo-tag{display:inline-block;background:rgba(139,92,246,0.2);color:var(--purple);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:4px;padding:2px 7px;margin-top:3px;}
-.sb-section{padding:0 10px;margin-bottom:4px;}
-.sb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;padding:0 8px;margin-bottom:5px;}
-.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;}
-.sb-item:hover{background:var(--card2);color:#fff;}
-.sb-item.active{background:var(--green-dim);color:var(--green);}
-.sb-item .ic{width:18px;text-align:center;}
-hr.sb-div{border:none;border-top:1px solid var(--border);margin:10px 10px;}
-.ag-pill{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;border:none;background:none;width:100%;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#888;transition:all .15s;}
-.ag-pill:hover,.ag-pill.active{background:var(--card2);color:#fff;}
-.ag-dot{width:7px;height:7px;border-radius:50%;}
-.sb-foot{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border);}
-.sb-foot a{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;font-weight:600;text-decoration:none;padding:9px 10px;border-radius:9px;transition:all .15s;}
-.sb-foot a:hover{color:#fff;background:var(--card2);}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
 
-/* MAIN */
-.main{margin-left:210px;flex:1;display:flex;flex-direction:column;min-width:0;}
+/* ── LOGIN ── */
+#login-ov{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.lbox{width:360px;background:var(--card);border:1px solid var(--b2);border-radius:20px;padding:40px 36px;}
+.lbox-logo{font-family:'Anton',sans-serif;font-size:52px;text-align:center;letter-spacing:2px;}
+.lbox-logo span{color:var(--green);}
+.lbox-sub{text-align:center;font-size:9px;letter-spacing:2.5px;color:var(--m2);text-transform:uppercase;margin-bottom:30px;margin-top:4px;}
+.lbox-err{color:var(--red);font-size:11px;text-align:center;min-height:16px;margin-bottom:6px;}
+.lf label{display:block;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--m2);text-transform:uppercase;margin-bottom:5px;}
+.lf{margin-bottom:14px;}
+.fi{width:100%;background:var(--card2);border:1px solid var(--b);border-radius:9px;color:var(--txt);
+  font-family:'Montserrat',sans-serif;font-size:13px;padding:10px 13px;outline:none;transition:border .15s;}
+.fi:focus{border-color:rgba(255,255,255,0.22);}
+.btn-g{background:var(--green);color:#000;border:none;border-radius:10px;padding:12px;width:100%;
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-top:6px;transition:background .15s;}
+.btn-g:hover{background:var(--green-dk);}
+
+/* ── APP SHELL ── */
+.app{display:flex;width:100%;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:215px;flex-shrink:0;background:var(--sb);border-right:1px solid var(--b);
+  display:flex;flex-direction:column;height:100vh;overflow:hidden;
+}
+.sb-top{padding:22px 16px 16px;border-bottom:1px solid var(--b);}
+.sb-logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1px;}
+.sb-logo span{color:var(--green);}
+.sb-logo-tag{display:block;font-size:8px;font-weight:700;letter-spacing:2px;color:var(--m2);text-transform:uppercase;margin-top:5px;}
+.sb-body{flex:1;overflow-y:auto;padding:14px 10px;}
+.sb-lbl{font-size:8px;font-weight:700;letter-spacing:1.8px;color:var(--m);text-transform:uppercase;padding:0 8px;margin:14px 0 7px;}
+.sb-lbl:first-child{margin-top:0;}
+.fsel{
+  display:block;width:100%;margin-bottom:7px;background:var(--card2);border:1px solid var(--b);
+  border-radius:8px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;
+  padding:8px 10px;outline:none;cursor:pointer;transition:border .15s;
+}
+.fsel:focus{border-color:var(--b2);}
+.sb-foot{padding:14px 16px;border-top:1px solid var(--b);}
+.sb-foot a{color:var(--m2);font-size:11px;font-weight:700;text-decoration:none;transition:color .15s;display:flex;align-items:center;gap:6px;}
+.sb-foot a:hover{color:var(--txt);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden;}
 
 /* TOPBAR */
-.topbar{padding:11px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:rgba(10,10,10,0.95);position:sticky;top:0;z-index:40;backdrop-filter:blur(12px);}
-.view-tabs{display:flex;background:var(--card2);border-radius:9px;padding:3px;gap:2px;}
-.vtab{padding:6px 15px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--muted);transition:all .15s;white-space:nowrap;}
-.vtab.active{background:var(--card3);color:#fff;}
-.tb-search{flex:1;min-width:0;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;font-family:'Montserrat',sans-serif;outline:none;}
-.tb-search:focus{border-color:rgba(255,255,255,0.2);}
-.btn-add{background:var(--green);color:#0a0a0a;border:none;border-radius:9px;padding:9px 18px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;cursor:pointer;flex-shrink:0;}
+.topbar{
+  display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--b);
+  flex-shrink:0;background:rgba(13,13,13,0.95);backdrop-filter:blur(12px);
+}
+.tsearch{
+  flex:1;background:var(--card2);border:1px solid var(--b);border-radius:9px;
+  padding:9px 14px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;transition:border .15s;
+}
+.tsearch:focus{border-color:var(--b2);}
+.tcnt{font-size:11px;color:var(--m2);font-weight:600;white-space:nowrap;}
+.btn-add{
+  background:var(--green);color:#000;border:none;border-radius:9px;padding:9px 18px;
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;
+  white-space:nowrap;flex-shrink:0;transition:background .15s;
+}
 .btn-add:hover{background:var(--green-dk);}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 13px;font-size:12px;font-family:'Montserrat',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;flex-shrink:0;}
-.btn-ghost:hover{border-color:#444;color:#fff;}
 
-/* CONTENT */
-.content{padding:18px 22px;flex:1;}
+/* STATS BAR */
+.stats-bar{display:flex;gap:0;border-bottom:1px solid var(--b);flex-shrink:0;}
+.stat{
+  flex:1;padding:10px 8px;cursor:pointer;transition:background .15s;text-align:center;
+  border-right:1px solid var(--b);position:relative;
+}
+.stat:last-child{border-right:none;}
+.stat:hover{background:var(--card);}
+.stat.sf{background:var(--card2);}
+.stat.sf::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.stat.sf.s-all::after{background:var(--txt);}
+.stat.sf.s-g::after{background:var(--green);}
+.stat.sf.s-a::after{background:var(--amber);}
+.stat.sf.s-r::after{background:var(--red);}
+.stat.sf.s-b::after{background:var(--blue);}
+.stat.sf.s-gr::after{background:var(--gray);}
+.stat-n{font-family:'Anton',sans-serif;font-size:20px;line-height:1;}
+.stat-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--m2);margin-top:2px;}
+.s-g .stat-n{color:var(--green);}
+.s-a .stat-n{color:var(--amber);}
+.s-r .stat-n{color:var(--red);}
+.s-b .stat-n{color:var(--blue);}
+.s-gr .stat-n{color:var(--gray);}
 
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:14px;}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:11px 13px;cursor:pointer;transition:all .15s;}
-.stat-card:hover,.stat-card.sel{border-color:rgba(255,255,255,0.2);}
-.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:3px;}
-.stat-val{font-family:'Anton',sans-serif;font-size:21px;}
+/* KANBAN */
+.kboard-wrap{flex:1;overflow-x:auto;overflow-y:hidden;padding:14px;}
+.kboard{display:flex;gap:11px;height:100%;min-width:max-content;}
 
-/* FILTERS */
-.filter-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
-.f-sel{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:#fff;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:600;cursor:pointer;outline:none;}
-.f-count{font-size:11px;color:var(--muted);font-weight:600;margin-left:2px;}
+.kol{
+  width:255px;flex-shrink:0;display:flex;flex-direction:column;
+  background:var(--card);border-radius:14px;border:1px solid var(--b);overflow:hidden;
+  max-height:100%;
+}
+.kol-hd{
+  padding:11px 13px;display:flex;align-items:center;gap:8px;flex-shrink:0;
+  border-bottom:1px solid var(--b);
+}
+.kol-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.kol-nm{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;flex:1;}
+.kol-cnt{background:rgba(255,255,255,0.05);color:var(--m2);font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.kol-bd{
+  flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;
+}
+.kol-bd.dov{background:rgba(170,255,0,0.035);outline:1.5px dashed rgba(170,255,0,0.25);outline-offset:-3px;border-radius:8px;}
+.kol-empty{display:flex;align-items:center;justify-content:center;flex:1;min-height:60px;
+  color:var(--m);font-size:11px;font-weight:600;text-align:center;padding:16px;}
 
-/* PIPELINE */
-.pl-wrap{overflow-x:auto;padding-bottom:8px;}
-.pl-board{display:flex;gap:11px;min-width:max-content;}
-.pl-col{width:230px;background:var(--card);border-radius:12px;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;}
-.pl-head{padding:10px 13px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border);}
-.pl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.pl-name{font-weight:800;font-size:10px;flex:1;text-transform:uppercase;letter-spacing:.6px;}
-.pl-cnt{background:rgba(255,255,255,0.06);color:var(--muted);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
-.pl-cards{padding:7px;display:flex;flex-direction:column;gap:6px;}
-.pl-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:grab;transition:border .15s,box-shadow .15s,opacity .15s,transform .15s;}
-.pl-card:hover{border-color:rgba(255,255,255,0.13);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
-.pl-card.dragging{opacity:0.35;cursor:grabbing;transform:rotate(1.5deg) scale(1.02);box-shadow:0 8px 28px rgba(0,0,0,.6);}
-.pl-cards.drag-over{background:rgba(170,255,0,0.05);outline:2px dashed rgba(170,255,0,0.35);outline-offset:-4px;border-radius:8px;}
-.pl-drop-ghost{height:70px;border-radius:8px;background:rgba(170,255,0,0.06);border:1.5px dashed rgba(170,255,0,0.3);flex-shrink:0;}
-.pc-class{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;margin-bottom:5px;line-height:1;}
-.pc-class small{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:inline;margin-right:4px;opacity:.7;}
-.pc-name{font-weight:700;font-size:12px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pc-sport{font-size:10px;color:var(--muted);margin-bottom:6px;}
-.pc-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
-.pc-uni{font-size:10px;color:#555;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pc-status-row{margin-top:7px;display:flex;align-items:center;gap:5px;}
-.pc-status-sel{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#aaa;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;padding:4px 6px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;padding-right:20px;transition:border .15s;}
-.pc-status-sel:hover{border-color:rgba(255,255,255,0.18);}
-.pc-status-sel.s-ip  {border-color:rgba(96,165,250,.35);color:#60a5fa;}
-.pc-status-sel.s-int {border-color:rgba(251,191,36,.35);color:#fbbf24;}
-.pc-status-sel.s-sta {border-color:rgba(156,163,175,.25);color:#9ca3af;}
-.pc-status-sel.s-com {border-color:rgba(170,255,0,.35);color:#AAFF00;}
-.pc-status-sel.s-cls {border-color:rgba(248,113,113,.3);color:#f87171;}
-.pc-note-area{margin-top:6px;border-top:1px solid rgba(255,255,255,0.05);padding-top:6px;cursor:text;}
-.pc-note-txt{font-size:10px;color:#555;line-height:1.35;word-break:break-word;}
-.pc-note-txt::before{content:'✎ ';opacity:.5;}
-.pc-note-empty{font-size:10px;color:#2d2d2d;font-style:italic;transition:color .15s;}
-.pc-note-area:hover .pc-note-empty{color:#444;}
-.pc-note-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(170,255,0,0.25);border-radius:6px;padding:6px 8px;color:#ccc;font-size:11px;font-family:'Montserrat',sans-serif;resize:none;outline:none;min-height:58px;line-height:1.4;}
-.pc-note-input:focus{border-color:rgba(170,255,0,0.5);}
-.pc-note-hint{font-size:9px;color:#333;margin-top:3px;}
-.pl-empty{text-align:center;padding:18px;color:#222;font-size:11px;}
-/* Touch drag ghost */
-#touch-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:0.85;width:210px;background:var(--card3);border:1px solid rgba(170,255,0,0.4);border-radius:9px;padding:10px 12px;box-shadow:0 12px 36px rgba(0,0,0,.7);display:none;}
+/* CARDS */
+.card{
+  background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:11px;
+  cursor:grab;transition:transform .12s,box-shadow .12s,border-color .12s;
+  border-top-width:2.5px;position:relative;user-select:none;
+}
+.card:hover{border-color:rgba(255,255,255,0.12);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.card.dragging{opacity:.25;cursor:grabbing;}
+.card-top{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.ava{
+  width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:800;font-size:12px;color:#000;flex-shrink:0;letter-spacing:.5px;
+}
+.card-info{flex:1;min-width:0;}
+.card-nm{font-size:12px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-sp{font-size:10px;color:var(--m2);margin-top:1px;}
+.card-bdg{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.bdg{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;}
+.bdg-plan{background:rgba(96,165,250,0.1);color:var(--blue);border:1px solid rgba(96,165,250,0.18);}
+.bdg-serv{background:rgba(167,139,250,0.1);color:var(--purple);border:1px solid rgba(167,139,250,0.18);}
+.bdg-serv.prem{background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.18);}
+.card-$$${display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.card-tot{font-family:'Anton',sans-serif;font-size:16px;}
+.card-pg{font-size:9px;color:var(--m2);font-weight:600;text-align:right;max-width:130px;line-height:1.3;}
+.card-ft{display:flex;align-items:center;gap:6px;}
+.card-ref{font-size:9px;color:var(--m);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.btn-wa{
+  display:inline-flex;align-items:center;gap:3px;background:#1DB954;color:#fff;
+  border:none;border-radius:6px;padding:4px 8px;font-size:9px;font-weight:700;
+  cursor:pointer;text-decoration:none;flex-shrink:0;transition:background .15s;
+}
+.btn-wa:hover{background:#17a34a;}
 
-/* TABLE */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
-table.dt{width:100%;border-collapse:collapse;font-size:12px;}
-table.dt thead{background:var(--card2);position:sticky;top:0;z-index:5;}
-table.dt th{padding:9px 11px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);white-space:nowrap;cursor:pointer;border-bottom:1px solid var(--border);user-select:none;transition:color .15s;}
-table.dt th:hover,table.dt th.sorted{color:#fff;}
-.sort-ic{margin-left:3px;font-size:8px;opacity:.5;}
-table.dt td{padding:8px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;white-space:nowrap;}
-table.dt tr:last-child td{border-bottom:none;}
-table.dt tbody tr{cursor:pointer;transition:background .1s;}
-table.dt tbody tr:hover{background:rgba(255,255,255,0.025);}
-.td-n{font-weight:700;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;}
-.td-s{font-size:10px;color:var(--muted);}
-.td-num{font-size:10px;color:#333;font-weight:700;text-align:center;width:32px;}
-
-/* BADGES */
-.badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 6px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
-.b-cpl  {background:rgba(59,130,246,.13);color:var(--blue);}
-.b-board{background:rgba(139,92,246,.13);color:var(--purple);}
-.b-trans{background:rgba(249,115,22,.13);color:#fb923c;}
-.b-std  {background:rgba(170,255,0,.12);color:var(--green);}
-.b-prm  {background:rgba(139,92,246,.13);color:var(--purple);}
-.b-sch  {background:rgba(245,158,11,.13);color:var(--amber);}
-.b-ip   {background:rgba(59,130,246,.13);color:var(--blue);}
-.b-int  {background:rgba(245,158,11,.13);color:var(--amber);}
-.b-sta  {background:rgba(107,114,128,.13);color:var(--gray);}
-.b-com  {background:rgba(170,255,0,.13);color:var(--green);}
-.b-cls  {background:rgba(239,68,68,.1);color:var(--red);}
-.b-sc   {background:rgba(170,255,0,.15);color:var(--green);}
-.b-jb   {background:rgba(59,130,246,.15);color:var(--blue);}
-.b-ac   {background:rgba(139,92,246,.15);color:var(--purple);}
+/* DETAIL PANEL */
+.dp-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;}
+.dp-ov.open{display:block;}
+.dp{
+  position:fixed;top:0;right:-430px;width:400px;height:100vh;background:var(--sb);
+  border-left:1px solid var(--b);z-index:101;transition:right .26s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.dp.open{right:0;}
+.dp-hd{
+  padding:18px 18px 14px;border-bottom:1px solid var(--b);display:flex;align-items:flex-start;gap:13px;
+  flex-shrink:0;background:var(--card);
+}
+.dp-ava{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#000;flex-shrink:0;}
+.dp-nm{font-weight:800;font-size:17px;line-height:1.2;}
+.dp-sub{font-size:11px;color:var(--m2);margin-top:4px;}
+.dp-x{margin-left:auto;background:none;border:none;color:var(--m2);font-size:22px;cursor:pointer;padding:0 4px;line-height:1;transition:color .15s;}
+.dp-x:hover{color:var(--txt);}
+.dp-body{flex:1;overflow-y:auto;padding:16px 18px;}
+.dp-sec{margin-bottom:18px;}
+.dp-sec-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--m);text-transform:uppercase;margin-bottom:10px;}
+.dp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);}
+.dp-row:last-child{border-bottom:none;}
+.dp-rl{font-size:10px;color:var(--m2);font-weight:600;}
+.dp-rv{font-size:11px;font-weight:700;text-align:right;max-width:56%;}
+.dp-rv a{color:var(--green);text-decoration:none;}
+.dp-sel{
+  width:100%;background:var(--card2);border:1px solid var(--b);border-radius:8px;
+  color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;
+  padding:8px 10px;outline:none;cursor:pointer;transition:border .15s;
+}
+.dp-sel:focus{border-color:var(--b2);}
+.dp-ft{padding:14px 18px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
+.dp-btn{
+  flex:1;padding:10px;border-radius:9px;font-family:'Montserrat',sans-serif;
+  font-weight:700;font-size:11px;cursor:pointer;border:none;transition:all .15s;
+}
+.dp-btn.p{background:var(--green);color:#000;}
+.dp-btn.p:hover{background:var(--green-dk);}
+.dp-btn.d{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.25);}
+.dp-btn.d:hover{background:rgba(248,113,113,0.2);}
 
 /* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px);padding:16px;}
-.overlay.open{display:flex;}
-.modal{background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:18px;width:780px;max-width:100%;max-height:94vh;overflow:hidden;display:flex;flex-direction:column;}
-.mh{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.m-av{width:42px;height:42px;border-radius:10px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:16px;color:var(--green);flex-shrink:0;}
-.m-inf{flex:1;min-width:0;}
-.m-nm{font-family:'Anton',sans-serif;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.m-sb{font-size:11px;color:var(--muted);margin-top:1px;}
-.m-btns{display:flex;gap:6px;flex-wrap:wrap;}
-.btn-save{background:var(--green);color:#0a0a0a;border:none;border-radius:8px;padding:7px 16px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;}
+.m-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;}
+.m-ov.open{display:block;}
+.modal{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:530px;max-width:96vw;max-height:90vh;overflow-y:auto;
+  background:var(--sb);border:1px solid var(--b2);border-radius:18px;z-index:201;display:none;
+}
+.modal.open{display:block;}
+.m-hd{padding:18px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.m-ttl{font-weight:800;font-size:15px;}
+.m-x{background:none;border:none;color:var(--m2);font-size:23px;cursor:pointer;line-height:1;}
+.m-body{padding:20px;}
+.mf{margin-bottom:13px;}
+.mf label{display:block;font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--m2);text-transform:uppercase;margin-bottom:4px;}
+.mf-2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.m-ft{padding:13px 20px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end;}
+.btn-cancel{background:var(--card2);border:1px solid var(--b);color:var(--m2);border-radius:9px;padding:9px 16px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;cursor:pointer;}
+.btn-save{background:var(--green);color:#000;border:none;border-radius:9px;padding:9px 22px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;}
 .btn-save:hover{background:var(--green-dk);}
-.btn-del{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px 13px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;cursor:pointer;}
-.mb{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
-.m2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-.mfull{grid-column:1/-1;}
-.msec{background:var(--card2);border-radius:11px;padding:13px 14px;}
-.ms-t{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:10px;}
-.mf{margin-bottom:8px;}
-.mf:last-child{margin-bottom:0;}
-.mf label{display:block;font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px;}
-.fi{width:100%;background:#222;border:1px solid #2a2a2a;border-radius:7px;padding:7px 10px;color:#fff;font-size:12px;font-family:'Montserrat',sans-serif;outline:none;transition:border .15s;}
-.fi:focus{border-color:rgba(255,255,255,0.2);}
-textarea.fi{resize:vertical;min-height:70px;}
-.agent-checks{display:flex;flex-direction:column;gap:6px;}
-.ag-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#222;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:border .15s;}
-.ag-row:hover{border-color:#333;}
-.ag-row input{accent-color:var(--green);width:14px;height:14px;cursor:pointer;flex-shrink:0;}
-.ag-row span{font-size:12px;font-weight:700;cursor:pointer;}
-.uni-list{display:flex;flex-direction:column;gap:3px;margin-top:7px;}
-.uni-item{font-size:11px;padding:4px 8px;background:rgba(255,255,255,0.04);border-radius:5px;color:#bbb;line-height:1.3;}
-.uni-item:first-child{color:var(--green);font-weight:700;background:var(--green-dim);}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--card3);border:1px solid var(--b2);border-radius:10px;padding:10px 18px;
+  font-size:12px;font-weight:700;z-index:999;transition:transform .25s;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{color:var(--green);}
+.toast.err{color:var(--red);}
 
 /* MOBILE */
 @media(max-width:768px){
   .sidebar{display:none;}
-  .main{margin-left:0;padding-bottom:74px;}
-  .content{padding:12px;}
-  .topbar{padding:9px 12px;gap:7px;}
-  .stats-row{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
-  .stat-val{font-size:18px;}
-  .m2{grid-template-columns:1fr;}
-  .modal{border-radius:18px 18px 0 0;max-height:92vh;}
-  .overlay{align-items:flex-end;padding:0;}
-  .mobile-nav{display:flex!important;}
-  .view-tabs{display:none;}
+  .stats-bar{flex-wrap:wrap;}
+  .stat{flex:0 0 33.33%;}
+  .kol{width:230px;}
+  .dp{width:100%;right:-100%;}
+  .dp.open{right:0;}
 }
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--border);padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:100;justify-content:space-around;}
-.mn-i{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:9px;font-family:'Montserrat',sans-serif;font-weight:700;text-transform:uppercase;cursor:pointer;padding:0 10px;-webkit-tap-highlight-color:transparent;}
-.mn-i svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;}
-.mn-i.active{color:var(--green);}
-.mn-fab{background:var(--green);border-radius:50%;width:48px;height:48px;color:#0a0a0a;font-size:24px;box-shadow:0 4px 16px rgba(170,255,0,.3);padding:0;display:flex;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sb-logo">
-    <div class="sb-logo-name">NVS</div>
-    <div class="sb-logo-tag">APL · Placements</div>
+<!-- LOGIN -->
+<div id="login-ov">
+  <div class="lbox">
+    <div class="lbox-logo">NV<span>S</span></div>
+    <div class="lbox-sub">Athlete Dashboard</div>
+    <div class="lbox-err" id="l-err"></div>
+    <div class="lf"><label>Email</label><input class="fi" id="l-em" type="email" placeholder="tu@email.com"></div>
+    <div class="lf"><label>Contraseña</label><input class="fi" id="l-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-g" onclick="doLogin()">Entrar →</button>
   </div>
-  <div class="sb-section">
-    <div class="sb-lbl">Vistas</div>
-    <button class="sb-item active" id="snav-pipeline" onclick="setView('pipeline')">
-      <span class="ic">⚡</span> Pipeline
-    </button>
-    <button class="sb-item" id="snav-tabla" onclick="setView('tabla')">
-      <span class="ic">📊</span> Tabla
-    </button>
-  </div>
-  <hr class="sb-div">
-  <div class="sb-section">
-    <div class="sb-lbl">Agentes</div>
-    <button class="ag-pill active" id="apill-" onclick="filterAgent('')">
-      <div class="ag-dot" style="background:#444"></div> Todos
-    </button>
-    <button class="ag-pill" id="apill-sc" onclick="filterAgent('Stefano Cano')">
-      <div class="ag-dot" style="background:var(--green)"></div> Stefano Cano
-    </button>
-    <button class="ag-pill" id="apill-jb" onclick="filterAgent('Julio Blanco')">
-      <div class="ag-dot" style="background:var(--blue)"></div> Julio Blanco
-    </button>
-    <button class="ag-pill" id="apill-ac" onclick="filterAgent('Andrea Castillo')">
-      <div class="ag-dot" style="background:var(--purple)"></div> Andrea Castillo
-    </button>
-  </div>
-  <div class="sb-foot">
-    <a href="index.html">← Volver al Hub</a>
-  </div>
-</nav>
+</div>
 
-<!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <div class="view-tabs">
-      <button class="vtab active" id="tab-pipeline" onclick="setView('pipeline')">⚡ Pipeline</button>
-      <button class="vtab" id="tab-tabla" onclick="setView('tabla')">📊 Tabla</button>
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-top">
+      <div class="sb-logo">NV<span>S</span><span class="sb-logo-tag">Athlete Dashboard</span></div>
     </div>
-    <input class="tb-search" id="f-q" placeholder="🔍  Buscar atleta, deporte, universidad…" oninput="applyFilters()">
-    <a href="index.html" class="btn-ghost">⌂</a>
-    <button class="btn-add" onclick="openAdd()">+ Atleta</button>
-  </div>
-
-  <div class="content">
-    <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-card" onclick="filterStatus('')"               id="sf-all"><div class="stat-lbl">Total</div><div class="stat-val" id="s-tot">—</div></div>
-      <div class="stat-card" onclick="filterStatus('Committed')"      id="sf-com"><div class="stat-lbl">Committed</div><div class="stat-val" id="s-com" style="color:var(--green)">—</div></div>
-      <div class="stat-card" onclick="filterStatus('In Process')"     id="sf-ip"> <div class="stat-lbl">In Process</div><div class="stat-val" id="s-ip"  style="color:var(--blue)">—</div></div>
-      <div class="stat-card" onclick="filterStatus('Interested Schools')" id="sf-int"><div class="stat-lbl">Int. Schools</div><div class="stat-val" id="s-int" style="color:var(--amber)">—</div></div>
-      <div class="stat-card" onclick="filterStatus('Standby')"        id="sf-sta"><div class="stat-lbl">Standby</div><div class="stat-val" id="s-sta" style="color:var(--gray)">—</div></div>
-      <div class="stat-card" onclick="filterStatus('Closed')"         id="sf-cls"><div class="stat-lbl">Closed</div><div class="stat-val" id="s-cls" style="color:var(--red)">—</div></div>
-    </div>
-
-    <!-- Filters -->
-    <div class="filter-bar">
-      <select class="f-sel" id="f-class"   onchange="applyFilters()"><option value="">📅 Todas las clases</option></select>
-      <select class="f-sel" id="f-sport"   onchange="applyFilters()"><option value="">🏅 Todos los deportes</option></select>
-      <select class="f-sel" id="f-tipo"    onchange="applyFilters()">
-        <option value="">📁 Todos los tipos</option>
-        <option>College Placement</option><option>Boarding School</option><option>Transfer</option>
+    <div class="sb-body">
+      <div class="sb-lbl">Filtros</div>
+      <select class="fsel" id="f-sport" onchange="applyFilters()"><option value="">🏅 Todos los deportes</option></select>
+      <select class="fsel" id="f-plan" onchange="applyFilters()">
+        <option value="">💳 Todos los planes</option>
+        <option>1 PAYMENT</option><option>2 PAYMENTS</option><option>3 PAYMENTS</option>
+        <option>4 PAYMENTS</option><option>QUARTERLY</option><option>MONTHLY</option>
+        <option>ABONO + MENSUALIDAD</option>
       </select>
-      <select class="f-sel" id="f-program" onchange="applyFilters()">
-        <option value="">🎯 Todos los programas</option>
-        <option>Standard</option><option>Premium</option><option>Scholarship</option>
+      <select class="fsel" id="f-serv" onchange="applyFilters()">
+        <option value="">⭐ Todos los servicios</option>
+        <option>ESTANDAR</option><option>PREMIUM</option><option>TRANSFER</option>
       </select>
-      <span class="f-count" id="f-count"></span>
+    </div>
+    <div class="sb-foot"><a href="index.html">← Volver al Hub</a></div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <input class="tsearch" id="search" placeholder="🔍  Buscar atleta, deporte, referido..." oninput="applyFilters()">
+      <span class="tcnt" id="cnt"></span>
+      <button class="btn-add" onclick="openAdd()">+ Atleta</button>
     </div>
 
-    <!-- PIPELINE -->
-    <div id="view-pipeline">
-      <div class="pl-wrap">
-        <div class="pl-board" id="pl-board"><div style="color:var(--muted);padding:30px;font-size:13px">Cargando…</div></div>
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat s-all sf" id="sf-all" onclick="sfClick('')">
+        <div class="stat-n" id="st-tot">—</div><div class="stat-l">Total</div>
+      </div>
+      <div class="stat s-g" id="sf-act" onclick="sfClick('Activo')">
+        <div class="stat-n" id="st-act">—</div><div class="stat-l">Activos</div>
+      </div>
+      <div class="stat s-a" id="sf-pen" onclick="sfClick('Pendiente')">
+        <div class="stat-n" id="st-pen">—</div><div class="stat-l">Pendientes</div>
+      </div>
+      <div class="stat s-r" id="sf-deu" onclick="sfClick('Deudor')">
+        <div class="stat-n" id="st-deu">—</div><div class="stat-l">Deudores</div>
+      </div>
+      <div class="stat s-b" id="sf-com" onclick="sfClick('Completado')">
+        <div class="stat-n" id="st-com">—</div><div class="stat-l">Completados</div>
+      </div>
+      <div class="stat s-gr" id="sf-cer" onclick="sfClick('Cerrado')">
+        <div class="stat-n" id="st-cer">—</div><div class="stat-l">Cerrados</div>
       </div>
     </div>
 
-    <!-- TABLE -->
-    <div id="view-tabla" style="display:none">
-      <div class="tbl-wrap">
-        <table class="dt">
-          <thead><tr id="tbl-head"></tr></thead>
-          <tbody id="tbl-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- EDIT MODAL -->
-<div class="overlay" id="edit-modal">
-  <div class="modal">
-    <div class="mh">
-      <div class="m-av" id="m-av">?</div>
-      <div class="m-inf">
-        <div class="m-nm" id="m-nm">—</div>
-        <div class="m-sb" id="m-sb">—</div>
-      </div>
-      <div class="m-btns">
-        <a id="m-notion" href="#" target="_blank" class="btn-ghost" style="display:none;font-size:11px">Notion ↗</a>
-        <a id="m-profilebtn" href="#" target="_blank" class="btn-ghost" style="display:none;font-size:11px">🎬 Perfil</a>
-        <button class="btn-del" onclick="delAthlete()">Eliminar</button>
-        <button class="btn-save" onclick="saveAthlete()">Guardar</button>
-        <button class="btn-ghost" onclick="closeEdit()" style="padding:7px 11px">✕</button>
-      </div>
-    </div>
-    <div class="mb">
-
-      <div class="m2">
-        <!-- Proceso -->
-        <div class="msec">
-          <div class="ms-t">Proceso</div>
-          <div class="mf"><label>Status</label>
-            <select id="m-status" class="fi">
-              <option>In Process</option><option>Interested Schools</option>
-              <option>Standby</option><option>Committed</option><option>Closed</option>
-            </select>
-          </div>
-          <div class="mf"><label>Tipo</label>
-            <select id="m-tipo" class="fi">
-              <option>College Placement</option><option>Boarding School</option><option>Transfer</option>
-            </select>
-          </div>
-          <div class="mf"><label>NVS Program</label>
-            <select id="m-prog" class="fi">
-              <option>Standard</option><option>Premium</option><option>Scholarship</option><option>Transfer</option>
-            </select>
-          </div>
-          <div class="mf"><label>Budget</label>
-            <select id="m-budget" class="fi">
-              <option value="">—</option>
-              <option>0-5K</option><option>5-10K</option><option>10-15K</option>
-              <option>15-20K</option><option>20-25K</option><option>25-30K</option><option>30K+</option>
-            </select>
-          </div>
-          <div class="mf"><label>Universidad Comprometida</label>
-            <input id="m-uni-com" class="fi" placeholder="—">
-          </div>
-        </div>
-        <!-- Personal -->
-        <div class="msec">
-          <div class="ms-t">Información Personal</div>
-          <div class="mf"><label>Nombre</label><input id="m-nombre" class="fi" placeholder="Nombre completo"></div>
-          <div class="mf"><label>Deporte</label><input id="m-deporte" class="fi" placeholder="Soccer…"></div>
-          <div class="mf"><label>Posición</label><input id="m-posicion" class="fi" placeholder="CM, GK…"></div>
-          <div class="mf"><label>Nacionalidad</label><input id="m-nac" class="fi" placeholder="Panamá…"></div>
-          <div class="mf"><label>Fecha de nacimiento</label><input id="m-dob" class="fi" placeholder="MM/DD/YYYY"></div>
-          <div class="mf"><label>Equipo actual</label><input id="m-team" class="fi" placeholder="—"></div>
-        </div>
-      </div>
-
-      <div class="m2">
-        <!-- Agentes -->
-        <div class="msec">
-          <div class="ms-t">Agentes Asignados</div>
-          <div class="agent-checks">
-            <label class="ag-row">
-              <input type="checkbox" id="ag-sc" value="Stefano Cano">
-              <div class="ag-dot" style="background:var(--green)"></div>
-              <span style="color:var(--green)">Stefano Cano</span>
-            </label>
-            <label class="ag-row">
-              <input type="checkbox" id="ag-jb" value="Julio Blanco">
-              <div class="ag-dot" style="background:var(--blue)"></div>
-              <span style="color:var(--blue)">Julio Blanco</span>
-            </label>
-            <label class="ag-row">
-              <input type="checkbox" id="ag-ac" value="Andrea Castillo">
-              <div class="ag-dot" style="background:var(--purple)"></div>
-              <span style="color:var(--purple)">Andrea Castillo</span>
-            </label>
-          </div>
-          <div class="mf" style="margin-top:11px"><label>Relación Familiar</label>
-            <select id="m-family" class="fi">
-              <option value="">—</option><option>Excellent</option><option>Good</option><option>Mid</option><option>Bad</option>
-            </select>
-          </div>
-        </div>
-        <!-- Académico -->
-        <div class="msec">
-          <div class="ms-t">Académico</div>
-          <div class="mf"><label>GPA</label><input id="m-gpa" class="fi" placeholder="3.5"></div>
-          <div class="mf"><label>Major deseado</label><input id="m-major" class="fi" placeholder="Business…"></div>
-          <div class="mf"><label>Start Year</label><input id="m-start" class="fi" placeholder="Fall 2026"></div>
-          <div class="mf"><label>Target End</label><input id="m-end" class="fi" placeholder="Spring 2030"></div>
-          <div class="mf"><label>Perfil Digital</label><input id="m-profile" class="fi" placeholder="https://…"></div>
-        </div>
-      </div>
-
-      <div class="m2">
-        <!-- Universidades -->
-        <div class="msec">
-          <div class="ms-t">Universidades Interesadas</div>
-          <div class="mf"><textarea id="m-unis" class="fi" rows="5" placeholder="Una universidad por línea…" oninput="previewUnis()"></textarea></div>
-          <div class="uni-list" id="unis-preview"></div>
-        </div>
-        <!-- Notas -->
-        <div class="msec">
-          <div class="ms-t">Notas Internas</div>
-          <div class="mf"><textarea id="m-notas" class="fi" rows="5" placeholder="Notas del proceso…"></textarea></div>
-          <div class="mf"><label>Notion URL</label><input id="m-notion-url" class="fi" placeholder="https://notion.so/…"></div>
-        </div>
-      </div>
-
+    <!-- KANBAN -->
+    <div class="kboard-wrap">
+      <div class="kboard" id="kboard"></div>
     </div>
   </div>
 </div>
 
-<!-- ADD MODAL -->
-<div class="overlay" id="add-modal">
-  <div class="modal" style="max-width:520px">
-    <div class="mh">
-      <div style="font-family:'Anton',sans-serif;font-size:20px;flex:1">Nuevo Atleta</div>
-      <button class="btn-ghost" onclick="closeAdd()" style="padding:7px 10px">✕</button>
+<!-- DETAIL PANEL -->
+<div class="dp-ov" id="dp-ov" onclick="closeDP()"></div>
+<div class="dp" id="dp"></div>
+
+<!-- MODAL -->
+<div class="m-ov" id="m-ov" onclick="closeMod()"></div>
+<div class="modal" id="modal">
+  <div class="m-hd">
+    <span class="m-ttl" id="m-ttl">Nuevo Atleta</span>
+    <button class="m-x" onclick="closeMod()">×</button>
+  </div>
+  <div class="m-body">
+    <div class="mf-2">
+      <div class="mf"><label>Nombre</label><input class="fi" id="m-nombre" placeholder="Nombre completo"></div>
+      <div class="mf"><label>Deporte</label><input class="fi" id="m-deporte" placeholder="Soccer, Volleyball..."></div>
     </div>
-    <div class="mb">
-      <div class="msec">
-        <div class="mf"><label>Nombre *</label><input class="fi" id="a-nombre" placeholder="Nombre completo"></div>
+    <div class="mf-2">
+      <div class="mf"><label>Servicio</label>
+        <select class="fi" id="m-servicio"><option>ESTANDAR</option><option>PREMIUM</option><option>TRANSFER</option></select>
       </div>
-      <div class="m2">
-        <div class="msec">
-          <div class="ms-t">Deporte</div>
-          <div class="mf"><label>Deporte</label><input class="fi" id="a-deporte" placeholder="Soccer…"></div>
-          <div class="mf"><label>Posición</label><input class="fi" id="a-pos" placeholder="CM, GK…"></div>
-          <div class="mf"><label>Equipo actual</label><input class="fi" id="a-team" placeholder="—"></div>
-        </div>
-        <div class="msec">
-          <div class="ms-t">Proceso</div>
-          <div class="mf"><label>Tipo</label>
-            <select class="fi" id="a-tipo"><option>College Placement</option><option>Boarding School</option><option>Transfer</option></select>
-          </div>
-          <div class="mf"><label>Status</label>
-            <select class="fi" id="a-status"><option>In Process</option><option>Interested Schools</option><option>Standby</option><option>Committed</option><option>Closed</option></select>
-          </div>
-          <div class="mf"><label>Budget</label>
-            <select class="fi" id="a-budget"><option value="">—</option><option>0-5K</option><option>5-10K</option><option>10-15K</option><option>15-20K</option><option>20-25K</option><option>25-30K</option><option>30K+</option></select>
-          </div>
-          <div class="mf"><label>NVS Program</label>
-            <select class="fi" id="a-prog"><option>Standard</option><option>Premium</option><option>Scholarship</option></select>
-          </div>
-        </div>
-      </div>
-      <div class="msec">
-        <div class="ms-t">Agentes</div>
-        <div class="agent-checks">
-          <label class="ag-row"><input type="checkbox" id="aa-sc" value="Stefano Cano">
-            <div class="ag-dot" style="background:var(--green)"></div><span style="color:var(--green)">Stefano Cano</span></label>
-          <label class="ag-row"><input type="checkbox" id="aa-jb" value="Julio Blanco">
-            <div class="ag-dot" style="background:var(--blue)"></div><span style="color:var(--blue)">Julio Blanco</span></label>
-          <label class="ag-row"><input type="checkbox" id="aa-ac" value="Andrea Castillo">
-            <div class="ag-dot" style="background:var(--purple)"></div><span style="color:var(--purple)">Andrea Castillo</span></label>
-        </div>
-      </div>
-      <div class="msec">
-        <div class="mf"><label>Notas</label><textarea class="fi" id="a-notas" rows="2" placeholder="Notas…"></textarea></div>
+      <div class="mf"><label>Plan de Pago</label>
+        <select class="fi" id="m-plan">
+          <option>1 PAYMENT</option><option>2 PAYMENTS</option><option>3 PAYMENTS</option>
+          <option>4 PAYMENTS</option><option>QUARTERLY</option><option>MONTHLY</option>
+          <option>ABONO + MENSUALIDAD</option>
+        </select>
       </div>
     </div>
-    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;">
-      <button class="btn-ghost" onclick="closeAdd()">Cancelar</button>
-      <button class="btn-save" onclick="saveNew()">Crear atleta</button>
+    <div class="mf-2">
+      <div class="mf"><label>Total Contrato ($)</label><input class="fi" id="m-total" type="number" placeholder="0.00" step="0.01"></div>
+      <div class="mf"><label>Cuota / Pago ($)</label><input class="fi" id="m-pago" type="number" placeholder="0.00" step="0.01"></div>
     </div>
+    <div class="mf-2">
+      <div class="mf"><label>Pagos Realizados</label><input class="fi" id="m-pagos" placeholder="1 out of 2"></div>
+      <div class="mf"><label>Estado</label>
+        <select class="fi" id="m-estado">
+          <option>Activo</option><option>Pendiente</option><option>Deudor</option>
+          <option>Completado</option><option>Cerrado</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf-2">
+      <div class="mf"><label>WhatsApp</label><input class="fi" id="m-wa" placeholder="507 6xxx-xxxx"></div>
+      <div class="mf"><label>Referido Por</label><input class="fi" id="m-ref" placeholder="Nombre del referidor"></div>
+    </div>
+    <div class="mf"><label>Notas / Contacto de Pago</label><input class="fi" id="m-notas" placeholder="Ej: Rogelio Ramirez (padre) — Contacto para cobro"></div>
+  </div>
+  <div class="m-ft">
+    <button class="btn-cancel" onclick="closeMod()">Cancelar</button>
+    <button class="btn-save" onclick="saveAth()">Guardar Atleta</button>
   </div>
 </div>
 
-<!-- TOUCH DRAG GHOST -->
-<div id="touch-ghost"></div>
-
-<!-- MOBILE NAV -->
-<nav class="mobile-nav">
-  <button class="mn-i active" id="mn-pipeline" onclick="setView('pipeline')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1.5"/><rect x="10" y="7" width="5" height="14" rx="1.5"/><rect x="17" y="10" width="4" height="11" rx="1.5"/></svg>
-    Pipeline
-  </button>
-  <button class="mn-i" id="mn-tabla" onclick="setView('tabla')">
-    <svg viewBox="0 0 24 24"><path d="M3 5h18M3 10h18M3 15h18M3 20h18M8 5v15M16 5v15" stroke-linecap="round"/></svg>
-    Tabla
-  </button>
-  <button class="mn-fab mn-i" onclick="openAdd()">+</button>
-</nav>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-const _sb = supabase.createClient(
-  'https://mwefvjvvitsondqghgsx.supabase.co',
-  'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk'
-);
+/* ── CONFIG ── */
+const SB_URL = 'https://mwefvjvvitsondqghgsx.supabase.co';
+const SB_KEY = 'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
+const sb = supabase.createClient(SB_URL, SB_KEY);
 
-const STAGES = [
-  {key:'In Process',         dot:'#60a5fa'},
-  {key:'Interested Schools', dot:'#fbbf24'},
-  {key:'Standby',            dot:'#9ca3af'},
-  {key:'Committed',          dot:'#AAFF00'},
-  {key:'Closed',             dot:'#f87171'},
+const COLS = [
+  {k:'Activo',     nm:'Activo',     c:'#AAFF00', av:'rgba(170,255,0,0.85)' },
+  {k:'Pendiente',  nm:'Pendiente',  c:'#fbbf24', av:'rgba(251,191,36,0.85)'},
+  {k:'Deudor',     nm:'Deudor',     c:'#f87171', av:'rgba(248,113,113,0.85)'},
+  {k:'Completado', nm:'Completado', c:'#60a5fa', av:'rgba(96,165,250,0.85)' },
+  {k:'Cerrado',    nm:'Cerrado',    c:'#6b7280', av:'rgba(107,114,128,0.85)'},
 ];
+const C2COL = Object.fromEntries(COLS.map(c=>[c.k,c.c]));
+const C2AV  = Object.fromEntries(COLS.map(c=>[c.k,c.av]));
 
-const TBL_COLS = [
-  {k:'nombre',               lbl:'Atleta',        w:'150px'},
-  {k:'deporte',              lbl:'Deporte / Pos',  w:'110px'},
-  {k:'tipo',                 lbl:'Tipo',           w:'85px'},
-  {k:'commit_status',        lbl:'Status',         w:'110px'},
-  {k:'working_with',         lbl:'Agente',         w:'130px'},
-  {k:'budget',               lbl:'Budget',         w:'75px'},
-  {k:'gpa',                  lbl:'GPA',            w:'50px'},
-  {k:'start_year',           lbl:'Start',          w:'80px'},
-  {k:'committed_university', lbl:'Universidad',    w:'155px'},
-  {k:'nvs_program',          lbl:'Programa',       w:'85px'},
-  {k:'nacionalidad',         lbl:'País',           w:'75px'},
-];
+const SP_EM = {
+  Soccer:'⚽',Volleyball:'🏐',Volley:'🏐','Volley and Dance':'🏐',
+  Basketball:'🏀',Baseball:'⚾','Flag Football':'🏈','Flag footbal':'🏈',
+  'Flag Footbal':'🏈','Football Americano':'🏈',Gimnasia:'🤸',Tennis:'🎾',
+  Atletismo:'🏃',Natacion:'🏊',Softbol:'🥎'
+};
+const spIco = d => SP_EM[d]||'🏅';
+const fmt$ = n => n ? '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2}) : '—';
+const ini  = n => (n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
 
-let data=[], filtered=[], currentId=null;
-let statusFilter='', agentFilter='';
-let sortK='nombre', sortD=1, curView='pipeline';
+/* ── STATE ── */
+let ALL = [], FLT = [], SF = '', dragId = null, editId = null;
 
-/* RECORDATORIO */
-.rem-banner{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;margin-bottom:18px;font-weight:700;font-size:14px;}
-.rem-banner.today{background:rgba(170,255,0,0.12);border:1.5px solid var(--green);color:var(--green);}
-.rem-banner.soon{background:rgba(251,191,36,0.1);border:1.5px solid var(--amber);color:var(--amber);}
-.rem-banner.normal{background:var(--card);border:1px solid var(--border);color:var(--muted);}
-.rem-banner .rem-icon{font-size:24px;flex-shrink:0;}
-.rem-banner .rem-title{font-size:15px;font-family:'Anton',sans-serif;letter-spacing:.5px;}
-.rem-banner .rem-sub{font-size:12px;font-weight:500;opacity:.8;margin-top:2px;}
-.rem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
-.rem-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:border .15s;}
-.rem-card:hover{border-color:rgba(255,255,255,0.15);}
-.rem-top{display:flex;align-items:center;gap:10px;}
-.rem-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#AAFF00,#6aaa00);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#000;flex-shrink:0;}
-.rem-name{font-weight:700;font-size:13px;line-height:1.2;}
-.rem-sport{font-size:11px;color:var(--muted);margin-top:2px;}
-.rem-badges{display:flex;gap:6px;flex-wrap:wrap;}
-.rem-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.4px;text-transform:uppercase;}
-.rem-badge.monthly{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.25);}
-.rem-badge.abono{background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.25);}
-.rem-badge.activo{background:rgba(170,255,0,0.1);color:var(--green);border:1px solid rgba(170,255,0,0.2);}
-.rem-pay{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--card2);border-radius:8px;font-size:12px;}
-.rem-pay-lbl{color:var(--muted);font-weight:600;}
-.rem-pay-val{font-weight:800;color:#fff;}
-.rem-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-.rem-prog{font-size:11px;color:var(--muted);font-weight:600;}
-.btn-wa{display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .15s;}
-.btn-wa:hover{opacity:.85;}
-.rem-section-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin:16px 0 8px;}
-.rem-empty{padding:30px;text-align:center;color:var(--muted);font-size:13px;}
-
-/* INIT */
+/* ── AUTH ── */
 async function init(){
-  const {data:{session}} = await _sb.auth.getSession();
-  if(!session){window.location.href='index.html';return;}
-  await loadData();
+  const {data:{session}} = await sb.auth.getSession();
+  if(session){ showApp(); }
+  else { document.getElementById('login-ov').style.display='flex'; }
 }
 
+async function doLogin(){
+  const e=q('#l-em').value.trim(), p=q('#l-pw').value;
+  q('#l-err').textContent='';
+  const {error}=await sb.auth.signInWithPassword({email:e,password:p});
+  if(error){q('#l-err').textContent=error.message;}
+  else showApp();
+}
+
+function showApp(){
+  q('#login-ov').style.display='none';
+  q('#app').style.display='flex';
+  loadData();
+  setupRT();
+}
+
+/* ── DATA ── */
 async function loadData(){
-  const {data:rows} = await _sb.from('placements').select('*').order('nombre');
-  data = rows||[];
-  populateSports();
-  populateClasses();
+  const {data,error}=await sb.from('atletas').select('*').order('nombre');
+  if(error){console.error(error);return;}
+  ALL = data||[];
+  buildSportFilter();
   applyFilters();
 }
 
-/* SPORTS FILTER */
-function populateSports(){
-  const sel=document.getElementById('f-sport');
-  [...new Set(data.map(a=>a.deporte).filter(Boolean))].sort()
-    .forEach(s=>{const o=document.createElement('option');o.textContent=s;sel.appendChild(o);});
+function buildSportFilter(){
+  const sel=q('#f-sport');
+  const sp=[...new Set(ALL.map(a=>a.deporte).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">🏅 Todos los deportes</option>'+sp.map(s=>`<option>${s}</option>`).join('');
 }
 
-function populateClasses(){
-  const sel=document.getElementById('f-class');
-  const years=[...new Set(data.map(a=>a.start_year).filter(Boolean))]
-    .sort((a,b)=>{
-      const ya=parseInt(a.match(/\d{4}/)?.[0]||0), yb=parseInt(b.match(/\d{4}/)?.[0]||0);
-      if(ya!==yb) return ya-yb;
-      // Fall before Spring within same year
-      const sa=a.toLowerCase().includes('spring')?1:0, sb=b.toLowerCase().includes('spring')?1:0;
-      return sa-sb;
-    });
-  years.forEach(y=>{
-    const o=document.createElement('option');
-    o.value=y; o.textContent=y;
-    // Color hint in option text
-    sel.appendChild(o);
-  });
+let _rt=null;
+function setupRT(){
+  sb.channel('crm-rt').on('postgres_changes',{event:'*',schema:'public',table:'atletas'},()=>{
+    clearTimeout(_rt);_rt=setTimeout(loadData,800);
+  }).subscribe();
 }
 
-/* STATUS FILTER */
-function filterStatus(s){
-  statusFilter=s;
-  document.querySelectorAll('.stat-card').forEach(el=>el.classList.remove('sel'));
-  const m={'':'sf-all','Committed':'sf-com','In Process':'sf-ip','Interested Schools':'sf-int','Standby':'sf-sta','Closed':'sf-cls'};
-  document.getElementById(m[s]||'sf-all')?.classList.add('sel');
+/* ── FILTERS ── */
+function sfClick(k){
+  SF = SF===k?'':k;
+  document.querySelectorAll('.stat').forEach(el=>el.classList.remove('sf'));
+  const map={'':'sf-all','Activo':'sf-act','Pendiente':'sf-pen','Deudor':'sf-deu','Completado':'sf-com','Cerrado':'sf-cer'};
+  q('#'+map[SF])?.classList.add('sf');
   applyFilters();
 }
 
-/* AGENT FILTER */
-function filterAgent(a){
-  agentFilter=a;
-  document.querySelectorAll('.ag-pill').forEach(el=>el.classList.remove('active'));
-  const id='apill-'+(a==='Stefano Cano'?'sc':a==='Julio Blanco'?'jb':a==='Andrea Castillo'?'ac':'');
-  document.getElementById(id)?.classList.add('active');
-  applyFilters();
-}
-
-/* APPLY FILTERS */
 function applyFilters(){
-  const q      =(document.getElementById('f-q')?.value||'').toLowerCase();
-  const cls    =(document.getElementById('f-class')?.value||'');
-  const sport  =(document.getElementById('f-sport')?.value||'');
-  const tipo   =(document.getElementById('f-tipo')?.value||'');
-  const prog   =(document.getElementById('f-program')?.value||'');
-
-  filtered=data.filter(a=>{
-    if(statusFilter && a.commit_status!==statusFilter) return false;
-    if(agentFilter  && !(a.working_with||'').includes(agentFilter)) return false;
-    if(cls   && a.start_year!==cls) return false;
-    if(q && !['nombre','deporte','committed_university','notas'].some(f=>(a[f]||'').toLowerCase().includes(q))) return false;
-    if(sport && a.deporte!==sport) return false;
-    if(tipo  && a.tipo!==tipo) return false;
-    if(prog  && a.nvs_program!==prog) return false;
+  const qs=(q('#search')?.value||'').toLowerCase();
+  const sp=q('#f-sport')?.value||'';
+  const pl=q('#f-plan')?.value||'';
+  const sv=q('#f-serv')?.value||'';
+  FLT=ALL.filter(a=>{
+    if(SF && a.estado!==SF) return false;
+    if(sp && a.deporte!==sp) return false;
+    if(pl && a.tipo_pago!==pl) return false;
+    if(sv && a.servicio!==sv) return false;
+    if(qs && !`${a.nombre} ${a.deporte} ${a.referido} ${a.notas}`.toLowerCase().includes(qs)) return false;
     return true;
   });
-
-  if(curView==='tabla'){
-    filtered.sort((a,b)=>{
-      const av=(a[sortK]||'').toLowerCase(), bv=(b[sortK]||'').toLowerCase();
-      return av<bv?-sortD:av>bv?sortD:0;
-    });
-  }
-
-  const cnt=document.getElementById('f-count');
-  if(cnt) cnt.textContent=filtered.length!==data.length?`${filtered.length} de ${data.length}`:`${data.length} atletas`;
-
-  renderStats(); renderPipeline(); renderTable();
+  renderStats();
+  renderBoard();
+  q('#cnt').textContent=`${FLT.length} atleta${FLT.length!==1?'s':''}`;
 }
 
-/* STATS */
+/* ── STATS ── */
 function renderStats(){
-  document.getElementById('s-tot').textContent=data.length;
-  document.getElementById('s-com').textContent=data.filter(a=>a.commit_status==='Committed').length;
-  document.getElementById('s-ip').textContent =data.filter(a=>a.commit_status==='In Process').length;
-  document.getElementById('s-int').textContent=data.filter(a=>a.commit_status==='Interested Schools').length;
-  document.getElementById('s-sta').textContent=data.filter(a=>a.commit_status==='Standby').length;
-  document.getElementById('s-cls').textContent=data.filter(a=>a.commit_status==='Closed').length;
+  const cn=k=>ALL.filter(a=>a.estado===k).length;
+  q('#st-tot').textContent=ALL.length;
+  q('#st-act').textContent=cn('Activo');
+  q('#st-pen').textContent=cn('Pendiente');
+  q('#st-deu').textContent=cn('Deudor');
+  q('#st-com').textContent=cn('Completado');
+  q('#st-cer').textContent=cn('Cerrado');
 }
 
-/* PIPELINE */
-function renderPipeline(){
-  if(curView!=='pipeline') return;
-  document.getElementById('pl-board').innerHTML=STAGES.map(s=>{
-    const cards=filtered.filter(a=>a.commit_status===s.key);
-    return `<div class="pl-col">
-      <div class="pl-head">
-        <div class="pl-dot" style="background:${s.dot}"></div>
-        <div class="pl-name">${s.key}</div>
-        <div class="pl-cnt">${cards.length}</div>
+/* ── KANBAN ── */
+function renderBoard(){
+  const bd=q('#kboard');
+  bd.innerHTML=COLS.map(col=>{
+    const cards=FLT.filter(a=>a.estado===col.k);
+    return `<div class="kol">
+      <div class="kol-hd">
+        <div class="kol-dot" style="background:${col.c}"></div>
+        <div class="kol-nm" style="color:${col.c}">${col.nm}</div>
+        <div class="kol-cnt">${cards.length}</div>
       </div>
-      <div class="pl-cards"
-        data-status="${s.key}"
-        ondragover="onDragOver(event)"
-        ondragenter="onDragEnter(event)"
-        ondragleave="onDragLeave(event)"
-        ondrop="onDrop(event,'${s.key}')"
-      >${cards.length
-        ?cards.map(a=>`<div class="pl-card"
-            draggable="true"
-            data-id="${a.id}"
-            onclick="cardClick(event,${a.id})"
-            ondragstart="onDragStart(event,${a.id})"
-            ondragend="onDragEnd(event)"
-          >
-            ${classYearBlock(a.start_year)}
-            <div class="pc-name">${esc(a.nombre)}</div>
-            <div class="pc-sport">${esc(a.deporte||'—')} · ${esc(a.posicion||'—')}</div>
-            <div class="pc-badges">
-              <span class="badge ${tipoCls(a.tipo)}">${tipoShort(a.tipo)}</span>
-              ${agBadges(a.working_with)}
-            </div>
-            ${a.committed_university?`<div class="pc-uni">✓ ${esc(a.committed_university)}</div>`:a.budget?`<div class="pc-uni" style="color:#444">${esc(a.budget)}</div>`:''}
-            <div class="pc-status-row" onclick="event.stopPropagation()">
-              <select class="pc-status-sel ${stSelCls(a.commit_status)}"
-                onchange="changeStatus(event,${a.id})"
-                onmousedown="event.stopPropagation()">
-                <option value="In Process"         ${a.commit_status==='In Process'        ?'selected':''}>⚡ In Process</option>
-                <option value="Interested Schools"  ${a.commit_status==='Interested Schools' ?'selected':''}>🎯 Int. Schools</option>
-                <option value="Standby"             ${a.commit_status==='Standby'            ?'selected':''}>⏸ Standby</option>
-                <option value="Committed"           ${a.commit_status==='Committed'          ?'selected':''}>✅ Committed</option>
-                <option value="Closed"              ${a.commit_status==='Closed'             ?'selected':''}>🔒 Closed</option>
-              </select>
-            </div>
-            <div class="pc-note-area" onclick="quickNote(event,${a.id})">
-              ${a.notas
-                ?`<div class="pc-note-txt">${esc(a.notas.length>70?a.notas.slice(0,70)+'…':a.notas)}</div>`
-                :`<div class="pc-note-empty">✎ Nota rápida…</div>`}
-            </div>
-          </div>`).join('')
-        :'<div class="pl-empty">—</div>'}
+      <div class="kol-bd" id="col-${col.k}"
+        ondragover="event.preventDefault();this.classList.add('dov')"
+        ondragleave="this.classList.remove('dov')"
+        ondrop="onDrop(event,'${col.k}')">
+        ${cards.length?cards.map(a=>mkCard(a)).join(''):'<div class="kol-empty">Sin atletas</div>'}
       </div>
     </div>`;
   }).join('');
-  bindTouchCards();
 }
 
-/* TABLE */
-function renderTable(){
-  if(curView!=='tabla') return;
-  document.getElementById('tbl-head').innerHTML=
-    `<th style="width:32px">#</th>`+
-    TBL_COLS.map(c=>`<th onclick="sortBy('${c.k}')" style="min-width:${c.w}" class="${sortK===c.k?'sorted':''}">${c.lbl}<span class="sort-ic">${sortK===c.k?(sortD===1?'↑':'↓'):'↕'}</span></th>`).join('');
-
-  const tb=document.getElementById('tbl-body');
-  if(!filtered.length){
-    tb.innerHTML=`<tr><td colspan="${TBL_COLS.length+1}" style="text-align:center;padding:40px;color:var(--muted)">Sin resultados</td></tr>`;
-    return;
-  }
-  tb.innerHTML=filtered.map((a,i)=>
-    `<tr onclick="openEdit(${a.id})">
-      <td class="td-num">${i+1}</td>
-      ${TBL_COLS.map(c=>`<td>${cellVal(c.k,a)}</td>`).join('')}
-    </tr>`).join('');
+function mkCard(a){
+  const col=C2COL[a.estado]||'#888';
+  const av =C2AV[a.estado]||'rgba(255,255,255,0.7)';
+  const waN=(a.whatsapp||'').replace(/\D/g,'');
+  const isPrem=a.servicio==='PREMIUM';
+  return `<div class="card" draggable="true" id="c-${a.id}"
+    style="border-top-color:${col}"
+    onclick="openDP(${a.id})"
+    ondragstart="dragId=${a.id};this.classList.add('dragging')"
+    ondragend="this.classList.remove('dragging')">
+    <div class="card-top">
+      <div class="ava" style="background:${av}">${ini(a.nombre)}</div>
+      <div class="card-info">
+        <div class="card-nm">${esc(a.nombre)||'—'}</div>
+        <div class="card-sp">${spIco(a.deporte)} ${esc(a.deporte)||'—'}</div>
+      </div>
+    </div>
+    <div class="card-bdg">
+      <span class="bdg bdg-plan">${esc(a.tipo_pago)||'—'}</span>
+      <span class="bdg bdg-serv${isPrem?' prem':''}">${esc(a.servicio)||'—'}</span>
+    </div>
+    <div class="card-$$$">
+      <div class="card-tot" style="color:${col}">${fmt$(a.total)}</div>
+      <div class="card-pg">${esc(a.pagos_hechos)||'—'}</div>
+    </div>
+    <div class="card-ft">
+      <span class="card-ref">${a.referido?'↗ '+esc(a.referido):a.notas?'📞 '+esc(a.notas):''}</span>
+      ${waN?`<a class="btn-wa" href="https://wa.me/${waN}" target="_blank" onclick="event.stopPropagation()">💬 WA</a>`:''}
+    </div>
+  </div>`;
 }
 
-function sortBy(k){
-  if(sortK===k) sortD*=-1; else {sortK=k;sortD=1;}
-  applyFilters();
-}
-
-function cellVal(k,a){
-  switch(k){
-    case 'nombre':
-      return `<div class="td-n">${esc(a.nombre)}</div>`;
-    case 'deporte':
-      return `<div class="td-n" style="font-size:11px">${esc(a.deporte||'—')}</div><div class="td-s">${esc(a.posicion||'')}</div>`;
-    case 'tipo':
-      return `<span class="badge ${tipoCls(a.tipo)}">${tipoShort(a.tipo)}</span>`;
-    case 'commit_status':
-      return `<span class="badge ${stCls(a.commit_status)}">${esc(a.commit_status||'—')}</span>`;
-    case 'working_with':
-      return agBadges(a.working_with)||'<span style="color:#2a2a2a">—</span>';
-    case 'committed_university':
-      return a.committed_university
-        ?`<span style="color:var(--green);font-size:11px;font-weight:700">${esc(a.committed_university)}</span>`
-        :'<span style="color:#2a2a2a">—</span>';
-    case 'nvs_program':
-      return `<span class="badge ${progCls(a.nvs_program)}">${esc(a.nvs_program||'—')}</span>`;
-    default:
-      return `<span style="font-size:11px;color:#bbb">${esc(a[k]||'—')}</span>`;
-  }
-}
-
-/* VIEWS */
-function setView(v){
-  curView=v;
-  ['pipeline','tabla'].forEach(t=>{
-    document.getElementById('view-'+t).style.display=t===v?'':'none';
-    document.getElementById('tab-'+t)?.classList.toggle('active',t===v);
-    document.getElementById('snav-'+t)?.classList.toggle('active',t===v);
-    document.getElementById('mn-'+t)?.classList.toggle('active',t===v);
-  });
-  applyFilters();
-}
-
-/* EDIT MODAL */
-function openEdit(id){
-  const a=data.find(x=>x.id===id); if(!a) return;
-  currentId=id;
-  document.getElementById('m-av').textContent =initials(a.nombre);
-  document.getElementById('m-nm').textContent =a.nombre;
-  document.getElementById('m-sb').textContent =`${a.deporte||'—'} · ${a.posicion||'—'} · ${a.nacionalidad||'—'}`;
-  setV('m-status',a.commit_status||'In Process');
-  setV('m-tipo',a.tipo||'College Placement');
-  setV('m-prog',a.nvs_program||'Standard');
-  setV('m-budget',a.budget||'');
-  setV('m-family',a.family_status||'');
-  setFi('m-uni-com',a.committed_university);
-  setFi('m-nombre',a.nombre);
-  setFi('m-deporte',a.deporte);
-  setFi('m-posicion',a.posicion);
-  setFi('m-nac',a.nacionalidad);
-  setFi('m-dob',a.fecha_nacimiento);
-  setFi('m-team',a.current_team);
-  setFi('m-gpa',a.gpa);
-  setFi('m-major',a.desired_major);
-  setFi('m-start',a.start_year);
-  setFi('m-end',a.target_end_year);
-  setFi('m-profile',a.digital_profile);
-  setFi('m-notas',a.notas);
-  setFi('m-notion-url',a.notion_url);
-
-  const uniTxt=(a.universities_interested||'').replace(/\s*\|\s*/g,'\n');
-  setFi('m-unis',uniTxt); previewUnis();
-
-  const aw=a.working_with||'';
-  document.getElementById('ag-sc').checked=aw.includes('Stefano Cano');
-  document.getElementById('ag-jb').checked=aw.includes('Julio Blanco');
-  document.getElementById('ag-ac').checked=aw.includes('Andrea Castillo');
-
-  const nb=document.getElementById('m-notion');
-  nb.style.display=a.notion_url?'':'none'; nb.href=a.notion_url||'#';
-  const pb=document.getElementById('m-profilebtn');
-  pb.style.display=a.digital_profile?'':'none'; pb.href=a.digital_profile||'#';
-
-  document.getElementById('edit-modal').classList.add('open');
-}
-
-function previewUnis(){
-  const txt=document.getElementById('m-unis')?.value||'';
-  const unis=txt.split('\n').map(s=>s.trim()).filter(Boolean);
-  document.getElementById('unis-preview').innerHTML=
-    unis.map((u,i)=>`<div class="uni-item">${i===0?'→':'•'} ${esc(u)}</div>`).join('');
-}
-
-function closeEdit(){document.getElementById('edit-modal').classList.remove('open');currentId=null;}
-
-async function saveAthlete(){
-  if(!currentId) return;
-  const agents=['ag-sc','ag-jb','ag-ac']
-    .filter(id=>document.getElementById(id)?.checked)
-    .map(id=>document.getElementById(id).value).join(', ');
-  const unis=document.getElementById('m-unis').value
-    .split('\n').map(s=>s.trim()).filter(Boolean).join(' | ');
-  const upd={
-    nombre:gv('m-nombre'), commit_status:gv('m-status'), tipo:gv('m-tipo'),
-    nvs_program:gv('m-prog'), budget:gv('m-budget'), committed_university:gv('m-uni-com'),
-    deporte:gv('m-deporte'), posicion:gv('m-posicion'), nacionalidad:gv('m-nac'),
-    fecha_nacimiento:gv('m-dob'), current_team:gv('m-team'), gpa:gv('m-gpa'),
-    desired_major:gv('m-major'), start_year:gv('m-start'), target_end_year:gv('m-end'),
-    digital_profile:gv('m-profile'), family_status:gv('m-family'),
-    notas:gv('m-notas'), notion_url:gv('m-notion-url'),
-    universities_interested:unis, working_with:agents,
-  };
-  const {error}=await _sb.from('placements').update(upd).eq('id',currentId);
-  if(!error){Object.assign(data.find(a=>a.id===currentId),upd);applyFilters();closeEdit();}
-  else alert('Error: '+error.message);
-}
-
-async function delAthlete(){
-  if(!currentId) return;
-  const a=data.find(x=>x.id===currentId);
-  if(!confirm(`¿Eliminar a ${a?.nombre}? Esta acción no se puede deshacer.`)) return;
-  const {error}=await _sb.from('placements').delete().eq('id',currentId);
-  if(!error){data=data.filter(x=>x.id!==currentId);applyFilters();closeEdit();}
-  else alert('Error: '+error.message);
-}
-
-/* ADD MODAL */
-function openAdd(){document.getElementById('add-modal').classList.add('open');}
-function closeAdd(){document.getElementById('add-modal').classList.remove('open');}
-
-async function saveNew(){
-  const nombre=document.getElementById('a-nombre').value.trim();
-  if(!nombre){alert('El nombre es obligatorio');return;}
-  const agents=['aa-sc','aa-jb','aa-ac']
-    .filter(id=>document.getElementById(id)?.checked)
-    .map(id=>document.getElementById(id).value).join(', ');
-  const {error}=await _sb.from('placements').insert({
-    nombre, deporte:gv('a-deporte'), posicion:gv('a-pos'),
-    current_team:gv('a-team'), tipo:gv('a-tipo'),
-    commit_status:gv('a-status'), budget:gv('a-budget'),
-    nvs_program:gv('a-prog'), working_with:agents, notas:gv('a-notas'),
-  });
+/* ── DRAG & DROP ── */
+async function onDrop(e, newEst){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dov');
+  if(!dragId||!newEst) return;
+  const a=ALL.find(x=>x.id===dragId);
+  if(!a||a.estado===newEst){dragId=null;return;}
+  const {error}=await sb.from('atletas').update({estado:newEst,deudor:newEst==='Deudor'?'YES':'NO'}).eq('id',dragId);
   if(!error){
-    await loadData(); closeAdd();
-    ['a-nombre','a-deporte','a-pos','a-team','a-notas'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-    ['aa-sc','aa-jb','aa-ac'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
-  } else alert('Error: '+error.message);
-}
-
-/* HELPERS */
-function gv(id){return(document.getElementById(id)?.value||'').trim();}
-function setV(id,v){const el=document.getElementById(id);if(el)el.value=v;}
-function setFi(id,v){setV(id,v||'');}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function initials(n){return(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';}
-function tipoCls(t){return t==='Boarding School'?'b-board':t==='Transfer'?'b-trans':'b-cpl';}
-function tipoShort(t){return t==='Boarding School'?'Board':t==='College Placement'?'CPL':t||'—';}
-function progCls(p){return p==='Premium'?'b-prm':p==='Scholarship'?'b-sch':'b-std';}
-function stCls(s){return{'In Process':'b-ip','Interested Schools':'b-int','Standby':'b-sta','Committed':'b-com','Closed':'b-cls'}[s]||'b-sta';}
-function stSelCls(s){return{'In Process':'s-ip','Interested Schools':'s-int','Standby':'s-sta','Committed':'s-com','Closed':'s-cls'}[s]||'s-sta';}
-
-async function changeStatus(e,id){
-  e.stopPropagation();
-  const newStatus=e.target.value;
-  const a=data.find(x=>x.id===id);
-  if(!a||a.commit_status===newStatus) return;
-  a.commit_status=newStatus;
-  applyFilters();
-  await _sb.from('placements').update({commit_status:newStatus}).eq('id',id);
-}
-function classYearBlock(sy){
-  if(!sy) return '';
-  // Parse "Fall 2026" → season + year
-  const m=sy.match(/(fall|spring|summer|winter)/i);
-  const y=sy.match(/\d{4}/);
-  if(!y) return '';
-  const season=m?m[1].charAt(0).toUpperCase()+m[1].slice(1).toLowerCase():'';
-  const year=y[0];
-  const colors={
-    '2025':'#AAFF00','2026':'#AAFF00',
-    '2027':'#60a5fa',
-    '2028':'#fbbf24',
-    '2029':'#a78bfa',
-    '2030':'#f87171',
-  };
-  const c=colors[year]||'#9ca3af';
-  return `<div class="pc-class" style="color:${c}"><small style="color:${c}">${season}</small>${year}</div>`;
-}
-function agBadge(name){
-  if(name.includes('Stefano')) return`<span class="badge b-sc">SC</span>`;
-  if(name.includes('Julio'))   return`<span class="badge b-jb">JB</span>`;
-  if(name.includes('Andrea'))  return`<span class="badge b-ac">AC</span>`;
-  return`<span class="badge b-sta" style="font-size:8px">${esc(name.substring(0,4))}</span>`;
-}
-function agBadges(w){return w?(w.split(',').map(s=>s.trim()).filter(Boolean).map(agBadge).join(' ')):''}
-
-/* ── DRAG & DROP (Desktop) ── */
-let dragId=null, dragMoved=false;
-
-function onDragStart(e,id){
-  dragId=id; dragMoved=false;
-  e.dataTransfer.effectAllowed='move';
-  e.dataTransfer.setData('text/plain',id);
-  setTimeout(()=>e.target.classList.add('dragging'),0);
-}
-function onDragEnd(e){
-  e.target.classList.remove('dragging');
-  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
-  document.querySelectorAll('.pl-drop-ghost').forEach(g=>g.remove());
-}
-function onDragOver(e){
-  e.preventDefault(); e.dataTransfer.dropEffect='move';
-  const zone=e.currentTarget;
-  if(!zone.querySelector('.pl-drop-ghost')){
-    const gh=document.createElement('div'); gh.className='pl-drop-ghost'; zone.appendChild(gh);
-  }
-}
-function onDragEnter(e){e.preventDefault(); e.currentTarget.classList.add('drag-over');}
-function onDragLeave(e){
-  if(!e.currentTarget.contains(e.relatedTarget)){
-    e.currentTarget.classList.remove('drag-over');
-    e.currentTarget.querySelector('.pl-drop-ghost')?.remove();
-  }
-}
-async function onDrop(e,status){
-  e.preventDefault(); dragMoved=true;
-  const zone=e.currentTarget;
-  zone.classList.remove('drag-over');
-  zone.querySelector('.pl-drop-ghost')?.remove();
-  if(!dragId) return;
-  const a=data.find(x=>x.id===dragId);
-  if(!a||a.commit_status===status){dragId=null;return;}
-  a.commit_status=status;
-  applyFilters();
-  await _sb.from('placements').update({commit_status:status}).eq('id',dragId);
+    a.estado=newEst;a.deudor=newEst==='Deudor'?'YES':'NO';
+    applyFilters();
+    if(q('#dp').classList.contains('open')) openDP(dragId);
+    toast('Estado actualizado ✓','ok');
+  } else toast('Error al actualizar','err');
   dragId=null;
 }
 
-/* Prevent click-to-open when finishing a drag or clicking note area */
-function cardClick(e,id){
-  if(dragMoved){dragMoved=false;return;}
-  if(e.target.closest('.pc-note-area,.pc-status-row')) return;
-  openEdit(id);
+/* ── DETAIL PANEL ── */
+function openDP(id){
+  const a=ALL.find(x=>x.id===id); if(!a) return;
+  editId=id;
+  const col=C2COL[a.estado]||'#888';
+  const av =C2AV[a.estado]||'rgba(255,255,255,0.7)';
+  const waN=(a.whatsapp||'').replace(/\D/g,'');
+  q('#dp').innerHTML=`
+    <div class="dp-hd">
+      <div class="dp-ava" style="background:${av}">${ini(a.nombre)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="dp-nm">${esc(a.nombre)||'—'}</div>
+        <div class="dp-sub">${spIco(a.deporte)} ${esc(a.deporte)||'—'} · ${esc(a.servicio)||'—'}</div>
+      </div>
+      <button class="dp-x" onclick="closeDP()">×</button>
+    </div>
+    <div class="dp-body">
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Estado</div>
+        <select class="dp-sel" onchange="updateEst(${id},this.value)">
+          ${COLS.map(c=>`<option ${a.estado===c.k?'selected':''}>${c.k}</option>`).join('')}
+        </select>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Financiero</div>
+        <div class="dp-row"><span class="dp-rl">Plan</span><span class="dp-rv" style="color:var(--blue)">${esc(a.tipo_pago)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Total Contrato</span><span class="dp-rv" style="color:${col}">${fmt$(a.total)}</span></div>
+        <div class="dp-row"><span class="dp-rl">Cuota</span><span class="dp-rv">${fmt$(a.pago)}</span></div>
+        <div class="dp-row"><span class="dp-rl">Pagos Realizados</span><span class="dp-rv">${esc(a.pagos_hechos)||'—'}</span></div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Contacto</div>
+        <div class="dp-row"><span class="dp-rl">WhatsApp</span>
+          <span class="dp-rv">${waN?`<a href="https://wa.me/${waN}" target="_blank">${esc(a.whatsapp)}</a>`:esc(a.whatsapp)||'—'}</span>
+        </div>
+        <div class="dp-row"><span class="dp-rl">Responsable Pago</span><span class="dp-rv">${esc(a.notas)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Referido Por</span><span class="dp-rv">${esc(a.referido)||'—'}</span></div>
+      </div>
+    </div>
+    <div class="dp-ft">
+      <button class="dp-btn p" onclick="openEdit(${id})">✏ Editar</button>
+      <button class="dp-btn d" onclick="delAth(${id})">🗑 Eliminar</button>
+    </div>`;
+  q('#dp').classList.add('open');
+  q('#dp-ov').classList.add('open');
 }
 
-/* ── QUICK NOTE ── */
-function quickNote(e,id){
-  e.stopPropagation();
-  const area=e.currentTarget;
-  area.onclick=null; // disable while editing
-  const a=data.find(x=>x.id===id);
-  area.innerHTML=`<textarea class="pc-note-input" placeholder="Escribir nota… (Enter para guardar, Shift+Enter para salto de línea)">${a?.notas||''}</textarea><div class="pc-note-hint">Enter · guardar &nbsp;·&nbsp; Esc · cancelar</div>`;
-  const ta=area.querySelector('textarea');
-  ta.addEventListener('click',ev=>ev.stopPropagation());
-  ta.addEventListener('mousedown',ev=>ev.stopPropagation());
-  ta.focus();
-  ta.setSelectionRange(ta.value.length,ta.value.length);
-  const cancel=()=>{if(a)a.notas=(a.notas||'');renderPipeline();};
-  ta.addEventListener('keydown',ev=>{
-    if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ta.blur();}
-    if(ev.key==='Escape'){ev.preventDefault();cancel();}
-  });
-  ta.addEventListener('blur',async()=>{
-    const val=ta.value.trim();
-    const prev=(a?.notas||'').trim();
-    if(a) a.notas=val;
-    renderPipeline();
-    if(a&&val!==prev) await _sb.from('placements').update({notas:val}).eq('id',id);
-  });
+function closeDP(){
+  q('#dp').classList.remove('open');
+  q('#dp-ov').classList.remove('open');
+  editId=null;
 }
 
-/* ── DRAG & DROP (Mobile Touch) ── */
-let _tId=null, _tDragging=false, _tX0=0, _tY0=0;
-const DRAG_THRESHOLD=10, DRAG_HOLD=120;
-let _tHoldTimer=null;
-
-function bindTouchCards(){
-  document.querySelectorAll('.pl-card').forEach(card=>{
-    const id=parseInt(card.dataset.id);
-    card.addEventListener('touchstart', e=>_tStart(e,card,id), {passive:true});
-    card.addEventListener('touchmove',  e=>_tMove(e),           {passive:false});
-    card.addEventListener('touchend',   e=>_tEnd(e),            {passive:true});
-    card.addEventListener('touchcancel',e=>_tCancel(),          {passive:true});
-  });
+async function updateEst(id, ne){
+  const {error}=await sb.from('atletas').update({estado:ne,deudor:ne==='Deudor'?'YES':'NO'}).eq('id',id);
+  if(!error){
+    const a=ALL.find(x=>x.id===id);
+    if(a){a.estado=ne;a.deudor=ne==='Deudor'?'YES':'NO';}
+    applyFilters();
+    toast('Estado actualizado ✓','ok');
+  } else toast('Error: '+error.message,'err');
 }
 
-function _tStart(e,card,id){
-  if(e.touches.length!==1) return;
-  const t=e.touches[0];
-  _tX0=t.clientX; _tY0=t.clientY;
-  _tId=id; _tDragging=false;
-  // Pre-fill ghost with athlete name/sport
-  const a=data.find(x=>x.id===id);
-  const ghost=document.getElementById('touch-ghost');
-  ghost.innerHTML=`
-    <div style="font-family:'Anton',sans-serif;font-size:15px;color:var(--green);margin-bottom:2px">${classYearBlock(a?.start_year)||''}</div>
-    <div style="font-weight:700;font-size:13px;margin-bottom:2px">${esc(a?.nombre||'')}</div>
-    <div style="font-size:11px;color:var(--muted)">${esc(a?.deporte||'—')} · ${esc(a?.posicion||'—')}</div>`;
-  ghost.style.left=(t.clientX-105)+'px';
-  ghost.style.top =(t.clientY-50)+'px';
-  // Show ghost after a brief hold so taps still work
-  _tHoldTimer=setTimeout(()=>{
-    if(_tId) ghost.style.display='block';
-  }, DRAG_HOLD);
+/* ── MODAL ── */
+function openAdd(){
+  editId=null;
+  q('#m-ttl').textContent='Nuevo Atleta';
+  ['nombre','deporte','pagos','wa','ref','notas'].forEach(f=>q('#m-'+f).value='');
+  q('#m-total').value=''; q('#m-pago').value='';
+  sel('#m-servicio','ESTANDAR'); sel('#m-plan','2 PAYMENTS'); sel('#m-estado','Activo');
+  q('#m-ov').classList.add('open'); q('#modal').classList.add('open');
 }
 
-function _tMove(e){
-  if(!_tId) return;
-  const t=e.touches[0];
-  const dx=t.clientX-_tX0, dy=t.clientY-_tY0;
-  if(!_tDragging && Math.hypot(dx,dy)<DRAG_THRESHOLD) return;
-  _tDragging=true;
-  e.preventDefault(); // block page scroll during drag
-
-  const ghost=document.getElementById('touch-ghost');
-  ghost.style.display='block';
-  ghost.style.left=(t.clientX-105)+'px';
-  ghost.style.top =(t.clientY-50)+'px';
-
-  // Highlight target column
-  ghost.style.pointerEvents='none';
-  const el=document.elementFromPoint(t.clientX,t.clientY);
-  ghost.style.pointerEvents='';
-  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
-  el?.closest('.pl-cards')?.classList.add('drag-over');
+function openEdit(id){
+  const a=ALL.find(x=>x.id===id); if(!a) return;
+  editId=id;
+  q('#m-ttl').textContent='Editar Atleta';
+  q('#m-nombre').value=a.nombre||''; q('#m-deporte').value=a.deporte||'';
+  q('#m-total').value=a.total||''; q('#m-pago').value=a.pago||'';
+  q('#m-pagos').value=a.pagos_hechos||''; q('#m-wa').value=a.whatsapp||'';
+  q('#m-ref').value=a.referido||''; q('#m-notas').value=a.notas||'';
+  sel('#m-servicio',a.servicio||'ESTANDAR'); sel('#m-plan',a.tipo_pago||'2 PAYMENTS');
+  sel('#m-estado',a.estado||'Activo');
+  q('#m-ov').classList.add('open'); q('#modal').classList.add('open');
 }
 
-async function _tEnd(e){
-  clearTimeout(_tHoldTimer);
-  const ghost=document.getElementById('touch-ghost');
-  ghost.style.display='none';
-  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
+function closeMod(){
+  q('#m-ov').classList.remove('open'); q('#modal').classList.remove('open');
+}
 
-  if(!_tId||!_tDragging){_tId=null;_tDragging=false;return;}
-
-  const t=e.changedTouches[0];
-  ghost.style.pointerEvents='none';
-  const el=document.elementFromPoint(t.clientX,t.clientY);
-  ghost.style.pointerEvents='';
-  const newStatus=el?.closest('.pl-cards')?.dataset?.status;
-
-  if(newStatus){
-    const a=data.find(x=>x.id===_tId);
-    if(a&&a.commit_status!==newStatus){
-      a.commit_status=newStatus;
-      applyFilters();
-      await _sb.from('placements').update({commit_status:newStatus}).eq('id',_tId);
-    }
+async function saveAth(){
+  const nombre=q('#m-nombre').value.trim();
+  if(!nombre){toast('Ingresa el nombre','err');return;}
+  const est=q('#m-estado').value;
+  const payload={
+    nombre, deporte:q('#m-deporte').value.trim(), servicio:q('#m-servicio').value,
+    tipo_pago:q('#m-plan').value, total:parseFloat(q('#m-total').value)||0,
+    pago:parseFloat(q('#m-pago').value)||0, pagos_hechos:q('#m-pagos').value.trim(),
+    estado:est, referido:q('#m-ref').value.trim(), whatsapp:q('#m-wa').value.trim(),
+    notas:q('#m-notas').value.trim(), deudor:est==='Deudor'?'YES':'NO',
+  };
+  let error;
+  if(editId){
+    ({error}=await sb.from('atletas').update(payload).eq('id',editId));
+  } else {
+    const maxId=ALL.reduce((m,a)=>Math.max(m,a.id||0),0);
+    ({error}=await sb.from('atletas').insert({...payload,id:maxId+1}));
   }
-  _tId=null; _tDragging=false;
+  if(error){toast('Error: '+error.message,'err');return;}
+  closeMod();
+  await loadData();
+  if(editId) openDP(editId);
+  toast(editId?'Atleta actualizado ✓':'Atleta agregado ✓','ok');
 }
 
-function _tCancel(){
-  clearTimeout(_tHoldTimer);
-  document.getElementById('touch-ghost').style.display='none';
-  document.querySelectorAll('.pl-cards').forEach(c=>c.classList.remove('drag-over'));
-  _tId=null; _tDragging=false;
+async function delAth(id){
+  if(!confirm('¿Eliminar este atleta permanentemente?')) return;
+  const {error}=await sb.from('atletas').delete().eq('id',id);
+  if(!error){closeDP();await loadData();toast('Atleta eliminado','ok');}
+  else toast('Error: '+error.message,'err');
 }
 
-/* CLOSE ON BG CLICK */
-document.querySelectorAll('.overlay').forEach(el=>{
-  el.addEventListener('click',e=>{if(e.target===el){closeEdit();closeAdd();}});
-});
+/* ── UTIL ── */
+const q  = s => document.querySelector(s);
+const esc= s => (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const sel= (id,v)=>{const e=q(id);if(e)e.value=v;};
 
-document.addEventListener('DOMContentLoaded',()=>{
-  filterStatus(''); filterAgent('');
-  init();
-});
+let _toastT=null;
+function toast(msg,type='ok'){
+  const el=q('#toast');
+  el.textContent=msg; el.className='toast '+type+' show';
+  clearTimeout(_toastT);
+  _toastT=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+window.addEventListener('DOMContentLoaded',init);
 </script>
-
 </body>
 </html>
