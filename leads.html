@@ -614,8 +614,8 @@ function applyFilters(){
   const src=q('#f-src')?.value||'';
   const pa=q('#f-pais')?.value||'';
   FLT=ALL.filter(a=>{
-    // Website leads sin recruiter = solo visibles en tab 🌐, no en pipeline principal
-    if(a.fuente==='Website'&&!(a.recruiter||'').trim())return false;
+    // Módulo Recruiters: excluye TODOS los website leads
+    if(a.fuente==='Website')return false;
     if(SF&&a.estado!==SF)return false;
     if(recFilter&&a.recruiter!==recFilter)return false;
     if(sp&&a.deporte!==sp)return false;
