@@ -172,6 +172,28 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .btn-save{background:var(--green);color:#000;border:none;border-radius:10px;padding:10px 26px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s ease;box-shadow:0 0 22px var(--green-glow);}
 .btn-save:hover{background:var(--green-dk);box-shadow:0 0 34px rgba(170,255,0,.44);}
 
+/* WEB LEADS VIEW */
+.web-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:14px;gap:12px;}
+.web-header{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.web-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:-.3px;}
+.web-badge{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.25);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:800;}
+.web-cols{display:flex;gap:12px;flex:1;overflow:hidden;}
+.web-col{flex:1;display:flex;flex-direction:column;background:rgba(13,13,13,0.85);border-radius:14px;border:1px solid rgba(255,255,255,0.055);overflow:hidden;}
+.web-col-hd{padding:13px 15px;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);flex-shrink:0;}
+.web-col-dot{width:8px;height:8px;border-radius:50%;}
+.web-col-nm{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;flex:1;}
+.web-col-cnt{background:rgba(255,255,255,0.07);color:var(--m3);font-size:9px;font-weight:800;padding:2px 9px;border-radius:99px;}
+.web-col-bd{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:7px;}
+.web-card{background:linear-gradient(155deg,#1b1b1b,#141414);border:1px solid rgba(255,255,255,0.07);border-left:3px solid var(--blue);border-radius:12px;padding:13px;cursor:pointer;transition:transform .28s cubic-bezier(.34,1.5,.64,1),box-shadow .2s;}
+.web-card:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(0,0,0,.65);}
+.web-card-nm{font-size:13px;font-weight:800;margin-bottom:5px;}
+.web-card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
+.web-card-contact{width:100%;padding:8px;border-radius:9px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;cursor:pointer;border:none;transition:all .18s;text-align:center;}
+.web-card-contact.pending{background:rgba(170,255,0,0.12);color:var(--green);border:1px solid rgba(170,255,0,0.25);}
+.web-card-contact.pending:hover{background:rgba(170,255,0,0.22);}
+.web-card-contact.done{background:rgba(255,255,255,0.05);color:var(--m2);border:1px solid var(--b);}
+.web-card-contact.done:hover{background:rgba(248,113,113,0.1);color:var(--red);border-color:rgba(248,113,113,0.2);}
+
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(18,18,18,0.96);backdrop-filter:blur(14px);border:1px solid var(--b2);border-radius:12px;padding:10px 22px;font-size:12px;font-weight:700;z-index:999;transition:transform .28s cubic-bezier(.34,1.5,.64,1);white-space:nowrap;box-shadow:0 16px 40px rgba(0,0,0,.55);}
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -249,6 +271,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
       <div class="view-btns">
         <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')" title="Kanban">⬛</button>
         <button class="vbtn" id="vbtn-l" onclick="setView('list')" title="Lista">☰</button>
+        <button class="vbtn" id="vbtn-w" onclick="setView('web')" title="Website Leads">🌐</button>
       </div>
       <button class="btn-add" onclick="openAdd()">+ Lead</button>
     </div>
@@ -280,6 +303,33 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
         </thead>
         <tbody id="list-body"></tbody>
       </table>
+    </div>
+
+    <!-- WEBSITE LEADS VIEW -->
+    <div class="web-wrap" id="view-web" style="display:none">
+      <div class="web-header">
+        <div class="web-title">🌐 Website Leads</div>
+        <div class="web-badge" id="web-cnt-badge">0 leads</div>
+        <input class="tsearch" id="web-search" placeholder="Buscar..." oninput="renderWeb()" style="max-width:220px;padding:7px 12px;font-size:12px;">
+      </div>
+      <div class="web-cols">
+        <div class="web-col">
+          <div class="web-col-hd">
+            <div class="web-col-dot" style="background:#AAFF00;box-shadow:0 0 7px #AAFF0077"></div>
+            <div class="web-col-nm" style="color:#AAFF00">Por Contactar</div>
+            <div class="web-col-cnt" id="web-cnt-pending">0</div>
+          </div>
+          <div class="web-col-bd" id="web-col-pending"></div>
+        </div>
+        <div class="web-col">
+          <div class="web-col-hd">
+            <div class="web-col-dot" style="background:#60a5fa;box-shadow:0 0 7px #60a5fa77"></div>
+            <div class="web-col-nm" style="color:#60a5fa">Contactado</div>
+            <div class="web-col-cnt" id="web-cnt-done">0</div>
+          </div>
+          <div class="web-col-bd" id="web-col-done"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -404,8 +454,11 @@ function setView(v){
   curView=v;
   q('#view-kanban').style.display=v==='kanban'?'':'none';
   q('#view-list').style.display=v==='list'?'':'none';
+  q('#view-web').style.display=v==='web'?'flex':'none';
   q('#vbtn-k').classList.toggle('active',v==='kanban');
   q('#vbtn-l').classList.toggle('active',v==='list');
+  q('#vbtn-w').classList.toggle('active',v==='web');
+  if(v==='web'){renderWeb();return;}
   render();
 }
 
@@ -579,6 +632,41 @@ function openDP(id){
   q('#dp').classList.add('open');q('#dp-ov').classList.add('open');
 }
 function closeDP(){q('#dp').classList.remove('open');q('#dp-ov').classList.remove('open');editId=null;}
+
+/* WEBSITE LEADS */
+function renderWeb(){
+  const qs=(q('#web-search')?.value||'').toLowerCase();
+  const webAll=ALL.filter(a=>a.fuente==='Website');
+  const web=webAll.filter(a=>!qs||`${a.nombre} ${a.deporte} ${a.pais} ${a.email} ${a.whatsapp}`.toLowerCase().includes(qs));
+  const pending=web.filter(a=>!a.estado||a.estado==='Nuevo');
+  const done=web.filter(a=>a.estado&&a.estado!=='Nuevo');
+  q('#web-cnt-badge').textContent=webAll.length+' leads';
+  q('#web-cnt-pending').textContent=pending.length;
+  q('#web-cnt-done').textContent=done.length;
+  q('#web-col-pending').innerHTML=pending.length?pending.map(a=>mkWebCard(a,false)).join(''):'<div style="text-align:center;color:var(--m);font-size:11px;padding:24px">Sin leads pendientes 🎉</div>';
+  q('#web-col-done').innerHTML=done.length?done.map(a=>mkWebCard(a,true)).join(''):'<div style="text-align:center;color:var(--m);font-size:11px;padding:24px">—</div>';
+}
+function mkWebCard(a,isDone){
+  const sport=a.deporte?`<span class="tag tag-rec">${esc(a.deporte)}</span>`:'';
+  const pais=a.pais?`<span class="tag tag-pais">${esc(a.pais)}</span>`:'';
+  const estado=a.estado&&a.estado!=='Nuevo'?`<span class="tag" style="background:rgba(96,165,250,0.1);color:var(--blue);border:1px solid rgba(96,165,250,0.2)">${esc(a.estado)}</span>`:'';
+  const btnLabel=isDone?'↩ Marcar pendiente':'✓ Marcar como contactado';
+  const btnClass=isDone?'done':'pending';
+  return `<div class="web-card" onclick="openDP(${a.id})">
+    <div class="web-card-nm">${esc(a.nombre)}</div>
+    <div class="web-card-meta">${sport}${pais}${estado}
+      ${a.whatsapp?`<span class="tag" style="background:rgba(29,185,84,0.1);color:#1DB954;border:1px solid rgba(29,185,84,0.2)">📱 ${esc(a.whatsapp)}</span>`:''}
+      ${a.email?`<span class="tag" style="background:rgba(255,255,255,0.05);color:var(--m3);border:1px solid var(--b)">${esc(a.email)}</span>`:''}
+    </div>
+    <button class="web-card-contact ${btnClass}" onclick="event.stopPropagation();toggleContactado(${a.id},${isDone})">${btnLabel}</button>
+  </div>`;
+}
+async function toggleContactado(id,isDone){
+  const ne=isDone?'Nuevo':'Contactado';
+  const {error}=await sb.from('leads').update({estado:ne}).eq('id',id);
+  if(!error){const a=ALL.find(x=>x.id===id);if(a)a.estado=ne;renderWeb();toast(isDone?'Marcado como pendiente':'¡Contactado! ✓','ok');}
+  else toast('Error','err');
+}
 function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').classList.toggle('open');}
 
 async function updateEst(id,ne){
