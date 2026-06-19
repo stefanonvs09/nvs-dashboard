@@ -183,8 +183,6 @@ textarea.fi{resize:vertical;min-height:70px;}
   .overlay{align-items:flex-end;padding:0;}
   .mobile-nav{display:flex!important;}
   .view-tabs{display:none;}
-  .calc-fab{bottom:90px;right:14px;width:42px;height:42px;font-size:18px;}
-  .calc-panel{bottom:142px;right:14px;width:220px;}
 }
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--border);padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:100;justify-content:space-around;}
 .mn-i{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:9px;font-family:'Montserrat',sans-serif;font-weight:700;text-transform:uppercase;cursor:pointer;padding:0 10px;-webkit-tap-highlight-color:transparent;}
@@ -208,9 +206,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     </button>
     <button class="sb-item" id="snav-tabla" onclick="setView('tabla')">
       <span class="ic">📊</span> Tabla
-    </button>
-    <button class="sb-item" id="snav-recordatorio" onclick="setView('recordatorio')">
-      <span class="ic">🔔</span> Recordatorio <span id="rem-badge-count" style="display:none;background:var(--amber);color:#000;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-left:auto;"></span>
     </button>
   </div>
   <hr class="sb-div">
@@ -240,7 +235,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     <div class="view-tabs">
       <button class="vtab active" id="tab-pipeline" onclick="setView('pipeline')">⚡ Pipeline</button>
       <button class="vtab" id="tab-tabla" onclick="setView('tabla')">📊 Tabla</button>
-      <button class="vtab" id="tab-recordatorio" onclick="setView('recordatorio')">🔔 Recordatorio</button>
     </div>
     <input class="tb-search" id="f-q" placeholder="🔍  Buscar atleta, deporte, universidad…" oninput="applyFilters()">
     <a href="index.html" class="btn-ghost">⌂</a>
@@ -290,12 +284,6 @@ textarea.fi{resize:vertical;min-height:70px;}
       </div>
     </div>
 
-    <!-- RECORDATORIO -->
-    <div id="view-recordatorio" style="display:none">
-      <div id="rem-banner-wrap"></div>
-      <div id="rem-section-monthly"></div>
-      <div id="rem-section-abono"></div>
-    </div>
   </div>
 </div>
 
@@ -488,10 +476,6 @@ textarea.fi{resize:vertical;min-height:70px;}
     Tabla
   </button>
   <button class="mn-fab mn-i" onclick="openAdd()">+</button>
-  <button class="mn-i" id="mn-recordatorio" onclick="setView('recordatorio')">
-    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Cobros
-  </button>
 </nav>
 
 <script>
@@ -569,7 +553,6 @@ async function loadData(){
   populateSports();
   populateClasses();
   applyFilters();
-  loadAtletasRem();
 }
 
 /* SPORTS FILTER */
@@ -764,167 +747,13 @@ function cellVal(k,a){
 /* VIEWS */
 function setView(v){
   curView=v;
-  ['pipeline','tabla','recordatorio'].forEach(t=>{
+  ['pipeline','tabla'].forEach(t=>{
     document.getElementById('view-'+t).style.display=t===v?'':'none';
     document.getElementById('tab-'+t)?.classList.toggle('active',t===v);
     document.getElementById('snav-'+t)?.classList.toggle('active',t===v);
     document.getElementById('mn-'+t)?.classList.toggle('active',t===v);
   });
-  if(v==='recordatorio') renderRecordatorio();
-  else applyFilters();
-}
-
-/* RECORDATORIO — atletas con pago mensual/abono */
-let atletasRem = [];
-let pagosEsteMes = new Set(); // nombres que ya pagaron este mes
-
-function curMes(){
-  const n=new Date();
-  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
-}
-
-async function loadAtletasRem(){
-  const [resAtletas, resPagos] = await Promise.all([
-    _sb.from('atletas')
-      .select('nombre,deporte,tipo_pago,pago,total,pagos_hechos,estado,whatsapp,referido')
-      .in('tipo_pago',['MONTHLY','ABONO + MENSUALIDAD'])
-      .eq('estado','Activo')
-      .order('nombre'),
-    _sb.from('pagos_mensuales')
-      .select('atleta_nombre')
-      .eq('mes', curMes())
-  ]);
-  atletasRem = resAtletas.data||[];
-  pagosEsteMes = new Set((resPagos.data||[]).map(p=>p.atleta_nombre));
-  // badge: muestra pendientes
-  const pendientes = atletasRem.filter(a=>!pagosEsteMes.has(a.nombre)).length;
-  const badge = document.getElementById('rem-badge-count');
-  if(pendientes>0){badge.textContent=pendientes+' pendientes';badge.style.display='inline';}
-  else badge.style.display='none';
-}
-
-async function togglePago(nombre){
-  const mes = curMes();
-  if(pagosEsteMes.has(nombre)){
-    await _sb.from('pagos_mensuales').delete().eq('atleta_nombre',nombre).eq('mes',mes);
-    pagosEsteMes.delete(nombre);
-  } else {
-    await _sb.from('pagos_mensuales').insert({atleta_nombre:nombre, mes});
-    pagosEsteMes.add(nombre);
-  }
-  // badge update
-  const pendientes = atletasRem.filter(a=>!pagosEsteMes.has(a.nombre)).length;
-  const badge = document.getElementById('rem-badge-count');
-  if(pendientes>0){badge.textContent=pendientes+' pendientes';badge.style.display='inline';}
-  else badge.style.display='none';
-  renderRecordatorio();
-}
-
-function renderRecordatorio(){
-  const now = new Date();
-  const day = now.getDate();
-  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-  // Calcular días hasta el próximo 15
-  let daysTo15;
-  if(day <= 15) daysTo15 = 15 - day;
-  else {
-    const next15 = new Date(now.getFullYear(), now.getMonth()+1, 15);
-    daysTo15 = Math.round((next15 - now)/(1000*60*60*24));
-  }
-
-  // Banner
-  let bannerCls, bannerIcon, bannerTitle, bannerSub;
-  if(daysTo15 === 0){
-    bannerCls='today'; bannerIcon='🟢';
-    bannerTitle='HOY ES DÍA 15 — COBROS PENDIENTES';
-    bannerSub=`${atletasRem.length} atletas con pago mensual/abono vencen hoy`;
-  } else if(daysTo15 <= 3){
-    bannerCls='soon'; bannerIcon='⚠️';
-    bannerTitle=`EN ${daysTo15} DÍA${daysTo15>1?'S':''} ES EL DÍA 15`;
-    bannerSub=`${atletasRem.length} atletas pendientes de cobro`;
-  } else {
-    bannerCls='normal'; bannerIcon='🔔';
-    bannerTitle=`PRÓXIMO COBRO: 15 DE ${monthNames[daysTo15<=15?now.getMonth():(now.getMonth()+1)%12].toUpperCase()}`;
-    bannerSub=`${daysTo15} días · ${atletasRem.length} atletas en plan mensual/abono`;
-  }
-
-  document.getElementById('rem-banner-wrap').innerHTML=`
-    <div class="rem-banner ${bannerCls}">
-      <span class="rem-icon">${bannerIcon}</span>
-      <div><div class="rem-title">${bannerTitle}</div><div class="rem-sub">${bannerSub}</div></div>
-    </div>`;
-
-  const mesLabel = monthNames[now.getMonth()] + ' ' + now.getFullYear();
-  const fmtAmt = n => n ? '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0}) : '—';
-
-  const mkCards = list => {
-    // unpaid first, then paid
-    const sorted = [...list].sort((a,b)=>{
-      const ap=pagosEsteMes.has(a.nombre), bp=pagosEsteMes.has(b.nombre);
-      if(ap!==bp) return ap?1:-1;
-      return (a.nombre||'').localeCompare(b.nombre||'');
-    });
-    return sorted.map(a=>{
-      const ini = (a.nombre||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
-      const tipoCls = a.tipo_pago==='MONTHLY'?'monthly':'abono';
-      const tipoLabel = a.tipo_pago==='MONTHLY'?'Monthly':'Abono + Mensualidad';
-      const waNum = (a.whatsapp||'').replace(/\D/g,'');
-      const waLink = waNum ? `https://wa.me/${waNum}` : '#';
-      const pagado = pagosEsteMes.has(a.nombre);
-      const cardBorder = pagado ? 'border-color:rgba(170,255,0,0.3)' : 'border-color:rgba(248,113,113,0.25)';
-      return `
-      <div class="rem-card" style="${cardBorder}">
-        <div class="rem-top">
-          <div class="rem-av" style="${pagado?'background:linear-gradient(135deg,#AAFF00,#6aaa00)':'background:linear-gradient(135deg,#f87171,#dc2626)'}">${ini}</div>
-          <div style="flex:1">
-            <div class="rem-name">${esc(a.nombre)}</div>
-            <div class="rem-sport">${esc(a.deporte||'—')}</div>
-          </div>
-          <div style="font-size:20px">${pagado?'✅':'❌'}</div>
-        </div>
-        <div class="rem-badges">
-          <span class="rem-badge ${tipoCls}">${tipoLabel}</span>
-          ${pagado
-            ? `<span class="rem-badge activo">Pagó ${mesLabel}</span>`
-            : `<span class="rem-badge" style="background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.25)">Pendiente ${mesLabel}</span>`}
-        </div>
-        <div class="rem-pay">
-          <span class="rem-pay-lbl">Cuota mensual</span>
-          <span class="rem-pay-val">${fmtAmt(a.pago)}</span>
-        </div>
-        <div class="rem-pay" style="margin-top:-4px">
-          <span class="rem-pay-lbl">Pagos realizados</span>
-          <span class="rem-pay-val" style="color:var(--muted);font-size:11px">${esc(a.pagos_hechos||'—')}</span>
-        </div>
-        <div class="rem-footer">
-          ${waNum ? `<a class="btn-wa" href="${waLink}" target="_blank">💬 WhatsApp</a>` : '<span style="color:var(--muted);font-size:11px">Sin WhatsApp</span>'}
-          <button onclick="togglePago('${esc(a.nombre)}')" style="
-            border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;
-            background:${pagado?'rgba(248,113,113,0.15)':'rgba(170,255,0,0.15)'};
-            color:${pagado?'var(--red)':'var(--green)'};
-            border:1px solid ${pagado?'rgba(248,113,113,0.3)':'rgba(170,255,0,0.3)'};
-          ">${pagado?'↩ Quitar pago':'✓ Marcar pagado'}</button>
-        </div>
-      </div>`;
-    }).join('');
-  };
-
-  const monthly = atletasRem.filter(a=>a.tipo_pago==='MONTHLY');
-  const abono   = atletasRem.filter(a=>a.tipo_pago==='ABONO + MENSUALIDAD');
-
-  const secM = document.getElementById('rem-section-monthly');
-  secM.innerHTML = monthly.length
-    ? `<div class="rem-section-title">📅 Plan Monthly (${monthly.length})</div><div class="rem-grid">${mkCards(monthly)}</div>`
-    : '';
-
-  const secA = document.getElementById('rem-section-abono');
-  secA.innerHTML = abono.length
-    ? `<div class="rem-section-title">📋 Abono + Mensualidad (${abono.length})</div><div class="rem-grid">${mkCards(abono)}</div>`
-    : '';
-
-  if(!atletasRem.length)
-    secM.innerHTML='<div class="rem-empty">No hay atletas activos con plan mensual o abono.</div>';
+  applyFilters();
 }
 
 /* EDIT MODAL */
@@ -1254,93 +1083,5 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
-<!-- CALCULADORA FLOTANTE -->
-<style>
-.calc-fab{position:fixed;bottom:24px;right:24px;width:48px;height:48px;background:var(--card2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:200;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.5);}
-.calc-fab:hover{background:var(--card3);border-color:#444;transform:scale(1.08);}
-.calc-panel{position:fixed;bottom:82px;right:24px;width:240px;background:#161616;border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.7);z-index:199;overflow:hidden;display:none;}
-.calc-panel.open{display:block;animation:calcIn .18s ease;}
-@keyframes calcIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-.calc-screen{padding:12px 14px 8px;text-align:right;}
-.calc-expr{font-size:11px;color:var(--muted);min-height:16px;word-break:break-all;}
-.calc-val{font-family:'Anton',sans-serif;font-size:30px;color:#fff;word-break:break-all;line-height:1.1;}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
-.calc-btn{background:#1a1a1a;border:none;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;padding:14px 0;cursor:pointer;transition:background .1s;text-align:center;}
-.calc-btn:hover{background:#252525;}
-.calc-btn.op{color:var(--amber);}
-.calc-btn.eq{background:var(--green);color:#000;}
-.calc-btn.eq:hover{background:var(--green-dk);}
-.calc-btn.clr{color:var(--red);}
-.calc-btn.zero{grid-column:span 2;}
-</style>
-
-<button class="calc-fab" onclick="toggleCalc()" title="Calculadora">🧮</button>
-<div class="calc-panel" id="calc-panel">
-  <div class="calc-screen">
-    <div class="calc-expr" id="calc-expr"></div>
-    <div class="calc-val" id="calc-val">0</div>
-  </div>
-  <div class="calc-grid">
-    <button class="calc-btn clr" onclick="calcAC()">AC</button>
-    <button class="calc-btn op" onclick="calcSign()">+/-</button>
-    <button class="calc-btn op" onclick="calcPct()">%</button>
-    <button class="calc-btn op" onclick="calcOp('/')">÷</button>
-    <button class="calc-btn" onclick="calcNum('7')">7</button>
-    <button class="calc-btn" onclick="calcNum('8')">8</button>
-    <button class="calc-btn" onclick="calcNum('9')">9</button>
-    <button class="calc-btn op" onclick="calcOp('*')">×</button>
-    <button class="calc-btn" onclick="calcNum('4')">4</button>
-    <button class="calc-btn" onclick="calcNum('5')">5</button>
-    <button class="calc-btn" onclick="calcNum('6')">6</button>
-    <button class="calc-btn op" onclick="calcOp('-')">−</button>
-    <button class="calc-btn" onclick="calcNum('1')">1</button>
-    <button class="calc-btn" onclick="calcNum('2')">2</button>
-    <button class="calc-btn" onclick="calcNum('3')">3</button>
-    <button class="calc-btn op" onclick="calcOp('+')">+</button>
-    <button class="calc-btn zero" onclick="calcNum('0')">0</button>
-    <button class="calc-btn" onclick="calcDot()">.</button>
-    <button class="calc-btn eq" onclick="calcEq()">=</button>
-  </div>
-</div>
-
-<script>
-(function(){
-  let cur='0', prev='', op=null, fresh=false;
-  function upd(){
-    document.getElementById('calc-val').textContent=cur;
-    document.getElementById('calc-expr').textContent=prev&&op?prev+' '+opSym(op):'';
-  }
-  function opSym(o){return o==='/'?'÷':o==='*'?'×':o;}
-  window.toggleCalc=()=>document.getElementById('calc-panel').classList.toggle('open');
-  window.calcNum=d=>{
-    if(cur==='0'||fresh){cur=d;fresh=false;}
-    else if(cur.length<12) cur+=d;
-    upd();
-  };
-  window.calcDot=()=>{
-    if(fresh){cur='0.';fresh=false;}
-    else if(!cur.includes('.')) cur+='.';
-    upd();
-  };
-  window.calcOp=o=>{
-    if(op&&!fresh) calcEq();
-    prev=cur; op=o; fresh=true; upd();
-  };
-  window.calcEq=()=>{
-    if(!op||!prev) return;
-    const a=parseFloat(prev), b=parseFloat(cur);
-    let r;
-    switch(op){
-      case '+': r=a+b; break; case '-': r=a-b; break;
-      case '*': r=a*b; break; case '/': r=b===0?'Error':a/b; break;
-    }
-    cur=r==='Error'?'Error':String(parseFloat(r.toFixed(8)));
-    prev=''; op=null; fresh=true; upd();
-  };
-  window.calcAC=()=>{cur='0';prev='';op=null;fresh=false;upd();};
-  window.calcSign=()=>{if(cur!=='0')cur=String(-parseFloat(cur));upd();};
-  window.calcPct=()=>{cur=String(parseFloat(cur)/100);upd();};
-})();
-</script>
 </body>
 </html>
