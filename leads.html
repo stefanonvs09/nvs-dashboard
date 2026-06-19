@@ -194,6 +194,9 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .web-card-contact.done{background:rgba(255,255,255,0.05);color:var(--m2);border:1px solid var(--b);}
 .web-card-contact.done:hover{background:rgba(248,113,113,0.1);color:var(--red);border-color:rgba(248,113,113,0.2);}
 
+.assign-btn{background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:10px;padding:11px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;color:var(--m3);cursor:pointer;transition:all .15s;}
+.assign-btn:hover{background:rgba(170,255,0,0.1);border-color:rgba(170,255,0,0.3);color:var(--green);}
+
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(18,18,18,0.96);backdrop-filter:blur(14px);border:1px solid var(--b2);border-radius:12px;padding:10px 22px;font-size:12px;font-weight:700;z-index:999;transition:transform .28s cubic-bezier(.34,1.5,.64,1);white-space:nowrap;box-shadow:0 16px 40px rgba(0,0,0,.55);}
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -337,6 +340,24 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 <!-- SIDEBAR OVERLAY (mobile) -->
 <div class="sb-ov" id="sb-ov" onclick="toggleSidebar()"></div>
 
+<!-- ASSIGN TO RECRUITER MODAL -->
+<div id="assign-ov" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeAssign()">
+  <div style="background:#111;border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:28px 26px;min-width:290px;max-width:340px;width:90%">
+    <div style="font-family:'Anton',sans-serif;font-size:19px;margin-bottom:4px">Asignar al Pipeline</div>
+    <div style="font-size:12px;color:var(--m2);margin-bottom:20px">Lead: <strong id="assign-nm" style="color:var(--m3)"></strong></div>
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--m);margin-bottom:10px">Selecciona el recruiter</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="assign-grid">
+      <button class="assign-btn" onclick="doAssign('Andy')">👤 Andy</button>
+      <button class="assign-btn" onclick="doAssign('Ariel')">👤 Ariel</button>
+      <button class="assign-btn" onclick="doAssign('Floyd')">👤 Floyd</button>
+      <button class="assign-btn" onclick="doAssign('Julio')">👤 Julio</button>
+      <button class="assign-btn" onclick="doAssign('Marketing')">👤 Marketing</button>
+      <button class="assign-btn" onclick="doAssign('Stefano')">👤 Stefano</button>
+    </div>
+    <button onclick="closeAssign()" style="width:100%;margin-top:14px;padding:10px;background:transparent;border:1px solid var(--b);border-radius:10px;color:var(--m);font-size:11px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif">Cancelar</button>
+  </div>
+</div>
+
 <!-- DETAIL PANEL -->
 <div class="dp-ov" id="dp-ov" onclick="closeDP()"></div>
 <div class="dp" id="dp"></div>
@@ -477,6 +498,8 @@ function applyFilters(){
   const src=q('#f-src')?.value||'';
   const pa=q('#f-pais')?.value||'';
   FLT=ALL.filter(a=>{
+    // Website leads sin recruiter = solo visibles en tab 🌐, no en pipeline principal
+    if(a.fuente==='Website'&&!(a.recruiter||'').trim())return false;
     if(SF&&a.estado!==SF)return false;
     if(recFilter&&a.recruiter!==recFilter)return false;
     if(sp&&a.deporte!==sp)return false;
@@ -649,16 +672,20 @@ function renderWeb(){
 function mkWebCard(a,isDone){
   const sport=a.deporte?`<span class="tag tag-rec">${esc(a.deporte)}</span>`:'';
   const pais=a.pais?`<span class="tag tag-pais">${esc(a.pais)}</span>`:'';
-  const estado=a.estado&&a.estado!=='Nuevo'?`<span class="tag" style="background:rgba(96,165,250,0.1);color:var(--blue);border:1px solid rgba(96,165,250,0.2)">${esc(a.estado)}</span>`:'';
+  const inPipeline=isDone&&(a.recruiter||'').trim();
   const btnLabel=isDone?'↩ Marcar pendiente':'✓ Marcar como contactado';
   const btnClass=isDone?'done':'pending';
-  return `<div class="web-card" onclick="openDP(${a.id})">
-    <div class="web-card-nm">${esc(a.nombre)}</div>
-    <div class="web-card-meta">${sport}${pais}${estado}
+  return `<div class="web-card${inPipeline?' web-card-pipeline':''}" onclick="openDP(${a.id})">
+    <div class="web-card-nm">${esc(a.nombre)}${inPipeline?` <span style="font-size:9px;color:var(--green);font-weight:700">● Pipeline</span>`:''}</div>
+    <div class="web-card-meta">${sport}${pais}
       ${a.whatsapp?`<span class="tag" style="background:rgba(29,185,84,0.1);color:#1DB954;border:1px solid rgba(29,185,84,0.2)">📱 ${esc(a.whatsapp)}</span>`:''}
       ${a.email?`<span class="tag" style="background:rgba(255,255,255,0.05);color:var(--m3);border:1px solid var(--b)">${esc(a.email)}</span>`:''}
     </div>
-    <button class="web-card-contact ${btnClass}" onclick="event.stopPropagation();toggleContactado(${a.id},${isDone})">${btnLabel}</button>
+    <div style="display:flex;gap:6px">
+      <button class="web-card-contact ${btnClass}" style="flex:1" onclick="event.stopPropagation();toggleContactado(${a.id},${isDone})">${btnLabel}</button>
+      ${isDone&&!inPipeline?`<button class="web-card-contact pending" style="flex:1.4;background:rgba(170,255,0,0.12);color:var(--green);border-color:rgba(170,255,0,0.25)" onclick="event.stopPropagation();openAssign(${a.id})">→ Asignar al Pipeline</button>`:''}
+      ${inPipeline?`<span style="font-size:9px;color:var(--m2);align-self:center;white-space:nowrap">👤 ${esc(a.recruiter)}</span>`:''}
+    </div>
   </div>`;
 }
 async function toggleContactado(id,isDone){
@@ -666,6 +693,27 @@ async function toggleContactado(id,isDone){
   const {error}=await sb.from('leads').update({estado:ne}).eq('id',id);
   if(!error){const a=ALL.find(x=>x.id===id);if(a)a.estado=ne;renderWeb();toast(isDone?'Marcado como pendiente':'¡Contactado! ✓','ok');}
   else toast('Error','err');
+}
+
+/* ASIGNAR AL PIPELINE */
+const RECRUITERS=['Andy','Ariel','Floyd','Julio','Marketing','Stefano'];
+let _assignId=null;
+function openAssign(id){
+  _assignId=id;
+  const a=ALL.find(x=>x.id===id);
+  q('#assign-nm').textContent=a?a.nombre:'';
+  q('#assign-ov').style.display='flex';
+}
+function closeAssign(){q('#assign-ov').style.display='none';_assignId=null;}
+async function doAssign(recruiter){
+  if(!_assignId)return;
+  const {error}=await sb.from('leads').update({recruiter,estado:'Contactado'}).eq('id',_assignId);
+  if(!error){
+    const a=ALL.find(x=>x.id===_assignId);
+    if(a){a.recruiter=recruiter;a.estado='Contactado';}
+    closeAssign();applyFilters();renderWeb();
+    toast(`✓ Asignado a ${recruiter} — ya está en el pipeline`,'ok');
+  } else toast('Error: '+error.message,'err');
 }
 function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').classList.toggle('open');}
 
