@@ -13,7 +13,7 @@
   --bg:#080808;--sb:#0b0b0b;--card:#121212;--card2:#181818;--card3:#1e1e1e;
   --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.11);
   --txt:#f0f0f0;--m:#484848;--m2:#777;--m3:#aaa;
-  --blue:#60a5fa;--amber:#fbbf24;--purple:#a78bfa;--red:#f87171;--teal:#2dd4bf;--pink:#f472b6;--orange:#fb923c;
+  --blue:#60a5fa;--amber:#fbbf24;--purple:#a78bfa;--red:#f87171;--teal:#2dd4bf;
 }
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);display:flex;}
@@ -46,7 +46,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .sb-body{flex:1;overflow-y:auto;padding:16px 12px;}
 .sb-lbl{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--m);text-transform:uppercase;padding:0 8px;margin:18px 0 8px;}
 .sb-lbl:first-child{margin-top:0;}
-.fsel{display:block;width:100%;margin-bottom:8px;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;padding:9px 11px;outline:none;cursor:pointer;transition:border .15s;}
+.fsel{display:block;width:100%;margin-bottom:8px;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;padding:9px 11px;outline:none;cursor:pointer;}
 .fsel:focus{border-color:var(--b2);}
 .sb-foot{padding:14px 18px;border-top:1px solid var(--b);}
 .sb-foot a{color:var(--m2);font-size:11px;font-weight:700;text-decoration:none;transition:color .15s;}
@@ -63,6 +63,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .view-btns{display:flex;gap:4px;}
 .vbtn{background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:13px;transition:all .15s;}
 .vbtn.active{background:var(--green-bg);border-color:rgba(170,255,0,0.25);}
+.btn-add{background:var(--green);color:#000;border:none;border-radius:10px;padding:9px 20px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s;box-shadow:0 0 22px var(--green-glow);}
+.btn-add:hover{background:var(--green-dk);box-shadow:0 0 36px rgba(170,255,0,.42);transform:translateY(-1px);}
 
 /* STATS BAR */
 .stats-bar{display:flex;border-bottom:1px solid var(--b);flex-shrink:0;}
@@ -81,16 +83,21 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .kol-hd{padding:13px 15px;display:flex;align-items:center;gap:9px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.045);background:rgba(255,255,255,0.02);}
 .kol-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .kol-nm{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;flex:1;}
-.kol-cnt{background:rgba(255,255,255,0.07);color:var(--m3);font-size:9px;font-weight:800;padding:3px 9px;border-radius:99px;letter-spacing:.3px;}
+.kol-cnt{background:rgba(255,255,255,0.07);color:var(--m3);font-size:9px;font-weight:800;padding:3px 9px;border-radius:99px;}
+.kol-add{background:none;border:none;color:var(--m2);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px;transition:all .15s;line-height:1;}
+.kol-add:hover{background:rgba(255,255,255,0.08);color:var(--txt);}
 .kol-bd{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:7px;}
 .kol-empty{display:flex;align-items:center;justify-content:center;flex:1;min-height:60px;color:var(--m);font-size:11px;font-weight:600;text-align:center;padding:16px;}
 
 /* CARDS */
-.card{background:linear-gradient(160deg,#1b1b1b 0%,#141414 100%);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:13px;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.64,1),box-shadow .22s ease,border-color .2s ease;border-top-width:2.5px;user-select:none;}
+.card{background:linear-gradient(160deg,#1b1b1b 0%,#141414 100%);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:13px;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.64,1),box-shadow .22s,border-color .2s;border-top-width:2.5px;user-select:none;position:relative;}
 .card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-4px);box-shadow:0 24px 56px rgba(0,0,0,.65);}
+.card:hover .card-edit-btn{opacity:1;}
+.card-edit-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:var(--m3);font-size:10px;font-weight:700;border-radius:7px;padding:3px 8px;cursor:pointer;opacity:0;transition:all .15s;line-height:1.4;}
+.card-edit-btn:hover{background:rgba(255,255,255,0.14);color:var(--txt);}
 .card-top{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
 .ava{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#000;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.55);}
-.card-nm{font-size:12px;font-weight:800;line-height:1.2;letter-spacing:-.1px;}
+.card-nm{font-size:12px;font-weight:800;line-height:1.2;letter-spacing:-.1px;padding-right:38px;}
 .card-pos{font-size:10px;color:var(--m2);margin-top:2px;font-weight:600;}
 .card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
 .tag{font-size:8px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;}
@@ -98,7 +105,6 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .tag-prog-Scholarship{background:rgba(45,212,191,0.1);color:var(--teal);border:1px solid rgba(45,212,191,0.2);}
 .tag-prog-Premium{background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.2);}
 .tag-type{background:rgba(96,165,250,0.08);color:var(--blue);border:1px solid rgba(96,165,250,0.15);}
-.tag-rec{background:rgba(167,139,250,0.08);color:var(--purple);border:1px solid rgba(167,139,250,0.15);}
 .card-ft{display:flex;align-items:center;justify-content:space-between;gap:6px;}
 .card-info{font-size:9px;color:var(--m2);display:flex;align-items:center;gap:8px;}
 .fam-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
@@ -141,11 +147,37 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .dp-univ-item.committed{color:var(--green);font-weight:700;}
 .dp-notas{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;padding:10px;outline:none;resize:vertical;min-height:80px;margin-top:8px;transition:border .15s;line-height:1.5;}
 .dp-notas:focus{border-color:rgba(255,255,255,0.15);}
+.dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;}
 .dp-ft{padding:15px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
 .dp-btn{flex:1;padding:11px;border-radius:10px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;cursor:pointer;border:none;transition:all .18s;}
 .dp-btn.p{background:var(--green);color:#000;box-shadow:0 0 18px var(--green-glow);}
 .dp-btn.p:hover{background:var(--green-dk);}
-.dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;}
+.dp-btn.e{background:rgba(96,165,250,0.1);color:var(--blue);border:1px solid rgba(96,165,250,0.2);}
+.dp-btn.e:hover{background:rgba(96,165,250,0.18);}
+.dp-btn.d{background:rgba(248,113,113,0.08);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+.dp-btn.d:hover{background:rgba(248,113,113,0.16);}
+
+/* MODAL */
+.m-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);z-index:200;display:none;}
+.m-ov.open{display:block;}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;max-width:96vw;max-height:92vh;overflow-y:auto;background:var(--sb);border:1px solid rgba(255,255,255,0.1);border-radius:20px;z-index:201;display:none;box-shadow:0 48px 96px rgba(0,0,0,.75);}
+.modal.open{display:block;}
+.m-hd{padding:20px 22px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(255,255,255,0.02);position:sticky;top:0;z-index:1;backdrop-filter:blur(10px);}
+.m-ttl{font-weight:800;font-size:15px;letter-spacing:-.2px;}
+.m-x{background:rgba(255,255,255,0.06);border:1px solid var(--b);color:var(--m2);font-size:19px;cursor:pointer;line-height:1;border-radius:8px;padding:2px 8px;transition:all .15s;}
+.m-x:hover{color:var(--txt);background:rgba(255,255,255,0.1);}
+.m-body{padding:22px;}
+.m-sec-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--m);text-transform:uppercase;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--b);}
+.m-sec-lbl:first-child{margin-top:0;}
+.mf{margin-bottom:13px;}
+.mf label{display:block;font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--m2);text-transform:uppercase;margin-bottom:5px;}
+.mf-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mf-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.m-ft{padding:14px 22px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end;background:rgba(255,255,255,0.02);position:sticky;bottom:0;backdrop-filter:blur(10px);}
+.btn-cancel{background:rgba(255,255,255,0.04);border:1px solid var(--b);color:var(--m2);border-radius:10px;padding:10px 18px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;}
+.btn-cancel:hover{background:rgba(255,255,255,0.08);color:var(--txt);}
+.btn-save{background:var(--green);color:#000;border:none;border-radius:10px;padding:10px 26px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s;box-shadow:0 0 22px var(--green-glow);}
+.btn-save:hover{background:var(--green-dk);}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(18,18,18,0.96);backdrop-filter:blur(14px);border:1px solid var(--b2);border-radius:12px;padding:10px 22px;font-size:12px;font-weight:700;z-index:999;transition:transform .28s cubic-bezier(.34,1.5,.64,1);white-space:nowrap;box-shadow:0 16px 40px rgba(0,0,0,.55);}
@@ -208,6 +240,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
         <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')" title="Kanban">⬛</button>
         <button class="vbtn" id="vbtn-l" onclick="setView('list')" title="Lista">☰</button>
       </div>
+      <button class="btn-add" onclick="openModal(null)">+ Atleta</button>
     </div>
 
     <!-- STATS -->
@@ -231,7 +264,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
         <thead>
           <tr>
             <th>Atleta</th><th>Deporte / Pos</th><th>Programa</th><th>Tipo</th>
-            <th>Budget</th><th>Start</th><th>Universidad</th><th>Recruiter</th><th>Familia</th>
+            <th>Budget</th><th>Start</th><th>Universidad</th><th>Recruiter</th><th>Familia</th><th></th>
           </tr>
         </thead>
         <tbody id="list-body"></tbody>
@@ -243,6 +276,94 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 <!-- DETAIL PANEL -->
 <div class="dp-ov" id="dp-ov" onclick="closeDP()"></div>
 <div class="dp" id="dp"></div>
+
+<!-- MODAL CREAR/EDITAR -->
+<div class="m-ov" id="m-ov" onclick="if(event.target===this)closeMod()"></div>
+<div class="modal" id="modal">
+  <div class="m-hd">
+    <span class="m-ttl" id="m-ttl">Nuevo Atleta</span>
+    <button class="m-x" onclick="closeMod()">×</button>
+  </div>
+  <div class="m-body">
+    <div class="m-sec-lbl">Información del Atleta</div>
+    <div class="mf-2">
+      <div class="mf"><label>Nombre Completo *</label><input class="fi" id="m-nombre" placeholder="Ej: Lenin Flores"></div>
+      <div class="mf"><label>Deporte</label>
+        <select class="fi" id="m-deporte">
+          <option value="">— Seleccionar —</option>
+          <option>Soccer</option><option>Basketball</option><option>Volleyball</option>
+          <option>Baseball</option><option>Flag Football</option><option>Tennis</option>
+          <option>Gymnastics</option><option>American Football</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf-3">
+      <div class="mf"><label>Posición</label><input class="fi" id="m-posicion" placeholder="ST, CDM, GK..."></div>
+      <div class="mf"><label>GPA</label><input class="fi" id="m-gpa" placeholder="3.5"></div>
+      <div class="mf"><label>Fecha de Nac.</label><input class="fi" id="m-dob" placeholder="MM/DD/YYYY"></div>
+    </div>
+    <div class="mf-2">
+      <div class="mf"><label>Equipo Actual</label><input class="fi" id="m-team" placeholder="Club / Academia"></div>
+      <div class="mf"><label>Nacionalidad</label><input class="fi" id="m-nac" placeholder="Panamá, Colombia..."></div>
+    </div>
+    <div class="mf"><label>Perfil Digital / Highlights (URL)</label><input class="fi" id="m-profile" placeholder="https://..."></div>
+
+    <div class="m-sec-lbl">Placement</div>
+    <div class="mf-3">
+      <div class="mf"><label>Commit Status</label>
+        <select class="fi" id="m-status">
+          <option>In Process</option><option>Interested Schools</option>
+          <option>Standby</option><option>Committed</option><option>Closed</option>
+        </select>
+      </div>
+      <div class="mf"><label>NVS Program</label>
+        <select class="fi" id="m-prog">
+          <option>Standard</option><option>Scholarship</option><option>Premium</option>
+        </select>
+      </div>
+      <div class="mf"><label>Tipo</label>
+        <select class="fi" id="m-tipo">
+          <option>College Placement</option><option>Transfer</option><option>Boarding School</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf-3">
+      <div class="mf"><label>Budget</label>
+        <select class="fi" id="m-budget">
+          <option value="">—</option>
+          <option>0-5K</option><option>5-10K</option><option>10-15K</option>
+          <option>15-20K</option><option>20-25K</option><option>25-30K</option><option>30K+</option>
+        </select>
+      </div>
+      <div class="mf"><label>Start Year</label><input class="fi" id="m-start" placeholder="Fall 2026"></div>
+      <div class="mf"><label>Target End Year</label><input class="fi" id="m-end" placeholder="Spring 2030"></div>
+    </div>
+    <div class="mf"><label>Major Deseada</label><input class="fi" id="m-major" placeholder="Business Administration..."></div>
+    <div class="mf"><label>Recruiter / Working With</label><input class="fi" id="m-rec" placeholder="New Vision, Julio New, Andy..."></div>
+
+    <div class="m-sec-lbl">Universidades</div>
+    <div class="mf"><label>Universidades Interesadas (una por línea)</label>
+      <textarea class="fi" id="m-univs" rows="4" placeholder="Iowa Western (NJCAA D1)&#10;Carl Sandburg (NAIA)&#10;Benedictine College (NAIA)"></textarea>
+    </div>
+    <div class="mf"><label>Universidad Comprometida</label><input class="fi" id="m-committed" placeholder="Nombre de la universidad firmada"></div>
+
+    <div class="m-sec-lbl">Relación y Notas</div>
+    <div class="mf-2">
+      <div class="mf"><label>Relación Familiar</label>
+        <select class="fi" id="m-fam">
+          <option value="">—</option>
+          <option>Excellent</option><option>Good</option><option>Mid</option><option>Bad</option>
+        </select>
+      </div>
+      <div class="mf"><label>Link Notion (APL)</label><input class="fi" id="m-notion" placeholder="https://app.notion.com/..."></div>
+    </div>
+    <div class="mf"><label>Notas</label><textarea class="fi" id="m-notas" rows="3" placeholder="Observaciones sobre el atleta o proceso..."></textarea></div>
+  </div>
+  <div class="m-ft">
+    <button class="btn-cancel" onclick="closeMod()">Cancelar</button>
+    <button class="btn-save" onclick="saveAthlete()">Guardar Atleta</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -259,15 +380,14 @@ const STAGES = [
   {k:'Closed',            c:'#f87171', label:'Closed'},
 ];
 const S2C = Object.fromEntries(STAGES.map(s=>[s.k,s.c]));
-
 const FAM_COLORS = {Excellent:'#AAFF00',Good:'#60a5fa',Mid:'#fbbf24',Bad:'#f87171'};
 const SP_EM = {Soccer:'⚽',Basketball:'🏀',Tennis:'🎾','Flag Football':'🏈',Volleyball:'🏐',Baseball:'⚾',Gymnastics:'🤸','American Football':'🏈'};
 const spIco = d => SP_EM[d]||'🏅';
 const ini   = n => (n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
 const esc   = s => (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const PROG_COLORS = {Standard:'rgba(255,255,255,0.7)',Scholarship:'rgba(45,212,191,0.85)',Premium:'rgba(251,191,36,0.85)'};
+const PROG_BG = {Standard:'rgba(255,255,255,0.7)',Scholarship:'rgba(45,212,191,0.85)',Premium:'rgba(251,191,36,0.85)'};
 
-let ALL=[], FLT=[], SF='', curView='kanban', openId=null;
+let ALL=[], FLT=[], SF='', curView='kanban', openId=null, editId=null;
 
 /* AUTH */
 async function init(){
@@ -287,18 +407,21 @@ async function loadData(){
   ALL=data||[];
   buildFilters();
   applyFilters();
+  if(openId){
+    const a=ALL.find(x=>x.id===openId);
+    if(a) renderDP(a);
+  }
 }
 
 function buildFilters(){
-  const opts = (arr, sel) => {
-    const el = q(sel); if(!el) return;
-    const cur = el.value;
-    const first = el.options[0].outerHTML;
-    el.innerHTML = first + [...new Set(arr.filter(Boolean))].sort().map(v=>`<option${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+  const opts=(arr,sel)=>{
+    const el=q(sel);if(!el)return;
+    const cur=el.value, first=el.options[0].outerHTML;
+    el.innerHTML=first+[...new Set(arr.filter(Boolean))].sort().map(v=>`<option${v===cur?' selected':''}>${esc(v)}</option>`).join('');
   };
-  opts(ALL.map(a=>a.deporte), '#f-sport');
-  opts(ALL.map(a=>a.start_year), '#f-year');
-  opts(ALL.map(a=>a.working_with).flatMap(w=>(w||'').split(',').map(s=>s.trim())), '#f-rec');
+  opts(ALL.map(a=>a.deporte),'#f-sport');
+  opts(ALL.map(a=>a.start_year),'#f-year');
+  opts(ALL.map(a=>a.working_with).flatMap(w=>(w||'').split(',').map(s=>s.trim())),'#f-rec');
 }
 
 /* VIEW */
@@ -319,33 +442,26 @@ function sfClick(k){
   if(map[SF]) q('#'+map[SF])?.classList.add('sf');
   applyFilters();
 }
-
 function applyFilters(){
-  const qs  = (q('#search')?.value||'').toLowerCase();
-  const sp  = q('#f-sport')?.value||'';
-  const pg  = q('#f-prog')?.value||'';
-  const tp  = q('#f-type')?.value||'';
-  const yr  = q('#f-year')?.value||'';
-  const rec = q('#f-rec')?.value||'';
-  const fam = q('#f-fam')?.value||'';
-
+  const qs=q('#search')?.value.toLowerCase()||'';
+  const sp=q('#f-sport')?.value||'', pg=q('#f-prog')?.value||'';
+  const tp=q('#f-type')?.value||'', yr=q('#f-year')?.value||'';
+  const rec=q('#f-rec')?.value||'', fam=q('#f-fam')?.value||'';
   FLT=ALL.filter(a=>{
-    if(SF && a.commit_status!==SF) return false;
-    if(sp  && a.deporte!==sp) return false;
-    if(pg  && a.nvs_program!==pg) return false;
-    if(tp  && a.tipo!==tp) return false;
-    if(yr  && a.start_year!==yr) return false;
-    if(rec && !(a.working_with||'').includes(rec)) return false;
-    if(fam && a.family_status!==fam) return false;
-    if(qs  && !`${a.nombre} ${a.deporte} ${a.posicion} ${a.committed_university} ${a.universities_interested} ${a.notas} ${a.current_team}`.toLowerCase().includes(qs)) return false;
+    if(SF&&a.commit_status!==SF)return false;
+    if(sp&&a.deporte!==sp)return false;
+    if(pg&&a.nvs_program!==pg)return false;
+    if(tp&&a.tipo!==tp)return false;
+    if(yr&&a.start_year!==yr)return false;
+    if(rec&&!(a.working_with||'').includes(rec))return false;
+    if(fam&&a.family_status!==fam)return false;
+    if(qs&&!`${a.nombre} ${a.deporte} ${a.posicion} ${a.committed_university} ${a.universities_interested} ${a.notas} ${a.current_team}`.toLowerCase().includes(qs))return false;
     return true;
   });
-  renderStats();
-  render();
+  renderStats();render();
   q('#cnt').textContent=`${FLT.length} atleta${FLT.length!==1?'s':''}`;
 }
 
-/* STATS */
 function renderStats(){
   const cn=k=>ALL.filter(a=>a.commit_status===k).length;
   q('#st-tot').textContent=ALL.length;
@@ -367,6 +483,7 @@ function renderKanban(){
         <div class="kol-dot" style="background:${st.c};box-shadow:0 0 8px ${st.c}66"></div>
         <div class="kol-nm" style="color:${st.c}">${st.label}</div>
         <div class="kol-cnt">${cards.length}</div>
+        <button class="kol-add" title="Agregar en ${st.label}" onclick="openModal(null,'${st.k}')">+</button>
       </div>
       <div class="kol-bd">
         ${cards.length?cards.map(mkCard).join(''):'<div class="kol-empty">Sin atletas</div>'}
@@ -376,11 +493,12 @@ function renderKanban(){
 }
 
 function mkCard(a){
-  const col  = S2C[a.commit_status]||'#888';
-  const avBg = PROG_COLORS[a.nvs_program]||'rgba(255,255,255,0.7)';
-  const famC = FAM_COLORS[a.family_status]||'#555';
-  const progClass = 'tag-prog-'+(a.nvs_program||'Standard');
+  const col=S2C[a.commit_status]||'#888';
+  const avBg=PROG_BG[a.nvs_program]||'rgba(255,255,255,0.7)';
+  const famC=FAM_COLORS[a.family_status]||'#555';
+  const pc='tag-prog-'+(a.nvs_program||'Standard');
   return `<div class="card" style="border-top-color:${col}" onclick="openDP(${a.id})">
+    <button class="card-edit-btn" onclick="event.stopPropagation();openModal(${a.id})">✏ Editar</button>
     <div class="card-top">
       <div class="ava" style="background:${avBg}">${ini(a.nombre)}</div>
       <div style="flex:1;min-width:0">
@@ -389,15 +507,15 @@ function mkCard(a){
       </div>
     </div>
     <div class="card-meta">
-      ${a.nvs_program?`<span class="tag ${progClass}">${esc(a.nvs_program)}</span>`:''}
+      ${a.nvs_program?`<span class="tag ${pc}">${esc(a.nvs_program)}</span>`:''}
       ${a.tipo?`<span class="tag tag-type">${esc(a.tipo)}</span>`:''}
       ${a.budget?`<span class="tag" style="background:rgba(170,255,0,0.08);color:var(--green);border:1px solid rgba(170,255,0,0.15)">💰 ${esc(a.budget)}</span>`:''}
     </div>
     <div class="card-ft">
       <div class="card-info">
         <div class="fam-dot" style="background:${famC};box-shadow:0 0 5px ${famC}" title="Familia: ${a.family_status||'—'}"></div>
-        ${a.start_year?`<span style="color:var(--m3);font-size:9px">${esc(a.start_year)}</span>`:''}
-        ${a.working_with?`<span style="color:var(--purple);font-size:9px;font-weight:700">👤 ${esc(a.working_with.split(',')[0].trim())}</span>`:''}
+        ${a.start_year?`<span>${esc(a.start_year)}</span>`:''}
+        ${a.working_with?`<span style="color:var(--purple);font-weight:700">👤 ${esc(a.working_with.split(',')[0].trim())}</span>`:''}
       </div>
       ${a.digital_profile?`<a class="btn-profile" href="${esc(a.digital_profile)}" target="_blank" onclick="event.stopPropagation()">🎬 Perfil</a>`:''}
     </div>
@@ -412,33 +530,36 @@ function renderList(){
     const famC=FAM_COLORS[a.family_status]||'#555';
     return `<tr onclick="openDP(${a.id})">
       <td class="td-nm">${esc(a.nombre)}</td>
-      <td>${spIco(a.deporte)} ${esc(a.deporte)||'—'}${a.posicion?' · <span style="color:var(--m2)">'+esc(a.posicion)+'</span>':''}</td>
+      <td>${spIco(a.deporte)} ${esc(a.deporte)||'—'}${a.posicion?` · <span style="color:var(--m2)">${esc(a.posicion)}</span>`:''}</td>
       <td><span class="tag tag-prog-${a.nvs_program||'Standard'}">${esc(a.nvs_program)||'—'}</span></td>
       <td style="color:var(--m3);font-size:11px">${esc(a.tipo)||'—'}</td>
       <td style="color:var(--green);font-size:11px;font-weight:700">${esc(a.budget)||'—'}</td>
       <td style="color:var(--m3);font-size:11px">${esc(a.start_year)||'—'}</td>
-      <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.committed_university?`<span style="color:var(--green);font-weight:700">${esc(a.committed_university)}</span>`:esc(a.universities_interested||'').split('\n')[0]||'—'}</td>
+      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.committed_university?`<span style="color:var(--green);font-weight:700">${esc(a.committed_university)}</span>`:esc((a.universities_interested||'').split('\n')[0])||'—'}</td>
       <td style="color:var(--purple);font-size:11px">${esc((a.working_with||'').split(',')[0].trim())||'—'}</td>
       <td><div class="fam-dot" style="background:${famC};box-shadow:0 0 5px ${famC};margin:auto" title="${a.family_status||'—'}"></div></td>
+      <td><button class="tag" style="background:rgba(96,165,250,0.08);color:var(--blue);border:1px solid rgba(96,165,250,0.15);cursor:pointer" onclick="event.stopPropagation();openModal(${a.id})">✏ Editar</button></td>
     </tr>`;
-  }).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--m);padding:40px">Sin atletas</td></tr>';
+  }).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--m);padding:40px">Sin atletas</td></tr>';
 }
 
 /* DETAIL PANEL */
 function openDP(id){
-  const a=ALL.find(x=>x.id===id); if(!a)return;
+  const a=ALL.find(x=>x.id===id);if(!a)return;
   openId=id;
+  renderDP(a);
+  q('#dp').classList.add('open');q('#dp-ov').classList.add('open');
+}
+function renderDP(a){
   const col=S2C[a.commit_status]||'#888';
-  const avBg=PROG_COLORS[a.nvs_program]||'rgba(255,255,255,0.7)';
+  const avBg=PROG_BG[a.nvs_program]||'rgba(255,255,255,0.7)';
   const famC=FAM_COLORS[a.family_status]||'#555';
-  const progClass='tag-prog-'+(a.nvs_program||'Standard');
-
-  const univList = (a.universities_interested||'').split('\n').map(u=>u.trim()).filter(Boolean);
-  const committed = (a.committed_university||'').trim();
-
-  const univHTML = univList.length
-    ? `<div class="dp-univ-list">${univList.map(u=>`<div class="dp-univ-item${u===committed?' committed':''}">${u===committed?'✅ ':''} ${esc(u)}</div>`).join('')}</div>`
-    : (committed ? `<div class="dp-univ-list"><div class="dp-univ-item committed">✅ ${esc(committed)}</div></div>` : '<span style="color:var(--m);font-size:11px">—</span>');
+  const pc='tag-prog-'+(a.nvs_program||'Standard');
+  const univList=(a.universities_interested||'').split('\n').map(u=>u.trim()).filter(Boolean);
+  const committed=(a.committed_university||'').trim();
+  const univHTML=univList.length
+    ?`<div class="dp-univ-list">${univList.map(u=>`<div class="dp-univ-item${u===committed?' committed':''}">${u===committed?'✅ ':''} ${esc(u)}</div>`).join('')}</div>`
+    :(committed?`<div class="dp-univ-list"><div class="dp-univ-item committed">✅ ${esc(committed)}</div></div>`:'<span style="color:var(--m);font-size:11px">—</span>');
 
   q('#dp').innerHTML=`
     <div class="dp-hd">
@@ -447,9 +568,9 @@ function openDP(id){
         <div class="dp-nm">${esc(a.nombre)}</div>
         <div class="dp-sub">${spIco(a.deporte)} ${esc(a.deporte)||'—'}${a.posicion?' · '+esc(a.posicion):''}${a.nacionalidad?' · 🌎 '+esc(a.nacionalidad):''}</div>
         <div class="dp-tags">
-          <span class="tag ${progClass}">${esc(a.nvs_program)||'—'}</span>
+          <span class="tag ${pc}">${esc(a.nvs_program)||'—'}</span>
           ${a.tipo?`<span class="tag tag-type">${esc(a.tipo)}</span>`:''}
-          <span class="tag" style="background:rgba(${famC.slice(1).match(/../g).map(h=>parseInt(h,16)).join(',')},0.12);color:${famC};border:1px solid ${famC}33">❤ ${a.family_status||'—'}</span>
+          <span class="tag" style="background:rgba(255,255,255,0.04);color:${famC};border:1px solid ${famC}44">❤ ${a.family_status||'—'}</span>
         </div>
       </div>
       <button class="dp-x" onclick="closeDP()">×</button>
@@ -457,7 +578,7 @@ function openDP(id){
     <div class="dp-body">
       <div class="dp-sec">
         <div class="dp-sec-lbl">Commit Status</div>
-        <select class="dp-sel" onchange="updateStatus(${id},this.value)">
+        <select class="dp-sel" onchange="updateStatus(${a.id},this.value)">
           ${STAGES.map(s=>`<option ${a.commit_status===s.k?'selected':''}>${s.k}</option>`).join('')}
         </select>
       </div>
@@ -466,7 +587,7 @@ function openDP(id){
         <div class="dp-row"><span class="dp-rl">Budget</span><span class="dp-rv" style="color:var(--green);font-weight:800">${esc(a.budget)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Start Year</span><span class="dp-rv">${esc(a.start_year)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Target End</span><span class="dp-rv">${esc(a.target_end_year)||'—'}</span></div>
-        <div class="dp-row"><span class="dp-rl">Universidad comprometida</span><span class="dp-rv" style="color:var(--green)">${esc(committed)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Universidad</span><span class="dp-rv" style="color:var(--green)">${esc(committed)||'—'}</span></div>
       </div>
       <div class="dp-sec">
         <div class="dp-sec-lbl">Universidades Interesadas</div>
@@ -480,23 +601,24 @@ function openDP(id){
         <div class="dp-row"><span class="dp-rl">Major Deseada</span><span class="dp-rv">${esc(a.desired_major)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="color:var(--purple)">${esc(a.working_with)||'—'}</span></div>
         ${a.digital_profile?`<div class="dp-row"><span class="dp-rl">Perfil Digital</span><span class="dp-rv"><a href="${esc(a.digital_profile)}" target="_blank">🎬 Ver perfil</a></span></div>`:''}
-        ${a.notion_url?`<div class="dp-row"><span class="dp-rl">Notion</span><span class="dp-rv"><a href="${esc(a.notion_url)}" target="_blank">📎 Ver en Notion</a></span></div>`:''}
+        ${a.notion_url?`<div class="dp-row"><span class="dp-rl">Notion</span><span class="dp-rv"><a href="${esc(a.notion_url)}" target="_blank">📎 Notion</a></span></div>`:''}
       </div>
       <div class="dp-sec">
         <div class="dp-sec-lbl">Notas</div>
-        <textarea class="dp-notas" id="dp-notas-ta" onblur="saveNotas(${id})">${esc(a.notas||'')}</textarea>
+        <textarea class="dp-notas" id="dp-notas-ta" onblur="saveNotas(${a.id})">${esc(a.notas||'')}</textarea>
       </div>
     </div>
     <div class="dp-ft">
+      <button class="dp-btn e" onclick="openModal(${a.id})">✏ Editar</button>
+      <button class="dp-btn d" onclick="delAthlete(${a.id})">🗑 Eliminar</button>
       <button class="dp-btn p" onclick="closeDP()">Cerrar</button>
     </div>`;
-  q('#dp').classList.add('open');q('#dp-ov').classList.add('open');
 }
 function closeDP(){q('#dp').classList.remove('open');q('#dp-ov').classList.remove('open');openId=null;}
 
 async function updateStatus(id,ne){
   const {error}=await sb.from('placements').update({commit_status:ne}).eq('id',id);
-  if(!error){const a=ALL.find(x=>x.id===id);if(a)a.commit_status=ne;applyFilters();toast('Estado actualizado ✓','ok');}
+  if(!error){const a=ALL.find(x=>x.id===id);if(a){a.commit_status=ne;renderDP(a);}applyFilters();toast('Estado actualizado ✓','ok');}
   else toast('Error','err');
 }
 async function saveNotas(id){
@@ -504,13 +626,90 @@ async function saveNotas(id){
   await sb.from('placements').update({notas:val}).eq('id',id);
   const a=ALL.find(x=>x.id===id);if(a)a.notas=val;
 }
+async function delAthlete(id){
+  if(!confirm('¿Eliminar este atleta?'))return;
+  const {error}=await sb.from('placements').delete().eq('id',id);
+  if(!error){closeDP();await loadData();toast('Atleta eliminado','ok');}
+  else toast('Error: '+error.message,'err');
+}
+
+/* MODAL */
+function openModal(id, defaultStatus=null){
+  editId=id;
+  const a=id?ALL.find(x=>x.id===id):null;
+  q('#m-ttl').textContent=a?'Editar Atleta':'Nuevo Atleta';
+
+  // Reset / populate
+  q('#m-nombre').value   = a?.nombre||'';
+  setV('#m-deporte',     a?.deporte||'');
+  q('#m-posicion').value = a?.posicion||'';
+  q('#m-gpa').value      = a?.gpa||'';
+  q('#m-dob').value      = a?.fecha_nacimiento||'';
+  q('#m-team').value     = a?.current_team||'';
+  q('#m-nac').value      = a?.nacionalidad||'';
+  q('#m-profile').value  = a?.digital_profile||'';
+  setV('#m-status',      a?.commit_status||(defaultStatus||'In Process'));
+  setV('#m-prog',        a?.nvs_program||'Standard');
+  setV('#m-tipo',        a?.tipo||'College Placement');
+  setV('#m-budget',      a?.budget||'');
+  q('#m-start').value    = a?.start_year||'';
+  q('#m-end').value      = a?.target_end_year||'';
+  q('#m-major').value    = a?.desired_major||'';
+  q('#m-rec').value      = a?.working_with||'';
+  q('#m-univs').value    = a?.universities_interested||'';
+  q('#m-committed').value= a?.committed_university||'';
+  setV('#m-fam',         a?.family_status||'');
+  q('#m-notion').value   = a?.notion_url||'';
+  q('#m-notas').value    = a?.notas||'';
+
+  q('#m-ov').classList.add('open');q('#modal').classList.add('open');
+  setTimeout(()=>q('#m-nombre').focus(),80);
+}
+function closeMod(){q('#m-ov').classList.remove('open');q('#modal').classList.remove('open');editId=null;}
+
+async function saveAthlete(){
+  const nombre=q('#m-nombre').value.trim();
+  if(!nombre){toast('Ingresa el nombre del atleta','err');return;}
+  const payload={
+    nombre,
+    deporte:               q('#m-deporte').value,
+    posicion:              q('#m-posicion').value.trim(),
+    gpa:                   q('#m-gpa').value.trim(),
+    fecha_nacimiento:      q('#m-dob').value.trim(),
+    current_team:          q('#m-team').value.trim(),
+    nacionalidad:          q('#m-nac').value.trim(),
+    digital_profile:       q('#m-profile').value.trim(),
+    commit_status:         q('#m-status').value,
+    nvs_program:           q('#m-prog').value,
+    tipo:                  q('#m-tipo').value,
+    budget:                q('#m-budget').value,
+    start_year:            q('#m-start').value.trim(),
+    target_end_year:       q('#m-end').value.trim(),
+    desired_major:         q('#m-major').value.trim(),
+    working_with:          q('#m-rec').value.trim(),
+    universities_interested: q('#m-univs').value.trim(),
+    committed_university:  q('#m-committed').value.trim(),
+    family_status:         q('#m-fam').value,
+    notion_url:            q('#m-notion').value.trim(),
+    notas:                 q('#m-notas').value.trim(),
+  };
+  let error;
+  if(editId){({error}=await sb.from('placements').update(payload).eq('id',editId));}
+  else{({error}=await sb.from('placements').insert(payload));}
+  if(error){toast('Error: '+error.message,'err');return;}
+  closeMod();
+  await loadData();
+  if(editId) openDP(editId);
+  toast(editId?'Atleta actualizado ✓':'Atleta agregado ✓','ok');
+}
 
 /* UTIL */
-const q=s=>document.querySelector(s);
+const q   = s=>document.querySelector(s);
+const setV= (sel,v)=>{const e=q(sel);if(e)e.value=v;};
 let _toastT=null;
 function toast(msg,type='ok'){
   const el=q('#toast');el.textContent=msg;el.className='toast '+type+' show';
-  clearTimeout(_toastT);_toastT=setTimeout(()=>el.classList.remove('show'),2500);
+  clearTimeout(_toastT);_toastT=setTimeout(()=>el.classList.remove('show'),2600);
 }
 window.addEventListener('DOMContentLoaded',init);
 </script>
