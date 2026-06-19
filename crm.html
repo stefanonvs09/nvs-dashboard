@@ -9,7 +9,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --green:#8AD500;--green-dim:rgba(138,213,0,0.1);--green-dk:#6aaa00;
+  --green:#AAFF00;--green-dim:rgba(170,255,0,0.1);--green-dk:#6aaa00;
   --bg:#0a0a0a;--sb:#0f0f0f;--card:#141414;--card2:#1a1a1a;--card3:#1f1f1f;
   --border:rgba(255,255,255,0.07);--text:#fff;--muted:#666;
   --blue:#60a5fa;--amber:#fbbf24;--gray:#9ca3af;--red:#f87171;--purple:#a78bfa;
@@ -77,8 +77,8 @@ hr.sb-div{border:none;border-top:1px solid var(--border);margin:10px 10px;}
 .pl-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:grab;transition:border .15s,box-shadow .15s,opacity .15s,transform .15s;}
 .pl-card:hover{border-color:rgba(255,255,255,0.13);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
 .pl-card.dragging{opacity:0.35;cursor:grabbing;transform:rotate(1.5deg) scale(1.02);box-shadow:0 8px 28px rgba(0,0,0,.6);}
-.pl-cards.drag-over{background:rgba(138,213,0,0.05);outline:2px dashed rgba(138,213,0,0.35);outline-offset:-4px;border-radius:8px;}
-.pl-drop-ghost{height:70px;border-radius:8px;background:rgba(138,213,0,0.06);border:1.5px dashed rgba(138,213,0,0.3);flex-shrink:0;}
+.pl-cards.drag-over{background:rgba(170,255,0,0.05);outline:2px dashed rgba(170,255,0,0.35);outline-offset:-4px;border-radius:8px;}
+.pl-drop-ghost{height:70px;border-radius:8px;background:rgba(170,255,0,0.06);border:1.5px dashed rgba(170,255,0,0.3);flex-shrink:0;}
 .pc-class{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;margin-bottom:5px;line-height:1;}
 .pc-class small{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:inline;margin-right:4px;opacity:.7;}
 .pc-name{font-weight:700;font-size:12px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -91,19 +91,19 @@ hr.sb-div{border:none;border-top:1px solid var(--border);margin:10px 10px;}
 .pc-status-sel.s-ip  {border-color:rgba(96,165,250,.35);color:#60a5fa;}
 .pc-status-sel.s-int {border-color:rgba(251,191,36,.35);color:#fbbf24;}
 .pc-status-sel.s-sta {border-color:rgba(156,163,175,.25);color:#9ca3af;}
-.pc-status-sel.s-com {border-color:rgba(138,213,0,.35);color:#8AD500;}
+.pc-status-sel.s-com {border-color:rgba(170,255,0,.35);color:#AAFF00;}
 .pc-status-sel.s-cls {border-color:rgba(248,113,113,.3);color:#f87171;}
 .pc-note-area{margin-top:6px;border-top:1px solid rgba(255,255,255,0.05);padding-top:6px;cursor:text;}
 .pc-note-txt{font-size:10px;color:#555;line-height:1.35;word-break:break-word;}
 .pc-note-txt::before{content:'✎ ';opacity:.5;}
 .pc-note-empty{font-size:10px;color:#2d2d2d;font-style:italic;transition:color .15s;}
 .pc-note-area:hover .pc-note-empty{color:#444;}
-.pc-note-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(138,213,0,0.25);border-radius:6px;padding:6px 8px;color:#ccc;font-size:11px;font-family:'Montserrat',sans-serif;resize:none;outline:none;min-height:58px;line-height:1.4;}
-.pc-note-input:focus{border-color:rgba(138,213,0,0.5);}
+.pc-note-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(170,255,0,0.25);border-radius:6px;padding:6px 8px;color:#ccc;font-size:11px;font-family:'Montserrat',sans-serif;resize:none;outline:none;min-height:58px;line-height:1.4;}
+.pc-note-input:focus{border-color:rgba(170,255,0,0.5);}
 .pc-note-hint{font-size:9px;color:#333;margin-top:3px;}
 .pl-empty{text-align:center;padding:18px;color:#222;font-size:11px;}
 /* Touch drag ghost */
-#touch-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:0.85;width:210px;background:var(--card3);border:1px solid rgba(138,213,0,0.4);border-radius:9px;padding:10px 12px;box-shadow:0 12px 36px rgba(0,0,0,.7);display:none;}
+#touch-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:0.85;width:210px;background:var(--card3);border:1px solid rgba(170,255,0,0.4);border-radius:9px;padding:10px 12px;box-shadow:0 12px 36px rgba(0,0,0,.7);display:none;}
 
 /* TABLE */
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
@@ -125,15 +125,15 @@ table.dt tbody tr:hover{background:rgba(255,255,255,0.025);}
 .b-cpl  {background:rgba(59,130,246,.13);color:var(--blue);}
 .b-board{background:rgba(139,92,246,.13);color:var(--purple);}
 .b-trans{background:rgba(249,115,22,.13);color:#fb923c;}
-.b-std  {background:rgba(138,213,0,.12);color:var(--green);}
+.b-std  {background:rgba(170,255,0,.12);color:var(--green);}
 .b-prm  {background:rgba(139,92,246,.13);color:var(--purple);}
 .b-sch  {background:rgba(245,158,11,.13);color:var(--amber);}
 .b-ip   {background:rgba(59,130,246,.13);color:var(--blue);}
 .b-int  {background:rgba(245,158,11,.13);color:var(--amber);}
 .b-sta  {background:rgba(107,114,128,.13);color:var(--gray);}
-.b-com  {background:rgba(138,213,0,.13);color:var(--green);}
+.b-com  {background:rgba(170,255,0,.13);color:var(--green);}
 .b-cls  {background:rgba(239,68,68,.1);color:var(--red);}
-.b-sc   {background:rgba(138,213,0,.15);color:var(--green);}
+.b-sc   {background:rgba(170,255,0,.15);color:var(--green);}
 .b-jb   {background:rgba(59,130,246,.15);color:var(--blue);}
 .b-ac   {background:rgba(139,92,246,.15);color:var(--purple);}
 
@@ -190,7 +190,7 @@ textarea.fi{resize:vertical;min-height:70px;}
 .mn-i{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:9px;font-family:'Montserrat',sans-serif;font-weight:700;text-transform:uppercase;cursor:pointer;padding:0 10px;-webkit-tap-highlight-color:transparent;}
 .mn-i svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;}
 .mn-i.active{color:var(--green);}
-.mn-fab{background:var(--green);border-radius:50%;width:48px;height:48px;color:#0a0a0a;font-size:24px;box-shadow:0 4px 16px rgba(138,213,0,.3);padding:0;display:flex;align-items:center;justify-content:center;}
+.mn-fab{background:var(--green);border-radius:50%;width:48px;height:48px;color:#0a0a0a;font-size:24px;box-shadow:0 4px 16px rgba(170,255,0,.3);padding:0;display:flex;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
@@ -504,7 +504,7 @@ const STAGES = [
   {key:'In Process',         dot:'#60a5fa'},
   {key:'Interested Schools', dot:'#fbbf24'},
   {key:'Standby',            dot:'#9ca3af'},
-  {key:'Committed',          dot:'#8AD500'},
+  {key:'Committed',          dot:'#AAFF00'},
   {key:'Closed',             dot:'#f87171'},
 ];
 
@@ -528,7 +528,7 @@ let sortK='nombre', sortD=1, curView='pipeline';
 
 /* RECORDATORIO */
 .rem-banner{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;margin-bottom:18px;font-weight:700;font-size:14px;}
-.rem-banner.today{background:rgba(138,213,0,0.12);border:1.5px solid var(--green);color:var(--green);}
+.rem-banner.today{background:rgba(170,255,0,0.12);border:1.5px solid var(--green);color:var(--green);}
 .rem-banner.soon{background:rgba(251,191,36,0.1);border:1.5px solid var(--amber);color:var(--amber);}
 .rem-banner.normal{background:var(--card);border:1px solid var(--border);color:var(--muted);}
 .rem-banner .rem-icon{font-size:24px;flex-shrink:0;}
@@ -538,14 +538,14 @@ let sortK='nombre', sortD=1, curView='pipeline';
 .rem-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:border .15s;}
 .rem-card:hover{border-color:rgba(255,255,255,0.15);}
 .rem-top{display:flex;align-items:center;gap:10px;}
-.rem-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#8AD500,#6aaa00);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#000;flex-shrink:0;}
+.rem-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#AAFF00,#6aaa00);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#000;flex-shrink:0;}
 .rem-name{font-weight:700;font-size:13px;line-height:1.2;}
 .rem-sport{font-size:11px;color:var(--muted);margin-top:2px;}
 .rem-badges{display:flex;gap:6px;flex-wrap:wrap;}
 .rem-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.4px;text-transform:uppercase;}
 .rem-badge.monthly{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.25);}
 .rem-badge.abono{background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.25);}
-.rem-badge.activo{background:rgba(138,213,0,0.1);color:var(--green);border:1px solid rgba(138,213,0,0.2);}
+.rem-badge.activo{background:rgba(170,255,0,0.1);color:var(--green);border:1px solid rgba(170,255,0,0.2);}
 .rem-pay{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--card2);border-radius:8px;font-size:12px;}
 .rem-pay-lbl{color:var(--muted);font-weight:600;}
 .rem-pay-val{font-weight:800;color:#fff;}
@@ -872,11 +872,11 @@ function renderRecordatorio(){
       const waNum = (a.whatsapp||'').replace(/\D/g,'');
       const waLink = waNum ? `https://wa.me/${waNum}` : '#';
       const pagado = pagosEsteMes.has(a.nombre);
-      const cardBorder = pagado ? 'border-color:rgba(138,213,0,0.3)' : 'border-color:rgba(248,113,113,0.25)';
+      const cardBorder = pagado ? 'border-color:rgba(170,255,0,0.3)' : 'border-color:rgba(248,113,113,0.25)';
       return `
       <div class="rem-card" style="${cardBorder}">
         <div class="rem-top">
-          <div class="rem-av" style="${pagado?'background:linear-gradient(135deg,#8AD500,#6aaa00)':'background:linear-gradient(135deg,#f87171,#dc2626)'}">${ini}</div>
+          <div class="rem-av" style="${pagado?'background:linear-gradient(135deg,#AAFF00,#6aaa00)':'background:linear-gradient(135deg,#f87171,#dc2626)'}">${ini}</div>
           <div style="flex:1">
             <div class="rem-name">${esc(a.nombre)}</div>
             <div class="rem-sport">${esc(a.deporte||'—')}</div>
@@ -901,9 +901,9 @@ function renderRecordatorio(){
           ${waNum ? `<a class="btn-wa" href="${waLink}" target="_blank">💬 WhatsApp</a>` : '<span style="color:var(--muted);font-size:11px">Sin WhatsApp</span>'}
           <button onclick="togglePago('${esc(a.nombre)}')" style="
             border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;
-            background:${pagado?'rgba(248,113,113,0.15)':'rgba(138,213,0,0.15)'};
+            background:${pagado?'rgba(248,113,113,0.15)':'rgba(170,255,0,0.15)'};
             color:${pagado?'var(--red)':'var(--green)'};
-            border:1px solid ${pagado?'rgba(248,113,113,0.3)':'rgba(138,213,0,0.3)'};
+            border:1px solid ${pagado?'rgba(248,113,113,0.3)':'rgba(170,255,0,0.3)'};
           ">${pagado?'↩ Quitar pago':'✓ Marcar pagado'}</button>
         </div>
       </div>`;
@@ -1063,7 +1063,7 @@ function classYearBlock(sy){
   const season=m?m[1].charAt(0).toUpperCase()+m[1].slice(1).toLowerCase():'';
   const year=y[0];
   const colors={
-    '2025':'#8AD500','2026':'#8AD500',
+    '2025':'#AAFF00','2026':'#AAFF00',
     '2027':'#60a5fa',
     '2028':'#fbbf24',
     '2029':'#a78bfa',
