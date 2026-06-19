@@ -286,6 +286,30 @@ label.fl { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px
   .mnav-item span { font-size: 9.5px; }
 }
 
+/* ── RECORDATORIO ── */
+.rem-banner{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;margin-bottom:18px;font-weight:700;font-size:14px;}
+.rem-banner.today{background:rgba(138,213,0,0.12);border:1.5px solid #8AD500;color:#8AD500;}
+.rem-banner.soon{background:rgba(251,191,36,0.1);border:1.5px solid #fbbf24;color:#fbbf24;}
+.rem-banner.normal{background:var(--card);border:1px solid var(--border);color:var(--muted);}
+.rem-banner .rem-icon{font-size:24px;flex-shrink:0;}
+.rem-banner .rem-title{font-size:15px;font-family:'Anton',sans-serif;letter-spacing:.5px;}
+.rem-banner .rem-sub{font-size:12px;font-weight:500;opacity:.8;margin-top:2px;}
+.rem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;}
+.rem-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:border .15s;}
+.rem-top{display:flex;align-items:center;gap:10px;}
+.rem-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#000;flex-shrink:0;}
+.rem-name{font-weight:700;font-size:13px;color:#fff;}
+.rem-sport{font-size:11px;color:var(--muted);margin-top:2px;}
+.rem-badge-row{display:flex;gap:6px;flex-wrap:wrap;}
+.rem-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.4px;text-transform:uppercase;}
+.rem-pay-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#1a1a1a;border-radius:8px;font-size:12px;}
+.rem-pay-lbl{color:var(--muted);font-weight:600;}
+.rem-pay-val{font-weight:800;color:#fff;}
+.rem-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.rem-section-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin:16px 0 8px;}
+.btn-wa-sm{display:inline-flex;align-items:center;gap:5px;background:#25D366;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;}
+.btn-pago{border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+
 /* ── FAB CENTER BUTTON ── */
 @media (max-width: 768px) {
   .mnav-fab {
@@ -412,6 +436,10 @@ label.fl { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px
       Transacciones
     </a>
     <div class="sidebar-section">Herramientas</div>
+    <a onclick="showTab('recordatorio')" id="nav-recordatorio">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      Recordatorio <span id="nav-rem-badge" style="display:none;background:#fbbf24;color:#000;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-left:4px;"></span>
+    </a>
     <a onclick="showTab('deudores')" id="nav-deudores">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
       Deudores / Alertas
@@ -608,6 +636,13 @@ label.fl { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px
           </table>
         </div>
       </div>
+    </div>
+
+    <!-- ========== RECORDATORIO ========== -->
+    <div id="tab-recordatorio" class="tab-content">
+      <div id="fin-rem-banner"></div>
+      <div id="fin-rem-monthly"></div>
+      <div id="fin-rem-abono"></div>
     </div>
 
   </div><!-- /content -->
@@ -897,6 +932,7 @@ async function initWithSupabase() {
   if(count === 0) await migrateToSupabase();
   await Promise.all([reloadAtletasFromSB(), reloadTransFromSB()]);
   renderAll();
+  loadFinRecordatorio();
 
   // Realtime: debounced para evitar renders parciales durante sync por lotes
   let _reloadTimer = null;
@@ -1273,26 +1309,30 @@ async function init() {
 // TAB NAVIGATION
 // ================================================================
 function showTab(tab) {
-  ['dashboard','atletas','transacciones','deudores'].forEach(t => {
+  ['dashboard','atletas','transacciones','deudores','recordatorio'].forEach(t => {
     document.getElementById('tab-'+t).classList.remove('active');
-    document.getElementById('nav-'+t).classList.remove('active');
+    const nav = document.getElementById('nav-'+t);
+    if(nav) nav.classList.remove('active');
     const mn = document.getElementById('mnav-'+t);
     if(mn) mn.classList.remove('active');
   });
   document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('nav-'+tab).classList.add('active');
+  const nav = document.getElementById('nav-'+tab);
+  if(nav) nav.classList.add('active');
   const mn = document.getElementById('mnav-'+tab);
   if(mn) mn.classList.add('active');
 
-  const titles = {dashboard:'Dashboard', atletas:'Atletas', transacciones:'Transacciones', deudores:'Deudores / Alertas'};
-  const subs = {dashboard:'Resumen financiero general', atletas:'Gestión de atletas y contratos', transacciones:'Historial de ingresos y gastos', deudores:'Atletas con alertas de pago'};
-  document.getElementById('page-title').textContent = titles[tab];
-  document.getElementById('page-sub').textContent = subs[tab];
+  const titles = {dashboard:'Dashboard', atletas:'Atletas', transacciones:'Transacciones', deudores:'Deudores / Alertas', recordatorio:'Recordatorio de Cobros'};
+  const subs = {dashboard:'Resumen financiero general', atletas:'Gestión de atletas y contratos', transacciones:'Historial de ingresos y gastos', deudores:'Atletas con alertas de pago', recordatorio:'Pagos mensuales del día 15'};
+  document.getElementById('page-title').textContent = titles[tab]||tab;
+  document.getElementById('page-sub').textContent = subs[tab]||'';
 
   const btn = document.getElementById('topbar-btn');
   if(tab==='atletas'){btn.textContent='+ Nuevo Atleta';btn.onclick=()=>openAtletaModal();}
   else if(tab==='transacciones'){btn.textContent='+ Nueva Transacción';btn.onclick=()=>openTransModal();}
   else{btn.textContent='+ Agregar';btn.onclick=openAddModal;}
+
+  if(tab==='recordatorio') renderFinRemordatorio();
 }
 
 function openAddModal(){
@@ -2137,6 +2177,95 @@ window.addEventListener('resize', () => {
     renderTransTable();
   }, 200);
 });
+
+// ================================================================
+// RECORDATORIO DE COBROS DÍA 15
+// ================================================================
+let finAtletasRem = [];
+let finPagosEsteMes = new Set();
+
+function finCurMes(){
+  const n=new Date();
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+}
+
+async function loadFinRecordatorio(){
+  const mes = finCurMes();
+  const [r1,r2] = await Promise.all([
+    sb.from('atletas')
+      .select('nombre,deporte,tipo_pago,pago,total,pagos_hechos,estado,whatsapp,referido')
+      .in('tipo_pago',['MONTHLY','ABONO + MENSUALIDAD'])
+      .eq('estado','Activo')
+      .order('nombre'),
+    sb.from('pagos_mensuales').select('atleta_nombre').eq('mes',mes)
+  ]);
+  finAtletasRem = r1.data||[];
+  finPagosEsteMes = new Set((r2.data||[]).map(p=>p.atleta_nombre));
+  const pend = finAtletasRem.filter(a=>!finPagosEsteMes.has(a.nombre)).length;
+  const badge = document.getElementById('nav-rem-badge');
+  if(badge){ badge.textContent=pend>0?pend+' pend.':''; badge.style.display=pend>0?'inline':'none'; }
+}
+
+async function finTogglePago(nombre){
+  const mes = finCurMes();
+  if(finPagosEsteMes.has(nombre)){
+    await sb.from('pagos_mensuales').delete().eq('atleta_nombre',nombre).eq('mes',mes);
+    finPagosEsteMes.delete(nombre);
+  } else {
+    await sb.from('pagos_mensuales').insert({atleta_nombre:nombre, mes});
+    finPagosEsteMes.add(nombre);
+  }
+  const pend = finAtletasRem.filter(a=>!finPagosEsteMes.has(a.nombre)).length;
+  const badge = document.getElementById('nav-rem-badge');
+  if(badge){ badge.textContent=pend>0?pend+' pend.':''; badge.style.display=pend>0?'inline':'none'; }
+  renderFinRemordatorio();
+}
+
+function renderFinRemordatorio(){
+  if(!finAtletasRem.length){ loadFinRecordatorio().then(renderFinRemordatorio); return; }
+  const now=new Date(), day=now.getDate();
+  const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  let daysTo15 = day<=15 ? 15-day : Math.round((new Date(now.getFullYear(),now.getMonth()+1,15)-now)/86400000);
+  const mesLabel = MESES[now.getMonth()]+' '+now.getFullYear();
+
+  let bCls,bIcon,bTitle,bSub;
+  if(daysTo15===0){bCls='today';bIcon='🟢';bTitle='HOY ES DÍA 15 — COBROS PENDIENTES';bSub=finAtletasRem.filter(a=>!finPagosEsteMes.has(a.nombre)).length+' atletas pendientes de pago hoy';}
+  else if(daysTo15<=3){bCls='soon';bIcon='⚠️';bTitle=`EN ${daysTo15} DÍA${daysTo15>1?'S':''} ES EL DÍA 15`;bSub='Prepara los cobros mensuales';}
+  else{bCls='normal';bIcon='🔔';bTitle=`PRÓXIMO COBRO — 15 DE ${MESES[day<=15?now.getMonth():(now.getMonth()+1)%12].toUpperCase()}`;bSub=`${daysTo15} días · ${finAtletasRem.length} atletas en plan mensual`;}
+
+  document.getElementById('fin-rem-banner').innerHTML=`<div class="rem-banner ${bCls}"><span class="rem-icon">${bIcon}</span><div><div class="rem-title">${bTitle}</div><div class="rem-sub">${bSub}</div></div></div>`;
+
+  const fmt=n=>n?'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0}):'—';
+  const mkCards=list=>[...list].sort((a,b)=>{const ap=finPagosEsteMes.has(a.nombre),bp=finPagosEsteMes.has(b.nombre);return ap!==bp?ap?1:-1:(a.nombre||'').localeCompare(b.nombre||'');}).map(a=>{
+    const ini=(a.nombre||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+    const pagado=finPagosEsteMes.has(a.nombre);
+    const waNum=(a.whatsapp||'').replace(/\D/g,'');
+    const safeNombre=a.nombre.replace(/'/g,"\\'");
+    return `<div class="rem-card" style="border-color:${pagado?'rgba(138,213,0,0.3)':'rgba(248,113,113,0.25)'}">
+      <div class="rem-top">
+        <div class="rem-av" style="background:${pagado?'linear-gradient(135deg,#8AD500,#6aaa00)':'linear-gradient(135deg,#f87171,#dc2626)'}">${ini}</div>
+        <div style="flex:1"><div class="rem-name">${a.nombre}</div><div class="rem-sport">${a.deporte||'—'}</div></div>
+        <div style="font-size:20px">${pagado?'✅':'❌'}</div>
+      </div>
+      <div class="rem-badge-row">
+        <span class="rem-badge" style="background:rgba(96,165,250,0.12);color:#60a5fa;border:1px solid rgba(96,165,250,0.25)">${a.tipo_pago}</span>
+        <span class="rem-badge" style="${pagado?'background:rgba(138,213,0,0.1);color:#8AD500;border:1px solid rgba(138,213,0,0.2)':'background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.25)'}">${pagado?'Pagó '+mesLabel:'Pendiente '+mesLabel}</span>
+      </div>
+      <div class="rem-pay-row"><span class="rem-pay-lbl">Cuota mensual</span><span class="rem-pay-val">${fmt(a.pago)}</span></div>
+      <div class="rem-pay-row" style="margin-top:-4px"><span class="rem-pay-lbl">Pagos realizados</span><span class="rem-pay-val" style="color:#666;font-size:11px">${a.pagos_hechos||'—'}</span></div>
+      <div class="rem-footer">
+        ${waNum?`<a class="btn-wa-sm" href="https://wa.me/${waNum}" target="_blank">💬 WhatsApp</a>`:'<span style="color:#666;font-size:11px">Sin WhatsApp</span>'}
+        <button class="btn-pago" onclick="finTogglePago('${safeNombre}')" style="background:${pagado?'rgba(248,113,113,0.15)':'rgba(138,213,0,0.15)'};color:${pagado?'#f87171':'#8AD500'};border:1px solid ${pagado?'rgba(248,113,113,0.3)':'rgba(138,213,0,0.3)'};">${pagado?'↩ Quitar pago':'✓ Marcar pagado'}</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const monthly=finAtletasRem.filter(a=>a.tipo_pago==='MONTHLY');
+  const abono=finAtletasRem.filter(a=>a.tipo_pago==='ABONO + MENSUALIDAD');
+  document.getElementById('fin-rem-monthly').innerHTML=monthly.length?`<div class="rem-section-title">📅 Plan Monthly (${monthly.length})</div><div class="rem-grid">${mkCards(monthly)}</div>`:'';
+  document.getElementById('fin-rem-abono').innerHTML=abono.length?`<div class="rem-section-title">📋 Abono + Mensualidad (${abono.length})</div><div class="rem-grid">${mkCards(abono)}</div>`:'';
+  if(!finAtletasRem.length) document.getElementById('fin-rem-monthly').innerHTML='<p style="color:#666;padding:30px;text-align:center">No hay atletas activos con plan mensual.</p>';
+}
 </script>
 
 <!-- ===== MOBILE BOTTOM NAV ===== -->
@@ -2157,10 +2286,75 @@ window.addEventListener('resize', () => {
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     <span>Alertas</span>
   </button>
+  <button class="mnav-item" id="mnav-recordatorio" onclick="showTab('recordatorio')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+    <span>Cobros</span>
+  </button>
   <button class="mnav-item mnav-fab" onclick="openAddModal()">
     <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     <span>Agregar</span>
   </button>
 </nav>
+
+<!-- ===== CALCULADORA FLOTANTE ===== -->
+<style>
+.calc-fab{position:fixed;bottom:24px;right:24px;width:48px;height:48px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:300;box-shadow:0 4px 16px rgba(0,0,0,.6);transition:transform .2s;}
+.calc-fab:hover{transform:scale(1.1);}
+.calc-panel{position:fixed;bottom:82px;right:24px;width:240px;background:#161616;border:1px solid rgba(255,255,255,0.1);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.8);z-index:299;overflow:hidden;display:none;}
+.calc-panel.open{display:block;}
+.calc-screen{padding:12px 14px 8px;text-align:right;}
+.calc-expr{font-size:11px;color:#555;min-height:16px;word-break:break-all;}
+.calc-val{font-family:'Anton',sans-serif;font-size:30px;color:#fff;word-break:break-all;line-height:1.1;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.05);}
+.calc-btn{background:#1a1a1a;border:none;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;padding:14px 0;cursor:pointer;transition:background .1s;}
+.calc-btn:hover{background:#252525;}
+.calc-btn.op{color:#fbbf24;}
+.calc-btn.eq{background:#8AD500;color:#000;}
+.calc-btn.eq:hover{background:#6aaa00;}
+.calc-btn.clr{color:#f87171;}
+.calc-btn.zero{grid-column:span 2;}
+@media(max-width:768px){.calc-fab{bottom:90px;right:14px;width:42px;height:42px;font-size:18px;}.calc-panel{bottom:142px;right:14px;width:220px;}}
+</style>
+<button class="calc-fab" onclick="this.nextElementSibling.classList.toggle('open')" title="Calculadora">🧮</button>
+<div class="calc-panel">
+  <div class="calc-screen">
+    <div class="calc-expr" id="fc-expr"></div>
+    <div class="calc-val" id="fc-val">0</div>
+  </div>
+  <div class="calc-grid">
+    <button class="calc-btn clr" onclick="fcAC()">AC</button>
+    <button class="calc-btn op" onclick="fcSign()">+/−</button>
+    <button class="calc-btn op" onclick="fcPct()">%</button>
+    <button class="calc-btn op" onclick="fcOp('/')">÷</button>
+    <button class="calc-btn" onclick="fcNum('7')">7</button>
+    <button class="calc-btn" onclick="fcNum('8')">8</button>
+    <button class="calc-btn" onclick="fcNum('9')">9</button>
+    <button class="calc-btn op" onclick="fcOp('*')">×</button>
+    <button class="calc-btn" onclick="fcNum('4')">4</button>
+    <button class="calc-btn" onclick="fcNum('5')">5</button>
+    <button class="calc-btn" onclick="fcNum('6')">6</button>
+    <button class="calc-btn op" onclick="fcOp('-')">−</button>
+    <button class="calc-btn" onclick="fcNum('1')">1</button>
+    <button class="calc-btn" onclick="fcNum('2')">2</button>
+    <button class="calc-btn" onclick="fcNum('3')">3</button>
+    <button class="calc-btn op" onclick="fcOp('+')">+</button>
+    <button class="calc-btn zero" onclick="fcNum('0')">0</button>
+    <button class="calc-btn" onclick="fcDot()">.</button>
+    <button class="calc-btn eq" onclick="fcEq()">=</button>
+  </div>
+</div>
+<script>
+(function(){
+  let c='0',p='',o=null,f=false;
+  const upd=()=>{document.getElementById('fc-val').textContent=c;document.getElementById('fc-expr').textContent=p&&o?p+' '+(o==='/'?'÷':o==='*'?'×':o):'';};
+  window.fcNum=d=>{if(c==='0'||f){c=d;f=false;}else if(c.length<12)c+=d;upd();};
+  window.fcDot=()=>{if(f){c='0.';f=false;}else if(!c.includes('.'))c+='.';upd();};
+  window.fcOp=v=>{if(o&&!f)fcEq();p=c;o=v;f=true;upd();};
+  window.fcEq=()=>{if(!o||!p)return;const a=parseFloat(p),b=parseFloat(c);let r;switch(o){case'+':r=a+b;break;case'-':r=a-b;break;case'*':r=a*b;break;case'/':r=b===0?'Error':a/b;break;}c=r==='Error'?'Error':String(parseFloat(r.toFixed(8)));p='';o=null;f=true;upd();};
+  window.fcAC=()=>{c='0';p='';o=null;f=false;upd();};
+  window.fcSign=()=>{if(c!=='0')c=String(-parseFloat(c));upd();};
+  window.fcPct=()=>{c=String(parseFloat(c)/100);upd();};
+})();
+</script>
 </body>
 </html>
