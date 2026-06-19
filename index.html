@@ -9,7 +9,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --green:#8AD500;--green-dim:rgba(138,213,0,0.08);--green-dk:#6aaa00;
+  --green:#AAFF00;--green-dim:rgba(170,255,0,0.08);--green-dk:#6aaa00;
   --bg:#0a0a0a;--card:#111;--card2:#161616;--card3:#1c1c1c;
   --border:rgba(255,255,255,0.07);--muted:#555;--muted2:#333;
 }
@@ -21,7 +21,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 @keyframes pulse   {0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes shimmer {0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes spin    {to{transform:rotate(360deg)}}
-@keyframes glow    {0%,100%{box-shadow:0 0 20px rgba(138,213,0,.2)}50%{box-shadow:0 0 40px rgba(138,213,0,.5)}}
+@keyframes glow    {0%,100%{box-shadow:0 0 20px rgba(170,255,0,.2)}50%{box-shadow:0 0 40px rgba(170,255,0,.5)}}
 @keyframes float   {0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
 /* ══ LOGIN ══ */
@@ -33,7 +33,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 .login-bg{
   position:absolute;inset:0;overflow:hidden;
   background:
-    radial-gradient(ellipse 70% 60% at 15% 50%,rgba(138,213,0,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 70% 60% at 15% 50%,rgba(170,255,0,.06) 0%,transparent 60%),
     radial-gradient(ellipse 50% 50% at 85% 20%,rgba(99,102,241,.05) 0%,transparent 50%);
 }
 .login-grid{
@@ -70,7 +70,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
   font-family:'Montserrat',sans-serif;margin-bottom:10px;outline:none;
   transition:border .2s,background .2s;
 }
-.login-field:focus{border-color:var(--green);background:rgba(138,213,0,.05);}
+.login-field:focus{border-color:var(--green);background:rgba(170,255,0,.05);}
 .login-field::placeholder{color:#333;}
 .login-btn{
   width:100%;background:var(--green);color:#0a0a0a;border:none;
@@ -132,7 +132,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 .hero-bg{
   position:absolute;inset:0;pointer-events:none;
   background:
-    radial-gradient(ellipse 60% 80% at -10% 50%,rgba(138,213,0,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 80% at -10% 50%,rgba(170,255,0,.06) 0%,transparent 60%),
     radial-gradient(ellipse 40% 60% at 110% 0%,rgba(99,102,241,.04) 0%,transparent 50%);
 }
 .hero-bg-text{
@@ -264,7 +264,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 .pin-title{font-family:'Anton',sans-serif;font-size:24px;margin-bottom:28px;}
 .pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:28px;}
 .pin-dot{width:12px;height:12px;border-radius:50%;background:#1e1e1e;border:2px solid #2a2a2a;transition:all .12s;}
-.pin-dot.filled{background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(138,213,0,.4);}
+.pin-dot.filled{background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(170,255,0,.4);}
 .pin-dot.error{background:#f87171;border-color:#f87171;animation:pinshake .35s;}
 @keyframes pinshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:10px;}
@@ -379,10 +379,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 
       <!-- FINANZAS -->
       <div class="mod-card"
-        style="--accent:#8AD500;--accent-dim:rgba(138,213,0,.1);--accent-border:rgba(138,213,0,.25);"
+        style="--accent:#AAFF00;--accent-dim:rgba(170,255,0,.1);--accent-border:rgba(170,255,0,.25);"
         onclick="openModule('Dashboard Financiero','pin_finanzas','finanzas.html')">
         <div class="card-glow"></div>
-        <div class="card-top-line" style="background:linear-gradient(90deg,#8AD500,transparent)"></div>
+        <div class="card-top-line" style="background:linear-gradient(90deg,#AAFF00,transparent)"></div>
         <div class="card-icon-wrap">💰</div>
         <div class="card-name">Dashboard Financiero</div>
         <div class="card-desc">Ingresos, pagos, contratos y balance de la agencia.</div>
