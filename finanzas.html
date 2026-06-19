@@ -898,19 +898,18 @@ async function initWithSupabase() {
   await Promise.all([reloadAtletasFromSB(), reloadTransFromSB()]);
   renderAll();
 
-  // Realtime: re-render cuando Apps Script sincroniza desde Google Sheets
+  // Realtime: debounced para evitar renders parciales durante sync por lotes
+  let _reloadTimer = null;
+  function _scheduleReload() {
+    clearTimeout(_reloadTimer);
+    _reloadTimer = setTimeout(async () => {
+      await Promise.all([reloadAtletasFromSB(), reloadTransFromSB()]);
+      renderAll();
+    }, 1800);
+  }
   sb.channel('finanzas-realtime')
-    .on('postgres_changes', {event:'*', schema:'public', table:'transacciones'}, async () => {
-      await reloadTransFromSB();
-      renderDashboard();
-      renderTransacciones();
-    })
-    .on('postgres_changes', {event:'*', schema:'public', table:'atletas'}, async () => {
-      await reloadAtletasFromSB();
-      renderDashboard();
-      renderAtletas();
-      renderDeudores();
-    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'transacciones'}, _scheduleReload)
+    .on('postgres_changes', {event:'*', schema:'public', table:'atletas'}, _scheduleReload)
     .subscribe();
 }
 
@@ -1509,12 +1508,13 @@ function changePage(d) {
 // TRANSACCIONES
 // ================================================================
 function renderTransacciones() {
-  // Current month KPIs (Jun 2026)
-  const curKey = '2026-06';
-  const curMonth = transData.filter(t=>t.fecha.startsWith(curKey));
+  const now = new Date();
+  const curKey = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const curMonth = transData.filter(t=>t.fecha && t.fecha.startsWith(curKey));
   const mI = curMonth.reduce((s,t)=>s+t.ingreso,0);
   const mG = curMonth.reduce((s,t)=>s+t.gasto,0);
-  document.getElementById('t-mes-label').textContent = 'Junio 2026';
+  document.getElementById('t-mes-label').textContent = MESES[now.getMonth()] + ' ' + now.getFullYear();
   document.getElementById('t-ingresos-mes').textContent = fmt(mI);
   document.getElementById('t-gastos-mes').textContent = fmt(mG);
   const mb = mI-mG;
