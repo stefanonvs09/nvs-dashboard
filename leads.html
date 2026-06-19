@@ -54,6 +54,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 /* TOPBAR BACK BTN */
 .btn-back{background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;padding:7px 13px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;color:var(--m3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .btn-back:hover{border-color:var(--b2);color:var(--txt);}
+.btn-web{background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:8px 16px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;color:var(--blue);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .18s;display:flex;align-items:center;gap:8px;}
+.btn-web:hover,.btn-web.active{background:rgba(96,165,250,0.15);border-color:rgba(96,165,250,0.35);}
+.btn-web.active{background:rgba(96,165,250,0.18);}
+.btn-web span{background:rgba(96,165,250,0.2);color:var(--blue);border-radius:99px;padding:1px 8px;font-size:10px;}
 
 /* LOGIN */
 #login-ov{position:fixed;inset:0;background:radial-gradient(ellipse at 50% -10%,rgba(170,255,0,0.05) 0%,var(--bg) 55%);z-index:9999;display:flex;align-items:center;justify-content:center;}
@@ -350,8 +354,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
       <div class="view-btns">
         <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')" title="Kanban">⬛</button>
         <button class="vbtn" id="vbtn-l" onclick="setView('list')" title="Lista">☰</button>
-        <button class="vbtn" id="vbtn-w" onclick="setView('web')" title="Website Leads">🌐</button>
       </div>
+      <button class="btn-web" id="vbtn-w" onclick="setView('web')">🌐 Website Leads <span id="web-pill">—</span></button>
       <button class="btn-add" onclick="openAdd()">+ Lead</button>
     </div>
 
@@ -362,6 +366,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
       <div class="stat" id="sf-con" onclick="sfClick('Contactado')" style="--c:var(--blue)"><div class="stat-n" id="st-con" style="color:var(--blue)">—</div><div class="stat-l">Contactados</div></div>
       <div class="stat" id="sf-int" onclick="sfClick('Interesado')" style="--c:var(--amber)"><div class="stat-n" id="st-int" style="color:var(--amber)">—</div><div class="stat-l">Interesados</div></div>
       <div class="stat" id="sf-neg" onclick="sfClick('En Negociacion')" style="--c:var(--purple)"><div class="stat-n" id="st-neg" style="color:var(--purple)">—</div><div class="stat-l">En Negociación</div></div>
+      <div class="stat" id="sf-con2" onclick="sfClick('Contract Sent')" style="--c:var(--teal)"><div class="stat-n" id="st-con2" style="color:var(--teal)">—</div><div class="stat-l">Contract Sent</div></div>
+      <div class="stat" id="sf-del" onclick="sfClick('Delayed Sign Up')" style="--c:var(--orange)"><div class="stat-n" id="st-del" style="color:var(--orange)">—</div><div class="stat-l">Delayed</div></div>
       <div class="stat" id="sf-fir" onclick="sfClick('Firmado')" style="--c:var(--green)"><div class="stat-n" id="st-fir" style="color:var(--green)">—</div><div class="stat-l">Firmados</div></div>
       <div class="stat" id="sf-per" onclick="sfClick('Perdido')" style="--c:var(--red)"><div class="stat-n" id="st-per" style="color:var(--red)">—</div><div class="stat-l">Perdidos</div></div>
     </div>
@@ -498,6 +504,8 @@ const STAGES = [
   {k:'Contactado',     c:'#60a5fa', av:'rgba(96,165,250,0.85)'},
   {k:'Interesado',     c:'#fbbf24', av:'rgba(251,191,36,0.85)'},
   {k:'En Negociacion', c:'#a78bfa', av:'rgba(167,139,250,0.85)'},
+  {k:'Contract Sent',  c:'#2dd4bf', av:'rgba(45,212,191,0.85)'},
+  {k:'Delayed Sign Up',c:'#fb923c', av:'rgba(251,146,60,0.85)'},
   {k:'Firmado',        c:'#AAFF00', av:'rgba(170,255,0,0.85)'},
   {k:'Perdido',        c:'#f87171', av:'rgba(248,113,113,0.85)'},
 ];
@@ -522,46 +530,8 @@ async function doLogin(){
   const {error} = await sb.auth.signInWithPassword({email:q('#l-em').value.trim(),password:q('#l-pw').value});
   if(error){q('#l-err').textContent=error.message;} else showApp();
 }
-function showApp(){
-  q('#login-ov').style.display='none';
-  q('#home-screen').style.display='flex';
-  loadData();
-  setupRT();
-}
-function goHome(){
-  q('#home-screen').style.display='flex';
-  q('#app').style.display='none';
-  updateHomeStats();
-}
-function enterModule(type){
-  curModule=type;
-  q('#home-screen').style.display='none';
-  q('#app').style.display='flex';
-  if(type==='web'){
-    curView='web';
-    q('#view-kanban').style.display='none';
-    q('#view-list').style.display='none';
-    q('#view-web').style.display='flex';
-    q('#vbtn-k').classList.remove('active');
-    q('#vbtn-l').classList.remove('active');
-    q('#vbtn-w').classList.add('active');
-    renderWeb();
-  } else {
-    setView('kanban');
-  }
-}
-function updateHomeStats(){
-  if(!ALL.length) return;
-  const rec=ALL.filter(a=>!(a.fuente==='Website'&&!(a.recruiter||'').trim()));
-  const web=ALL.filter(a=>a.fuente==='Website');
-  const set=n=>n;
-  q('#hs-rec-total').textContent=rec.length;
-  q('#hs-rec-new').textContent=rec.filter(a=>a.estado==='Nuevo').length;
-  q('#hs-rec-signed').textContent=rec.filter(a=>a.estado==='Firmado').length;
-  q('#hs-web-total').textContent=web.length;
-  q('#hs-web-pending').textContent=web.filter(a=>!a.estado||a.estado==='Nuevo').length;
-  q('#hs-web-done').textContent=web.filter(a=>a.estado&&a.estado!=='Nuevo').length;
-}
+function showApp(){q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();setupRT();}
+function updateHomeStats(){}
 
 /* DATA */
 async function loadData(){
@@ -571,6 +541,8 @@ async function loadData(){
   buildFilters();
   applyFilters();
   updateHomeStats();
+  const wc=ALL.filter(a=>a.fuente==='Website').length;
+  if(q('#web-pill'))q('#web-pill').textContent=wc;
 }
 function buildFilters(){
   const sports=[...new Set(ALL.map(a=>a.deporte).filter(Boolean))].sort();
@@ -595,6 +567,7 @@ function setView(v){
   q('#vbtn-k').classList.toggle('active',v==='kanban');
   q('#vbtn-l').classList.toggle('active',v==='list');
   q('#vbtn-w').classList.toggle('active',v==='web');
+  q('#btn-back-wrap')&&(q('#btn-back-wrap').style.display=v==='web'?'':'none');
   if(v==='web'){renderWeb();return;}
   render();
 }
@@ -603,7 +576,7 @@ function setView(v){
 function sfClick(k){
   SF=SF===k?'':k;
   document.querySelectorAll('.stat').forEach(el=>el.classList.remove('sf'));
-  const map={'':'sf-all','Nuevo':'sf-nue','Contactado':'sf-con','Interesado':'sf-int','En Negociacion':'sf-neg','Firmado':'sf-fir','Perdido':'sf-per'};
+  const map={'':'sf-all','Nuevo':'sf-nue','Contactado':'sf-con','Interesado':'sf-int','En Negociacion':'sf-neg','Contract Sent':'sf-con2','Delayed Sign Up':'sf-del','Firmado':'sf-fir','Perdido':'sf-per'};
   q('#'+map[SF])?.classList.add('sf');
   applyFilters();
 }
@@ -614,8 +587,6 @@ function applyFilters(){
   const src=q('#f-src')?.value||'';
   const pa=q('#f-pais')?.value||'';
   FLT=ALL.filter(a=>{
-    // Módulo Recruiters: excluye TODOS los website leads
-    if(a.fuente==='Website')return false;
     if(SF&&a.estado!==SF)return false;
     if(recFilter&&a.recruiter!==recFilter)return false;
     if(sp&&a.deporte!==sp)return false;
@@ -637,6 +608,8 @@ function renderStats(){
   q('#st-con').textContent=cn('Contactado');
   q('#st-int').textContent=cn('Interesado');
   q('#st-neg').textContent=cn('En Negociacion');
+  q('#st-con2').textContent=cn('Contract Sent');
+  q('#st-del').textContent=cn('Delayed Sign Up');
   q('#st-fir').textContent=cn('Firmado');
   q('#st-per').textContent=cn('Perdido');
 }
