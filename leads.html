@@ -690,7 +690,7 @@ async function onDrop(e, newEst){
   const a=ALL.find(x=>x.id===dragId);
   if(!a||a.estado===newEst){dragId=null;return;}
   const {error}=await sb.from('leads').update({estado:newEst,updated_at:new Date().toISOString()}).eq('id',dragId);
-  if(!error){a.estado=newEst;applyFilters();if(q('#dp').classList.contains('open'))openDP(dragId);toast('Estado actualizado ✓','ok');}
+  if(!error){a.estado=newEst;applyFilters();if(q('#dp').classList.contains('open'))openDP(dragId);toast('Estado actualizado ✓','ok');if(newEst==='Firmado')sendToCRM(a);}
   else toast('Error: '+error.message,'err');
   dragId=null;
 }
@@ -808,8 +808,26 @@ function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').
 
 async function updateEst(id,ne){
   const {error}=await sb.from('leads').update({estado:ne,updated_at:new Date().toISOString()}).eq('id',id);
-  if(!error){const a=ALL.find(x=>x.id===id);if(a)a.estado=ne;applyFilters();toast('Estado actualizado ✓','ok');}
+  if(!error){const a=ALL.find(x=>x.id===id);if(a){a.estado=ne;if(ne==='Firmado')sendToCRM(a);}applyFilters();toast('Estado actualizado ✓','ok');}
   else toast('Error','err');
+}
+
+async function sendToCRM(lead){
+  const {data:exists}=await sb.from('placements').select('id').ilike('nombre',lead.nombre).limit(1);
+  if(exists&&exists.length>0){toast('Ya existe en el CRM: '+lead.nombre,'ok');return;}
+  const payload={
+    nombre:       lead.nombre,
+    deporte:      lead.deporte||'',
+    posicion:     lead.posicion||'',
+    nacionalidad: lead.pais||'',
+    budget:       lead.presupuesto||'',
+    working_with: lead.recruiter||'',
+    notas:        lead.notas||'',
+    commit_status:'Prospecto',
+  };
+  const {error}=await sb.from('placements').insert(payload);
+  if(!error)toast('✓ '+lead.nombre+' agregado al APL CRM','ok');
+  else toast('Error al crear en CRM: '+error.message,'err');
 }
 async function saveNotas(id){
   const val=q('#dp-notas-ta')?.value||'';
