@@ -4,16 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NVS Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --green:#AAFF00;--green-dim:rgba(170,255,0,0.08);--green-dk:#6aaa00;
-  --bg:#0a0a0a;--card:#111;--card2:#161616;--card3:#1c1c1c;
-  --border:rgba(255,255,255,0.07);--muted:#555;--muted2:#333;
+  --green:#AAFF00;--green-dim:rgba(85,136,0,0.1);--green-dk:#4a7a00;
+  --bg:#f6f9fc;--card:#ffffff;--card2:#f6f9fc;--card3:#eef1f6;
+  --border:rgba(0,0,0,0.08);--muted:#697386;--muted2:#8792a2;
+  --txt:#1a1f36;
 }
-body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
 
 /* ══ ANIMATIONS ══ */
 @keyframes fadeUp  {from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -281,6 +282,48 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#fff;min-hei
 .pin-error-msg{color:#f87171;font-size:12px;height:16px;margin-bottom:10px;font-weight:600;}
 .pin-cancel{background:none;border:none;color:#333;font-size:12px;font-family:'Montserrat',sans-serif;cursor:pointer;padding:8px 16px;transition:color .15s;font-weight:600;}
 .pin-cancel:hover{color:#666;}
+
+/* ══ LIGHT MODE ══ */
+.login-bg{background:radial-gradient(ellipse 70% 60% at 15% 50%,rgba(170,255,0,.12),transparent 60%),radial-gradient(ellipse 50% 50% at 85% 20%,rgba(99,102,241,.07),transparent 50%);}
+.login-grid{background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);}
+.login-logo{color:var(--txt);}
+.login-logo span,.login-logo-s{color:#5a8800;}
+.login-tagline{color:var(--muted);}
+.login-card{background:#fff;border:1px solid rgba(0,0,0,.09);box-shadow:0 8px 40px rgba(0,0,0,.08);}
+.login-field{background:#f8fafc;border:1px solid rgba(0,0,0,.1);color:var(--txt);}
+.login-field:focus{border-color:var(--txt);background:#fff;}
+.login-field::placeholder{color:#aab0bc;}
+.topbar{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.07);box-shadow:0 1px 0 rgba(0,0,0,.06);}
+.tb-logo{color:#1a1f36;}
+.tb-name{color:var(--muted);}
+.tb-user{background:#f1f5f9;border-color:rgba(0,0,0,.07);}
+.tb-uname{color:var(--txt);}
+.btn-logout{color:var(--muted);border-color:rgba(0,0,0,.09);}
+.btn-logout:hover{color:var(--txt);border-color:rgba(0,0,0,.2);background:rgba(0,0,0,.03);}
+.hero-bg{background:radial-gradient(ellipse 60% 80% at -10% 50%,rgba(170,255,0,.08),transparent 60%),radial-gradient(ellipse 40% 60% at 110% 0%,rgba(99,102,241,.05),transparent 50%);}
+.hero-bg-text{color:rgba(0,0,0,.04);}
+.hero-title .dim{color:#8792a2;}
+.stat-banner{background:#fff;border-color:rgba(0,0,0,.07);box-shadow:0 2px 12px rgba(0,0,0,.05);}
+.stat-big-label{color:var(--muted);}
+.stat-big-sub{color:var(--muted2);}
+.stat-val.loading{background:linear-gradient(90deg,#e8edf2 25%,#f1f5f9 50%,#e8edf2 75%);background-size:200% 100%;}
+.section-label{color:var(--muted);}
+.section-count{background:#f1f5f9;border-color:rgba(0,0,0,.07);color:var(--muted);}
+.mod-card{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.04);}
+.mod-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.1);}
+.card-desc{color:var(--muted);}
+.card-soon-badge{background:#f1f5f9;border-color:rgba(0,0,0,.07);color:var(--muted);}
+#pin-overlay{background:rgba(26,31,54,.6);}
+.pin-box{background:#fff;border:1px solid rgba(0,0,0,.09);box-shadow:0 32px 80px rgba(0,0,0,.18);}
+.pin-module-lbl{color:var(--muted);}
+.pin-dot{background:#e8edf2;border-color:#dde3ea;}
+.pin-key{background:#f6f9fc;border:1px solid rgba(0,0,0,.08);color:var(--txt);}
+.pin-key:hover{background:#eef1f6;border-color:rgba(0,0,0,.14);}
+.pin-key.del{color:var(--muted);}
+.pin-key.del:hover{color:var(--txt);}
+.pin-cancel{color:var(--muted);}
+.pin-cancel:hover{color:var(--txt);}
+.pin-error-msg{color:#ef4444;}
 
 /* MOBILE */
 @media(max-width:640px){
