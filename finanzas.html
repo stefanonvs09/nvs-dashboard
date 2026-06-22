@@ -1067,6 +1067,7 @@ async function reloadTransFromSB() {
 }
 
 // ── Auth functions ──
+const FINANZAS_ALLOWED = ['stefano@playwithnewvision.com','sd@cervicalservices.com'];
 async function doLogin() {
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
@@ -1074,6 +1075,7 @@ async function doLogin() {
   const loadEl   = document.getElementById('login-loading');
   errEl.textContent = '';
   if(!email || !password){ errEl.textContent = 'Ingresa email y contraseña.'; return; }
+  if(!FINANZAS_ALLOWED.includes(email.toLowerCase())){ errEl.textContent = 'No tienes acceso a este módulo.'; return; }
   loadEl.style.display = 'block';
   const { error } = await sb.auth.signInWithPassword({ email, password });
   loadEl.style.display = 'none';
@@ -1457,6 +1459,10 @@ async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if(!session) {
       document.getElementById('login-overlay').style.display = 'flex';
+    } else if(!FINANZAS_ALLOWED.includes(session.user.email.toLowerCase())) {
+      await sb.auth.signOut();
+      document.getElementById('login-overlay').style.display = 'flex';
+      document.getElementById('login-error').textContent = 'No tienes acceso a este módulo.';
     } else {
       await initWithSupabase();
     }
