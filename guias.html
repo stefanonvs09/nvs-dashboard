@@ -199,6 +199,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         </div>
         <div class="sb-cat-item" id="cat-elegibilidad" onclick="setCategory('elegibilidad')">
           <span class="sb-cat-icon">✅</span> Elegibilidad
+          <span class="sb-cat-badge">3</span>
         </div>
         <div class="sb-cat-item active" id="cat-visado" onclick="setCategory('visado')">
           <span class="sb-cat-icon">✈️</span> Visado
@@ -291,9 +292,11 @@ function renderContent(cat){
   const wrap=document.getElementById('guides-wrap');
   if(cat==='visado'||cat==='todas'){
     wrap.innerHTML=renderVisadoGuide()+renderCanadaGuide()+renderMexicoGuide();
-    if(cat==='todas') wrap.innerHTML+=renderContratosSection()+emptyOtherCats();
+    if(cat==='todas') wrap.innerHTML+=renderElegibilidadSection()+renderContratosSection()+emptyOtherCats();
   } else if(cat==='contratos'){
     wrap.innerHTML=renderContratosSection();
+  } else if(cat==='elegibilidad'){
+    wrap.innerHTML=renderElegibilidadSection();
   } else {
     wrap.innerHTML=emptyState(cat);
   }
@@ -310,6 +313,293 @@ function emptyState(cat){
 function emptyOtherCats(){
   return`<div style="margin-top:8px;padding:16px 20px;background:var(--card2);border-radius:12px;font-size:12px;color:var(--muted);text-align:center;">
     Más guías de Elegibilidad, Onboarding y Pagos se agregarán próximamente.
+  </div>`;
+}
+
+function renderElegibilidadSection(){
+  return`
+  <!-- ══ NCAA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(0,93,160,.12);">🏛️</div>
+      <div>
+        <div class="guide-card-title">Elegibilidad NCAA — National Collegiate Athletic Association</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(0,93,160,.1);color:#005da0;">Division I · II · III</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">Eligibility Center</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">$170 USD internacional</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es el NCAA Eligibility Center?</strong><br>
+        Es el organismo oficial de la NCAA que certifica que un atleta cumple con los requisitos académicos y de amateurismo antes de poder competir en una universidad D1, D2 o D3. Sin esta certificación, el atleta no puede practicar, competir ni recibir becas deportivas su primer año.</div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(170,255,0,.06);border-color:rgba(170,255,0,.2);">
+        <span class="guide-alert-icon">🎓</span>
+        <div><strong>Tipos de cuenta según División</strong><br>
+        <strong>D1 / D2</strong>: Cuenta de Certificación Académica + Amateurismo → costo $170 USD (internacional)<br>
+        <strong>D3</strong>: Solo Certificación de Amateurismo → no requiere revisión académica central, la hace la universidad directamente</div>
+      </div>
+
+      <div class="steps-title">PROCESO PASO A PASO — NCAA ELIGIBILITY CENTER</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Crear cuenta en el NCAA Eligibility Center</div>
+          <div class="step-desc">Visita el sitio oficial y crea tu cuenta. Necesitas: nombre completo, fecha de nacimiento, email, dirección, y el nombre de las escuelas donde estudiaste. El proceso de registro toma entre 30 y 45 minutos. Puedes guardar y continuar después.</div>
+          <a class="step-link step-link-green" href="https://web3.ncaa.org/ecwr3/" target="_blank" rel="noopener">🔗 NCAA Eligibility Center (Registro oficial) →</a>
+          <a class="step-link" href="https://www.ncaa.org/sports/2018/5/15/initial-eligibility-steps-for-international-students.aspx" target="_blank" rel="noopener">📋 Pasos para estudiantes internacionales →</a>
+          <div class="step-fee">💰 $170 USD — pago con tarjeta de débito, crédito o e-check</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Declarar historial académico completo</div>
+          <div class="step-desc">Debes reportar TODAS las escuelas secundarias donde estudiaste desde 9° grado en adelante. El NCAA Eligibility Center evaluará si tus materias equivalen a los cursos "core" requeridos. Los cursos mínimos incluyen: inglés, matemáticas, ciencias, ciencias sociales e idioma nativo.</div>
+          <div class="step-fee">📌 Mínimo de cursos core exigidos: varía por país — la NCAA tiene una guía de equivalencias por nación</div>
+          <a class="step-link" href="https://s3.amazonaws.com/fs.ncaa.org/Docs/eligibility_center/International_Information/International_Guide.pdf" target="_blank" rel="noopener">📄 Guía Internacional de Estándares Académicos 2025-26 →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Enviar transcripts oficiales al NCAA Eligibility Center</div>
+          <div class="step-desc">Los documentos académicos deben ser enviados directamente por tu escuela secundaria. Si el país no tiene inglés como idioma nativo, debes enviar: (1) copia oficial en el idioma original y (2) traducción certificada línea por línea al inglés. Sin estos documentos el proceso no puede iniciar.</div>
+          <div class="step-fee">⚠️ La traducción debe ser certificada — no sirve Google Translate ni traducción sin sello notarial</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Certificación de Amateurismo (D1 y D2)</div>
+          <div class="step-desc">Debes declarar todo tu historial deportivo: equipos, ligas, torneos, contratos, agentes, patrocinadores, premios en efectivo recibidos. El amateurismo se pierde si: firmaste un contrato profesional, tuviste un agente activo que te representó a cambio de dinero, recibiste pagos más allá de gastos de viaje/hospedaje, o aceptaste dinero de premios que supere los gastos necesarios.</div>
+          <div class="step-fee">⚠️ Excepción: tenistas pueden ganar hasta $10,000/año en premios sin perder elegibilidad</div>
+          <a class="step-link" href="https://www.ncsasports.org/ncaa-eligibility-center/amateurism-rules" target="_blank" rel="noopener">📋 Reglas de amateurismo explicadas →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Requisitos académicos mínimos (D1/D2)</div>
+          <div class="step-desc">Para ser elegible el primer año debes cumplir AMBAS condiciones: (1) completar el número mínimo de cursos core requeridos según tu país + (2) tener GPA y puntaje ACT/SAT dentro de la escala deslizante de la NCAA. A mayor GPA, menor puntaje de test aceptado, y viceversa. La universidad te guiará sobre los requisitos específicos de tu país.</div>
+          <a class="step-link" href="https://fs.ncaa.org/Docs/eligibility_center/Student_Resources/CBSA.pdf" target="_blank" rel="noopener">📄 Guía para el Atleta Estudiante 2025-26 →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">6</div>
+        <div class="step-content">
+          <div class="step-title">Esperar la certificación y confirmación de beca</div>
+          <div class="step-desc">Una vez que el Eligibility Center recibe todos los documentos, procesa la certificación. La universidad (a través de su Compliance Office) recibe el resultado. Solo cuando el atleta tiene certificación aprobada la universidad puede hacer oficial la beca deportiva y el atleta puede entrenar y competir oficialmente.</div>
+          <div class="step-fee">⏱ El proceso puede tardar semanas — envía los documentos lo antes posible</div>
+        </div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.2);">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Regla 40-60-80 (D1) — Progreso Académico Continuo</strong><br>
+        Una vez en la universidad, para mantener la elegibilidad debes completar: 40% de los créditos requeridos para graduarte al final del 2° año, 60% al final del 3°, y 80% al final del 4°. Si no cumples, pierdes el derecho a competir.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ NAIA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(234,88,12,.1);">🏅</div>
+      <div>
+        <div class="guide-card-title">Elegibilidad NAIA — National Association of Intercollegiate Athletics</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(234,88,12,.1);color:#ea580c;">PlayNAIA</span>
+          <span class="guide-tag" style="background:rgba(234,88,12,.08);color:#c2410c;">InCred Evaluation</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">$160–170 USD + $95 InCred</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es la NAIA?</strong><br>
+        La NAIA es una asociación con más de 250 universidades pequeñas. Su proceso de elegibilidad es más flexible y accesible que la NCAA. Para atletas internacionales, toda la evaluación académica pasa por InCred Evaluations, empresa integrada directamente con el sistema PlayNAIA.</div>
+      </div>
+
+      <div class="steps-title">PROCESO PASO A PASO — NAIA ELIGIBILITY CENTER</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Registrarse en PlayNAIA.org</div>
+          <div class="step-desc">Ingresa a PlayNAIA.org, crea tu cuenta con tu email y completa tu perfil. Este es el portal central donde vas a trackear todo tu proceso de elegibilidad. El registro toma solo unos minutos.</div>
+          <a class="step-link step-link-green" href="https://play.mynaia.org" target="_blank" rel="noopener">🔗 PlayNAIA — Registro oficial →</a>
+          <a class="step-link" href="https://www.naia.org/findyourpath/international/index" target="_blank" rel="noopener">🌍 Guía para estudiantes internacionales →</a>
+          <div class="step-fee">💰 $160 USD (a partir de septiembre 2025: $170 USD) — no reembolsable</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Registrarse en InCred Evaluations</div>
+          <div class="step-desc">Todos los atletas internacionales DEBEN completar una evaluación de credenciales a través de InCred. InCred analiza tus notas del bachillerato y las convierte al sistema GPA americano. Ve a InCredEvals.org, crea tu cuenta y selecciona la evaluación de high school básica.</div>
+          <a class="step-link step-link-green" href="https://www.incredevals.org/students/" target="_blank" rel="noopener">🔗 InCred Evaluations — Portal de estudiantes →</a>
+          <div class="step-fee">💰 Basic Evaluation: $95 USD · Expedito 5 días: $75 adicional · Expedito 2 días: $150 adicional</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Subir documentos académicos a InCred</div>
+          <div class="step-desc">Sube tus transcripts en formato PDF o Word directamente al portal de InCred. Si tus documentos no están en inglés, debes incluir una traducción al inglés. InCred acepta documentos electrónicos, lo que agiliza el proceso. Una vez recibido el expediente completo (documentos + pago), InCred completa la evaluación en aproximadamente 10 días hábiles.</div>
+          <div class="step-fee">⚠️ Envía los documentos lo antes posible — 2 meses antes del inicio del semestre si puedes</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Requisitos académicos para ser elegible (Freshmen)</div>
+          <div class="step-desc">Eres elegible automáticamente si tienes <strong>GPA 2.3 o superior</strong> (en escala americana). Si tu GPA está entre 2.0 y 2.29, debes cumplir al menos 2 de estos 3 criterios:</div>
+          <div style="margin:8px 0 4px;padding:10px 14px;background:var(--green-dim);border-radius:8px;font-size:12px;">
+            ✅ <strong>Puntaje ACT 18+</strong> o <strong>SAT 970+</strong><br>
+            ✅ <strong>GPA mínimo 2.0</strong> (en escala americana)<br>
+            ✅ <strong>Top 50%</strong> de tu clase de graduación
+          </div>
+          <div class="step-fee">📌 InCred convierte tu GPA al sistema americano automáticamente</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Declarar historial deportivo completo</div>
+          <div class="step-desc">En tu perfil de PlayNAIA debes declarar todos los equipos, ligas, eventos y competencias en los que has participado, sin importar el nivel. Esto es fundamental para que la NAIA determine si ya usaste alguna temporada de elegibilidad previamente.</div>
+          <div class="step-fee">⚠️ No ocultes ningún equipo — la NAIA verifica esta información y ocultarla puede costarte la elegibilidad</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">6</div>
+        <div class="step-content">
+          <div class="step-title">InCred envía resultado → NAIA determina elegibilidad</div>
+          <div class="step-desc">Una vez InCred completa la evaluación, envía el resultado directamente a la NAIA. El sistema PlayNAIA se actualiza y puedes ver el estado de tu elegibilidad en tiempo real. La universidad recibe la notificación y puede confirmar formalmente tu inscripción deportiva.</div>
+          <a class="step-link" href="https://play.mynaia.org/media/f04dhiia/naia_ec_guide_international_students.pdf" target="_blank" rel="noopener">📄 Guía oficial NAIA para estudiantes internacionales →</a>
+        </div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(170,255,0,.06);border-color:rgba(170,255,0,.2);">
+        <span class="guide-alert-icon">📌</span>
+        <div><strong>Temporadas de elegibilidad NAIA</strong><br>
+        La NAIA otorga <strong>4 temporadas de elegibilidad en 5 años</strong> (igual que la NCAA D1/D2). Si ya competiste a nivel universitario o semi-profesional en tu país, es posible que ya hayas usado temporadas. Declara todo en PlayNAIA para un cálculo preciso.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ NJCAA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(20,184,166,.1);">🏫</div>
+      <div>
+        <div class="guide-card-title">Elegibilidad NJCAA — National Junior College Athletic Association</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(20,184,166,.1);color:#0d9488;">Junior College · Community College</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">Sin registro centralizado</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Máx. 2 temporadas</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es la NJCAA?</strong><br>
+        La NJCAA agrupa más de 500 junior colleges y community colleges. A diferencia de NCAA y NAIA, no tiene un portal centralizado de elegibilidad — el proceso se hace directamente con el Athletic Department (AD) de la escuela. Es la opción más accesible académicamente y una excelente puerta de entrada al sistema universitario americano.</div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.25);">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Importante para atletas internacionales</strong><br>
+        La NJCAA permite solo <strong>2 temporadas de competición</strong> por deporte. Cualquier participación en un partido oficial (aunque sea una sola jugada) cuenta como temporada consumida. Si solo te vistes pero no juegas, no se consume temporada.</div>
+      </div>
+
+      <div class="steps-title">PROCESO PASO A PASO — NJCAA</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Contactar directamente al Athletic Department de la escuela</div>
+          <div class="step-desc">No hay portal único de registro. Una vez que el coach te ofrece un lugar en el equipo, trabajas directamente con el Athletic Director (AD) de esa escuela. El AD es quien gestiona y certifica tu elegibilidad ante la NJCAA. Pregúntale exactamente qué documentos necesitan.</div>
+          <a class="step-link step-link-green" href="https://www.njcaa.org/eligibility/index" target="_blank" rel="noopener">🔗 NJCAA — Información de elegibilidad oficial →</a>
+          <a class="step-link" href="https://www.njcaa.org/compete/faqs" target="_blank" rel="noopener">❓ NJCAA FAQs de elegibilidad →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Entregar diploma de high school y transcripts</div>
+          <div class="step-desc">Debes demostrar que eres graduado de bachillerato con diploma académico reconocido. Para atletas internacionales: transcripts de los años 9° en adelante, traducidos al inglés. La traducción corre por cuenta del atleta. Si también asististe a una universidad fuera de EE.UU., debes entregar también esos transcripts universitarios.</div>
+          <div class="step-fee">⚠️ Los transcripts deben mostrar notas, materias y año de graduación claramente</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Inscribirse a tiempo completo (mínimo 12 créditos)</div>
+          <div class="step-desc">Para competir en la NJCAA debes estar inscrito como estudiante de tiempo completo en la institución. La NJCAA define tiempo completo como 12 o más créditos por semestre. Puedes combinar distintas modalidades de cursos (regular, fast track, mini-term) dentro del mismo semestre para alcanzar los 12 créditos.</div>
+          <div class="step-fee">📌 Debes estar inscrito ANTES de la primera competición de la temporada</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Verificar temporadas de elegibilidad disponibles</div>
+          <div class="step-desc">La NJCAA permite exactamente 2 temporadas de elegibilidad por deporte. Si competiste a nivel universitario o intercolegial fuera de EE.UU., es posible que ya hayas usado 1 temporada. Discute tu historial deportivo con el AD para saber cuántas temporadas te quedan disponibles.</div>
+          <div class="step-fee">⚠️ Una sola participación en partido oficial (hasta 1 turno al bate, 1 jugada) = 1 temporada consumida</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Status de Amateur — obligatorio desde los 19 años</div>
+          <div class="step-desc">Debes mantener estatus de amateur. Esto se vuelve obligatorio desde que cumples 19 años O desde el momento en que te inscribes por primera vez en una universidad (lo que ocurra primero). Antes de ese punto, haber jugado en ligas semiprofesionales o recibido pagos puede ser permitido dependiendo del deporte y el contexto.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">6</div>
+        <div class="step-content">
+          <div class="step-title">El AD certifica tu elegibilidad ante la NJCAA</div>
+          <div class="step-desc">Una vez completados todos los pasos, el Athletic Director de tu escuela envía la documentación a la NJCAA y certifica formalmente tu elegibilidad. A partir de ese momento puedes entrenar y competir oficialmente representando a la institución.</div>
+          <a class="step-link" href="https://www.njcaa.org/governance/handbook/index" target="_blank" rel="noopener">📄 NJCAA Handbook 2025-26 →</a>
+          <a class="step-link" href="mailto:compliance@njcaa.org">📧 Contacto directo NJCAA Compliance →</a>
+        </div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(170,255,0,.06);border-color:rgba(170,255,0,.2);">
+        <span class="guide-alert-icon">🎯</span>
+        <div><strong>NJCAA como trampolín</strong><br>
+        Muchos atletas internacionales usan 1-2 años en una NJCAA school para adaptarse al sistema americano, mejorar su inglés y nivel académico, y luego transferirse a una universidad NCAA D1/D2 o NAIA. La NJCAA es un punto de entrada excelente para quienes no califican académicamente para NCAA desde el inicio.</div>
+      </div>
+
+    </div>
   </div>`;
 }
 
