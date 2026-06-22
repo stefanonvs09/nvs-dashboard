@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NVS · Proyectos</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
   --green:#AAFF00;--green-dim:rgba(170,255,0,0.12);--green-dk:#88CC00;
   --bg:#f8fafc;--card:#ffffff;--card2:#f1f5f9;--border:rgba(0,0,0,0.08);
-  --muted:#64748b;--txt:#0f172a;
+  --muted:#64748b;--txt:#0f172a;--red:#dc2626;
 }
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 
 /* ── LOGIN ── */
 #login-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
@@ -31,7 +31,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .login-sub{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;margin-top:6px;}
 .login-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;padding:26px 22px;box-shadow:0 4px 20px rgba(0,0,0,.06);}
 .lf{width:100%;background:#f8fafc;border:1px solid rgba(0,0,0,.09);border-radius:10px;padding:12px 14px;color:var(--txt);font-size:13px;font-family:'Inter',sans-serif;margin-bottom:10px;outline:none;transition:border .2s;}
-.lf:focus{border-color:var(--green);background:#fff;}
+.lf:focus{border-color:var(--green);}
 .lf::placeholder{color:#94a3b8;}
 .login-btn{width:100%;background:var(--green);color:#0f172a;border:none;border-radius:10px;padding:13px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;margin-top:4px;transition:background .2s;}
 .login-btn:hover{background:var(--green-dk);}
@@ -44,33 +44,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:52px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;z-index:50;}
 .tb-left{display:flex;align-items:center;gap:9px;}
-.tb-back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;padding:5px 9px;border-radius:7px;transition:all .15s;text-decoration:none;white-space:nowrap;}
+.tb-back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;padding:5px 9px;border-radius:7px;transition:all .15s;text-decoration:none;}
 .tb-back:hover{background:var(--card2);color:var(--txt);}
 .tb-divider{width:1px;height:16px;background:var(--border);}
-.tb-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;white-space:nowrap;}
+.tb-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;}
 .tb-title span{color:var(--green);}
 .tb-right{display:flex;align-items:center;gap:8px;}
 .tb-user{display:flex;align-items:center;gap:7px;padding:5px 11px;background:var(--card2);border:1px solid var(--border);border-radius:99px;}
 .tb-avatar{width:20px;height:20px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#3a6b00;}
-.tb-uname{font-size:11px;font-weight:600;color:var(--txt);}
+.tb-uname{font-size:11px;font-weight:600;}
 .btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .15s;font-weight:600;font-family:'Inter',sans-serif;}
 .btn-logout:hover{border-color:rgba(0,0,0,.18);color:var(--txt);}
 
 /* ── SPLIT ── */
 .split{display:flex;flex:1;overflow:hidden;}
 
-/* ── SIDEBAR ── */
-.sidebar{width:260px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-.sb-head{padding:14px 12px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+/* ── PROJECT SIDEBAR ── */
+.sidebar{width:255px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:12px 10px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .sb-head-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .sb-label{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);}
-.btn-new-proj{display:flex;align-items:center;gap:5px;background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.btn-new-proj{display:flex;align-items:center;gap:5px;background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s;}
 .btn-new-proj:hover{background:var(--green-dk);}
 .sb-search{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--txt);font-family:'Inter',sans-serif;outline:none;transition:border .15s;}
 .sb-search:focus{border-color:var(--green);}
 .sb-search::placeholder{color:#94a3b8;}
-.proj-list{flex:1;overflow-y:auto;padding:6px 6px;}
-.proj-item{display:flex;align-items:center;gap:9px;padding:9px 9px;border-radius:9px;cursor:pointer;transition:all .14s;margin-bottom:1px;border:1px solid transparent;}
+.proj-list{flex:1;overflow-y:auto;padding:6px;}
+.proj-item{display:flex;align-items:center;gap:9px;padding:9px 8px;border-radius:9px;cursor:pointer;transition:all .14s;margin-bottom:1px;border:1px solid transparent;}
 .proj-item:hover{background:var(--card2);}
 .proj-item.active{background:rgba(170,255,0,.08);border-color:rgba(170,255,0,.3);}
 .pi-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
@@ -83,30 +83,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .pi-badge.completado{background:rgba(99,102,241,.15);color:#3730a3;}
 .sb-empty{padding:30px 14px;text-align:center;color:#94a3b8;font-size:12px;line-height:1.6;}
 
-/* ── SETUP REQUIRED ── */
-.setup-banner{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:16px;margin:16px;font-size:12px;line-height:1.7;}
-.setup-banner strong{color:#92400e;display:block;margin-bottom:4px;font-size:13px;}
-.setup-banner code{background:#fef08a;border-radius:4px;padding:1px 5px;font-size:11px;word-break:break-all;}
-
 /* ── DOC PANEL ── */
 .doc-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-
 .doc-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);}
 .doc-empty-icon{font-size:44px;opacity:.35;}
 .doc-empty-title{font-size:14px;font-weight:600;color:#94a3b8;}
 .doc-empty-sub{font-size:11px;color:#cbd5e1;}
 
 /* PROJECT HEADER */
-.proj-header{padding:20px 28px 0;flex-shrink:0;}
-.proj-header-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.proj-header{padding:18px 28px 0;flex-shrink:0;background:#fff;border-bottom:1px solid var(--border);}
+.proj-header-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
 .proj-color-btn{width:12px;height:12px;border-radius:50%;cursor:pointer;flex-shrink:0;transition:transform .15s;position:relative;}
 .proj-color-btn:hover{transform:scale(1.4);}
-.proj-name-input{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.3px;background:transparent;border:none;outline:none;color:var(--txt);flex:1;caret-color:var(--green);min-width:0;}
+.proj-name-input{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.3px;background:transparent;border:none;outline:none;color:var(--txt);flex:1;caret-color:var(--green);min-width:0;}
 .proj-name-input::placeholder{color:#cbd5e1;}
 .proj-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.status-sel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--txt);font-family:'Inter',sans-serif;cursor:pointer;outline:none;transition:border .15s;}
-.status-sel:focus{border-color:var(--green);}
-.del-btn{background:transparent;border:1px solid rgba(220,38,38,.2);color:#dc2626;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
+.status-sel{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--txt);font-family:'Inter',sans-serif;cursor:pointer;outline:none;}
+.del-btn{background:transparent;border:1px solid rgba(220,38,38,.2);color:#dc2626;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
 .del-btn:hover{background:rgba(220,38,38,.06);}
 
 /* COLOR POPOVER */
@@ -117,7 +110,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .cp-sw.sel{border-color:#0f172a;}
 
 /* TABS */
-.tab-bar{display:flex;align-items:center;gap:0;padding:0 28px;border-bottom:1px solid var(--border);flex-shrink:0;margin-top:4px;}
+.tab-bar{display:flex;align-items:center;gap:0;background:#fff;}
 .tab-btn{display:flex;align-items:center;gap:6px;padding:10px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif;margin-bottom:-1px;}
 .tab-btn:hover{color:var(--txt);}
 .tab-btn.active{color:var(--txt);border-bottom-color:var(--green);}
@@ -125,65 +118,107 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .tab-btn.active .tab-badge{background:var(--green-dim);color:#3a6b00;}
 
 /* TAB CONTENT */
-.tab-content{flex:1;overflow-y:auto;padding:20px 28px 48px;}
+.tab-content{flex:1;overflow-y:auto;padding:20px 28px 48px;display:none;}
+.tab-content.active{display:block;}
 
-/* NOTES TAB */
+/* ── NOTAS (Quill) ── */
 .section-lbl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;}
-.desc-input{width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);outline:none;resize:none;min-height:64px;max-height:120px;transition:border .15s;line-height:1.6;margin-bottom:20px;}
+.desc-input{width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);outline:none;resize:none;min-height:56px;max-height:100px;transition:border .15s;line-height:1.6;margin-bottom:20px;}
 .desc-input:focus{border-color:var(--green);}
 .desc-input::placeholder{color:#94a3b8;}
-.notes-input{width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);outline:none;resize:vertical;min-height:340px;transition:border .15s;line-height:1.9;}
-.notes-input:focus{border-color:var(--green);}
-.notes-input::placeholder{color:#94a3b8;}
-.save-row{display:flex;align-items:center;gap:10px;margin-top:14px;}
+
+.quill-wrap{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.quill-wrap .ql-toolbar{border:none;border-bottom:1px solid var(--border);background:var(--card2);padding:8px 12px;}
+.quill-wrap .ql-container{border:none;font-family:'Inter',sans-serif;font-size:13px;}
+.quill-wrap .ql-editor{min-height:320px;padding:16px 18px;line-height:1.8;color:var(--txt);}
+.quill-wrap .ql-editor p{margin-bottom:4px;}
+.quill-wrap .ql-editor h1{font-family:'Anton',sans-serif;font-size:22px;margin-bottom:8px;margin-top:16px;color:var(--txt);}
+.quill-wrap .ql-editor h2{font-size:16px;font-weight:700;margin-bottom:6px;margin-top:14px;color:var(--txt);}
+.quill-wrap .ql-editor h3{font-size:14px;font-weight:700;margin-bottom:4px;margin-top:12px;color:var(--muted);}
+.quill-wrap .ql-editor a{color:#4f46e5;text-decoration:underline;}
+.quill-wrap .ql-editor blockquote{border-left:3px solid var(--green);padding-left:14px;color:var(--muted);margin:8px 0;}
+.quill-wrap .ql-editor ul li,
+.quill-wrap .ql-editor ol li{margin-bottom:3px;}
+.quill-wrap .ql-editor pre{background:var(--card2);border-radius:8px;padding:12px 14px;font-size:12px;}
+
+.save-row{display:flex;align-items:center;gap:10px;margin-top:4px;}
 .btn-save{background:var(--green);color:#0f172a;border:none;border-radius:9px;padding:9px 22px;font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.5px;cursor:pointer;transition:background .15s;}
 .btn-save:hover{background:var(--green-dk);}
 .save-lbl{font-size:11px;font-weight:600;color:var(--muted);}
 .save-lbl.saved{color:#3a6b00;}
 
-/* DOCS TAB */
-.docs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.btn-add-doc{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--txt);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;}
-.btn-add-doc:hover{border-color:rgba(0,0,0,.18);background:var(--card2);}
-.docs-empty{padding:40px 20px;text-align:center;color:#94a3b8;font-size:12px;line-height:1.7;background:#fff;border:1px dashed var(--border);border-radius:12px;}
-.docs-empty-icon{font-size:32px;margin-bottom:8px;opacity:.5;}
+/* ── PÁGINAS TAB ── */
+.pages-layout{display:flex;gap:16px;min-height:100%;}
+.pages-list-col{width:220px;flex-shrink:0;}
+.pages-editor-col{flex:1;min-width:0;}
+.pages-list-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.btn-new-page{display:flex;align-items:center;gap:5px;background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s;}
+.btn-new-page:hover{background:var(--green-dk);}
+.page-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;cursor:pointer;border:1px solid transparent;margin-bottom:3px;transition:all .14s;}
+.page-item:hover{background:var(--card2);}
+.page-item.active{background:rgba(170,255,0,.08);border-color:rgba(170,255,0,.3);}
+.page-item-icon{font-size:14px;flex-shrink:0;}
+.page-item-body{flex:1;min-width:0;}
+.page-item-title{font-size:12px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.page-item-date{font-size:10px;color:#94a3b8;}
+.page-item-del{opacity:0;background:transparent;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:2px;transition:opacity .15s;flex-shrink:0;}
+.page-item:hover .page-item-del{opacity:1;}
+.pages-empty{padding:24px 0;text-align:center;color:#94a3b8;font-size:12px;line-height:1.7;}
 
-/* DOC CARD */
-.doc-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:box-shadow .15s;}
-.doc-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.07);}
-.doc-card-head{display:flex;align-items:center;gap:12px;padding:14px 16px;}
-.doc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.doc-icon.sheet{background:rgba(34,197,94,.12);}
-.doc-icon.doc{background:rgba(59,130,246,.12);}
-.doc-icon.slides{background:rgba(249,115,22,.12);}
-.doc-icon.link{background:var(--card2);}
-.doc-card-body{flex:1;min-width:0;}
-.doc-card-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
-.doc-card-url{font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;}
-.doc-card-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.btn-open{background:var(--green);color:#0f172a;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
-.btn-open:hover{background:var(--green-dk);}
-.btn-preview{background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;color:var(--txt);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;}
-.btn-preview:hover{background:#e2e8f0;}
-.btn-preview.active{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);color:#4f46e5;}
-.btn-del-doc{background:transparent;border:1px solid rgba(220,38,38,.15);border-radius:7px;padding:6px 8px;font-size:12px;cursor:pointer;transition:all .15s;color:#dc2626;}
-.btn-del-doc:hover{background:rgba(220,38,38,.06);}
-.doc-preview-frame{width:100%;height:420px;border:none;border-top:1px solid var(--border);display:block;}
+.page-editor-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.page-title-input{font-family:'Anton',sans-serif;font-size:20px;background:transparent;border:none;outline:none;color:var(--txt);flex:1;caret-color:var(--green);}
+.page-title-input::placeholder{color:#cbd5e1;}
+.page-save-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.page-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:#94a3b8;text-align:center;gap:10px;}
+.page-empty-icon{font-size:36px;opacity:.4;}
 
-/* ADD DOC FORM */
-.add-doc-form{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;animation:fadeUp .2s both;}
-.adf-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:12px;}
-.adf-row{display:flex;gap:10px;margin-bottom:10px;}
-.adf-input{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--txt);font-family:'Inter',sans-serif;outline:none;transition:border .15s;}
-.adf-input:focus{border-color:var(--green);}
-.adf-input::placeholder{color:#94a3b8;}
-.adf-detect{font-size:11px;color:var(--muted);margin:-4px 0 8px;min-height:16px;display:flex;align-items:center;gap:6px;}
-.adf-actions{display:flex;gap:8px;}
-.btn-adf-save{background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:9px 18px;font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.3px;cursor:pointer;transition:background .15s;}
-.btn-adf-save:hover{background:var(--green-dk);}
-.btn-adf-cancel{background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;}
+/* ── LINKS TAB ── */
+.links-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.btn-add-link{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--txt);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;}
+.btn-add-link:hover{border-color:rgba(0,0,0,.18);background:var(--card2);}
+.link-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:box-shadow .15s;}
+.link-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.07);}
+.link-card-head{display:flex;align-items:center;gap:12px;padding:13px 16px;}
+.link-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.link-icon.sheet{background:rgba(34,197,94,.12);}
+.link-icon.doc{background:rgba(59,130,246,.12);}
+.link-icon.slides{background:rgba(249,115,22,.12);}
+.link-icon.notion{background:rgba(0,0,0,.08);}
+.link-icon.figma{background:rgba(162,89,255,.12);}
+.link-icon.loom{background:rgba(99,102,241,.12);}
+.link-icon.link{background:var(--card2);}
+.link-card-body{flex:1;min-width:0;}
+.link-card-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:2px;}
+.link-card-url{font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;}
+.link-card-type{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--card2);color:var(--muted);margin-top:3px;}
+.link-card-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.btn-open-link{background:var(--green);color:#0f172a;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.btn-open-link:hover{background:var(--green-dk);}
+.btn-preview-link{background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;color:var(--txt);cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-preview-link:hover{background:#e2e8f0;}
+.btn-preview-link.active{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);color:#4f46e5;}
+.btn-del-link{background:transparent;border:1px solid rgba(220,38,38,.15);border-radius:7px;padding:6px 8px;font-size:12px;cursor:pointer;color:#dc2626;}
+.btn-del-link:hover{background:rgba(220,38,38,.06);}
+.link-preview-frame{width:100%;height:420px;border:none;border-top:1px solid var(--border);}
+.links-empty{padding:40px 20px;text-align:center;color:#94a3b8;font-size:12px;line-height:1.7;background:#fff;border:1px dashed var(--border);border-radius:12px;}
 
-/* MODAL: new project */
+/* ADD LINK FORM */
+.add-link-form{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;animation:fadeUp .2s both;}
+.alf-title{font-size:13px;font-weight:700;margin-bottom:12px;}
+.alf-row{display:flex;gap:10px;margin-bottom:10px;}
+.alf-input{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--txt);font-family:'Inter',sans-serif;outline:none;transition:border .15s;}
+.alf-input:focus{border-color:var(--green);}
+.alf-input::placeholder{color:#94a3b8;}
+.alf-detect{font-size:11px;color:var(--muted);margin:-4px 0 8px;min-height:16px;display:flex;align-items:center;gap:6px;}
+.alf-actions{display:flex;gap:8px;}
+.btn-alf-save{background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:9px 18px;font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.3px;cursor:pointer;}
+.btn-alf-cancel{background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;}
+
+/* ── SETUP BANNER ── */
+.setup-banner{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:16px;margin:16px;font-size:12px;line-height:1.7;}
+.setup-banner strong{color:#92400e;display:block;margin-bottom:4px;font-size:13px;}
+
+/* ── MODAL ── */
 #modal-new{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(6px);}
 #modal-new.open{display:flex;}
 .modal-box{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:20px;padding:28px 24px;width:400px;max-width:94vw;box-shadow:0 8px 40px rgba(0,0,0,.12);animation:fadeUp .2s both;}
@@ -198,7 +233,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .mc-sw.sel{border-color:#0f172a;}
 .modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
 .btn-m-cancel{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:9px 16px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
-.btn-m-create{background:var(--green);color:#0f172a;border:none;border-radius:9px;padding:9px 18px;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;cursor:pointer;transition:background .15s;}
+.btn-m-create{background:var(--green);color:#0f172a;border:none;border-radius:9px;padding:9px 18px;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;cursor:pointer;}
 .btn-m-create:hover{background:var(--green-dk);}
 
 /* TOAST */
@@ -207,11 +242,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .toast.ok{background:#14532d;border-left:3px solid var(--green);}
 .toast.err{background:#7f1d1d;border-left:3px solid #f87171;}
 
-@media(max-width:640px){
-  .sidebar{position:absolute;left:0;top:52px;bottom:0;z-index:40;transform:translateX(-100%);transition:transform .2s;}
-  .sidebar.open{transform:translateX(0);}
-  .split{position:relative;}
-}
+/* Quill tooltip link override */
+.ql-snow .ql-tooltip{z-index:300;}
 </style>
 </head>
 <body>
@@ -227,7 +259,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
     <div class="login-card">
       <input id="login-email" class="lf" type="email" placeholder="Email" autocomplete="email">
       <input id="login-password" class="lf" type="password" placeholder="Contraseña" autocomplete="current-password">
-      <button class="login-btn" id="login-btn" onclick="doLogin()">ENTRAR</button>
+      <button class="login-btn" onclick="doLogin()">ENTRAR</button>
       <div class="login-error" id="login-error"></div>
       <div class="login-spinner" id="login-spinner"></div>
     </div>
@@ -254,7 +286,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
   <div class="split">
 
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar">
       <div class="sb-head">
         <div class="sb-head-top">
           <div class="sb-label">Proyectos</div>
@@ -275,7 +307,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         <div class="doc-empty-sub">O crea uno nuevo con "+ Nuevo"</div>
       </div>
 
-      <!-- PROJ WORKSPACE (hidden until project selected) -->
+      <!-- WORKSPACE -->
       <div id="workspace" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
 
         <!-- HEADER -->
@@ -295,50 +327,90 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
               <button class="del-btn" onclick="deleteProject()">Eliminar</button>
             </div>
           </div>
+
+          <!-- TABS -->
+          <div class="tab-bar">
+            <button class="tab-btn active" id="tab-notas-btn" onclick="switchTab('notas')">📝 Notas</button>
+            <button class="tab-btn" id="tab-pages-btn" onclick="switchTab('pages')">📄 Páginas <span class="tab-badge" id="pages-count">0</span></button>
+            <button class="tab-btn" id="tab-links-btn" onclick="switchTab('links')">🔗 Links <span class="tab-badge" id="links-count">0</span></button>
+          </div>
         </div>
 
-        <!-- TABS -->
-        <div class="tab-bar">
-          <button class="tab-btn active" id="tab-notas-btn" onclick="switchTab('notas')">📝 Notas</button>
-          <button class="tab-btn" id="tab-docs-btn" onclick="switchTab('docs')">📎 Documentos <span class="tab-badge" id="docs-count">0</span></button>
-        </div>
-
-        <!-- TAB: NOTAS -->
-        <div class="tab-content" id="tab-notas">
-          <div class="section-lbl">Descripción</div>
-          <textarea class="desc-input" id="proj-desc" placeholder="Breve descripción del proyecto..." rows="3" oninput="markDirty()"></textarea>
-          <div class="section-lbl">Notas y detalles</div>
-          <textarea class="notes-input" id="proj-notes" placeholder="Escribe aquí toda la información — tareas, objetivos, links, ideas, fechas importantes, resumen de reuniones..." oninput="markDirty()"></textarea>
+        <!-- TAB: NOTAS (Quill rich text) -->
+        <div class="tab-content active" id="tab-notas">
+          <div class="section-lbl">Descripción corta</div>
+          <textarea class="desc-input" id="proj-desc" placeholder="Una línea para describir el proyecto..." rows="2" oninput="markDirty()"></textarea>
+          <div class="section-lbl">Notas del proyecto</div>
+          <div class="quill-wrap">
+            <div id="quill-editor"></div>
+          </div>
           <div class="save-row">
             <button class="btn-save" onclick="saveProject()">Guardar</button>
             <span class="save-lbl" id="save-lbl">Sin cambios</span>
           </div>
         </div>
 
-        <!-- TAB: DOCUMENTOS -->
-        <div class="tab-content" id="tab-docs" style="display:none;">
-          <div class="docs-head">
-            <div class="section-lbl" style="margin-bottom:0">Documentos vinculados</div>
-            <button class="btn-add-doc" id="btn-add-doc" onclick="showAddDocForm()">+ Agregar documento</button>
+        <!-- TAB: PÁGINAS INTERNAS -->
+        <div class="tab-content" id="tab-pages">
+          <div class="pages-layout">
+            <!-- Lista de páginas -->
+            <div class="pages-list-col">
+              <div class="pages-list-head">
+                <div class="section-lbl" style="margin:0">Páginas</div>
+                <button class="btn-new-page" onclick="newPage()">+ Nueva</button>
+              </div>
+              <div id="pages-list">
+                <div class="pages-empty">Sin páginas.<br>Crea la primera.</div>
+              </div>
+            </div>
+            <!-- Editor de página -->
+            <div class="pages-editor-col" id="page-editor-col">
+              <div class="page-empty-state" id="page-empty-state">
+                <div class="page-empty-icon">📄</div>
+                <div style="font-weight:600;font-size:13px;color:#94a3b8;">Selecciona o crea una página</div>
+                <div style="font-size:11px;color:#cbd5e1;">Crea documentos con texto, listas, links y más</div>
+              </div>
+              <div id="page-editor-area" style="display:none;">
+                <div class="page-editor-header">
+                  <input class="page-title-input" id="page-title" type="text" placeholder="Título de la página..." maxlength="120">
+                  <button class="del-btn" onclick="deletePage()">Eliminar</button>
+                </div>
+                <div class="quill-wrap">
+                  <div id="quill-page"></div>
+                </div>
+                <div class="page-save-row">
+                  <button class="btn-save" onclick="savePage()">Guardar</button>
+                  <span class="save-lbl" id="page-save-lbl">Sin cambios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: LINKS EXTERNOS -->
+        <div class="tab-content" id="tab-links">
+          <div class="links-head">
+            <div class="section-lbl" style="margin:0">Links y documentos externos</div>
+            <button class="btn-add-link" id="btn-add-link" onclick="showAddLinkForm()">+ Agregar link</button>
           </div>
 
-          <!-- ADD FORM (hidden initially) -->
-          <div id="add-doc-form" style="display:none;" class="add-doc-form">
-            <div class="adf-title">Vincular documento</div>
-            <div class="adf-row">
-              <input class="adf-input" id="adf-titulo" type="text" placeholder="Título (ej: Presupuesto Q3)" maxlength="100">
+          <!-- ADD FORM -->
+          <div id="add-link-form" style="display:none;" class="add-link-form">
+            <div class="alf-title">Agregar link</div>
+            <div class="alf-row">
+              <input class="alf-input" id="alf-titulo" type="text" placeholder="Título (ej: Presupuesto Q3)" maxlength="100">
             </div>
-            <div class="adf-row">
-              <input class="adf-input" id="adf-url" type="url" placeholder="Pega el link de Google Docs, Sheets, Drive..." oninput="detectDocType()">
+            <div class="alf-row">
+              <input class="alf-input" id="alf-url" type="url" placeholder="Pega el link (Google Docs, Notion, Figma, Loom...)" oninput="detectLinkType()">
             </div>
-            <div class="adf-detect" id="adf-detect">Pega un link para detectar el tipo automáticamente</div>
-            <div class="adf-actions">
-              <button class="btn-adf-save" onclick="addDoc()">GUARDAR</button>
-              <button class="btn-adf-cancel" onclick="hideAddDocForm()">Cancelar</button>
+            <div class="alf-detect" id="alf-detect">Pega un link para detectar el tipo</div>
+            <div class="alf-actions">
+              <button class="btn-alf-save" onclick="addLink()">GUARDAR</button>
+              <button class="btn-alf-cancel" onclick="hideAddLinkForm()">Cancelar</button>
             </div>
           </div>
 
-          <div id="docs-list"></div>
+          <div id="links-list"></div>
         </div>
 
       </div>
@@ -369,400 +441,575 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-const sb=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk');
+const sb = supabase.createClient(
+  'https://mwefvjvvitsondqghgsx.supabase.co',
+  'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk'
+);
 
-const COLORS=['#AAFF00','#6366f1','#f472b6','#0d9488','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#64748b'];
-const DOC_ICONS={sheet:'📊',doc:'📄',slides:'🖼️',link:'🔗'};
-const DOC_LABELS={sheet:'Google Sheets',doc:'Google Docs',slides:'Google Slides',link:'Enlace externo'};
+const COLORS = ['#AAFF00','#6366f1','#f472b6','#0d9488','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#64748b'];
+const LINK_META = {
+  sheet:  { icon:'📊', label:'Google Sheets',     cls:'sheet'  },
+  doc:    { icon:'📄', label:'Google Docs',        cls:'doc'    },
+  slides: { icon:'🖼️', label:'Google Slides',     cls:'slides' },
+  notion: { icon:'📓', label:'Notion',             cls:'notion' },
+  figma:  { icon:'🎨', label:'Figma',              cls:'figma'  },
+  loom:   { icon:'🎬', label:'Loom',               cls:'loom'   },
+  link:   { icon:'🔗', label:'Enlace externo',     cls:'link'   },
+};
+const SETUP_SQL = `-- Tabla proyectos
+CREATE TABLE IF NOT EXISTS proyectos (
+  id bigserial PRIMARY KEY,
+  nombre text NOT NULL,
+  descripcion text DEFAULT '',
+  notas text DEFAULT '',
+  color text DEFAULT '#AAFF00',
+  estado text DEFAULT 'Activo',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+ALTER TABLE proyectos ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "auth_all" ON proyectos FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
-let PROJECTS=[];
-let CURRENT=null;
-let DOCS=[];
-let dirty=false;
-let saveTimer=null;
-let newColor=COLORS[0];
-let currentTab='notas';
+-- Tabla links externos
+CREATE TABLE IF NOT EXISTS proyecto_docs (
+  id bigserial PRIMARY KEY,
+  proyecto_id bigint NOT NULL REFERENCES proyectos(id) ON DELETE CASCADE,
+  titulo text NOT NULL,
+  url text NOT NULL,
+  tipo text DEFAULT 'link',
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE proyecto_docs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "auth_all" ON proyecto_docs FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+-- Tabla páginas internas (docs ricos)
+CREATE TABLE IF NOT EXISTS proyecto_paginas (
+  id bigserial PRIMARY KEY,
+  proyecto_id bigint NOT NULL REFERENCES proyectos(id) ON DELETE CASCADE,
+  titulo text NOT NULL DEFAULT 'Sin título',
+  contenido text DEFAULT '',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+ALTER TABLE proyecto_paginas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "auth_all" ON proyecto_paginas FOR ALL TO authenticated USING (true) WITH CHECK (true);`;
+
+let PROJECTS = [], LINKS = [], PAGES = [];
+let CURRENT = null, CURRENT_PAGE = null;
+let dirty = false, pageDirty = false;
+let saveTimer = null, pageSaveTimer = null;
+let newColor = COLORS[0];
+let currentTab = 'notas';
+let quillNotes = null, quillPage = null;
+
+/* ── QUILL INIT ── */
+function initQuills() {
+  const toolbarOptions = [
+    [{ header: [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    ['link', 'blockquote', 'code-block'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ color: [] }, { background: [] }],
+    ['clean']
+  ];
+  quillNotes = new Quill('#quill-editor', {
+    theme: 'snow',
+    placeholder: 'Escribe aquí notas, objetivos, ideas, links, resúmenes de reuniones...',
+    modules: { toolbar: toolbarOptions }
+  });
+  quillNotes.on('text-change', () => markDirty());
+
+  quillPage = new Quill('#quill-page', {
+    theme: 'snow',
+    placeholder: 'Escribe el contenido de esta página...',
+    modules: { toolbar: toolbarOptions }
+  });
+  quillPage.on('text-change', () => markPageDirty());
+}
 
 /* ── AUTH ── */
-async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const pass=document.getElementById('login-password').value;
-  const err=document.getElementById('login-error');
-  const spin=document.getElementById('login-spinner');
-  const btn=document.getElementById('login-btn');
-  err.textContent='';
-  if(!email||!pass){err.textContent='Ingresa email y contraseña.';return;}
-  btn.style.opacity='.6';btn.style.pointerEvents='none';spin.style.display='block';
-  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  spin.style.display='none';btn.style.opacity='';btn.style.pointerEvents='';
-  if(error){err.textContent='Credenciales incorrectas.';return;}
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const err   = document.getElementById('login-error');
+  const spin  = document.getElementById('login-spinner');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Ingresa email y contraseña.'; return; }
+  spin.style.display = 'block';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  spin.style.display = 'none';
+  if (error) { err.textContent = 'Credenciales incorrectas.'; return; }
   initApp(data.user);
 }
-async function doLogout(){await sb.auth.signOut();location.reload();}
+async function doLogout() { await sb.auth.signOut(); location.reload(); }
 
 /* ── INIT ── */
-async function initApp(user){
-  document.getElementById('login-overlay').style.display='none';
-  document.getElementById('app').style.display='flex';
-  const name=user.email.split('@')[0];
-  const display=name.charAt(0).toUpperCase()+name.slice(1);
-  document.getElementById('tb-uname').textContent=display;
-  document.getElementById('tb-avatar').textContent=display.charAt(0).toUpperCase();
+async function initApp(user) {
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  const name = user.email.split('@')[0];
+  const display = name.charAt(0).toUpperCase() + name.slice(1);
+  document.getElementById('tb-uname').textContent = display;
+  document.getElementById('tb-avatar').textContent = display.charAt(0).toUpperCase();
   buildColorUIs();
+  initQuills();
   await loadProjects();
   subscribeRealtime();
 }
 
 /* ── PROJECTS ── */
-async function loadProjects(){
-  const {data,error}=await sb.from('proyectos').select('*').order('created_at',{ascending:false});
-  if(error){
-    const noTable=error.code==='42P01'||error.code==='PGRST116'||(error.message||'').toLowerCase().includes('does not exist');
-    if(noTable){showSetupBanner();}
-    else{
-      document.getElementById('proj-list').innerHTML=`<div class="sb-empty" style="padding:20px 12px;">
-        <div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:8px;">Error al cargar</div>
-        <div style="font-size:10px;color:#94a3b8;margin-bottom:10px;word-break:break-all;">${error.message||'Error desconocido'}</div>
-        <button onclick="loadProjects()" style="background:var(--green);border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Reintentar</button>
-      </div>`;
-    }
+async function loadProjects() {
+  const { data, error } = await sb.from('proyectos').select('*').order('created_at', { ascending: false });
+  if (error) {
+    const noTable = error.code === '42P01' || (error.message || '').toLowerCase().includes('does not exist');
+    if (noTable) showSetupBanner();
+    else document.getElementById('proj-list').innerHTML = `<div class="sb-empty" style="color:#dc2626;font-size:11px;">Error: ${error.message}</div>`;
     return;
   }
-  PROJECTS=data||[];
+  PROJECTS = data || [];
   renderList();
 }
 
-function showSetupBanner(){
-  document.getElementById('proj-list').innerHTML=`
+function showSetupBanner() {
+  document.getElementById('proj-list').innerHTML = `
   <div class="setup-banner">
-    <strong>⚠️ Tabla no creada aún</strong>
-    Corre este SQL en Supabase:<br>
-    <a href="https://supabase.com/dashboard/project/mwefvjvvitsondqghgsx/sql/new" target="_blank" style="color:#1d4ed8;font-size:11px;">Abrir SQL Editor →</a>
-    <pre style="margin-top:8px;font-size:10px;background:#fef08a;padding:8px;border-radius:6px;overflow:auto;white-space:pre-wrap">CREATE TABLE proyectos (id bigserial PRIMARY KEY,nombre text NOT NULL,descripcion text DEFAULT '',notas text DEFAULT '',color text DEFAULT '#AAFF00',estado text DEFAULT 'Activo',created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now());
-ALTER TABLE proyectos ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "auth_all" ON proyectos FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-CREATE TABLE proyecto_docs (id bigserial PRIMARY KEY,proyecto_id bigint NOT NULL REFERENCES proyectos(id) ON DELETE CASCADE,titulo text NOT NULL,url text NOT NULL,tipo text DEFAULT 'link',created_at timestamptz DEFAULT now());
-ALTER TABLE proyecto_docs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "auth_all" ON proyecto_docs FOR ALL TO authenticated USING (true) WITH CHECK (true);</pre>
+    <strong>⚠️ Configura las tablas en Supabase</strong>
+    <a href="https://supabase.com/dashboard/project/mwefvjvvitsondqghgsx/sql/new" target="_blank" style="color:#1d4ed8;font-size:11px;font-weight:700;">Abrir SQL Editor →</a>
+    <pre style="margin-top:8px;font-size:9px;background:#fef08a;padding:8px;border-radius:6px;overflow:auto;white-space:pre-wrap;line-height:1.5;">${esc(SETUP_SQL)}</pre>
   </div>`;
 }
 
-function renderList(q=''){
-  const lq=q.toLowerCase();
-  const filtered=PROJECTS.filter(p=>!lq||p.nombre.toLowerCase().includes(lq));
-  const list=document.getElementById('proj-list');
-  if(!filtered.length){
-    list.innerHTML=`<div class="sb-empty">${q?'Sin resultados':'Sin proyectos.<br>Crea el primero con "+ Nuevo"'}</div>`;
+function renderList(q = '') {
+  const lq = q.toLowerCase();
+  const filtered = PROJECTS.filter(p => !lq || p.nombre.toLowerCase().includes(lq));
+  const list = document.getElementById('proj-list');
+  if (!filtered.length) {
+    list.innerHTML = `<div class="sb-empty">${q ? 'Sin resultados' : 'Sin proyectos.<br>Crea el primero con "+ Nuevo"'}</div>`;
     return;
   }
-  list.innerHTML=filtered.map(p=>{
-    const active=CURRENT&&CURRENT.id===p.id?' active':'';
-    const bc=badgeClass(p.estado);
+  list.innerHTML = filtered.map(p => {
+    const active = CURRENT && CURRENT.id === p.id ? ' active' : '';
     return `<div class="proj-item${active}" onclick="selectProject(${p.id})">
       <div class="pi-dot" style="background:${p.color||'#AAFF00'}"></div>
       <div class="pi-body">
         <div class="pi-name">${esc(p.nombre)}</div>
         <div class="pi-meta">${fmtDate(p.updated_at||p.created_at)}</div>
       </div>
-      <span class="pi-badge ${bc}">${p.estado}</span>
+      <span class="pi-badge ${badgeClass(p.estado)}">${p.estado}</span>
     </div>`;
   }).join('');
 }
 
-function filterList(){renderList(document.getElementById('sb-search').value);}
+function filterList() { renderList(document.getElementById('sb-search').value); }
 
-async function selectProject(id){
-  if(dirty){const ok=confirm('Tienes cambios sin guardar. ¿Continuar sin guardar?');if(!ok)return;}
-  dirty=false;clearTimeout(saveTimer);
-  CURRENT=PROJECTS.find(p=>p.id===id);
-  if(!CURRENT)return;
+async function selectProject(id) {
+  if (dirty && !confirm('Tienes cambios sin guardar. ¿Continuar?')) return;
+  dirty = false; pageDirty = false;
+  clearTimeout(saveTimer); clearTimeout(pageSaveTimer);
+  CURRENT = PROJECTS.find(p => p.id === id);
+  if (!CURRENT) return;
   renderList(document.getElementById('sb-search').value);
-  await loadDocs();
+  await Promise.all([loadLinks(), loadPages()]);
   renderWorkspace();
 }
 
-function renderWorkspace(){
-  if(!CURRENT)return;
-  document.getElementById('doc-empty').style.display='none';
-  const ws=document.getElementById('workspace');
-  ws.style.display='flex';
-  document.getElementById('proj-name').value=CURRENT.nombre||'';
-  document.getElementById('proj-desc').value=CURRENT.descripcion||'';
-  document.getElementById('proj-notes').value=CURRENT.notas||'';
-  document.getElementById('proj-status').value=CURRENT.estado||'Activo';
-  document.getElementById('proj-color-btn').style.background=CURRENT.color||'#AAFF00';
-  document.getElementById('save-lbl').textContent='Sin cambios';
-  document.getElementById('save-lbl').className='save-lbl';
+function renderWorkspace() {
+  if (!CURRENT) return;
+  document.getElementById('doc-empty').style.display = 'none';
+  const ws = document.getElementById('workspace');
+  ws.style.display = 'flex';
+  document.getElementById('proj-name').value = CURRENT.nombre || '';
+  document.getElementById('proj-desc').value = CURRENT.descripcion || '';
+  document.getElementById('proj-status').value = CURRENT.estado || 'Activo';
+  document.getElementById('proj-color-btn').style.background = CURRENT.color || '#AAFF00';
+  document.getElementById('save-lbl').textContent = 'Sin cambios';
+  document.getElementById('save-lbl').className = 'save-lbl';
   updateColorPopSel(CURRENT.color);
-  renderDocs();
+
+  // Load rich text notes
+  if (quillNotes) {
+    quillNotes.root.innerHTML = CURRENT.notas || '';
+    quillNotes.history.clear();
+  }
+
+  renderLinks();
+  renderPagesList();
+  closePageEditor();
+  switchTab('notas');
 }
 
-/* ── SAVE ── */
-function markDirty(){
-  dirty=true;
-  document.getElementById('save-lbl').textContent='Sin guardar...';
-  document.getElementById('save-lbl').className='save-lbl';
+/* ── SAVE PROJECT ── */
+function markDirty() {
+  dirty = true;
+  document.getElementById('save-lbl').textContent = 'Sin guardar...';
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(saveProject,2000);
+  saveTimer = setTimeout(saveProject, 2000);
 }
 
-async function saveProject(){
-  if(!CURRENT)return;
+async function saveProject() {
+  if (!CURRENT) return;
   clearTimeout(saveTimer);
-  const nombre=document.getElementById('proj-name').value.trim();
-  if(!nombre){toast('El nombre no puede estar vacío','err');return;}
-  const updates={
+  const nombre = document.getElementById('proj-name').value.trim();
+  if (!nombre) { toast('El nombre no puede estar vacío', 'err'); return; }
+  const updates = {
     nombre,
-    descripcion:document.getElementById('proj-desc').value,
-    notas:document.getElementById('proj-notes').value,
-    estado:document.getElementById('proj-status').value,
-    color:document.getElementById('proj-color-btn').style.background,
-    updated_at:new Date().toISOString()
+    descripcion: document.getElementById('proj-desc').value,
+    notas: quillNotes ? quillNotes.root.innerHTML : '',
+    estado: document.getElementById('proj-status').value,
+    color: document.getElementById('proj-color-btn').style.background,
+    updated_at: new Date().toISOString()
   };
-  const {error}=await sb.from('proyectos').update(updates).eq('id',CURRENT.id);
-  if(error){toast('Error al guardar','err');return;}
-  Object.assign(CURRENT,updates);
-  PROJECTS=PROJECTS.map(p=>p.id===CURRENT.id?{...p,...updates}:p);
-  dirty=false;
-  document.getElementById('save-lbl').textContent='✓ Guardado';
-  document.getElementById('save-lbl').className='save-lbl saved';
+  const { error } = await sb.from('proyectos').update(updates).eq('id', CURRENT.id);
+  if (error) { toast('Error al guardar', 'err'); return; }
+  Object.assign(CURRENT, updates);
+  PROJECTS = PROJECTS.map(p => p.id === CURRENT.id ? { ...p, ...updates } : p);
+  dirty = false;
+  document.getElementById('save-lbl').textContent = '✓ Guardado';
+  document.getElementById('save-lbl').className = 'save-lbl saved';
   renderList(document.getElementById('sb-search').value);
 }
 
-/* ── CREATE / DELETE ── */
-function openNewModal(){
-  newColor=COLORS[0];
-  document.getElementById('m-nombre').value='';
-  document.getElementById('m-estado').value='Activo';
-  document.querySelectorAll('.mc-sw').forEach((s,i)=>s.classList.toggle('sel',i===0));
+/* ── CREATE / DELETE PROJECT ── */
+function openNewModal() {
+  newColor = COLORS[0];
+  document.getElementById('m-nombre').value = '';
+  document.getElementById('m-estado').value = 'Activo';
+  document.querySelectorAll('.mc-sw').forEach((s, i) => s.classList.toggle('sel', i === 0));
   document.getElementById('modal-new').classList.add('open');
-  setTimeout(()=>document.getElementById('m-nombre').focus(),150);
+  setTimeout(() => document.getElementById('m-nombre').focus(), 150);
 }
-function closeNewModal(){document.getElementById('modal-new').classList.remove('open');}
+function closeNewModal() { document.getElementById('modal-new').classList.remove('open'); }
 
-async function createProject(){
-  const nombre=document.getElementById('m-nombre').value.trim();
-  if(!nombre){document.getElementById('m-nombre').style.borderColor='#dc2626';return;}
-  document.getElementById('m-nombre').style.borderColor='';
-  const {data,error}=await sb.from('proyectos').insert({nombre,estado:document.getElementById('m-estado').value,color:newColor,descripcion:'',notas:''}).select().single();
-  if(error){
-    const noTable=error.code==='42P01'||(error.message||'').toLowerCase().includes('does not exist');
-    if(noTable){closeNewModal();showSetupBanner();toast('Primero crea las tablas en Supabase','err');}
-    else{
-      document.getElementById('modal-new').querySelector('.btn-m-create').textContent='CREAR';
-      const errEl=document.getElementById('m-err')||Object.assign(document.createElement('div'),{id:'m-err',style:'color:#dc2626;font-size:11px;margin-top:8px;font-weight:600;text-align:center;'});
-      errEl.textContent='Error: '+(error.message||'no se pudo crear');
-      document.querySelector('.modal-foot').before(errEl);
-    }
-    return;
-  }
+async function createProject() {
+  const nombre = document.getElementById('m-nombre').value.trim();
+  if (!nombre) { document.getElementById('m-nombre').style.borderColor = '#dc2626'; return; }
+  document.getElementById('m-nombre').style.borderColor = '';
+  const { data, error } = await sb.from('proyectos').insert({
+    nombre, estado: document.getElementById('m-estado').value, color: newColor, descripcion: '', notas: ''
+  }).select().single();
+  if (error) { toast('Error: ' + error.message, 'err'); return; }
   PROJECTS.unshift(data);
   closeNewModal();
   renderList();
   selectProject(data.id);
-  toast('Proyecto creado','ok');
+  toast('Proyecto creado', 'ok');
 }
 
-async function deleteProject(){
-  if(!CURRENT)return;
-  if(!confirm(`¿Eliminar "${CURRENT.nombre}"? Esta acción no se puede deshacer.`))return;
-  const {error}=await sb.from('proyectos').delete().eq('id',CURRENT.id);
-  if(error){toast('Error al eliminar','err');return;}
-  PROJECTS=PROJECTS.filter(p=>p.id!==CURRENT.id);
-  CURRENT=null;dirty=false;DOCS=[];
-  document.getElementById('workspace').style.display='none';
-  document.getElementById('doc-empty').style.display='flex';
+async function deleteProject() {
+  if (!CURRENT) return;
+  if (!confirm(`¿Eliminar "${CURRENT.nombre}"? Esta acción no se puede deshacer.`)) return;
+  const { error } = await sb.from('proyectos').delete().eq('id', CURRENT.id);
+  if (error) { toast('Error al eliminar', 'err'); return; }
+  PROJECTS = PROJECTS.filter(p => p.id !== CURRENT.id);
+  CURRENT = null; dirty = false; LINKS = []; PAGES = [];
+  document.getElementById('workspace').style.display = 'none';
+  document.getElementById('doc-empty').style.display = 'flex';
   renderList();
-  toast('Proyecto eliminado','ok');
+  toast('Proyecto eliminado', 'ok');
 }
 
 /* ── TABS ── */
-function switchTab(tab){
-  currentTab=tab;
-  document.getElementById('tab-notas').style.display=tab==='notas'?'block':'none';
-  document.getElementById('tab-docs').style.display=tab==='docs'?'block':'none';
-  document.getElementById('tab-notas-btn').classList.toggle('active',tab==='notas');
-  document.getElementById('tab-docs-btn').classList.toggle('active',tab==='docs');
-  if(tab==='docs')hideAddDocForm();
+function switchTab(tab) {
+  currentTab = tab;
+  ['notas', 'pages', 'links'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-' + t + '-btn').classList.toggle('active', t === tab);
+  });
+  if (tab === 'links') hideAddLinkForm();
 }
 
-/* ── DOCUMENTS ── */
-async function loadDocs(){
-  if(!CURRENT){DOCS=[];return;}
-  const {data,error}=await sb.from('proyecto_docs').select('*').eq('proyecto_id',CURRENT.id).order('created_at',{ascending:true});
-  DOCS=error?[]:(data||[]);
+/* ── PAGES (internal rich docs) ── */
+async function loadPages() {
+  if (!CURRENT) { PAGES = []; return; }
+  const { data, error } = await sb.from('proyecto_paginas').select('*').eq('proyecto_id', CURRENT.id).order('created_at', { ascending: true });
+  PAGES = error ? [] : (data || []);
 }
 
-function renderDocs(){
-  const count=DOCS.length;
-  document.getElementById('docs-count').textContent=count;
-  const list=document.getElementById('docs-list');
-  if(!count){
-    list.innerHTML=`<div class="docs-empty"><div class="docs-empty-icon">📎</div>Sin documentos aún.<br>Agrega Google Docs, Sheets o cualquier link.</div>`;
+function renderPagesList() {
+  document.getElementById('pages-count').textContent = PAGES.length;
+  const list = document.getElementById('pages-list');
+  if (!PAGES.length) {
+    list.innerHTML = `<div class="pages-empty">Sin páginas.<br>Crea la primera.</div>`;
     return;
   }
-  list.innerHTML=DOCS.map(d=>`
-  <div class="doc-card" id="dc-${d.id}">
-    <div class="doc-card-head">
-      <div class="doc-icon ${d.tipo}">${DOC_ICONS[d.tipo]||'🔗'}</div>
-      <div class="doc-card-body">
-        <div class="doc-card-title">${esc(d.titulo)}</div>
-        <div class="doc-card-url" title="${esc(d.url)}">${DOC_LABELS[d.tipo]||'Enlace'} · ${shortUrl(d.url)}</div>
+  list.innerHTML = PAGES.map(p => {
+    const active = CURRENT_PAGE && CURRENT_PAGE.id === p.id ? ' active' : '';
+    return `<div class="page-item${active}" onclick="openPage(${p.id})">
+      <div class="page-item-icon">📄</div>
+      <div class="page-item-body">
+        <div class="page-item-title">${esc(p.titulo || 'Sin título')}</div>
+        <div class="page-item-date">${fmtDate(p.updated_at || p.created_at)}</div>
       </div>
-      <div class="doc-card-actions">
-        <a class="btn-open" href="${esc(d.url)}" target="_blank" rel="noopener">Abrir ↗</a>
-        ${canEmbed(d.tipo)?`<button class="btn-preview" id="prev-btn-${d.id}" onclick="togglePreview(${d.id})">👁 Vista previa</button>`:''}
-        <button class="btn-del-doc" onclick="deleteDoc(${d.id})" title="Eliminar">🗑</button>
+      <button class="page-item-del" onclick="event.stopPropagation();deletePageById(${p.id})" title="Eliminar">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+async function newPage() {
+  if (!CURRENT) return;
+  const { data, error } = await sb.from('proyecto_paginas').insert({
+    proyecto_id: CURRENT.id, titulo: 'Nueva página', contenido: ''
+  }).select().single();
+  if (error) { toast('Error al crear página', 'err'); return; }
+  PAGES.push(data);
+  renderPagesList();
+  openPage(data.id);
+  toast('Página creada', 'ok');
+}
+
+function openPage(id) {
+  CURRENT_PAGE = PAGES.find(p => p.id === id);
+  if (!CURRENT_PAGE) return;
+  renderPagesList();
+  document.getElementById('page-empty-state').style.display = 'none';
+  document.getElementById('page-editor-area').style.display = 'block';
+  document.getElementById('page-title').value = CURRENT_PAGE.titulo || '';
+  if (quillPage) {
+    quillPage.root.innerHTML = CURRENT_PAGE.contenido || '';
+    quillPage.history.clear();
+  }
+  document.getElementById('page-save-lbl').textContent = 'Sin cambios';
+  document.getElementById('page-save-lbl').className = 'save-lbl';
+  pageDirty = false;
+}
+
+function closePageEditor() {
+  CURRENT_PAGE = null;
+  document.getElementById('page-empty-state').style.display = 'flex';
+  document.getElementById('page-editor-area').style.display = 'none';
+}
+
+function markPageDirty() {
+  pageDirty = true;
+  document.getElementById('page-save-lbl').textContent = 'Sin guardar...';
+  clearTimeout(pageSaveTimer);
+  pageSaveTimer = setTimeout(savePage, 2000);
+}
+
+async function savePage() {
+  if (!CURRENT_PAGE) return;
+  clearTimeout(pageSaveTimer);
+  const titulo = document.getElementById('page-title').value.trim() || 'Sin título';
+  const contenido = quillPage ? quillPage.root.innerHTML : '';
+  const { error } = await sb.from('proyecto_paginas').update({
+    titulo, contenido, updated_at: new Date().toISOString()
+  }).eq('id', CURRENT_PAGE.id);
+  if (error) { toast('Error al guardar página', 'err'); return; }
+  Object.assign(CURRENT_PAGE, { titulo, contenido });
+  PAGES = PAGES.map(p => p.id === CURRENT_PAGE.id ? { ...p, titulo, contenido } : p);
+  pageDirty = false;
+  document.getElementById('page-save-lbl').textContent = '✓ Guardado';
+  document.getElementById('page-save-lbl').className = 'save-lbl saved';
+  renderPagesList();
+}
+
+async function deletePage() {
+  if (!CURRENT_PAGE) return;
+  await deletePageById(CURRENT_PAGE.id);
+}
+
+async function deletePageById(id) {
+  if (!confirm('¿Eliminar esta página?')) return;
+  const { error } = await sb.from('proyecto_paginas').delete().eq('id', id);
+  if (error) { toast('Error al eliminar', 'err'); return; }
+  PAGES = PAGES.filter(p => p.id !== id);
+  if (CURRENT_PAGE && CURRENT_PAGE.id === id) closePageEditor();
+  renderPagesList();
+  toast('Página eliminada', 'ok');
+}
+
+/* ── LINKS (external) ── */
+async function loadLinks() {
+  if (!CURRENT) { LINKS = []; return; }
+  const { data, error } = await sb.from('proyecto_docs').select('*').eq('proyecto_id', CURRENT.id).order('created_at', { ascending: true });
+  LINKS = error ? [] : (data || []);
+}
+
+function renderLinks() {
+  const count = LINKS.length;
+  document.getElementById('links-count').textContent = count;
+  const list = document.getElementById('links-list');
+  if (!count) {
+    list.innerHTML = `<div class="links-empty">📎 Sin links aún.<br>Agrega Google Docs, Notion, Figma, Loom o cualquier URL.</div>`;
+    return;
+  }
+  list.innerHTML = LINKS.map(d => {
+    const m = LINK_META[d.tipo] || LINK_META.link;
+    const canPrev = d.tipo === 'sheet' || d.tipo === 'doc' || d.tipo === 'slides';
+    return `
+    <div class="link-card" id="lc-${d.id}">
+      <div class="link-card-head">
+        <div class="link-icon ${m.cls}">${m.icon}</div>
+        <div class="link-card-body">
+          <div class="link-card-title">${esc(d.titulo)}</div>
+          <div class="link-card-url" title="${esc(d.url)}">${shortUrl(d.url)}</div>
+          <span class="link-card-type">${m.label}</span>
+        </div>
+        <div class="link-card-actions">
+          <a class="btn-open-link" href="${esc(d.url)}" target="_blank" rel="noopener">Abrir ↗</a>
+          ${canPrev ? `<button class="btn-preview-link" id="prev-btn-${d.id}" onclick="togglePreview(${d.id})">👁 Preview</button>` : ''}
+          <button class="btn-del-link" onclick="deleteLink(${d.id})">🗑</button>
+        </div>
       </div>
-    </div>
-    <div id="prev-${d.id}" style="display:none;">
-      <iframe class="doc-preview-frame" src="${getEmbedUrl(d.url)}" allowfullscreen></iframe>
-    </div>
-  </div>`).join('');
+      <div id="prev-${d.id}" style="display:none;">
+        <iframe class="link-preview-frame" src="${getEmbedUrl(d.url)}" allowfullscreen></iframe>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function canEmbed(tipo){return tipo==='sheet'||tipo==='doc'||tipo==='slides';}
-
-function togglePreview(id){
-  const frame=document.getElementById('prev-'+id);
-  const btn=document.getElementById('prev-btn-'+id);
-  const open=frame.style.display==='none';
-  frame.style.display=open?'block':'none';
-  if(btn){btn.classList.toggle('active',open);btn.textContent=open?'✕ Cerrar':'👁 Vista previa';}
+function togglePreview(id) {
+  const frame = document.getElementById('prev-' + id);
+  const btn   = document.getElementById('prev-btn-' + id);
+  const open  = frame.style.display === 'none';
+  frame.style.display = open ? 'block' : 'none';
+  if (btn) { btn.classList.toggle('active', open); btn.textContent = open ? '✕ Cerrar' : '👁 Preview'; }
 }
 
-/* ── ADD DOC ── */
-function showAddDocForm(){
-  document.getElementById('add-doc-form').style.display='block';
-  document.getElementById('btn-add-doc').style.display='none';
-  document.getElementById('adf-titulo').value='';
-  document.getElementById('adf-url').value='';
-  document.getElementById('adf-detect').innerHTML='Pega un link para detectar el tipo automáticamente';
-  setTimeout(()=>document.getElementById('adf-titulo').focus(),100);
+function showAddLinkForm() {
+  document.getElementById('add-link-form').style.display = 'block';
+  document.getElementById('btn-add-link').style.display = 'none';
+  document.getElementById('alf-titulo').value = '';
+  document.getElementById('alf-url').value = '';
+  document.getElementById('alf-detect').innerHTML = 'Pega un link para detectar el tipo';
+  setTimeout(() => document.getElementById('alf-titulo').focus(), 100);
 }
-function hideAddDocForm(){
-  document.getElementById('add-doc-form').style.display='none';
-  document.getElementById('btn-add-doc').style.display='flex';
+function hideAddLinkForm() {
+  document.getElementById('add-link-form').style.display = 'none';
+  document.getElementById('btn-add-link').style.display = 'flex';
 }
 
-function detectDocType(){
-  const url=document.getElementById('adf-url').value.trim();
-  const tipo=getDocType(url);
-  const el=document.getElementById('adf-detect');
-  const icons={sheet:'📊',doc:'📄',slides:'🖼️',link:'🔗'};
-  const labels={sheet:'Google Sheets detectado','doc':'Google Docs detectado',slides:'Google Slides detectado',link:'Enlace externo'};
-  el.innerHTML=url?`${icons[tipo]||'🔗'} <span style="color:var(--txt);font-weight:600;">${labels[tipo]||'Enlace'}</span>`:'Pega un link para detectar el tipo automáticamente';
-  // Auto-fill title if empty
-  if(!document.getElementById('adf-titulo').value&&url){
-    if(tipo==='sheet')document.getElementById('adf-titulo').value='Hoja de cálculo';
-    else if(tipo==='doc')document.getElementById('adf-titulo').value='Documento';
-    else if(tipo==='slides')document.getElementById('adf-titulo').value='Presentación';
+function detectLinkType() {
+  const url  = document.getElementById('alf-url').value.trim();
+  const tipo = getLinkType(url);
+  const m    = LINK_META[tipo] || LINK_META.link;
+  const el   = document.getElementById('alf-detect');
+  el.innerHTML = url ? `${m.icon} <span style="color:var(--txt);font-weight:600;">${m.label} detectado</span>` : 'Pega un link para detectar el tipo';
+  if (!document.getElementById('alf-titulo').value && url) {
+    const autoTitles = { sheet: 'Hoja de cálculo', doc: 'Documento', slides: 'Presentación', notion: 'Página Notion', figma: 'Diseño Figma', loom: 'Video Loom' };
+    document.getElementById('alf-titulo').value = autoTitles[tipo] || '';
   }
 }
 
-async function addDoc(){
-  if(!CURRENT)return;
-  const titulo=document.getElementById('adf-titulo').value.trim();
-  const url=document.getElementById('adf-url').value.trim();
-  if(!titulo){document.getElementById('adf-titulo').style.borderColor='#dc2626';return;}
-  if(!url||!isValidUrl(url)){document.getElementById('adf-url').style.borderColor='#dc2626';toast('Ingresa un link válido','err');return;}
-  document.getElementById('adf-titulo').style.borderColor='';
-  document.getElementById('adf-url').style.borderColor='';
-  const tipo=getDocType(url);
-  const {data,error}=await sb.from('proyecto_docs').insert({proyecto_id:CURRENT.id,titulo,url,tipo}).select().single();
-  if(error){toast('Error al guardar documento','err');return;}
-  DOCS.push(data);
-  hideAddDocForm();
-  renderDocs();
-  toast('Documento agregado','ok');
+async function addLink() {
+  if (!CURRENT) return;
+  const titulo = document.getElementById('alf-titulo').value.trim();
+  const url    = document.getElementById('alf-url').value.trim();
+  if (!titulo) { document.getElementById('alf-titulo').style.borderColor = '#dc2626'; return; }
+  if (!url || !isValidUrl(url)) { document.getElementById('alf-url').style.borderColor = '#dc2626'; toast('Ingresa un link válido', 'err'); return; }
+  document.getElementById('alf-titulo').style.borderColor = '';
+  document.getElementById('alf-url').style.borderColor = '';
+  const tipo = getLinkType(url);
+  const { data, error } = await sb.from('proyecto_docs').insert({ proyecto_id: CURRENT.id, titulo, url, tipo }).select().single();
+  if (error) { toast('Error al guardar link', 'err'); return; }
+  LINKS.push(data);
+  hideAddLinkForm();
+  renderLinks();
+  toast('Link agregado', 'ok');
 }
 
-async function deleteDoc(id){
-  if(!confirm('¿Eliminar este documento?'))return;
-  const {error}=await sb.from('proyecto_docs').delete().eq('id',id);
-  if(error){toast('Error al eliminar','err');return;}
-  DOCS=DOCS.filter(d=>d.id!==id);
-  renderDocs();
-  toast('Documento eliminado','ok');
+async function deleteLink(id) {
+  if (!confirm('¿Eliminar este link?')) return;
+  const { error } = await sb.from('proyecto_docs').delete().eq('id', id);
+  if (error) { toast('Error al eliminar', 'err'); return; }
+  LINKS = LINKS.filter(d => d.id !== id);
+  renderLinks();
+  toast('Link eliminado', 'ok');
 }
 
 /* ── COLOR PICKER ── */
-function buildColorUIs(){
-  const pop=document.getElementById('color-pop');
-  pop.innerHTML=COLORS.map(c=>`<div class="cp-sw" style="background:${c}" onclick="setDocColor('${c}')"></div>`).join('');
-  const mc=document.getElementById('m-colors');
-  mc.innerHTML=COLORS.map((c,i)=>`<div class="mc-sw${i===0?' sel':''}" style="background:${c}" onclick="pickNewColor('${c}',this)"></div>`).join('');
+function buildColorUIs() {
+  document.getElementById('color-pop').innerHTML = COLORS.map(c =>
+    `<div class="cp-sw" style="background:${c}" onclick="setDocColor('${c}')"></div>`).join('');
+  document.getElementById('m-colors').innerHTML = COLORS.map((c, i) =>
+    `<div class="mc-sw${i===0?' sel':''}" style="background:${c}" onclick="pickNewColor('${c}',this)"></div>`).join('');
 }
-function toggleColorPop(){document.getElementById('color-pop').classList.toggle('open');}
-function updateColorPopSel(color){
-  document.querySelectorAll('.cp-sw').forEach(s=>s.classList.toggle('sel',s.style.background===color||s.style.backgroundColor===color));
+function toggleColorPop() { document.getElementById('color-pop').classList.toggle('open'); }
+function updateColorPopSel(color) {
+  document.querySelectorAll('.cp-sw').forEach(s => s.classList.toggle('sel', s.style.background === color || s.style.backgroundColor === color));
 }
-function setDocColor(c){
-  document.getElementById('proj-color-btn').style.background=c;
+function setDocColor(c) {
+  document.getElementById('proj-color-btn').style.background = c;
   document.getElementById('color-pop').classList.remove('open');
   updateColorPopSel(c);
   markDirty();
 }
-function pickNewColor(c,el){newColor=c;document.querySelectorAll('.mc-sw').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');}
+function pickNewColor(c, el) {
+  newColor = c;
+  document.querySelectorAll('.mc-sw').forEach(s => s.classList.remove('sel'));
+  el.classList.add('sel');
+}
 
-document.addEventListener('click',e=>{
-  const pop=document.getElementById('color-pop');
-  const btn=document.getElementById('proj-color-btn');
-  if(pop&&btn&&!pop.contains(e.target)&&!btn.contains(e.target))pop.classList.remove('open');
+document.addEventListener('click', e => {
+  const pop = document.getElementById('color-pop');
+  const btn = document.getElementById('proj-color-btn');
+  if (pop && btn && !pop.contains(e.target) && !btn.contains(e.target)) pop.classList.remove('open');
 });
 
 /* ── REALTIME ── */
-function subscribeRealtime(){
+function subscribeRealtime() {
   sb.channel('proj-live')
-    .on('postgres_changes',{event:'*',schema:'public',table:'proyectos'},async()=>{await loadProjects();if(CURRENT){const updated=PROJECTS.find(p=>p.id===CURRENT.id);if(updated)CURRENT=updated;}renderList();})
-    .subscribe();
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'proyectos' }, async () => {
+      await loadProjects();
+      if (CURRENT) { const u = PROJECTS.find(p => p.id === CURRENT.id); if (u) CURRENT = u; }
+      renderList();
+    }).subscribe();
 }
 
 /* ── HELPERS ── */
-function getDocType(url){
-  if(!url)return'link';
-  if(url.includes('docs.google.com/spreadsheets'))return'sheet';
-  if(url.includes('docs.google.com/document'))return'doc';
-  if(url.includes('docs.google.com/presentation'))return'slides';
-  return'link';
+function getLinkType(url) {
+  if (!url) return 'link';
+  if (url.includes('docs.google.com/spreadsheets')) return 'sheet';
+  if (url.includes('docs.google.com/document'))     return 'doc';
+  if (url.includes('docs.google.com/presentation')) return 'slides';
+  if (url.includes('notion.so') || url.includes('notion.site')) return 'notion';
+  if (url.includes('figma.com'))  return 'figma';
+  if (url.includes('loom.com'))   return 'loom';
+  return 'link';
 }
-function getEmbedUrl(url){
-  const m=url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-  if(!m)return url;
-  const id=m[1];
-  if(url.includes('spreadsheets'))return`https://docs.google.com/spreadsheets/d/${id}/preview`;
-  if(url.includes('document'))return`https://docs.google.com/document/d/${id}/preview`;
-  if(url.includes('presentation'))return`https://docs.google.com/presentation/d/${id}/embed`;
+function getEmbedUrl(url) {
+  const m = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (!m) return url;
+  const id = m[1];
+  if (url.includes('spreadsheets'))  return `https://docs.google.com/spreadsheets/d/${id}/preview`;
+  if (url.includes('document'))      return `https://docs.google.com/document/d/${id}/preview`;
+  if (url.includes('presentation'))  return `https://docs.google.com/presentation/d/${id}/embed`;
   return url;
 }
-function shortUrl(url){
-  try{const u=new URL(url);return u.hostname+(u.pathname.length>30?u.pathname.substring(0,28)+'…':u.pathname);}
-  catch{return url.substring(0,50);}
+function shortUrl(url) {
+  try { const u = new URL(url); return u.hostname + (u.pathname.length > 35 ? u.pathname.substring(0, 33) + '…' : u.pathname); }
+  catch { return url.substring(0, 55); }
 }
-function isValidUrl(s){try{new URL(s);return true;}catch{return false;}}
-function badgeClass(s){if(s==='Completado')return'completado';if(s==='En pausa')return'pausa';return'activo';}
-function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('es-PA',{day:'2-digit',month:'short',year:'numeric'});}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function toast(msg,type=''){
-  const w=document.getElementById('toast-wrap');
-  const t=document.createElement('div');
-  t.className='toast'+(type?' '+type:'');t.textContent=msg;
-  w.appendChild(t);setTimeout(()=>t.remove(),3000);
+function isValidUrl(s) { try { new URL(s); return true; } catch { return false; } }
+function badgeClass(s) { return s === 'Completado' ? 'completado' : s === 'En pausa' ? 'pausa' : 'activo'; }
+function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('es-PA', { day: '2-digit', month: 'short', year: 'numeric' }); }
+function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg, type = '') {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
 /* ── KEYBOARD ── */
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&document.getElementById('login-overlay').style.display==='flex')doLogin();
-  if(e.key==='Enter'&&document.getElementById('modal-new').classList.contains('open'))createProject();
-  if(e.key==='Escape'&&document.getElementById('modal-new').classList.contains('open'))closeNewModal();
-  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();if(CURRENT)saveProject();}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-overlay').style.display !== 'none') doLogin();
+  if (e.key === 'Enter' && document.getElementById('modal-new').classList.contains('open')) createProject();
+  if (e.key === 'Escape' && document.getElementById('modal-new').classList.contains('open')) closeNewModal();
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    if (currentTab === 'notas' && CURRENT) saveProject();
+    if (currentTab === 'pages' && CURRENT_PAGE) savePage();
+  }
 });
 
-document.addEventListener('DOMContentLoaded',async()=>{
-  const {data:{session}}=await sb.auth.getSession();
-  if(session)initApp(session.user);
-  else document.getElementById('login-overlay').style.display='flex';
+/* ── BOOT ── */
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) initApp(session.user);
+  else document.getElementById('login-overlay').style.display = 'flex';
 });
 </script>
 </body>
