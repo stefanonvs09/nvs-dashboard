@@ -1049,20 +1049,33 @@ const KANBAN_COLS = [
   { status: 'Completado', icon: '✅', key: 'completado'  },
 ];
 
-function switchView(v) {
+async function switchView(v) {
   currentView = v;
   document.getElementById('view-list-btn').classList.toggle('active', v === 'list');
   document.getElementById('view-board-btn').classList.toggle('active', v === 'board');
   document.querySelector('.split').style.display = v === 'list' ? 'flex' : 'none';
   const board = document.getElementById('board-view');
   board.classList.toggle('show', v === 'board');
-  if (v === 'board') renderKanban();
+  if (v === 'board') {
+    board.innerHTML = '<div style="padding:30px;color:#94a3b8;font-size:13px;">Cargando...</div>';
+    const { data } = await sb.from('proyectos').select('*').order('created_at', { ascending: false });
+    if (data) PROJECTS = data;
+    renderKanban();
+  }
 }
 
 function renderKanban() {
   const board = document.getElementById('board-view');
-  board.innerHTML = KANBAN_COLS.map(col => {
-    const cards = PROJECTS.filter(p => p.estado === col.status);
+  const assigned = new Set();
+
+  const html = KANBAN_COLS.map(col => {
+    const cards = PROJECTS.filter(p => {
+      const e = (p.estado || 'Activo').trim();
+      return e === col.status;
+    });
+    cards.forEach(p => assigned.add(p.id));
+
+    const cardsHtml = cards.map(p => kanbanCard(p)).join('');
     return `<div class="kanban-col">
       <div class="kanban-col-head">
         <span class="kanban-col-label">${col.icon} ${col.status}</span>
@@ -1072,27 +1085,39 @@ function renderKanban() {
         ondragover="event.preventDefault();this.classList.add('drag-over')"
         ondragleave="this.classList.remove('drag-over')"
         ondrop="dropOnCol('${col.status}',this)">
-        ${cards.length
-          ? cards.map(p => kanbanCard(p)).join('')
-          : '<div class="kanban-drop-hint">Sin proyectos<br>Arrastra aquí</div>'}
+        ${cardsHtml || '<div class="kanban-drop-hint">Sin proyectos<br>Arrastra aquí</div>'}
       </div>
     </div>`;
-  }).join('');
+  });
+
+  // Proyectos con estado no reconocido van a columna extra
+  const others = PROJECTS.filter(p => !assigned.has(p.id));
+  if (others.length) {
+    html.push(`<div class="kanban-col">
+      <div class="kanban-col-head">
+        <span class="kanban-col-label">⚪ Otros</span>
+        <span class="kanban-col-count">${others.length}</span>
+      </div>
+      <div class="kanban-cards">${others.map(p => kanbanCard(p)).join('')}</div>
+    </div>`);
+  }
+
+  board.innerHTML = html.join('');
 }
 
 function kanbanCard(p) {
   const raw = (p.descripcion || '').replace(/<[^>]*>/g, '').trim();
-  return `<div class="kanban-card" draggable="true" data-id="${p.id}"
-    ondragstart="dragStart(event,${p.id})"
-    ondragend="dragEnd(event)">
-    <div class="kc-top">
-      <div class="kc-color" style="background:${p.color||'#AAFF00'}"></div>
-      <div class="kc-name">${esc(p.nombre)}</div>
-      <button class="kc-open" onclick="openFromKanban(${p.id})" title="Abrir proyecto">↗</button>
-    </div>
-    ${raw ? `<div class="kc-desc">${esc(raw)}</div>` : ''}
-    <div class="kc-date">${fmtDate(p.updated_at || p.created_at)}</div>
-  </div>`;
+  const bg = p.color || '#AAFF00';
+  return '<div class="kanban-card" draggable="true" data-id="' + p.id + '" ' +
+    'ondragstart="dragStart(event,' + p.id + ')" ondragend="dragEnd(event)">' +
+    '<div class="kc-top">' +
+      '<div class="kc-color" style="background:' + bg + '"></div>' +
+      '<div class="kc-name">' + esc(p.nombre) + '</div>' +
+      '<button class="kc-open" onclick="openFromKanban(' + p.id + ')" title="Abrir">↗</button>' +
+    '</div>' +
+    (raw ? '<div class="kc-desc">' + esc(raw) + '</div>' : '') +
+    '<div class="kc-date">' + fmtDate(p.updated_at || p.created_at) + '</div>' +
+    '</div>';
 }
 
 function dragStart(e, id) {
