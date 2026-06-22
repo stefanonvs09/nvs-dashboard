@@ -606,6 +606,7 @@ body{background:#f8fafc;color:#0f172a;}
         <div class="web-title">🌐 Website Leads</div>
         <div class="web-badge" id="web-cnt-badge">0 leads</div>
         <input class="tsearch" id="web-search" placeholder="Buscar..." oninput="renderWeb()" style="max-width:220px;padding:7px 12px;font-size:12px;">
+        <button id="sync-btn" onclick="syncFromSheet()" style="margin-left:auto;background:rgba(170,255,0,0.1);color:#aaff00;border:1px solid rgba(170,255,0,0.3);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;">⟳ Sync Sheet</button>
       </div>
       <div class="web-rem" id="web-rem-banner" style="display:none"></div>
       <div class="web-cols">
@@ -743,6 +744,29 @@ async function doLogin(){
 }
 function showApp(){q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();setupRT();}
 function updateHomeStats(){}
+
+/* SYNC FROM GOOGLE SHEET */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiQXQwgPprDR7a7ddThLORj0H36lePQdkbPKPg3bNOeI-syFhHbtdBCxL3NYH9Jdwq3Q/exec';
+async function syncFromSheet(){
+  const btn = q('#sync-btn');
+  btn.textContent = '⏳ Sincronizando...';
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?action=sync');
+    const json = await res.json();
+    if(json.inserted > 0){
+      btn.textContent = '✅ ' + json.inserted + ' nuevo(s)';
+      setTimeout(loadData, 1000);
+    } else {
+      btn.textContent = '✅ Al día';
+    }
+  } catch(err) {
+    btn.textContent = '❌ Error';
+    console.error('Sync error:', err);
+  }
+  setTimeout(()=>{ btn.textContent='⟳ Sync Sheet'; btn.disabled=false; btn.style.opacity='1'; }, 3000);
+}
 
 /* DATA */
 async function loadData(){
