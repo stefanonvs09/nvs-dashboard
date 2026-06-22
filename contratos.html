@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NVS · Contratos</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0a0a;--card:#111;--border:rgba(255,255,255,0.07);
+  --text:#f0f0f0;--m:#888;--green:#aaff00;--blue:#60a5fa;
+  --amber:#fbbf24;--red:#f87171;--teal:#2dd4bf;--purple:#a78bfa;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:24px;}
+h1{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:-.5px;margin-bottom:4px;}
+.subtitle{color:var(--m);font-size:13px;margin-bottom:24px;}
+
+/* ALERT BANNER */
+.alert{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:14px 18px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start;}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.alert-title{font-size:13px;font-weight:700;color:var(--amber);margin-bottom:6px;}
+.alert-text{font-size:12px;color:#ccc;line-height:1.6;}
+.alert-fields{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;}
+.field-tag{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.2);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--amber);}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:20px;}
+.tab{padding:8px 20px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--m);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;}
+.tab.active{background:var(--green);color:#000;border-color:var(--green);}
+.tab:hover:not(.active){border-color:rgba(255,255,255,0.15);color:var(--text);}
+
+/* SECTION */
+.section{display:none;}
+.section.active{display:block;}
+
+/* PLAN HEADER */
+.plan-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:14px;}
+.plan-badge{padding:5px 14px;border-radius:8px;font-size:12px;font-weight:800;letter-spacing:.5px;}
+.plan-badge.std{background:rgba(96,165,250,0.15);color:var(--blue);border:1px solid rgba(96,165,250,0.25);}
+.plan-badge.pre{background:rgba(167,139,250,0.15);color:var(--purple);border:1px solid rgba(167,139,250,0.25);}
+.plan-price{font-family:'Anton',sans-serif;font-size:22px;}
+.plan-desc{font-size:12px;color:var(--m);max-width:500px;line-height:1.5;}
+
+/* GRID */
+.contracts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:700px){.contracts-grid{grid-template-columns:1fr;}}
+
+/* CONTRACT CARD */
+.contract-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s;}
+.contract-card:hover{border-color:rgba(255,255,255,0.13);}
+.card-header{padding:16px 18px 14px;border-bottom:1px solid var(--border);}
+.card-type{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+.tag{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.3px;}
+.tag-age{background:rgba(45,212,191,0.12);color:var(--teal);border:1px solid rgba(45,212,191,0.2);}
+.tag-pay{background:rgba(170,255,0,0.1);color:var(--green);border:1px solid rgba(170,255,0,0.2);}
+.card-title{font-size:15px;font-weight:700;margin-bottom:2px;}
+.card-subtitle{font-size:11px;color:var(--m);}
+.card-body{padding:16px 18px;}
+
+/* PAYMENT STRUCTURE */
+.pay-structure{margin-bottom:14px;}
+.pay-label{font-size:10px;font-weight:700;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;}
+.pay-steps{display:flex;flex-direction:column;gap:6px;}
+.pay-step{display:flex;align-items:center;gap:10px;font-size:12px;}
+.pay-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.pay-dot.blue{background:var(--blue);}
+.pay-dot.amber{background:var(--amber);}
+.pay-amount{font-weight:700;color:var(--text);}
+.pay-when{color:var(--m);}
+
+/* WHO SIGNS */
+.who-signs{margin-bottom:16px;}
+.sign-label{font-size:10px;font-weight:700;color:var(--m);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;}
+.sign-person{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;font-size:12px;}
+.sign-icon{flex-shrink:0;font-size:13px;margin-top:1px;}
+.sign-name{font-weight:700;color:var(--text);}
+.sign-desc{color:var(--m);}
+
+/* FIELDS LIST */
+.fields-list{background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.12);border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+.fields-title{font-size:10px;font-weight:700;color:var(--amber);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;}
+.field-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;font-size:11px;}
+.field-x{background:rgba(248,113,113,0.15);color:var(--red);border:1px solid rgba(248,113,113,0.2);border-radius:4px;padding:1px 6px;font-weight:800;font-size:10px;flex-shrink:0;margin-top:1px;}
+.field-desc{color:#ccc;line-height:1.4;}
+
+/* DOWNLOAD BTN */
+.download-btn{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(170,255,0,0.25);background:rgba(170,255,0,0.07);color:var(--green);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;font-family:'Inter',sans-serif;text-decoration:none;}
+.download-btn:hover{background:rgba(170,255,0,0.14);border-color:rgba(170,255,0,0.4);}
+
+/* INSTRUCTIONS */
+.instructions{margin-top:28px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;}
+.inst-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.inst-steps{display:flex;flex-direction:column;gap:10px;}
+.inst-step{display:flex;gap:12px;align-items:flex-start;}
+.step-num{width:24px;height:24px;border-radius:8px;background:rgba(170,255,0,0.12);border:1px solid rgba(170,255,0,0.2);color:var(--green);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-text{font-size:13px;color:#ccc;line-height:1.5;padding-top:3px;}
+.step-text strong{color:var(--text);}
+
+/* BACK BTN */
+.back-btn{display:inline-flex;align-items:center;gap:8px;color:var(--m);font-size:13px;text-decoration:none;margin-bottom:20px;transition:color .2s;}
+.back-btn:hover{color:var(--text);}
+</style>
+</head>
+<body>
+
+<a class="back-btn" href="index.html">← Volver al inicio</a>
+
+<h1>📄 Contratos NVS</h1>
+<p class="subtitle">8 plantillas oficiales · Estándar y Premium · Mayor y Menor de edad</p>
+
+<!-- ALERT BANNER -->
+<div class="alert">
+  <div class="alert-icon">⚠️</div>
+  <div>
+    <div class="alert-title">ESTAS SON PLANTILLAS — Debes reemplazar todos los campos marcados con X antes de enviar</div>
+    <div class="alert-text">Abre el .docx en Word, usa <strong>Ctrl+H (Buscar y reemplazar)</strong> para sustituir cada X por el dato correcto. Asegúrate de no dejar ninguna X sin reemplazar.</div>
+    <div class="alert-fields">
+      <span class="field-tag">X → Nombre del Deudor</span>
+      <span class="field-tag">X → Cédula del Deudor</span>
+      <span class="field-tag">X → Nacionalidad del Deudor</span>
+      <span class="field-tag">X → Nombre del Atleta</span>
+      <span class="field-tag">X → Cédula del Atleta</span>
+      <span class="field-tag">X → Nacionalidad del Atleta</span>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="setTab('std')">⚡ Estándar — USD 2,000</button>
+  <button class="tab" onclick="setTab('pre')">👑 Premium — USD 3,000</button>
+</div>
+
+<!-- ═══ ESTÁNDAR ═══ -->
+<div class="section active" id="sec-std">
+  <div class="plan-header">
+    <div>
+      <span class="plan-badge std">ESTÁNDAR</span>
+    </div>
+    <div class="plan-price">USD 2,000</div>
+    <div class="plan-desc">Incluye asesoría completa, highlights, perfil digital, orientación académica y deportiva, y acompañamiento hasta el commit oficial con la universidad.</div>
+  </div>
+
+  <div class="contracts-grid">
+
+    <!-- 1. Estándar 50%+50% Mayor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MAYOR DE EDAD</span>
+          <span class="tag tag-pay">50% + 50%</span>
+        </div>
+        <div class="card-title">Estándar · 50% + 50% · Mayor de edad</div>
+        <div class="card-subtitle">El atleta firma como deudor en su propio nombre</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 1,000</span><span class="pay-when">— al firmar el contrato</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">USD 1,000</span><span class="pay-when">— al hacer el commit con la universidad</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👤</span><div><div class="sign-name">Deudor = El Atleta</div><div class="sign-desc">Mayor de edad, actúa en su propio nombre</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div><div class="sign-desc">Representada por Alejandro Stefano Cano Sandoval</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del atleta/deudor</strong> (ej: Carlos Andrés Pérez López)</span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad</strong> (ej: panameño, colombiano...)</span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula de identidad</strong> (ej: 8-1234-5678)</span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Estandar - 50%25 + 50%25 - Mayor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+    <!-- 2. Estándar 50%+50% Menor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MENOR DE EDAD</span>
+          <span class="tag tag-pay">50% + 50%</span>
+        </div>
+        <div class="card-title">Estándar · 50% + 50% · Menor de edad</div>
+        <div class="card-subtitle">El padre/tutor firma como deudor y representante legal</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 1,000</span><span class="pay-when">— al firmar el contrato</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">USD 1,000</span><span class="pay-when">— al hacer el commit con la universidad</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👨</span><div><div class="sign-name">Deudor = Padre / Tutor legal</div><div class="sign-desc">Mayor de edad, actúa como representante legal del menor</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🧑‍🎓</span><div><div class="sign-name">El Atleta = Menor de edad</div><div class="sign-desc">Representado por su padre/tutor en este acto</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div><div class="sign-desc">Representada por Alejandro Stefano Cano Sandoval</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar (son distintos)</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del PADRE/TUTOR</strong> (1ª aparición)</span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del ATLETA (menor)</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre del padre</strong> en la frase "representado por su padre X"</span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre en la línea de firma</strong> (al final del contrato)</span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Estandar - 50%25 + 50%25 - Menor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+    <!-- 3. Estándar Abono Mayor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MAYOR DE EDAD</span>
+          <span class="tag tag-pay">ABONO + MENSUALIDAD</span>
+        </div>
+        <div class="card-title">Estándar · Abono + Mensualidad · Mayor de edad</div>
+        <div class="card-subtitle">Para clientes que prefieren cuotas mensuales en vez de 50/50</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 500</span><span class="pay-when">— abono inicial al firmar</span></div>
+            <div class="pay-step"><div class="pay-dot amber"></div><span class="pay-amount">USD 100/mes</span><span class="pay-when">— cada día 15, desde el mes siguiente</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">Saldo restante</span><span class="pay-when">— al commit (descontando lo ya pagado)</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👤</span><div><div class="sign-name">Deudor = El Atleta</div><div class="sign-desc">Mayor de edad, actúa en su propio nombre</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del atleta/deudor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula de identidad</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre en la línea de firma</strong> (al final)</span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Estandar - Abono + mensualidad - Mayor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+    <!-- 4. Estándar Abono Menor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MENOR DE EDAD</span>
+          <span class="tag tag-pay">ABONO + MENSUALIDAD</span>
+        </div>
+        <div class="card-title">Estándar · Abono + Mensualidad · Menor de edad</div>
+        <div class="card-subtitle">Padre/tutor firma como deudor, con cuotas mensuales</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 500</span><span class="pay-when">— abono inicial al firmar</span></div>
+            <div class="pay-step"><div class="pay-dot amber"></div><span class="pay-amount">USD 100/mes</span><span class="pay-when">— cada día 15, desde el mes siguiente</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">Saldo restante</span><span class="pay-when">— al commit (descontando lo ya pagado)</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👨</span><div><div class="sign-name">Deudor = Padre / Tutor legal</div><div class="sign-desc">Mayor de edad, representante legal del menor</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🧑‍🎓</span><div><div class="sign-name">El Atleta = Menor de edad</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del PADRE/TUTOR</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del ATLETA (menor)</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre en línea de firma</strong> (al final)</span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Estandar - Abono + mensualidad - Menor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /sec-std -->
+
+<!-- ═══ PREMIUM ═══ -->
+<div class="section" id="sec-pre">
+  <div class="plan-header">
+    <div>
+      <span class="plan-badge pre">PREMIUM</span>
+    </div>
+    <div class="plan-price">USD 3,000</div>
+    <div class="plan-desc">Todo lo del Estándar + seguimiento durante toda la etapa universitaria, asesoría en procesos de transferencia y acompañamiento integral hasta la graduación (Bachelor's Degree).</div>
+  </div>
+
+  <div class="contracts-grid">
+
+    <!-- 5. Premium 50%+50% Mayor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MAYOR DE EDAD</span>
+          <span class="tag tag-pay">50% + 50%</span>
+        </div>
+        <div class="card-title">Premium · 50% + 50% · Mayor de edad</div>
+        <div class="card-subtitle">El atleta firma como deudor en su propio nombre</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 1,500</span><span class="pay-when">— al firmar el contrato</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">USD 1,500</span><span class="pay-when">— al hacer el commit con la universidad</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👤</span><div><div class="sign-name">Deudor = El Atleta</div><div class="sign-desc">Mayor de edad, actúa en su propio nombre</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del atleta/deudor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula de identidad</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre en línea de firma</strong></span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Premium - 50%25 + 50%25 - Mayor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+    <!-- 6. Premium 50%+50% Menor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MENOR DE EDAD</span>
+          <span class="tag tag-pay">50% + 50%</span>
+        </div>
+        <div class="card-title">Premium · 50% + 50% · Menor de edad</div>
+        <div class="card-subtitle">El padre/tutor firma como deudor y representante legal</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 1,500</span><span class="pay-when">— al firmar el contrato</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">USD 1,500</span><span class="pay-when">— al hacer el commit con la universidad</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👨</span><div><div class="sign-name">Deudor = Padre / Tutor legal</div><div class="sign-desc">Mayor de edad, representante legal del menor</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🧑‍🎓</span><div><div class="sign-name">El Atleta = Menor de edad</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del PADRE/TUTOR</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del ATLETA (menor)</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre del padre</strong> en "representado por su padre X"</span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre en línea de firma</strong></span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Premium - 50%25 + 50%25 - Menor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+    <!-- 7. Premium Abono Mayor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MAYOR DE EDAD</span>
+          <span class="tag tag-pay">ABONO + MENSUALIDAD</span>
+        </div>
+        <div class="card-title">Premium · Abono + Mensualidad · Mayor de edad</div>
+        <div class="card-subtitle">Para clientes que prefieren cuotas mensuales en vez de 50/50</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 500</span><span class="pay-when">— abono inicial al firmar</span></div>
+            <div class="pay-step"><div class="pay-dot amber"></div><span class="pay-amount">USD 100/mes</span><span class="pay-when">— cada día 15, desde el mes siguiente</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">Saldo restante</span><span class="pay-when">— al commit (descontando lo ya pagado)</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👤</span><div><div class="sign-name">Deudor = El Atleta</div><div class="sign-desc">Mayor de edad, actúa en su propio nombre</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del atleta/deudor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula de identidad</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre en línea de firma</strong></span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Premium - Abono + mensualidad - Mayor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+    <!-- 8. Premium Abono Menor -->
+    <div class="contract-card">
+      <div class="card-header">
+        <div class="card-type">
+          <span class="tag tag-age">MENOR DE EDAD</span>
+          <span class="tag tag-pay">ABONO + MENSUALIDAD</span>
+        </div>
+        <div class="card-title">Premium · Abono + Mensualidad · Menor de edad</div>
+        <div class="card-subtitle">Padre/tutor firma como deudor, con cuotas mensuales</div>
+      </div>
+      <div class="card-body">
+        <div class="pay-structure">
+          <div class="pay-label">Estructura de pago</div>
+          <div class="pay-steps">
+            <div class="pay-step"><div class="pay-dot"></div><span class="pay-amount">USD 500</span><span class="pay-when">— abono inicial al firmar</span></div>
+            <div class="pay-step"><div class="pay-dot amber"></div><span class="pay-amount">USD 100/mes</span><span class="pay-when">— cada día 15, desde el mes siguiente</span></div>
+            <div class="pay-step"><div class="pay-dot blue"></div><span class="pay-amount">Saldo restante</span><span class="pay-when">— al commit (descontando lo ya pagado)</span></div>
+          </div>
+        </div>
+        <div class="who-signs">
+          <div class="sign-label">Partes del contrato</div>
+          <div class="sign-person"><span class="sign-icon">👨</span><div><div class="sign-name">Deudor = Padre / Tutor legal</div><div class="sign-desc">Mayor de edad, representante legal del menor</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🧑‍🎓</span><div><div class="sign-name">El Atleta = Menor de edad</div></div></div>
+          <div class="sign-person"><span class="sign-icon">🏢</span><div><div class="sign-name">New Vision Sports Group, S.A.</div></div></div>
+        </div>
+        <div class="fields-list">
+          <div class="fields-title">Campos X a rellenar</div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del PADRE/TUTOR</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del padre/tutor</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre completo del ATLETA (menor)</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nacionalidad del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Cédula del atleta</strong></span></div>
+          <div class="field-row"><span class="field-x">X</span><span class="field-desc"><strong>Nombre en línea de firma</strong></span></div>
+        </div>
+        <a class="download-btn" href="contratos/Contrato - Premium - Abono + mensualidad - Menor de edad.docx" download>⬇ Descargar plantilla .docx</a>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /sec-pre -->
+
+<!-- INSTRUCCIONES -->
+<div class="instructions">
+  <div class="inst-title">📋 Cómo usar las plantillas paso a paso</div>
+  <div class="inst-steps">
+    <div class="inst-step"><div class="step-num">1</div><div class="step-text">Descarga el contrato correcto según el plan (Estándar/Premium), la forma de pago (50%+50% o Abono) y si el atleta es mayor o menor de edad.</div></div>
+    <div class="inst-step"><div class="step-num">2</div><div class="step-text">Abre el archivo en <strong>Microsoft Word</strong>. Usa <strong>Ctrl+H</strong> (Buscar y reemplazar) y reemplaza cada <strong>X</strong> por el dato real. Hay varias X — asegúrate de reemplazarlas TODAS.</div></div>
+    <div class="inst-step"><div class="step-num">3</div><div class="step-text">Para contratos de <strong>menor de edad</strong>: las primeras X corresponden al padre/tutor (el deudor legal), las siguientes al atleta. Son personas distintas.</div></div>
+    <div class="inst-step"><div class="step-num">4</div><div class="step-text">Revisa el contrato completo antes de enviarlo. Busca cualquier X que haya quedado sin reemplazar con <strong>Ctrl+F → "X"</strong>.</div></div>
+    <div class="inst-step"><div class="step-num">5</div><div class="step-text">Envía el contrato al cliente para su firma. Una vez firmado, guarda una copia en <strong>OneDrive → NVS → Legal → [nombre del atleta]</strong>.</div></div>
+  </div>
+</div>
+
+<script>
+function setTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+t).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
