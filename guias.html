@@ -136,6 +136,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .guide-alert-icon{font-size:16px;flex-shrink:0;}
 .guide-alert strong{display:block;font-weight:700;margin-bottom:2px;}
 
+.guide-download-btn{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:7px 14px;background:#0f172a;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;flex-shrink:0;}
+.guide-download-btn:hover{background:#1e293b;}
+.guide-download-btn svg{flex-shrink:0;}
+
 @media(max-width:640px){
   .sidebar{display:none;}
   .main-head,.guides-wrap{padding-left:16px;padding-right:16px;}
@@ -319,6 +323,10 @@ function renderVisadoGuide(){
           <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">EE.UU.</span>
         </div>
       </div>
+      <button class="guide-download-btn" onclick="printGuide('usa')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
     </div>
 
     <div class="guide-body">
@@ -473,6 +481,10 @@ function renderCanadaGuide(){
           <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Canadá</span>
         </div>
       </div>
+      <button class="guide-download-btn" onclick="printGuide('canada')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
     </div>
 
     <div class="guide-body">
@@ -607,6 +619,10 @@ function renderMexicoGuide(){
           <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">México</span>
         </div>
       </div>
+      <button class="guide-download-btn" onclick="printGuide('mexico')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
     </div>
 
     <div class="guide-body">
@@ -726,6 +742,192 @@ function renderMexicoGuide(){
       </div>
     </div>
   </div>`;
+}
+
+/* ── PDF PRINT ── */
+const PDF_CONTENT={
+  usa:{
+    flag:'✈️',
+    country:'Estados Unidos de América',
+    title:'Visa F-1 — Atleta Estudiante Internacional',
+    subtitle:'NCAA · NAIA · NJCAA',
+    intro:`<p>Esta guía cubre el proceso de obtención de la Visa F-1 de estudiante no inmigrante de EE.UU. para atletas internacionales que han sido aceptados en una institución afiliada a la NCAA, NAIA o NJCAA. <strong>El proceso inicia una vez que ya tienes en tu poder el Formulario I-20</strong>, emitido por la oficina de estudiantes internacionales de tu universidad (DSO), lo cual confirma que ya fuiste aceptado, firmaste tu carta de scholarship y estás oficialmente inscrito.</p>
+    <p>La Visa F-1 no es una visa deportiva — el atleta entra a EE.UU. como <em>estudiante</em> que practica deporte. Confundirla o presentarla incorrectamente en la entrevista puede resultar en un rechazo.</p>`,
+    steps:[
+      {n:'1',title:'Pagar la tarifa SEVIS I-901 — $350 USD',body:'Usa el SEVIS ID de tu I-20 para pagar en el sitio oficial del ICE (Immigration &amp; Customs Enforcement): <strong>fmjfee.com/i901fee</strong>. Imprime y guarda el recibo de pago — lo necesitarás en la entrevista consular.'},
+      {n:'2',title:'Completar el Formulario DS-160',body:'El DS-160 es la solicitud oficial de visa del Departamento de Estado de EE.UU. Se completa 100% en línea en <strong>ceac.state.gov/genniv</strong>. Al terminar, descarga e imprime la página de confirmación con el código de barras. El MRV application fee de $185 USD se paga dentro de este mismo proceso.'},
+      {n:'3',title:'Agendar cita en la Embajada de EE.UU.',body:'Agenda tu entrevista en la Embajada o Consulado de EE.UU. más cercano. En Panamá: <strong>ustraveldocs.com/pa</strong> y <strong>pa.usembassy.gov/visas</strong>. Solicita con suficiente anticipación — los tiempos de espera varían. Si tu fecha de inicio en el I-20 es próxima, solicita una cita expedita una vez tengas cita normal asignada.'},
+      {n:'4',title:'Preparar los documentos para la entrevista',body:'Reúne los originales y copias de todos los documentos listados en esta guía. La entrevista consular dura aproximadamente 5-10 minutos. Es fundamental estar preparado para explicar claramente tu programa de estudios, tu beca y tu plan de regresar a tu país al terminar.'},
+      {n:'5',title:'Entrevista consular en la Embajada',body:'El cónsul evaluará tu intención de estudiar, tu solvencia económica y tus vínculos con tu país de origen. Puntos clave para atletas: confirma que tienes una beca atlética, que tu propósito principal es estudiar, que el deporte es complementario a tu educación, y que al terminar tus estudios regresarás a tu país. Fuente de referencia: <strong>studyinthestates.dhs.gov</strong>'},
+      {n:'6',title:'Recibir la visa y planificar el viaje',body:'Si la visa es aprobada, recibirás tu pasaporte con el sticker de la Visa F-1 en pocos días hábiles. Con la F-1 puedes entrar a EE.UU. máximo <strong>30 días antes</strong> de la fecha de inicio indicada en tu I-20. Al entrar, recibirás un I-94 del oficial de migraciones — guárdalo en todo momento.'},
+    ],
+    docs:['Pasaporte válido (mínimo 6 meses de vigencia más allá de tu estadía)','Formulario I-20 original firmado por el DSO de tu universidad','Comprobante de pago SEVIS I-901 ($350 USD)','Página de confirmación DS-160 (con código de barras impreso)','Confirmación de cita de la embajada','Carta oficial de aceptación universitaria','Carta de beca atlética (scholarship) si aplica','Carta de certificación NCAA/NAIA/NJCAA Eligibility','Estados de cuenta bancarios (últimos 3-6 meses, solvencia económica)','Transcripciones académicas originales con traducción si es necesario','Fotos tipo pasaporte (fondo blanco, recientes)','Visas anteriores a EE.UU. si las tuviste'],
+    fees:[['SEVIS I-901 Fee','$350 USD','fmjfee.com/i901fee'],['DS-160 MRV Application Fee','$185 USD','ceac.state.gov/genniv'],['TOTAL estimado','$535 USD','+ gastos de traslado a embajada']],
+    notes:[
+      {type:'warning',title:'Full-time enrollment obligatorio','body':'La Visa F-1 exige estar matriculado a tiempo completo durante cada semestre. Si el estudiante reduce su carga académica por debajo del mínimo sin autorización del DSO, puede perder su estatus migratorio F-1.'},
+      {type:'alert',title:'Restricciones de trabajo y NIL','body':'La F-1 generalmente no permite trabajar fuera del campus sin autorización especial. El NIL (Name, Image &amp; Likeness) está en evolución legal para atletas internacionales — siempre consultar con el DSO de la universidad antes de firmar cualquier acuerdo comercial.'},
+      {type:'info',title:'Regla de los 30 días','body':'Con la Visa F-1 puedes ingresar a EE.UU. máximo 30 días antes de la fecha de inicio del programa indicada en tu I-20. Intentar entrar antes puede resultar en rechazo en el puerto de entrada.'},
+      {type:'tip',title:'Cita expedita disponible','body':'Si el tiempo de espera para la entrevista es muy largo en relación a tu fecha de inicio de clases, puedes solicitar una cita expedita. Primero debes tener una cita normal asignada; luego solicitas la expedita y justificas la urgencia con tu I-20.'},
+    ]
+  },
+  canada:{
+    flag:'🍁',
+    country:'Canadá',
+    title:'Study Permit — Estudiante Internacional en Canadá',
+    subtitle:'U Sports · CCAA · Instituciones Canadienses',
+    intro:`<p>Esta guía cubre el proceso de obtención del Study Permit (Permiso de Estudio) emitido por Immigration, Refugees and Citizenship Canada (IRCC). Es el documento migratorio obligatorio para estudiar más de 6 meses en Canadá. <strong>El proceso inicia una vez que ya tienes la carta de aceptación oficial</strong> de una institución acreditada canadiense (DLI — Designated Learning Institution).</p>
+    <p>Dependiendo de tu nacionalidad, es posible que además del Study Permit necesites una Temporary Resident Visa (TRV) para entrar a Canadá. La mayoría de ciudadanos latinoamericanos, incluyendo panameños, requieren TRV. Ambas se solicitan en la misma aplicación de forma simultánea.</p>`,
+    steps:[
+      {n:'1',title:'Verificar que tu institución es una DLI',body:'Solo puedes obtener un Study Permit para estudiar en una Designated Learning Institution (DLI). Verifica que tu universidad o college aparezca en la lista oficial del gobierno canadiense en: <strong>canada.ca → DLI list</strong>. Si no aparece en esa lista, no podrás obtener el Study Permit.'},
+      {n:'2',title:'Crear cuenta en el portal IRCC y aplicar en línea',body:'Crea una cuenta GCKey o Sign-In Partner en el portal de IRCC. Inicia la solicitud del Study Permit. Si tu nacionalidad requiere TRV (visa de entrada), selecciona ambos en la misma solicitud — se procesan juntos. Paga las tarifas correspondientes durante el proceso: $150 CAD (Study Permit) + $100 CAD (TRV si aplica). Portal: <strong>canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html</strong>'},
+      {n:'3',title:'Dar biométricos en un Visa Application Centre (VAC)',body:'Después de enviar la solicitud, recibirás una carta de IRCC solicitando tus biométricos (huellas dactilares y foto). Debes acudir a un VAC autorizado en tu país. En Panamá, el VAC es operado por VFS Global. El costo del biométrico es $85 CAD. Este paso es obligatorio para la mayoría de solicitantes.'},
+      {n:'4',title:'Esperar la decisión y recibir la aprobación',body:'El tiempo de procesamiento varía según el país y la época del año (puede ser desde semanas hasta varios meses). Monitorea el estado de tu solicitud en tu cuenta IRCC. Si tu solicitud es aprobada, recibirás una carta de introducción llamada Port of Entry (POE) Letter — imprímela y llévala al viajar. El Study Permit físico lo recibes al entrar a Canadá.'},
+      {n:'5',title:'Viajar a Canadá y obtener el Study Permit',body:'Al llegar al punto de entrada canadiense (aeropuerto u otro), el oficial de migraciones revisará tu POE Letter, pasaporte y documentos. Te emitirá el Study Permit físico en ese momento. Puedes ingresar hasta 90 días antes de la fecha de inicio indicada en tu carta de aceptación.'},
+    ],
+    docs:['Pasaporte válido con vigencia suficiente para toda tu estadía de estudios','Carta de aceptación oficial de la DLI canadiense','Prueba de solvencia económica (colegiatura + mínimo $10,000 CAD para manutención)','Extractos bancarios (últimos 3-6 meses)','Carta de motivación (por qué quieres estudiar en Canadá)','Prueba de vínculos con tu país de origen (familia, propiedades, trabajo, etc.)','Historial académico / transcripciones','Fotos tipo pasaporte recientes','Carta de beca atlética (si aplica)','Carta de confirmación de VAC appointment (biométricos)'],
+    fees:[['Study Permit','$150 CAD','Portal IRCC'],['Temporary Resident Visa (TRV)','$100 CAD','Portal IRCC (si aplica)'],['Biometrics Fee','$85 CAD','VAC / VFS Global'],['TOTAL estimado','~$335 CAD (~$250 USD)','+ gastos de traslado']],
+    notes:[
+      {type:'warning',title:'Solvencia económica obligatoria','body':'Debes demostrar capacidad para cubrir la colegiatura completa del primer año más al menos $10,000 CAD de manutención. Si no puedes acreditar solvencia suficiente, el Study Permit será rechazado. Prepara estados de cuenta bancarios claros y actualizados.'},
+      {type:'info',title:'Tiempo de procesamiento variable','body':'Los tiempos de procesamiento de IRCC cambian constantemente. Verifica los tiempos estimados actuales en el portal de IRCC antes de aplicar y planifica con al menos 3-4 meses de anticipación a tu fecha de inicio de clases.'},
+      {type:'tip',title:'Work On Campus permitido','body':'Con el Study Permit puedes trabajar hasta 20 horas semanales dentro del campus durante el semestre y a tiempo completo durante vacaciones oficiales, sin necesidad de un permiso de trabajo adicional.'},
+    ]
+  },
+  mexico:{
+    flag:'🇲🇽',
+    country:'México',
+    title:'Visa de Estudiante — Residente Temporal en México',
+    subtitle:'CONADEIP · UANL · Tec de Monterrey · Universidades Mexicanas',
+    intro:`<p>Esta guía cubre el proceso de obtención de la <strong>Visa de Residente Temporal con característica migratoria de estudiante</strong> para cursar estudios en México por más de 180 días. <strong>El proceso inicia una vez que ya tienes la carta de aceptación oficial</strong> de la institución educativa mexicana donde estudiarás.</p>
+    <p>A diferencia de EE.UU. y Canadá, en México el proceso tiene dos etapas: primero obtienes la visa en el consulado antes de viajar, y luego, ya en México, realizas el canje ante el INM para obtener tu Tarjeta de Residente Temporal — este segundo trámite es obligatorio y tiene un plazo de 30 días a partir de tu llegada.</p>`,
+    steps:[
+      {n:'1',title:'Solicitar la visa en el Consulado Mexicano',body:'Agenda tu cita en el Consulado General de México en tu país de residencia. En Panamá: <strong>embamex.sre.gob.mx/panama</strong>. Lleva todos tus documentos completos el día de la cita. El consulado verificará tu información y emitirá la visa en tu pasaporte. La tarifa consular es aproximadamente $36 USD (puede variar según consulado).'},
+      {n:'2',title:'Preparar y entregar documentos en la cita consular',body:'El consulado revisará tu expediente completo y tomará fotos y datos biométricos. El proceso de emisión de la visa suele tardar entre 5 y 10 días hábiles después de la cita. Ver lista completa de documentos en esta guía.'},
+      {n:'3',title:'Recibir la visa en el pasaporte y viajar a México',body:'La visa de residente temporal aparece como sticker en tu pasaporte. Con ella puedes viajar a México. Al entrar, recibirás un FMM (Forma Migratoria Múltiple) del oficial de migraciones — consérvalo porque lo necesitarás para el canje en el INM. <strong>Tienes exactamente 30 días naturales para hacer el trámite de canje.</strong>'},
+      {n:'4',title:'Canje en el INM — Tarjeta de Residente Temporal',body:'Dentro de los primeros 30 días de llegada a México, acude a la oficina del Instituto Nacional de Migración (INM) más cercana para canjear tu visa por la Tarjeta de Residente Temporal. Este es tu documento migratorio oficial mientras vivas en México. El trámite se realiza en: <strong>inm.gob.mx</strong>. Los derechos del INM son aproximadamente $3,825 MXN (~$190 USD).'},
+      {n:'5',title:'Renovar la tarjeta anualmente',body:'La Tarjeta de Residente Temporal tiene vigencia de 1 año y puede renovarse hasta completar tu programa de estudios (máximo 4 años consecutivos). Inicia el trámite de renovación con al menos 30 días de anticipación al vencimiento para evitar quedar en situación irregular.'},
+    ],
+    docs:['Pasaporte válido con mínimo 6 meses de vigencia','Carta de aceptación oficial de la institución educativa mexicana','Prueba de solvencia económica (estados de cuenta, carta de beca, etc.)','Formulario de solicitud de visa (proporcionado por el consulado)','Fotos recientes (fondo blanco, tamaño pasaporte)','Carta de motivos u objetivos de estudio','Historial académico / transcripciones','Comprobante de domicilio en país de origen','Carta de beca atlética (si aplica)','Visas anteriores a México si las tuviste','FMM (al llegar a México, para el canje INM)'],
+    fees:[['Tarifa consular — visa de residente temporal','~$36 USD','Consulado mexicano en tu país'],['Derechos INM — Tarjeta de Residente Temporal','~$3,825 MXN','Oficina INM en México'],['TOTAL estimado','~$225 USD','+ gastos de traslado']],
+    notes:[
+      {type:'warning',title:'Canje INM en 30 días — es obligatorio','body':'Este es el error más frecuente. Si no realizas el canje de tu visa a Tarjeta de Residente Temporal dentro de los 30 días naturales de tu llegada a México, tu estatus migratorio queda irregular y podrías enfrentar multas, detención o deportación. Agenda este trámite antes de viajar.'},
+      {type:'info',title:'Renovación anual obligatoria','body':'La Tarjeta de Residente Temporal vence cada año. Debes renovarla ante el INM antes de su vencimiento. El trámite de renovación demora entre 1-2 semanas — no esperes al último momento.'},
+      {type:'tip',title:'CURP — trámítala al llegar','body':'Con tu Tarjeta de Residente Temporal puedes obtener tu CURP (Clave Única de Registro de Población) en línea en gob.mx. La necesitarás para inscripciones universitarias, trámites de salud, apertura de cuenta bancaria y prácticamente todo en México.'},
+    ]
+  }
+};
+
+function printGuide(type){
+  const g=PDF_CONTENT[type];
+  if(!g)return;
+  const today=new Date().toLocaleDateString('es-PA',{year:'numeric',month:'long',day:'numeric'});
+  const noteColors={warning:'#fff7ed',alert:'#fef2f2',info:'#eff6ff',tip:'#f0fdf4'};
+  const noteBorder={warning:'#fb923c',alert:'#f87171',info:'#93c5fd',tip:'#86efac'};
+  const noteLabel={warning:'⚠️ Importante',alert:'🚫 Atención',info:'ℹ️ Ten en cuenta',tip:'💡 Consejo NVS'};
+  const stepsHtml=g.steps.map(s=>`
+    <div style="display:flex;gap:14px;margin-bottom:18px;page-break-inside:avoid;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#AAFF00;color:#0f172a;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:Arial,sans-serif;">${s.n}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px;">${s.title}</div>
+        <div style="font-size:12px;color:#475569;line-height:1.7;">${s.body}</div>
+      </div>
+    </div>`).join('');
+  const docsHtml=g.docs.map(d=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:#f8fafc;border-radius:6px;margin-bottom:5px;font-size:11px;color:#0f172a;">
+      <span style="color:#AAFF00;font-weight:900;flex-shrink:0;">✓</span> ${d}
+    </div>`).join('');
+  const feesHtml=`<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;">
+    <tr style="background:#f8fafc;"><th style="text-align:left;padding:8px 12px;font-size:10px;font-weight:800;letter-spacing:1px;color:#94a3b8;border-bottom:1px solid #e2e8f0;">CONCEPTO</th><th style="text-align:left;padding:8px 12px;font-size:10px;font-weight:800;letter-spacing:1px;color:#94a3b8;border-bottom:1px solid #e2e8f0;">MONTO</th><th style="text-align:left;padding:8px 12px;font-size:10px;font-weight:800;letter-spacing:1px;color:#94a3b8;border-bottom:1px solid #e2e8f0;">DÓNDE PAGAR</th></tr>
+    ${g.fees.map((f,i)=>`<tr style="${i===g.fees.length-1?'background:#f0fdf4;font-weight:800;':''}"><td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;">${f[0]}</td><td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;color:#16a34a;font-weight:700;">${f[1]}</td><td style="padding:9px 12px;border-bottom:1px solid #f1f5f9;color:#64748b;">${f[2]}</td></tr>`).join('')}
+  </table>`;
+  const notesHtml=g.notes.map(n=>`
+    <div style="background:${noteColors[n.type]||'#f8fafc'};border-left:4px solid ${noteBorder[n.type]||'#94a3b8'};border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px;page-break-inside:avoid;">
+      <div style="font-size:11px;font-weight:800;color:#0f172a;margin-bottom:4px;">${noteLabel[n.type]||'Nota'}: ${n.title}</div>
+      <div style="font-size:11px;color:#475569;line-height:1.7;">${n.body}</div>
+    </div>`).join('');
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  <title>NVS · ${g.title}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#0f172a;font-size:12px;}
+    @page{margin:18mm 16mm 20mm 16mm;size:A4;}
+    @media print{
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .no-print{display:none;}
+    }
+    .page{max-width:720px;margin:0 auto;padding:24px;}
+    .header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #AAFF00;padding-bottom:14px;margin-bottom:20px;}
+    .logo{font-size:28px;font-weight:900;letter-spacing:3px;color:#0f172a;}
+    .logo span{color:#AAFF00;}
+    .header-right{text-align:right;}
+    .section-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin:22px 0 12px;}
+    .footer{margin-top:32px;padding-top:14px;border-top:2px solid #AAFF00;display:flex;align-items:center;justify-content:space-between;}
+    .print-btn{position:fixed;bottom:20px;right:20px;background:#0f172a;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;}
+    .print-btn:hover{background:#1e293b;}
+  </style>
+  </head><body>
+  <div class="page">
+    <!-- HEADER -->
+    <div class="header">
+      <div>
+        <div class="logo">NV<span>S</span></div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#64748b;margin-top:3px;">New Vision Sports</div>
+      </div>
+      <div class="header-right">
+        <div style="font-size:18px;">${g.flag}</div>
+        <div style="font-size:10px;font-weight:700;color:#0f172a;">${g.country}</div>
+        <div style="font-size:9px;color:#94a3b8;margin-top:2px;">Fecha: ${today}</div>
+      </div>
+    </div>
+
+    <!-- TITLE -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:22px;font-weight:900;color:#0f172a;letter-spacing:.5px;">${g.title}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:4px;">${g.subtitle}</div>
+    </div>
+
+    <!-- INTRO -->
+    <div style="background:#f8fafc;border-radius:10px;padding:14px 16px;font-size:12px;color:#475569;line-height:1.7;margin-bottom:4px;">
+      ${g.intro}
+    </div>
+
+    <!-- STEPS -->
+    <div class="section-title">Pasos del proceso</div>
+    ${stepsHtml}
+
+    <!-- DOCS -->
+    <div class="section-title">Documentos requeridos</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+      ${g.docs.map(d=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:#f8fafc;border-radius:6px;font-size:11px;color:#0f172a;"><span style="color:#16a34a;font-weight:900;flex-shrink:0;">✓</span>${d}</div>`).join('')}
+    </div>
+
+    <!-- FEES -->
+    <div class="section-title">Resumen de costos</div>
+    ${feesHtml}
+
+    <!-- NOTES -->
+    <div class="section-title">Notas importantes</div>
+    ${notesHtml}
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#0f172a;">New Vision Sports · Agencia de Colocación Deportiva</div>
+        <div style="font-size:9px;color:#94a3b8;margin-top:2px;">Este documento es orientativo. Verifica siempre los requisitos actuales con las autoridades migratorias competentes.</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:9px;color:#94a3b8;">playwithnewvision.com</div>
+        <div style="font-size:9px;color:#94a3b8;">info@playwithnewvision.com</div>
+      </div>
+    </div>
+  </div>
+  <button class="print-btn no-print" onclick="window.print()">⬇ Guardar como PDF</button>
+  <script>setTimeout(()=>window.print(),600);<\/script>
+  </body></html>`;
+
+  const win=window.open('','_blank','width=800,height=900');
+  win.document.write(html);
+  win.document.close();
 }
 
 /* ── KEYBOARD ── */
