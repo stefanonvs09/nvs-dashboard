@@ -205,104 +205,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
       </div>
 
       <div class="mod-list-label">Módulos activos</div>
-
-      <div class="mod-list">
-
-        <!-- FINANZAS -->
-        <div class="mod-row"
-          style="--row-accent:#AAFF00;--row-accent-border:rgba(170,255,0,.4);--row-icon-bg:rgba(170,255,0,.10);"
-          onclick="openModule('Dashboard Financiero','pin_finanzas','finanzas.html')">
-          <div class="mod-row-icon">💰</div>
-          <div class="mod-row-body">
-            <div class="mod-row-name">Dashboard Financiero</div>
-            <div class="mod-row-desc">Ingresos, pagos, contratos y balance general de la agencia</div>
-          </div>
-          <div class="mod-row-right">
-            <span class="mod-row-badge" style="color:#3a6b00">🔒 PIN</span>
-            <div class="mod-row-arrow" style="color:#3a6b00">→</div>
-          </div>
-        </div>
-
-        <!-- CRM APL -->
-        <a class="mod-row" id="mod-crm" href="crm.html"
-          style="--row-accent:#6366f1;--row-accent-border:rgba(99,102,241,.35);--row-icon-bg:rgba(99,102,241,.10);">
-          <div class="mod-row-icon">🎓</div>
-          <div class="mod-row-body">
-            <div class="mod-row-name">APL · Placements</div>
-            <div class="mod-row-desc">Pipeline de college placement, boarding schools y transfers</div>
-          </div>
-          <div class="mod-row-right">
-            <span class="mod-row-badge" id="mod-crm-stat">— atletas</span>
-            <div class="mod-row-arrow">→</div>
-          </div>
-        </a>
-
-        <!-- LEADS -->
-        <a class="mod-row" id="mod-leads" href="leads.html"
-          style="--row-accent:#f472b6;--row-accent-border:rgba(244,114,182,.35);--row-icon-bg:rgba(244,114,182,.10);">
-          <div class="mod-row-icon">🎯</div>
-          <div class="mod-row-body">
-            <div class="mod-row-name">Leads Pipeline</div>
-            <div class="mod-row-desc">Prospectos del formulario web y recruiters — Kanban en tiempo real</div>
-          </div>
-          <div class="mod-row-right">
-            <div class="mod-row-arrow">→</div>
-          </div>
-        </a>
-
-        <!-- PAGOS -->
-        <a class="mod-row" href="pagos.html"
-          style="--row-accent:#0d9488;--row-accent-border:rgba(13,148,136,.35);--row-icon-bg:rgba(13,148,136,.10);">
-          <div class="mod-row-icon">💸</div>
-          <div class="mod-row-body">
-            <div class="mod-row-name">Pagos</div>
-            <div class="mod-row-desc">Payroll del equipo, proveedores de software y mantenimiento</div>
-          </div>
-          <div class="mod-row-right">
-            <div class="mod-row-arrow">→</div>
-          </div>
-        </a>
-
-        <!-- MEDIA -->
-        <a class="mod-row" id="mod-media" href="media.html"
-          style="--row-accent:#ec4899;--row-accent-border:rgba(236,72,153,.35);--row-icon-bg:rgba(236,72,153,.10);">
-          <div class="mod-row-icon">🎬</div>
-          <div class="mod-row-body">
-            <div class="mod-row-name">Media Pipeline</div>
-            <div class="mod-row-desc">Kanban y calendario de contenido para Instagram y TikTok</div>
-          </div>
-          <div class="mod-row-right">
-            <div class="mod-row-arrow">→</div>
-          </div>
-        </a>
-
-        <!-- PROYECTOS -->
-        <a class="mod-row" id="mod-proyectos" href="proyectos.html"
-          style="--row-accent:#f59e0b;--row-accent-border:rgba(245,158,11,.35);--row-icon-bg:rgba(245,158,11,.10);">
-          <div class="mod-row-icon">📋</div>
-          <div class="mod-row-body">
-            <div class="mod-row-name">Proyectos</div>
-            <div class="mod-row-desc">Documenta y gestiona proyectos activos del equipo NVS</div>
-          </div>
-          <div class="mod-row-right">
-            <div class="mod-row-arrow">→</div>
-          </div>
-        </a>
-
-        <!-- REPORTES (próximo) -->
-        <div class="mod-row disabled" id="mod-reportes"
-          style="--row-accent:#8b5cf6;--row-icon-bg:rgba(139,92,246,.08);">
-          <div class="mod-row-icon">📊</div>
-          <div class="mod-row-body">
-            <div class="mod-row-name">Reportes</div>
-            <div class="mod-row-desc">Métricas avanzadas de rendimiento y análisis de atletas</div>
-          </div>
-          <div class="mod-row-right">
-            <span class="mod-row-soon">⏳ Próximamente</span>
-          </div>
-        </div>
-
-      </div>
+      <div class="mod-list" id="mod-list"></div>
     </div>
 
     <!-- RIGHT: Stats sidebar -->
@@ -385,6 +288,53 @@ async function doLogout(){
 
 const SD_EMAIL='sd@cervicalservices.com';
 
+const ALL_MODULES=[
+  {id:'finanzas', icon:'💰', name:'Dashboard Financiero', desc:'Ingresos, pagos, contratos y balance general de la agencia',
+   accent:'#AAFF00', dim:'rgba(170,255,0,.10)', border:'rgba(170,255,0,.4)',
+   pin:true, badgeTxt:'🔒 PIN', badgeColor:'#3a6b00'},
+  {id:'crm', icon:'🎓', name:'APL · Placements', desc:'Pipeline de college placement, boarding schools y transfers',
+   accent:'#6366f1', dim:'rgba(99,102,241,.10)', border:'rgba(99,102,241,.35)', href:'crm.html', statId:'mod-crm-stat'},
+  {id:'leads', icon:'🎯', name:'Leads Pipeline', desc:'Prospectos del formulario web y recruiters — Kanban en tiempo real',
+   accent:'#f472b6', dim:'rgba(244,114,182,.10)', border:'rgba(244,114,182,.35)', href:'leads.html'},
+  {id:'pagos', icon:'💸', name:'Pagos', desc:'Payroll del equipo, proveedores de software y mantenimiento',
+   accent:'#0d9488', dim:'rgba(13,148,136,.10)', border:'rgba(13,148,136,.35)', href:'pagos.html'},
+  {id:'media', icon:'🎬', name:'Media Pipeline', desc:'Kanban y calendario de contenido para Instagram y TikTok',
+   accent:'#ec4899', dim:'rgba(236,72,153,.10)', border:'rgba(236,72,153,.35)', href:'media.html'},
+  {id:'proyectos', icon:'📋', name:'Proyectos', desc:'Documenta y gestiona proyectos activos del equipo NVS',
+   accent:'#f59e0b', dim:'rgba(245,158,11,.10)', border:'rgba(245,158,11,.35)', href:'proyectos.html'},
+  {id:'reportes', icon:'📊', name:'Reportes', desc:'Métricas avanzadas de rendimiento y análisis de atletas',
+   accent:'#8b5cf6', dim:'rgba(139,92,246,.08)', disabled:true},
+];
+
+const SD_MODULES=['finanzas','pagos'];
+
+function buildModules(email){
+  const isSD=email.toLowerCase()===SD_EMAIL;
+  const visible=isSD ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id)) : ALL_MODULES;
+  const list=document.getElementById('mod-list');
+  list.innerHTML=visible.map(m=>{
+    const style=`--row-accent:${m.accent};--row-accent-border:${m.border||m.accent};--row-icon-bg:${m.dim};`;
+    const right=m.disabled
+      ? `<span class="mod-row-soon">⏳ Próximamente</span>`
+      : m.pin
+        ? `<span class="mod-row-badge" style="color:${m.badgeColor}">${m.badgeTxt}</span><div class="mod-row-arrow" style="color:${m.badgeColor}">→</div>`
+        : `${m.statId?`<span class="mod-row-badge" id="${m.statId}">— atletas</span>`:''}
+           <div class="mod-row-arrow">→</div>`;
+    const tag=m.href?'a':'div';
+    const hrefAttr=m.href?`href="${m.href}"`:'';
+    const clickAttr=m.pin?`onclick="openModule('Dashboard Financiero','pin_finanzas','finanzas.html')"`:'';
+    const disClass=m.disabled?' disabled':'';
+    return `<${tag} class="mod-row${disClass}" style="${style}" ${hrefAttr} ${clickAttr}>
+      <div class="mod-row-icon">${m.icon}</div>
+      <div class="mod-row-body">
+        <div class="mod-row-name">${m.name}</div>
+        <div class="mod-row-desc">${m.desc}</div>
+      </div>
+      <div class="mod-row-right">${right}</div>
+    </${tag}>`;
+  }).join('');
+}
+
 async function showPlatform(user){
   document.getElementById('login-overlay').style.display='none';
   document.getElementById('platform').style.display='block';
@@ -396,15 +346,10 @@ async function showPlatform(user){
   const gr=h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
   document.getElementById('hero-greeting').textContent=gr+', '+display;
   updateClock();setInterval(updateClock,30000);
-  if(user.email.toLowerCase()===SD_EMAIL){
-    // SD solo ve Finanzas y Pagos
-    ['mod-crm','mod-leads','mod-media','mod-proyectos','mod-reportes'].forEach(id=>{
-      const el=document.getElementById(id);if(el)el.style.display='none';
-    });
-    document.getElementById('hub-stats').style.display='none';
-  } else {
-    loadStats();subscribeStats();
-  }
+  buildModules(user.email);
+  const isSD=user.email.toLowerCase()===SD_EMAIL;
+  if(!isSD){loadStats();subscribeStats();}
+  else{const sa=document.getElementById('hub-stats');if(sa)sa.style.display='none';}
 }
 
 function updateClock(){
