@@ -304,11 +304,13 @@ const ALL_MODULES=[
    accent:'#ec4899', dim:'rgba(236,72,153,.10)', border:'rgba(236,72,153,.35)', href:'media.html'},
   {id:'proyectos', icon:'📋', name:'Proyectos', desc:'Documenta y gestiona proyectos activos del equipo NVS',
    accent:'#f59e0b', dim:'rgba(245,158,11,.10)', border:'rgba(245,158,11,.35)', href:'proyectos.html'},
+  {id:'servicios', icon:'📖', name:'Guía de Servicios', desc:'Procesos de pago, responsabilidades y contactos del equipo',
+   accent:'#0ea5e9', dim:'rgba(14,165,233,.10)', border:'rgba(14,165,233,.35)', href:'servicios.html'},
   {id:'reportes', icon:'📊', name:'Reportes', desc:'Métricas avanzadas de rendimiento y análisis de atletas',
    accent:'#8b5cf6', dim:'rgba(139,92,246,.08)', disabled:true},
 ];
 
-const SD_MODULES=['finanzas','pagos'];
+const SD_MODULES=['finanzas','pagos','servicios'];
 
 function buildModules(email){
   const em=email.toLowerCase();
