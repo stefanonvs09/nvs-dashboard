@@ -11,16 +11,16 @@
 :root{
   --green:#AAFF00;--green-dim:rgba(170,255,0,0.12);--green-dk:#88CC00;
   --bg:#f8fafc;--card:#fff;--card2:#f1f5f9;--border:rgba(0,0,0,0.08);
-  --muted:#64748b;--txt:#0f172a;--red:#ef4444;--amber:#f59e0b;
+  --muted:#64748b;--txt:#0f172a;--red:#ef4444;--amber:#f59e0b;--cyan:#06b6d4;
 }
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes strike{from{width:0}to{width:100%}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(170,255,0,.4)}70%{box-shadow:0 0 0 6px rgba(170,255,0,0)}}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #login-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
 .login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 15% 50%,rgba(170,255,0,.06) 0%,transparent 60%);}
 .login-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);}
@@ -38,7 +38,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .login-error{color:#dc2626;font-size:12px;margin-top:8px;min-height:14px;text-align:center;font-weight:600;}
 .login-spinner{width:16px;height:16px;border:2px solid rgba(15,23,42,.15);border-top-color:#0f172a;border-radius:50%;animation:spin .7s linear infinite;display:none;margin:8px auto 0;}
 
-/* ── SHELL ── */
+/* SHELL */
 #app{display:none;height:100vh;flex-direction:column;}
 
 /* TOPBAR */
@@ -50,22 +50,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .tb-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;}
 .tb-title span{color:var(--green);}
 .tb-right{display:flex;align-items:center;gap:8px;}
+.tb-notif-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:all .15s;position:relative;}
+.tb-notif-btn:hover{background:var(--card2);}
+.tb-notif-btn.denied{opacity:.5;}
+.tb-notif-dot{width:7px;height:7px;border-radius:50%;background:var(--green);position:absolute;top:3px;right:3px;display:none;}
+.tb-notif-btn.granted .tb-notif-dot{display:block;}
 .tb-user{display:flex;align-items:center;gap:7px;padding:5px 11px;background:var(--card2);border:1px solid var(--border);border-radius:99px;}
 .tb-avatar{width:20px;height:20px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#3a6b00;}
 .tb-uname{font-size:11px;font-weight:600;color:var(--txt);}
 .btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .15s;font-weight:600;font-family:'Inter',sans-serif;}
 .btn-logout:hover{border-color:rgba(0,0,0,.18);color:var(--txt);}
 
-/* ── SPLIT ── */
+/* NOTIFICATION PERMISSION BANNER */
+.notif-banner{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:10px;padding:10px 16px;margin:0 28px 0;display:flex;align-items:center;gap:10px;font-size:12px;animation:fadeUp .3s both;}
+.notif-banner strong{color:#92400e;}
+.notif-banner-btns{display:flex;gap:6px;margin-left:auto;flex-shrink:0;}
+.notif-allow-btn{background:var(--amber);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+.notif-dismiss-btn{background:transparent;border:1px solid rgba(0,0,0,.1);color:var(--muted);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+
+/* SPLIT */
 .split{display:flex;flex:1;overflow:hidden;}
 
-/* ── SIDEBAR ── */
+/* SIDEBAR */
 .sidebar{width:230px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
 .sb-profile{padding:18px 16px 12px;border-bottom:1px solid var(--border);}
 .sb-avatar-big{width:40px;height:40px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:17px;color:#3a6b00;margin-bottom:8px;}
 .sb-name{font-size:13px;font-weight:700;color:var(--txt);}
 .sb-email{font-size:10px;color:var(--muted);}
-
 .sb-section{padding:8px 8px 4px;}
 .sb-section-lbl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;padding:4px 8px 8px;}
 .sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:all .14s;font-size:12px;font-weight:600;color:var(--muted);}
@@ -74,72 +85,95 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .sb-item-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
 .sb-item-count{margin-left:auto;background:var(--card2);border-radius:99px;padding:1px 7px;font-size:9px;font-weight:800;color:var(--muted);}
 .sb-item.active .sb-item-count{background:rgba(170,255,0,.2);color:#3a6b00;}
+.sb-item-count.urgent{background:rgba(239,68,68,.12);color:var(--red);}
 
-/* ── MAIN ── */
+/* MAIN */
 .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
 
 /* LIST HEADER */
-.list-header{padding:24px 28px 0;flex-shrink:0;}
-.list-title{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.3px;margin-bottom:4px;}
-.list-subtitle{font-size:11px;color:var(--muted);margin-bottom:16px;}
+.list-header{padding:20px 28px 0;flex-shrink:0;}
+.list-title{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.3px;margin-bottom:2px;}
+.list-subtitle{font-size:11px;color:var(--muted);margin-bottom:14px;}
 
-/* QUICK ADD */
-.quick-add{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin:0 28px 16px;transition:border .15s;box-shadow:0 1px 3px rgba(0,0,0,.04);}
-.quick-add:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(170,255,0,.1);}
-.qa-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;}
-.qa-input{flex:1;border:none;outline:none;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);background:transparent;}
-.qa-input::placeholder{color:#94a3b8;}
-.qa-date{background:transparent;border:1px solid var(--border);border-radius:7px;padding:4px 8px;font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;outline:none;cursor:pointer;}
-.qa-date:focus{border-color:var(--green);}
-.qa-prio{background:transparent;border:1px solid var(--border);border-radius:7px;padding:4px 8px;font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;outline:none;cursor:pointer;}
-.qa-assign{background:transparent;border:1px solid var(--border);border-radius:7px;padding:4px 8px;font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;outline:none;cursor:pointer;display:none;}
-.qa-assign.visible{display:block;}
-.qa-btn{background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s;white-space:nowrap;}
-.qa-btn:hover{background:var(--green-dk);}
+/* QUICK ADD — collapsed */
+.quick-add-wrap{margin:0 28px 16px;flex-shrink:0;}
+.qa-collapsed{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px dashed rgba(0,0,0,.12);border-radius:12px;padding:11px 14px;cursor:text;transition:all .15s;}
+.qa-collapsed:hover{border-color:rgba(170,255,0,.5);background:#fffef8;}
+.qa-collapsed-circle{width:20px;height:20px;border-radius:50%;border:2px dashed #d1d5db;flex-shrink:0;}
+.qa-collapsed-placeholder{font-size:13px;color:#94a3b8;flex:1;font-weight:500;}
+.qa-collapsed-hint{font-size:10px;color:#cbd5e1;font-weight:600;}
+
+/* QUICK ADD — expanded */
+.qa-expanded{display:none;background:#fff;border:1.5px solid var(--green);border-radius:14px;box-shadow:0 4px 20px rgba(170,255,0,.12);overflow:hidden;}
+.qa-row1{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;}
+.qa-circle{width:20px;height:20px;border-radius:50%;border:2.5px solid #d1d5db;flex-shrink:0;}
+.qa-title-input{flex:1;border:none;outline:none;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;color:var(--txt);background:transparent;}
+.qa-title-input::placeholder{color:#94a3b8;font-weight:400;}
+.qa-row2{display:flex;align-items:center;gap:6px;padding:0 14px 12px;flex-wrap:wrap;border-top:1px solid var(--card2);}
+.qa-field-wrap{display:flex;align-items:center;gap:5px;background:var(--card2);border-radius:8px;padding:5px 9px;cursor:pointer;border:1px solid transparent;transition:border .15s;}
+.qa-field-wrap:hover{border-color:rgba(0,0,0,.1);}
+.qa-field-wrap:focus-within{border-color:var(--green);background:#fff;}
+.qa-field-icon{font-size:13px;}
+.qa-field-input{border:none;outline:none;font-size:11px;font-weight:600;color:var(--muted);font-family:'Inter',sans-serif;background:transparent;width:auto;cursor:pointer;}
+.qa-field-input::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer;}
+.qa-field-select{border:none;outline:none;font-size:11px;font-weight:600;color:var(--muted);font-family:'Inter',sans-serif;background:transparent;cursor:pointer;}
+.qa-spacer{flex:1;}
+.qa-actions{display:flex;gap:6px;}
+.qa-cancel-btn{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+.qa-cancel-btn:hover{border-color:rgba(0,0,0,.2);color:var(--txt);}
+.qa-add-btn{background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:6px 16px;font-size:11px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s;letter-spacing:.2px;}
+.qa-add-btn:hover{background:var(--green-dk);}
 
 /* TASK LIST */
 .task-list{flex:1;overflow-y:auto;padding:0 28px 40px;}
-
 .tasks-group{margin-bottom:8px;}
 .tasks-group-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;padding:8px 0 6px;}
 
 /* TASK ITEM */
-.task-item{background:#fff;border:1px solid var(--border);border-radius:11px;margin-bottom:6px;transition:box-shadow .15s;overflow:hidden;}
-.task-item:hover{box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.task-item{background:#fff;border:1px solid var(--border);border-radius:11px;margin-bottom:6px;transition:box-shadow .15s,border-color .15s;overflow:hidden;}
+.task-item:hover{box-shadow:0 2px 12px rgba(0,0,0,.07);}
 .task-item.completed .task-title-text{text-decoration:line-through;color:#94a3b8;}
-.task-item.completed{opacity:.7;}
+.task-item.completed{opacity:.65;}
+.task-item.overdue{border-color:rgba(239,68,68,.25);}
 .task-item.overdue .task-date-chip{color:var(--red)!important;background:rgba(239,68,68,.1)!important;}
+.task-item.due-soon{border-color:rgba(245,158,11,.3);}
 
-.task-main{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;}
-.task-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;background:transparent;}
-.task-check:hover{border-color:var(--green);}
+.task-main{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none;}
+.task-check{width:20px;height:20px;border-radius:50%;border:2px solid #d1d5db;flex-shrink:0;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;background:transparent;}
+.task-check:hover{border-color:var(--green);background:rgba(170,255,0,.06);}
 .task-item.completed .task-check{background:var(--green);border-color:var(--green);}
-.task-check-inner{width:8px;height:8px;border-radius:50%;background:#fff;display:none;}
-.task-item.completed .task-check-inner{display:block;}
+.task-check-icon{display:none;font-size:10px;}
+.task-item.completed .task-check-icon{display:block;}
 .task-body{flex:1;min-width:0;}
-.task-title-text{font-size:13px;font-weight:500;color:var(--txt);line-height:1.4;}
-.task-chips{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;}
-.task-date-chip{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;background:rgba(99,102,241,.08);color:#4f46e5;}
-.task-prio-chip{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.3px;}
-.prio-alta{background:rgba(239,68,68,.1);color:var(--red);}
-.prio-normal{background:rgba(99,102,241,.08);color:#4f46e5;}
-.prio-baja{background:rgba(100,116,139,.08);color:var(--muted);}
-.task-assign-chip{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;background:rgba(13,148,136,.1);color:#0d9488;display:flex;align-items:center;gap:4px;}
-.task-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.task-expand-btn{background:transparent;border:none;color:#94a3b8;font-size:14px;cursor:pointer;padding:2px 6px;border-radius:5px;transition:all .15s;}
+.task-title-text{font-size:13px;font-weight:500;color:var(--txt);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.task-chips{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap;}
+.chip{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;white-space:nowrap;}
+.chip-date{background:rgba(99,102,241,.08);color:#4f46e5;}
+.chip-time{background:rgba(6,182,212,.1);color:#0891b2;}
+.chip-remind{background:rgba(245,158,11,.1);color:#d97706;}
+.chip-prio-alta{background:rgba(239,68,68,.1);color:var(--red);}
+.chip-prio-baja{background:rgba(100,116,139,.08);color:var(--muted);}
+.chip-assign{background:rgba(13,148,136,.1);color:#0d9488;}
+.chip-from{background:rgba(99,102,241,.1);color:#4f46e5;}
+.task-right{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.task-expand-btn{background:transparent;border:none;color:#cbd5e1;font-size:12px;cursor:pointer;padding:3px 7px;border-radius:5px;transition:all .15s;}
+.task-item:hover .task-expand-btn{color:#94a3b8;}
 .task-expand-btn:hover{background:var(--card2);color:var(--txt);}
-.task-del-btn{background:transparent;border:none;color:#94a3b8;font-size:13px;cursor:pointer;padding:2px 6px;border-radius:5px;transition:all .15s;opacity:0;}
+.task-del-btn{background:transparent;border:none;color:#94a3b8;font-size:13px;cursor:pointer;padding:3px 7px;border-radius:5px;transition:all .15s;opacity:0;}
 .task-item:hover .task-del-btn{opacity:1;}
 .task-del-btn:hover{background:rgba(239,68,68,.08);color:var(--red);}
 
 /* TASK EXPANDED */
-.task-expanded{padding:0 14px 14px 42px;border-top:1px solid var(--border);margin-top:0;}
-.task-notes{width:100%;border:none;outline:none;font-size:12px;font-family:'Inter',sans-serif;color:var(--muted);resize:none;background:transparent;min-height:40px;line-height:1.6;margin-top:10px;}
+.task-expanded{padding:8px 14px 14px 44px;border-top:1px solid var(--card2);}
+.task-notes{width:100%;border:none;outline:none;font-size:12px;font-family:'Inter',sans-serif;color:var(--muted);resize:none;background:transparent;min-height:36px;line-height:1.6;margin-bottom:10px;}
 .task-notes::placeholder{color:#cbd5e1;}
-.task-exp-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
-.task-exp-sel{background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:11px;color:var(--txt);font-family:'Inter',sans-serif;outline:none;cursor:pointer;transition:border .15s;}
-.task-exp-sel:focus{border-color:var(--green);}
-.task-exp-label{font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;}
+.task-exp-grid{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.task-exp-field{display:flex;align-items:center;gap:5px;background:var(--card2);border-radius:8px;padding:5px 9px;border:1px solid transparent;transition:border .15s;}
+.task-exp-field:focus-within{border-color:var(--green);background:#fff;}
+.task-exp-icon{font-size:12px;}
+.task-exp-lbl{font-size:10px;font-weight:700;color:#94a3b8;white-space:nowrap;}
+.task-exp-input{border:none;outline:none;font-size:11px;font-weight:600;color:var(--txt);font-family:'Inter',sans-serif;background:transparent;cursor:pointer;}
+.task-exp-select{border:none;outline:none;font-size:11px;font-weight:600;color:var(--txt);font-family:'Inter',sans-serif;background:transparent;cursor:pointer;}
 .task-save-btn{background:var(--green);color:#0f172a;border:none;border-radius:7px;padding:5px 14px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;margin-left:auto;}
 .task-save-btn:hover{background:var(--green-dk);}
 
@@ -149,21 +183,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .tasks-empty-title{font-size:14px;font-weight:600;}
 .tasks-empty-sub{font-size:12px;}
 
+/* SETUP BANNER */
+.setup-banner{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:16px;margin:16px 28px;font-size:12px;line-height:1.8;}
+.setup-banner strong{color:#92400e;display:block;margin-bottom:4px;}
+.setup-banner a{color:#1d4ed8;}
+.setup-code{font-size:10px;display:block;background:#fef08a;padding:12px;border-radius:6px;white-space:pre-wrap;font-family:monospace;margin-top:6px;}
+
 /* TOAST */
 .toast-wrap{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:7px;z-index:900;pointer-events:none;}
 .toast{background:#0f172a;color:#fff;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:600;animation:fadeUp .2s both;box-shadow:0 4px 16px rgba(0,0,0,.2);}
 .toast.ok{background:#14532d;border-left:3px solid var(--green);}
 .toast.err{background:#7f1d1d;border-left:3px solid #f87171;}
-
-/* SETUP BANNER */
-.setup-banner{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:16px;margin:16px 28px;font-size:12px;line-height:1.7;}
-.setup-banner strong{color:#92400e;display:block;margin-bottom:4px;}
-.setup-banner a{color:#1d4ed8;}
+.toast.info{background:#1e3a5f;border-left:3px solid #60a5fa;}
 
 @media(max-width:640px){
   .sidebar{display:none;}
-  .list-header,.quick-add,.task-list{padding-left:14px;padding-right:14px;}
-  .quick-add{margin:0 14px 14px;}
+  .list-header{padding-left:14px;padding-right:14px;}
+  .quick-add-wrap{margin:0 14px 14px;}
   .task-list{padding:0 14px 40px;}
 }
 </style>
@@ -197,6 +233,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
       <div class="tb-title">NV<span>S</span> · Tareas</div>
     </div>
     <div class="tb-right">
+      <button class="tb-notif-btn" id="notif-btn" onclick="requestNotifPermission()" title="Activar recordatorios">
+        🔔<div class="tb-notif-dot"></div>
+      </button>
       <div class="tb-user">
         <div class="tb-avatar" id="tb-avatar">—</div>
         <span class="tb-uname" id="tb-uname">—</span>
@@ -214,7 +253,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         <div class="sb-name" id="sb-name">—</div>
         <div class="sb-email" id="sb-email">—</div>
       </div>
-
       <div class="sb-section">
         <div class="sb-section-lbl">Mis listas</div>
         <div class="sb-item active" id="filter-mis" onclick="setFilter('mis')">
@@ -234,7 +272,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
           <span class="sb-item-count" id="cnt-completadas">0</span>
         </div>
       </div>
-
       <div class="sb-section" id="team-section" style="display:none;">
         <div class="sb-section-lbl">Equipo</div>
         <div class="sb-item" id="filter-equipo" onclick="setFilter('equipo')">
@@ -246,23 +283,68 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 
     <!-- MAIN -->
     <div class="main-area">
+      <div id="notif-banner-wrap"></div>
+
       <div class="list-header">
         <div class="list-title" id="list-title">Mis Tareas</div>
         <div class="list-subtitle" id="list-subtitle">Tus tareas pendientes</div>
       </div>
 
       <!-- QUICK ADD -->
-      <div class="quick-add">
-        <div class="qa-check"></div>
-        <input class="qa-input" id="qa-input" type="text" placeholder="Agregar tarea... (Enter para guardar)" maxlength="200">
-        <input class="qa-date" id="qa-date" type="date" title="Fecha de vencimiento">
-        <select class="qa-prio" id="qa-prio">
-          <option value="Normal">Normal</option>
-          <option value="Alta">🔴 Alta</option>
-          <option value="Baja">⚪ Baja</option>
-        </select>
-        <select class="qa-assign" id="qa-assign" title="Asignar a..."></select>
-        <button class="qa-btn" onclick="addTask()">+ Agregar</button>
+      <div class="quick-add-wrap">
+        <!-- Collapsed state -->
+        <div class="qa-collapsed" id="qa-collapsed" onclick="expandQA()">
+          <div class="qa-collapsed-circle"></div>
+          <span class="qa-collapsed-placeholder">Agregar tarea...</span>
+          <span class="qa-collapsed-hint">↵ Enter</span>
+        </div>
+        <!-- Expanded state -->
+        <div class="qa-expanded" id="qa-expanded">
+          <div class="qa-row1">
+            <div class="qa-circle"></div>
+            <input class="qa-title-input" id="qa-input" type="text" placeholder="Nombre de la tarea" maxlength="200" autocomplete="off">
+          </div>
+          <div class="qa-row2">
+            <div class="qa-field-wrap">
+              <span class="qa-field-icon">📅</span>
+              <input class="qa-field-input" id="qa-date" type="date" title="Fecha de vencimiento">
+            </div>
+            <div class="qa-field-wrap">
+              <span class="qa-field-icon">⏰</span>
+              <input class="qa-field-input" id="qa-time" type="time" title="Hora">
+            </div>
+            <div class="qa-field-wrap">
+              <span class="qa-field-icon">🔔</span>
+              <select class="qa-field-select" id="qa-remind">
+                <option value="">Sin recordatorio</option>
+                <option value="0">Al momento</option>
+                <option value="5">5 min antes</option>
+                <option value="15">15 min antes</option>
+                <option value="30">30 min antes</option>
+                <option value="60">1 hora antes</option>
+                <option value="120">2 horas antes</option>
+                <option value="1440">1 día antes</option>
+              </select>
+            </div>
+            <div class="qa-field-wrap">
+              <span class="qa-field-icon">🎯</span>
+              <select class="qa-field-select" id="qa-prio">
+                <option value="Normal">Normal</option>
+                <option value="Alta">Alta</option>
+                <option value="Baja">Baja</option>
+              </select>
+            </div>
+            <div class="qa-field-wrap" id="qa-assign-wrap" style="display:none;">
+              <span class="qa-field-icon">👤</span>
+              <select class="qa-field-select" id="qa-assign"></select>
+            </div>
+            <div class="qa-spacer"></div>
+            <div class="qa-actions">
+              <button class="qa-cancel-btn" onclick="collapseQA()">Cancelar</button>
+              <button class="qa-add-btn" onclick="addTask()">Agregar tarea</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="task-list" id="task-list"></div>
@@ -277,11 +359,11 @@ const sb=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_pu
 
 const ADMIN_EMAIL='stefano@playwithnewvision.com';
 const TEAM=[
-  {email:'stefano@playwithnewvision.com', name:'Stefano'},
-  {email:'sd@cervicalservices.com',        name:'SD'},
-  {email:'julio@playwithnewvision.com',    name:'Julio'},
-  {email:'andy@playwithnewvision.com',     name:'Andy'},
-  {email:'floyd@playwithnewvision.com',    name:'Floyd'},
+  {email:'stefano@playwithnewvision.com',name:'Stefano'},
+  {email:'sd@cervicalservices.com',name:'SD'},
+  {email:'julio@playwithnewvision.com',name:'Julio'},
+  {email:'andy@playwithnewvision.com',name:'Andy'},
+  {email:'floyd@playwithnewvision.com',name:'Floyd'},
 ];
 
 let ME=null;
@@ -318,49 +400,118 @@ async function initApp(user){
   document.getElementById('sb-name').textContent=name;
   document.getElementById('sb-email').textContent=user.email;
 
-  // Admin sees team section
   if(user.email.toLowerCase()===ADMIN_EMAIL){
     document.getElementById('team-section').style.display='block';
-    document.getElementById('qa-assign').classList.add('visible');
+    document.getElementById('qa-assign-wrap').style.display='flex';
     TEAM.forEach(m=>{
       const o=document.createElement('option');
-      o.value=m.email; o.textContent=m.name;
-      if(m.email===user.email) o.selected=true;
+      o.value=m.email;o.textContent=m.name;
+      if(m.email===user.email)o.selected=true;
       document.getElementById('qa-assign').appendChild(o);
     });
   }
 
   await loadTasks();
   subscribeRealtime();
+  initNotifications();
+}
+
+/* ── NOTIFICATIONS ── */
+function initNotifications(){
+  if(!('Notification' in window))return;
+  const btn=document.getElementById('notif-btn');
+  const perm=Notification.permission;
+  if(perm==='granted'){
+    btn.classList.add('granted');
+    startReminderCheck();
+  } else if(perm==='default'){
+    showNotifBanner();
+  } else {
+    btn.classList.add('denied');
+    btn.title='Recordatorios bloqueados — actívalos en ajustes del navegador';
+  }
+}
+
+function showNotifBanner(){
+  const wrap=document.getElementById('notif-banner-wrap');
+  wrap.innerHTML=`<div class="notif-banner" id="notif-banner" style="margin:12px 28px 0;">
+    <span>🔔</span>
+    <span><strong>Activa los recordatorios</strong> para recibir notificaciones cuando una tarea esté por vencer.</span>
+    <div class="notif-banner-btns">
+      <button class="notif-allow-btn" onclick="requestNotifPermission()">Activar</button>
+      <button class="notif-dismiss-btn" onclick="dismissNotifBanner()">Ahora no</button>
+    </div>
+  </div>`;
+}
+
+async function requestNotifPermission(){
+  if(!('Notification' in window)){toast('Tu navegador no soporta notificaciones','err');return;}
+  const result=await Notification.requestPermission();
+  const btn=document.getElementById('notif-btn');
+  dismissNotifBanner();
+  if(result==='granted'){
+    btn.classList.add('granted');
+    btn.classList.remove('denied');
+    toast('🔔 Recordatorios activados','ok');
+    startReminderCheck();
+  } else {
+    btn.classList.add('denied');
+    toast('Recordatorios bloqueados en el navegador','err');
+  }
+}
+
+function dismissNotifBanner(){
+  const b=document.getElementById('notif-banner');
+  if(b)b.remove();
+}
+
+function startReminderCheck(){
+  checkReminders();
+  setInterval(checkReminders,60000);
+}
+
+function checkReminders(){
+  if(Notification.permission!=='granted')return;
+  const now=Date.now();
+  ALL_TASKS.filter(t=>!t.completado&&t.fecha_vencimiento&&t.hora&&t.recordatorio!=null).forEach(t=>{
+    const taskMs=new Date(t.fecha_vencimiento+'T'+t.hora).getTime();
+    const remindMs=taskMs-(t.recordatorio*60000);
+    const diff=now-remindMs;
+    const key=`nvs_reminded_${t.id}`;
+    if(diff>=0&&diff<120000&&!localStorage.getItem(key)){
+      localStorage.setItem(key,'1');
+      const msg=t.recordatorio===0
+        ?`Es ahora: ${t.titulo}`
+        :`Vence en ${fmtRemindLabel(t.recordatorio)}: ${t.titulo}`;
+      new Notification('NVS · Recordatorio 🔔',{body:msg,tag:`nvs-${t.id}`});
+    }
+  });
 }
 
 /* ── DATA ── */
 async function loadTasks(){
   const isAdmin=ME.email.toLowerCase()===ADMIN_EMAIL;
-  let query=sb.from('tareas').select('*');
-  if(!isAdmin) query=query.eq('asignado_a',ME.email.toLowerCase());
-  const {data,error}=await query.order('created_at',{ascending:false});
-  if(error){
-    if(error.code==='42P01'){showSetup();return;}
-    toast('Error cargando tareas','err');return;
-  }
+  let q=sb.from('tareas').select('*');
+  if(!isAdmin)q=q.eq('asignado_a',ME.email.toLowerCase());
+  const {data,error}=await q.order('created_at',{ascending:false});
+  if(error){if(error.code==='42P01'){showSetup();return;}toast('Error cargando tareas','err');return;}
   ALL_TASKS=data||[];
-  updateCounts();
-  renderTasks();
+  updateCounts();renderTasks();
 }
 
 function showSetup(){
-  document.getElementById('task-list').innerHTML=`
-  <div class="setup-banner">
+  document.getElementById('task-list').innerHTML=`<div class="setup-banner">
     <strong>⚠️ Tabla no creada aún</strong>
-    Corre este SQL en: <a href="https://supabase.com/dashboard/project/mwefvjvvitsondqghgsx/sql/new" target="_blank">Supabase SQL Editor →</a><br><br>
-    <code style="font-size:10px;display:block;background:#fef08a;padding:10px;border-radius:6px;white-space:pre-wrap">CREATE TABLE tareas (
+    Corre este SQL en <a href="https://supabase.com/dashboard/project/mwefvjvvitsondqghgsx/sql/new" target="_blank">Supabase SQL Editor →</a>
+    <code class="setup-code">CREATE TABLE tareas (
   id bigserial PRIMARY KEY,
   titulo text NOT NULL,
   descripcion text DEFAULT '',
   asignado_a text NOT NULL,
   asignado_por text DEFAULT '',
   fecha_vencimiento date,
+  hora time,
+  recordatorio int,
   prioridad text DEFAULT 'Normal',
   completado boolean DEFAULT false,
   completado_at timestamptz,
@@ -368,6 +519,9 @@ function showSetup(){
 );
 ALTER TABLE tareas ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "auth_all" ON tareas FOR ALL TO authenticated USING (true) WITH CHECK (true);</code>
+    <br>Si ya creaste la tabla antes (sin hora/recordatorio), agrega:<br>
+    <code class="setup-code">ALTER TABLE tareas ADD COLUMN IF NOT EXISTS hora time;
+ALTER TABLE tareas ADD COLUMN IF NOT EXISTS recordatorio int;</code>
   </div>`;
 }
 
@@ -375,102 +529,133 @@ function updateCounts(){
   const today=todayStr();
   const mine=ALL_TASKS.filter(t=>t.asignado_a===ME.email.toLowerCase());
   const pending=mine.filter(t=>!t.completado);
-  document.getElementById('cnt-mis').textContent=pending.length;
-  document.getElementById('cnt-hoy').textContent=pending.filter(t=>t.fecha_vencimiento===today).length;
+  const overdueCnt=pending.filter(t=>t.fecha_vencimiento&&t.fecha_vencimiento<today).length;
+  const hoyCnt=pending.filter(t=>t.fecha_vencimiento===today).length;
+  const misCnt=document.getElementById('cnt-mis');
+  misCnt.textContent=pending.length;
+  if(overdueCnt>0)misCnt.classList.add('urgent');else misCnt.classList.remove('urgent');
+  document.getElementById('cnt-hoy').textContent=hoyCnt;
   document.getElementById('cnt-proximas').textContent=pending.filter(t=>t.fecha_vencimiento&&t.fecha_vencimiento>today).length;
   document.getElementById('cnt-completadas').textContent=mine.filter(t=>t.completado).length;
-  const cntEq=document.getElementById('cnt-equipo');
-  if(cntEq) cntEq.textContent=ALL_TASKS.filter(t=>!t.completado).length;
+  const eq=document.getElementById('cnt-equipo');
+  if(eq)eq.textContent=ALL_TASKS.filter(t=>!t.completado).length;
 }
 
 /* ── RENDER ── */
 function renderTasks(){
   const filtered=getFiltered();
   const list=document.getElementById('task-list');
-
   if(!filtered.length){
     list.innerHTML=`<div class="tasks-empty">
       <div class="tasks-empty-icon">${CURRENT_FILTER==='completadas'?'🎉':'📋'}</div>
       <div class="tasks-empty-title">${CURRENT_FILTER==='completadas'?'Sin tareas completadas':'Sin tareas pendientes'}</div>
-      <div class="tasks-empty-sub">${CURRENT_FILTER==='completadas'?'Completa tareas para verlas aquí':'Agrega tu primera tarea arriba'}</div>
+      <div class="tasks-empty-sub">${CURRENT_FILTER==='completadas'?'Completa tareas para verlas aquí':'Haz clic arriba para agregar tu primera tarea'}</div>
     </div>`;
     return;
   }
-
-  // Group: pending vs completed (for equipo/mis view)
+  const today=todayStr();
   const pending=filtered.filter(t=>!t.completado);
   const done=filtered.filter(t=>t.completado);
-  const today=todayStr();
-
   let html='';
-  if(pending.length){
-    html+=`<div class="tasks-group">
-      ${CURRENT_FILTER==='completadas'?'':pending.map(t=>taskHTML(t,today)).join('')}
-    </div>`;
-  }
-  if(done.length&&CURRENT_FILTER!=='completadas'){
-    html+=`<div class="tasks-group"><div class="tasks-group-label">Completadas</div>${done.map(t=>taskHTML(t,today)).join('')}</div>`;
-  }
   if(CURRENT_FILTER==='completadas'){
     html=done.map(t=>taskHTML(t,today)).join('');
+  } else {
+    if(pending.length)html+=`<div class="tasks-group">${pending.map(t=>taskHTML(t,today)).join('')}</div>`;
+    if(done.length)html+=`<div class="tasks-group"><div class="tasks-group-label">✅ Completadas</div>${done.map(t=>taskHTML(t,today)).join('')}</div>`;
   }
   list.innerHTML=html;
 }
 
 function taskHTML(t,today){
   const overdue=t.fecha_vencimiento&&t.fecha_vencimiento<today&&!t.completado;
+  const dueSoon=!overdue&&t.fecha_vencimiento===today&&!t.completado;
   const expanded=EXPANDED_ID===t.id;
   const assignee=nameFromEmail(t.asignado_a);
   const assigner=t.asignado_por&&t.asignado_por!==t.asignado_a?nameFromEmail(t.asignado_por):'';
+  const cls=`task-item${t.completado?' completed':''}${overdue?' overdue':''}${dueSoon?' due-soon':''}`;
 
-  return `<div class="task-item${t.completado?' completed':''}${overdue?' overdue':''}" id="task-${t.id}">
+  return `<div class="${cls}" id="task-${t.id}">
     <div class="task-main" onclick="toggleExpand(${t.id})">
-      <div class="task-check" onclick="event.stopPropagation();toggleComplete(${t.id},${t.completado})">
-        <div class="task-check-inner"></div>
+      <div class="task-check" onclick="event.stopPropagation();toggleComplete(${t.id},${t.completado})" title="${t.completado?'Marcar pendiente':'Completar'}">
+        <span class="task-check-icon">✓</span>
       </div>
       <div class="task-body">
         <div class="task-title-text">${esc(t.titulo)}</div>
         <div class="task-chips">
-          ${t.fecha_vencimiento?`<span class="task-date-chip">📅 ${fmtDate(t.fecha_vencimiento)}</span>`:''}
-          ${t.prioridad&&t.prioridad!=='Normal'?`<span class="task-prio-chip prio-${t.prioridad.toLowerCase()}">${t.prioridad==='Alta'?'🔴':'⚪'} ${t.prioridad}</span>`:''}
-          ${CURRENT_FILTER==='equipo'||assigner?`<span class="task-assign-chip">👤 ${assignee}</span>`:''}
-          ${assigner?`<span class="task-assign-chip" style="background:rgba(99,102,241,.1);color:#4f46e5;">de ${assigner}</span>`:''}
+          ${t.fecha_vencimiento?`<span class="chip chip-date">📅 ${fmtDate(t.fecha_vencimiento)}</span>`:''}
+          ${t.hora?`<span class="chip chip-time">⏰ ${fmtTime(t.hora)}</span>`:''}
+          ${t.recordatorio!=null?`<span class="chip chip-remind">🔔 ${fmtRemindLabel(t.recordatorio)} antes</span>`:''}
+          ${t.prioridad==='Alta'?`<span class="chip chip-prio-alta">🔴 Alta</span>`:''}
+          ${t.prioridad==='Baja'?`<span class="chip chip-prio-baja">⚪ Baja</span>`:''}
+          ${CURRENT_FILTER==='equipo'?`<span class="chip chip-assign">👤 ${assignee}</span>`:''}
+          ${assigner?`<span class="chip chip-from">de ${assigner}</span>`:''}
         </div>
       </div>
       <div class="task-right">
-        <button class="task-expand-btn" title="Ver detalles">${expanded?'▲':'▼'}</button>
+        <button class="task-expand-btn" title="${expanded?'Cerrar':'Editar'}">${expanded?'▲':'▼'}</button>
         <button class="task-del-btn" onclick="event.stopPropagation();deleteTask(${t.id})" title="Eliminar">🗑</button>
       </div>
     </div>
     ${expanded?`<div class="task-expanded">
-      <textarea class="task-notes" id="notes-${t.id}" placeholder="Agregar descripción o notas..." rows="2">${esc(t.descripcion||'')}</textarea>
-      <div class="task-exp-row">
-        <span class="task-exp-label">Fecha:</span>
-        <input type="date" class="task-exp-sel" id="date-${t.id}" value="${t.fecha_vencimiento||''}">
-        <span class="task-exp-label">Prioridad:</span>
-        <select class="task-exp-sel" id="prio-${t.id}">
-          <option ${t.prioridad==='Normal'?'selected':''}>Normal</option>
-          <option ${t.prioridad==='Alta'?'selected':''}>Alta</option>
-          <option ${t.prioridad==='Baja'?'selected':''}>Baja</option>
-        </select>
-        ${ME.email.toLowerCase()===ADMIN_EMAIL?`
-        <span class="task-exp-label">Para:</span>
-        <select class="task-exp-sel" id="assign-${t.id}">
-          ${TEAM.map(m=>`<option value="${m.email}"${t.asignado_a===m.email?' selected':''}>${m.name}</option>`).join('')}
-        </select>`:''}
+      <textarea class="task-notes" id="notes-${t.id}" placeholder="Notas o descripción..." rows="2">${esc(t.descripcion||'')}</textarea>
+      <div class="task-exp-grid">
+        <div class="task-exp-field"><span class="task-exp-icon">📅</span><span class="task-exp-lbl">Fecha</span><input type="date" class="task-exp-input" id="date-${t.id}" value="${t.fecha_vencimiento||''}"></div>
+        <div class="task-exp-field"><span class="task-exp-icon">⏰</span><span class="task-exp-lbl">Hora</span><input type="time" class="task-exp-input" id="hora-${t.id}" value="${t.hora||''}"></div>
+        <div class="task-exp-field"><span class="task-exp-icon">🔔</span><span class="task-exp-lbl">Recordatorio</span>
+          <select class="task-exp-select" id="remind-${t.id}">
+            <option value="">Sin recordatorio</option>
+            <option value="0"${t.recordatorio===0?' selected':''}>Al momento</option>
+            <option value="5"${t.recordatorio===5?' selected':''}>5 min antes</option>
+            <option value="15"${t.recordatorio===15?' selected':''}>15 min antes</option>
+            <option value="30"${t.recordatorio===30?' selected':''}>30 min antes</option>
+            <option value="60"${t.recordatorio===60?' selected':''}>1 hora antes</option>
+            <option value="120"${t.recordatorio===120?' selected':''}>2 horas antes</option>
+            <option value="1440"${t.recordatorio===1440?' selected':''}>1 día antes</option>
+          </select>
+        </div>
+        <div class="task-exp-field"><span class="task-exp-icon">🎯</span><span class="task-exp-lbl">Prioridad</span>
+          <select class="task-exp-select" id="prio-${t.id}">
+            <option${t.prioridad==='Normal'?' selected':''}>Normal</option>
+            <option${t.prioridad==='Alta'?' selected':''}>Alta</option>
+            <option${t.prioridad==='Baja'?' selected':''}>Baja</option>
+          </select>
+        </div>
+        ${ME.email.toLowerCase()===ADMIN_EMAIL?`<div class="task-exp-field"><span class="task-exp-icon">👤</span><span class="task-exp-lbl">Para</span>
+          <select class="task-exp-select" id="assign-${t.id}">${TEAM.map(m=>`<option value="${m.email}"${t.asignado_a===m.email?' selected':''}>${m.name}</option>`).join('')}</select>
+        </div>`:''}
         <button class="task-save-btn" onclick="saveTask(${t.id})">Guardar</button>
       </div>
     </div>`:''}
   </div>`;
 }
 
+/* ── QUICK ADD EXPAND/COLLAPSE ── */
+function expandQA(){
+  document.getElementById('qa-collapsed').style.display='none';
+  document.getElementById('qa-expanded').style.display='block';
+  setTimeout(()=>document.getElementById('qa-input').focus(),50);
+}
+
+function collapseQA(){
+  document.getElementById('qa-expanded').style.display='none';
+  document.getElementById('qa-collapsed').style.display='flex';
+  clearQuickAdd();
+}
+
+function clearQuickAdd(){
+  document.getElementById('qa-input').value='';
+  document.getElementById('qa-date').value='';
+  document.getElementById('qa-time').value='';
+  document.getElementById('qa-remind').value='';
+  document.getElementById('qa-prio').value='Normal';
+}
+
 /* ── FILTER ── */
 function setFilter(f){
-  CURRENT_FILTER=f;
-  EXPANDED_ID=null;
+  CURRENT_FILTER=f;EXPANDED_ID=null;
   document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('filter-'+f)?.classList.add('active');
-  const titles={mis:'Mis Tareas',hoy:'Hoy',proximas:'Próximas',completadas:'Completadas',equipo:'Todas las Tareas del Equipo'};
+  const titles={mis:'Mis Tareas',hoy:'Hoy',proximas:'Próximas',completadas:'Completadas',equipo:'Todas las Tareas'};
   const subs={mis:'Tus tareas pendientes',hoy:'Tareas con vencimiento hoy',proximas:'Tareas para los próximos días',completadas:'Tareas que ya terminaste',equipo:'Vista de todas las tareas del equipo'};
   document.getElementById('list-title').textContent=titles[f]||f;
   document.getElementById('list-subtitle').textContent=subs[f]||'';
@@ -480,42 +665,47 @@ function setFilter(f){
 function getFiltered(){
   const today=todayStr();
   const myEmail=ME.email.toLowerCase();
+  const sortByDate=(a,b)=>{
+    const da=a.fecha_vencimiento||'9999';const db=b.fecha_vencimiento||'9999';
+    if(da!==db)return da.localeCompare(db);
+    return(a.hora||'23:59').localeCompare(b.hora||'23:59');
+  };
   switch(CURRENT_FILTER){
-    case 'mis':     return ALL_TASKS.filter(t=>t.asignado_a===myEmail&&!t.completado);
-    case 'hoy':     return ALL_TASKS.filter(t=>t.asignado_a===myEmail&&!t.completado&&t.fecha_vencimiento===today);
-    case 'proximas':return ALL_TASKS.filter(t=>t.asignado_a===myEmail&&!t.completado&&t.fecha_vencimiento&&t.fecha_vencimiento>today);
+    case 'mis':return ALL_TASKS.filter(t=>t.asignado_a===myEmail&&!t.completado).sort(sortByDate);
+    case 'hoy':return ALL_TASKS.filter(t=>t.asignado_a===myEmail&&!t.completado&&t.fecha_vencimiento===today).sort(sortByDate);
+    case 'proximas':return ALL_TASKS.filter(t=>t.asignado_a===myEmail&&!t.completado&&t.fecha_vencimiento&&t.fecha_vencimiento>today).sort(sortByDate);
     case 'completadas':return ALL_TASKS.filter(t=>t.asignado_a===myEmail&&t.completado).sort((a,b)=>new Date(b.completado_at)-new Date(a.completado_at));
-    case 'equipo':  return ALL_TASKS.sort((a,b)=>a.completado-b.completado);
-    default:        return [];
+    case 'equipo':return ALL_TASKS.sort((a,b)=>a.completado-b.completado||sortByDate(a,b));
+    default:return[];
   }
 }
 
 /* ── ACTIONS ── */
 async function addTask(){
-  const input=document.getElementById('qa-input');
-  const titulo=input.value.trim();
-  if(!titulo) return;
+  const titulo=document.getElementById('qa-input').value.trim();
+  if(!titulo){document.getElementById('qa-input').focus();return;}
   const fecha=document.getElementById('qa-date').value||null;
+  const hora=document.getElementById('qa-time').value||null;
+  const remindRaw=document.getElementById('qa-remind').value;
+  const recordatorio=remindRaw!==''?parseInt(remindRaw):null;
   const prio=document.getElementById('qa-prio').value;
   const assignSel=document.getElementById('qa-assign');
-  const asignado_a=assignSel.classList.contains('visible')&&assignSel.value ? assignSel.value : ME.email.toLowerCase();
+  const asignado_a=assignSel.parentElement.style.display!=='none'&&assignSel.value?assignSel.value:ME.email.toLowerCase();
+
   const {data,error}=await sb.from('tareas').insert({
-    titulo, descripcion:'',
-    asignado_a, asignado_por:ME.email.toLowerCase(),
-    fecha_vencimiento:fecha, prioridad:prio,
-    completado:false
+    titulo,descripcion:'',asignado_a,asignado_por:ME.email.toLowerCase(),
+    fecha_vencimiento:fecha,hora,recordatorio,prioridad:prio,completado:false
   }).select().single();
+
   if(error){
     if(error.code==='42P01'){showSetup();toast('Crea la tabla primero','err');}
     else toast('Error al agregar','err');
     return;
   }
   ALL_TASKS.unshift(data);
-  input.value='';
-  document.getElementById('qa-date').value='';
-  document.getElementById('qa-prio').value='Normal';
+  collapseQA();
   updateCounts();renderTasks();
-  toast('Tarea agregada','ok');
+  toast('Tarea agregada ✓','ok');
 }
 
 async function toggleComplete(id,wasComplete){
@@ -525,26 +715,26 @@ async function toggleComplete(id,wasComplete){
   if(error){toast('Error','err');return;}
   const t=ALL_TASKS.find(x=>x.id===id);
   if(t)Object.assign(t,updates);
-  EXPANDED_ID=null;
-  updateCounts();renderTasks();
+  EXPANDED_ID=null;updateCounts();renderTasks();
 }
 
 async function saveTask(id){
-  const titulo_input=document.querySelector(`#task-${id} .task-title-text`);
   const desc=document.getElementById('notes-'+id)?.value||'';
   const fecha=document.getElementById('date-'+id)?.value||null;
+  const hora=document.getElementById('hora-'+id)?.value||null;
+  const remindRaw=document.getElementById('remind-'+id)?.value;
+  const recordatorio=remindRaw!==''&&remindRaw!=null?parseInt(remindRaw):null;
   const prio=document.getElementById('prio-'+id)?.value||'Normal';
   const assignSel=document.getElementById('assign-'+id);
-  const asignado_a=assignSel?assignSel.value:undefined;
-  const updates={descripcion:desc,fecha_vencimiento:fecha,prioridad:prio};
-  if(asignado_a) updates.asignado_a=asignado_a;
+  const updates={descripcion:desc,fecha_vencimiento:fecha,hora,recordatorio,prioridad:prio};
+  if(assignSel)updates.asignado_a=assignSel.value;
   const {error}=await sb.from('tareas').update(updates).eq('id',id);
   if(error){toast('Error al guardar','err');return;}
   const t=ALL_TASKS.find(x=>x.id===id);
   if(t)Object.assign(t,updates);
-  EXPANDED_ID=null;
-  updateCounts();renderTasks();
-  toast('Guardado','ok');
+  if(recordatorio!=null)localStorage.removeItem(`nvs_reminded_${id}`);
+  EXPANDED_ID=null;updateCounts();renderTasks();
+  toast('Guardado ✓','ok');
 }
 
 async function deleteTask(id){
@@ -552,20 +742,15 @@ async function deleteTask(id){
   const {error}=await sb.from('tareas').delete().eq('id',id);
   if(error){toast('Error al eliminar','err');return;}
   ALL_TASKS=ALL_TASKS.filter(t=>t.id!==id);
-  EXPANDED_ID=null;
-  updateCounts();renderTasks();
+  localStorage.removeItem(`nvs_reminded_${id}`);
+  EXPANDED_ID=null;updateCounts();renderTasks();
   toast('Tarea eliminada','ok');
 }
 
 function toggleExpand(id){
   EXPANDED_ID=EXPANDED_ID===id?null:id;
   renderTasks();
-  if(EXPANDED_ID){
-    setTimeout(()=>{
-      const el=document.getElementById('notes-'+id);
-      if(el)el.focus();
-    },50);
-  }
+  if(EXPANDED_ID)setTimeout(()=>document.getElementById('notes-'+id)?.focus(),50);
 }
 
 /* ── REALTIME ── */
@@ -578,19 +763,35 @@ function subscribeRealtime(){
 /* ── HELPERS ── */
 function nameFromEmail(email){
   if(!email)return'—';
-  const found=TEAM.find(m=>m.email===email.toLowerCase());
-  if(found)return found.name;
-  return email.split('@')[0].charAt(0).toUpperCase()+email.split('@')[0].slice(1);
+  const f=TEAM.find(m=>m.email===email.toLowerCase());
+  if(f)return f.name;
+  const u=email.split('@')[0];
+  return u.charAt(0).toUpperCase()+u.slice(1);
 }
 function todayStr(){return new Date().toISOString().split('T')[0];}
 function fmtDate(d){
   if(!d)return'';
   const today=todayStr();
-  const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
-  const tomorrowStr=tomorrow.toISOString().split('T')[0];
+  const tmr=new Date();tmr.setDate(tmr.getDate()+1);
+  const tmrStr=tmr.toISOString().split('T')[0];
   if(d===today)return'Hoy';
-  if(d===tomorrowStr)return'Mañana';
+  if(d===tmrStr)return'Mañana';
   return new Date(d+'T12:00:00').toLocaleDateString('es-PA',{day:'numeric',month:'short'});
+}
+function fmtTime(t){
+  if(!t)return'';
+  const [h,m]=t.split(':');
+  const hr=parseInt(h);
+  return`${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`;
+}
+function fmtRemindLabel(min){
+  if(min==null)return'';
+  if(min===0)return'al momento';
+  if(min<60)return min+' min';
+  if(min===60)return'1 hora';
+  if(min===120)return'2 horas';
+  if(min===1440)return'1 día';
+  return min+' min';
 }
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(msg,type=''){
@@ -602,8 +803,9 @@ function toast(msg,type=''){
 
 /* ── KEYBOARD ── */
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&document.getElementById('login-overlay').style.display==='flex')doLogin();
+  if(e.key==='Enter'&&document.getElementById('login-overlay').style.display!=='none')doLogin();
   if(e.key==='Enter'&&document.activeElement.id==='qa-input')addTask();
+  if(e.key==='Escape'&&document.getElementById('qa-expanded').style.display!=='none')collapseQA();
 });
 
 document.addEventListener('DOMContentLoaded',async()=>{
