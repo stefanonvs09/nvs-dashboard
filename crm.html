@@ -702,6 +702,7 @@ function renderList(){
 
 /* DETAIL PANEL */
 function openDP(id){
+  if(_wasDragging)return;
   const a=ALL.find(x=>x.id===id);if(!a)return;
   openId=id;
   renderDP(a);
@@ -776,13 +777,18 @@ function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').
 
 /* ── DRAG & DROP ── */
 let _dragId=null;
+let _wasDragging=false;
 
 function dragStart(e,id){
   _dragId=id;
+  _wasDragging=false;
   e.dataTransfer.effectAllowed='move';
-  setTimeout(()=>{const c=document.querySelector(`.card[ondragstart*="${id}"]`);if(c)c.classList.add('dragging');},0);
+  const card=e.currentTarget;
+  setTimeout(()=>card.classList.add('dragging'),0);
 }
 function dragEnd(e){
+  _wasDragging=true;
+  setTimeout(()=>_wasDragging=false,250);
   document.querySelectorAll('.card.dragging').forEach(c=>c.classList.remove('dragging'));
   document.querySelectorAll('.kol-bd.drag-over').forEach(c=>c.classList.remove('drag-over'));
 }
