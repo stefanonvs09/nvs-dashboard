@@ -59,53 +59,87 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .split{display:flex;flex:1;overflow:hidden;}
 
 /* SIDEBAR */
-.sidebar{width:240px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar{width:230px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
 .sb-head{padding:16px 14px 12px;border-bottom:1px solid var(--border);}
 .sb-head-title{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.3px;margin-bottom:2px;}
 .sb-head-sub{font-size:10px;color:var(--muted);}
-.sb-cats{flex:1;overflow-y:auto;padding:8px 8px;}
+.sb-cats{flex:1;overflow-y:auto;padding:8px;}
 .sb-cat-lbl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;padding:10px 8px 6px;}
-.sb-cat-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:all .14s;font-size:12px;font-weight:600;color:var(--muted);border:1px solid transparent;}
+.sb-cat-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:all .14s;font-size:12px;font-weight:600;color:var(--muted);border:1px solid transparent;margin-bottom:1px;}
 .sb-cat-item:hover{background:var(--card2);color:var(--txt);}
 .sb-cat-item.active{background:var(--green-dim);color:#3a6b00;border-color:rgba(170,255,0,.25);}
-.sb-cat-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
-.sb-cat-count{margin-left:auto;font-size:9px;font-weight:800;background:var(--card2);padding:2px 7px;border-radius:99px;color:var(--muted);}
-.sb-cat-item.active .sb-cat-count{background:rgba(170,255,0,.2);color:#3a6b00;}
+.sb-cat-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sb-cat-badge{margin-left:auto;font-size:9px;font-weight:800;background:rgba(170,255,0,.2);color:#3a6b00;padding:2px 6px;border-radius:99px;}
 
 /* MAIN */
 .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-
-/* MAIN HEADER */
-.main-head{padding:20px 28px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;}
+.main-head{padding:18px 28px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;}
 .main-head-row{display:flex;align-items:center;justify-content:space-between;}
 .main-head-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.3px;}
 .main-head-sub{font-size:11px;color:var(--muted);margin-top:3px;}
-
-/* GUIDES GRID */
-.guides-wrap{flex:1;overflow-y:auto;padding:24px 28px 40px;}
+.guides-wrap{flex:1;overflow-y:auto;padding:24px 28px 48px;}
 
 /* EMPTY STATE */
 .guides-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 20px;color:#94a3b8;animation:fadeIn .3s both;}
-.guides-empty-icon{font-size:52px;opacity:.3;}
-.guides-empty-title{font-size:15px;font-weight:700;color:#cbd5e1;}
-.guides-empty-sub{font-size:12px;color:#cbd5e1;text-align:center;max-width:280px;line-height:1.6;}
-.guides-empty-badge{background:var(--green-dim);color:#3a6b00;border-radius:99px;padding:5px 14px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+.guides-empty-icon{font-size:48px;opacity:.3;}
+.guides-empty-title{font-size:14px;font-weight:700;color:#cbd5e1;}
+.guides-empty-sub{font-size:12px;color:#cbd5e1;text-align:center;max-width:260px;line-height:1.6;}
+.guides-empty-badge{background:var(--green-dim);color:#3a6b00;border-radius:99px;padding:5px 14px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
 
-/* COMING SOON BANNER */
-.coming-banner{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:14px;}
-.cb-icon{font-size:28px;flex-shrink:0;}
-.cb-title{font-size:13px;font-weight:800;color:#92400e;margin-bottom:3px;}
-.cb-sub{font-size:11px;color:#a16207;line-height:1.5;}
+/* ── GUIDE CARD ── */
+.guide-card{background:#fff;border:1px solid var(--border);border-radius:16px;margin-bottom:20px;overflow:hidden;animation:fadeUp .3s both;}
+.guide-card-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px;}
+.guide-card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.guide-card-title{font-family:'Anton',sans-serif;font-size:19px;letter-spacing:.3px;margin-bottom:4px;}
+.guide-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.guide-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;}
 
-/* CATEGORY CHIPS */
-.cat-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
-.cat-chip{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;font-size:11px;font-weight:700;border:1.5px solid var(--border);color:var(--muted);background:#fff;cursor:pointer;transition:all .15s;}
-.cat-chip:hover{border-color:rgba(0,0,0,.18);color:var(--txt);}
-.cat-chip.active{background:var(--green-dim);border-color:rgba(170,255,0,.4);color:#3a6b00;}
+/* STEPS */
+.guide-body{padding:20px 24px;}
+.steps-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;margin-bottom:14px;}
+.step-item{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--green-dim);color:#3a6b00;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;border:1px solid rgba(170,255,0,.3);}
+.step-num.active{background:var(--green);color:#0f172a;}
+.step-content{flex:1;}
+.step-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.step-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;font-weight:700;color:#4f46e5;text-decoration:none;padding:4px 10px;background:rgba(99,102,241,.08);border-radius:6px;transition:all .15s;}
+.step-link:hover{background:rgba(99,102,241,.15);color:#3730a3;}
+.step-link-green{color:#3a6b00;background:var(--green-dim);}
+.step-link-green:hover{background:rgba(170,255,0,.2);}
+.step-fee{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:11px;font-weight:800;color:#92400e;background:rgba(245,158,11,.12);padding:4px 10px;border-radius:6px;}
+
+/* SECTION DIVIDER */
+.guide-section{padding:0 24px 20px;}
+.guide-section-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* DOCS CHECKLIST */
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.doc-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card2);border-radius:8px;font-size:11px;font-weight:600;color:var(--txt);}
+.doc-item::before{content:'📎';font-size:12px;flex-shrink:0;}
+.doc-item.required::before{content:'⚠️';}
+
+/* FEES TABLE */
+.fees-table{width:100%;border-collapse:collapse;font-size:12px;}
+.fees-table th{text-align:left;padding:8px 12px;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;border-bottom:1px solid var(--border);}
+.fees-table td{padding:10px 12px;border-bottom:1px solid var(--card2);color:var(--txt);font-weight:500;}
+.fees-table tr:last-child td{border-bottom:none;font-weight:800;color:#0f172a;}
+.fees-table .fee-amt{font-weight:800;color:#3a6b00;}
+.fees-table .fee-total{color:#3a6b00;font-family:'Anton',sans-serif;font-size:15px;}
+
+/* ALERTS */
+.guide-alert{display:flex;gap:12px;padding:14px 16px;border-radius:10px;margin-bottom:12px;font-size:12px;line-height:1.6;}
+.guide-alert.yellow{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+.guide-alert.blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;}
+.guide-alert.green{background:var(--green-dim);border:1px solid rgba(170,255,0,.3);color:#3a6b00;}
+.guide-alert.red{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;}
+.guide-alert-icon{font-size:16px;flex-shrink:0;}
+.guide-alert strong{display:block;font-weight:700;margin-bottom:2px;}
 
 @media(max-width:640px){
   .sidebar{display:none;}
   .main-head,.guides-wrap{padding-left:16px;padding-right:16px;}
+  .doc-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -156,34 +190,27 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
       </div>
       <div class="sb-cats">
         <div class="sb-cat-lbl">Categorías</div>
-
-        <div class="sb-cat-item active" onclick="setCategory('todas')">
+        <div class="sb-cat-item" id="cat-todas" onclick="setCategory('todas')">
           <span class="sb-cat-icon">📚</span> Todas
-          <span class="sb-cat-count" id="cnt-todas">0</span>
         </div>
-        <div class="sb-cat-item" onclick="setCategory('elegibilidad')">
+        <div class="sb-cat-item" id="cat-elegibilidad" onclick="setCategory('elegibilidad')">
           <span class="sb-cat-icon">✅</span> Elegibilidad
-          <span class="sb-cat-count" id="cnt-elegibilidad">0</span>
         </div>
-        <div class="sb-cat-item" onclick="setCategory('onboarding')">
-          <span class="sb-cat-icon">🎓</span> Onboarding
-          <span class="sb-cat-count" id="cnt-onboarding">0</span>
-        </div>
-        <div class="sb-cat-item" onclick="setCategory('visado')">
+        <div class="sb-cat-item active" id="cat-visado" onclick="setCategory('visado')">
           <span class="sb-cat-icon">✈️</span> Visado
-          <span class="sb-cat-count" id="cnt-visado">0</span>
+          <span class="sb-cat-badge">1</span>
         </div>
-        <div class="sb-cat-item" onclick="setCategory('contratos')">
+        <div class="sb-cat-item" id="cat-onboarding" onclick="setCategory('onboarding')">
+          <span class="sb-cat-icon">🎓</span> Onboarding
+        </div>
+        <div class="sb-cat-item" id="cat-contratos" onclick="setCategory('contratos')">
           <span class="sb-cat-icon">📄</span> Contratos
-          <span class="sb-cat-count" id="cnt-contratos">0</span>
         </div>
-        <div class="sb-cat-item" onclick="setCategory('pagos')">
+        <div class="sb-cat-item" id="cat-pagos" onclick="setCategory('pagos')">
           <span class="sb-cat-icon">💸</span> Pagos
-          <span class="sb-cat-count" id="cnt-pagos">0</span>
         </div>
-        <div class="sb-cat-item" onclick="setCategory('general')">
+        <div class="sb-cat-item" id="cat-general" onclick="setCategory('general')">
           <span class="sb-cat-icon">📁</span> General
-          <span class="sb-cat-count" id="cnt-general">0</span>
         </div>
       </div>
     </div>
@@ -191,50 +218,32 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
     <!-- MAIN -->
     <div class="main-area">
       <div class="main-head">
-        <div class="main-head-row">
-          <div>
-            <div class="main-head-title" id="main-title">Todas las Guías</div>
-            <div class="main-head-sub" id="main-sub">Recursos, procesos y documentación del equipo</div>
-          </div>
-        </div>
+        <div class="main-head-title" id="main-title">Visado</div>
+        <div class="main-head-sub" id="main-sub">Documentación y procesos de visa estudiantil para EE.UU.</div>
       </div>
 
-      <div class="guides-wrap">
-        <div class="coming-banner">
-          <div class="cb-icon">🚧</div>
-          <div>
-            <div class="cb-title">Módulo en preparación</div>
-            <div class="cb-sub">Aquí se publicarán guías de elegibilidad, onboarding, visado, contratos y más. El contenido se agregará próximamente.</div>
-          </div>
-        </div>
-
-        <div class="guides-empty" id="guides-empty">
-          <div class="guides-empty-icon">📖</div>
-          <div class="guides-empty-title">Sin guías aún</div>
-          <div class="guides-empty-sub">Las guías de elegibilidad, onboarding, visado y procesos del equipo aparecerán aquí.</div>
-          <div class="guides-empty-badge">Próximamente</div>
-        </div>
+      <div class="guides-wrap" id="guides-wrap">
+        <!-- Content rendered by JS -->
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
 const sb=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk');
-
-let CURRENT_CAT='todas';
+let CURRENT_CAT='visado';
 
 const CATS={
-  todas:{label:'Todas las Guías',sub:'Recursos, procesos y documentación del equipo'},
-  elegibilidad:{label:'Elegibilidad',sub:'Requisitos y criterios para atletas'},
-  onboarding:{label:'Onboarding',sub:'Proceso de incorporación de nuevos atletas y clientes'},
-  visado:{label:'Visado',sub:'Documentación y procesos de visa estudiantil'},
-  contratos:{label:'Contratos',sub:'Modelos y guías de contratos NVS'},
-  pagos:{label:'Pagos',sub:'Procesos y métodos de pago'},
-  general:{label:'General',sub:'Recursos y documentación general'},
+  todas:     {label:'Todas las Guías',       sub:'Recursos, procesos y documentación del equipo'},
+  elegibilidad:{label:'Elegibilidad',         sub:'Requisitos y criterios para atletas'},
+  visado:    {label:'Visado',                 sub:'Documentación y procesos de visa estudiantil para EE.UU.'},
+  onboarding:{label:'Onboarding',             sub:'Proceso de incorporación de nuevos atletas y clientes'},
+  contratos: {label:'Contratos',              sub:'Modelos y guías de contratos NVS'},
+  pagos:     {label:'Pagos',                  sub:'Procesos y métodos de pago'},
+  general:   {label:'General',               sub:'Recursos y documentación general'},
 };
 
+/* ── AUTH ── */
 async function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-password').value;
@@ -250,30 +259,232 @@ async function doLogin(){
   initApp(data.user);
 }
 async function doLogout(){await sb.auth.signOut();location.reload();}
-
 async function initApp(user){
   document.getElementById('login-overlay').style.display='none';
   document.getElementById('app').style.display='flex';
   const name=user.email.split('@')[0];
-  const display=name.charAt(0).toUpperCase()+name.slice(1);
-  document.getElementById('tb-uname').textContent=display;
-  document.getElementById('tb-avatar').textContent=display.charAt(0).toUpperCase();
+  const d=name.charAt(0).toUpperCase()+name.slice(1);
+  document.getElementById('tb-uname').textContent=d;
+  document.getElementById('tb-avatar').textContent=d.charAt(0).toUpperCase();
+  setCategory('visado');
 }
 
+/* ── CATEGORIES ── */
 function setCategory(cat){
   CURRENT_CAT=cat;
   document.querySelectorAll('.sb-cat-item').forEach(el=>el.classList.remove('active'));
-  const idx=['todas','elegibilidad','onboarding','visado','contratos','pagos','general'].indexOf(cat);
-  if(idx>=0)document.querySelectorAll('.sb-cat-item')[idx].classList.add('active');
+  const el=document.getElementById('cat-'+cat);
+  if(el)el.classList.add('active');
   const c=CATS[cat]||CATS.todas;
   document.getElementById('main-title').textContent=c.label;
   document.getElementById('main-sub').textContent=c.sub;
+  renderContent(cat);
 }
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter')doLogin();
-});
+/* ── RENDER ── */
+function renderContent(cat){
+  const wrap=document.getElementById('guides-wrap');
+  if(cat==='visado'||cat==='todas'){
+    wrap.innerHTML=renderVisadoGuide();
+    if(cat==='todas') wrap.innerHTML+=emptyOtherCats();
+  } else {
+    wrap.innerHTML=emptyState(cat);
+  }
+}
 
+function emptyState(cat){
+  return`<div class="guides-empty">
+    <div class="guides-empty-icon">📖</div>
+    <div class="guides-empty-title">Sin guías aún</div>
+    <div class="guides-empty-sub">El contenido para esta sección se agregará próximamente.</div>
+    <div class="guides-empty-badge">Próximamente</div>
+  </div>`;
+}
+function emptyOtherCats(){
+  return`<div style="margin-top:8px;padding:16px 20px;background:var(--card2);border-radius:12px;font-size:12px;color:var(--muted);text-align:center;">
+    Más guías de Elegibilidad, Onboarding, Contratos y Pagos se agregarán próximamente.
+  </div>`;
+}
+
+function renderVisadoGuide(){
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(99,102,241,.1);">✈️</div>
+      <div>
+        <div class="guide-card-title">Visa F-1 — Atleta Estudiante NCAA D1</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5;">F-1 Student Visa</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">NCAA Division I</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">EE.UU.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es la Visa F-1?</strong>
+        La visa F-1 es la visa de estudiante no inmigrante de EE.UU. Es el tipo de visa que necesitan todos los atletas internacionales para estudiar y competir en universidades NCAA Division I. No confundir con una visa deportiva — el atleta entra como <em>estudiante</em> que practica deporte.</div>
+      </div>
+
+      <div class="steps-title">FASE 1 — PROCESO NCAA (ANTES DE LA VISA)</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Registrarse en el NCAA Eligibility Center</div>
+          <div class="step-desc">Todo atleta internacional que quiera competir en D1 debe registrarse en el Eligibility Center para que certifiquen su elegibilidad académica y de amateurismo. Costo: <strong>$170 USD</strong> (internacional). Crea una cuenta Academic &amp; Athletics Certification.</div>
+          <a class="step-link step-link-green" href="https://web3.ncaa.org/ecwr3/" target="_blank" rel="noopener">🔗 Abrir NCAA Eligibility Center →</a>
+          <a class="step-link" href="https://www.ncaa.org/sports/2018/5/15/initial-eligibility-steps-for-international-students.aspx" target="_blank" rel="noopener">📄 Pasos para internacionales →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Ser aceptado por una universidad D1 y obtener carta de scholarship</div>
+          <div class="step-desc">El atleta debe tener una oferta formal de un equipo D1 (carta de aceptación universitaria + carta de beca atlética si aplica). Sin aceptación no hay I-20.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Recibir el Formulario I-20 de la universidad</div>
+          <div class="step-desc">El I-20 es el "Certificate of Eligibility for Nonimmigrant Student Status". Lo emite la oficina de estudiantes internacionales de la universidad (DSO). Es el documento más importante — sin él no hay visa. El I-20 incluye tu SEVIS ID (empieza con "N").</div>
+          <a class="step-link" href="https://studyinthestates.dhs.gov/2017/01/f-1-student-athletes-learn-about-ncaa" target="_blank" rel="noopener">📘 F-1 Athletes &amp; NCAA — DHS →</a>
+        </div>
+      </div>
+
+      <div class="steps-title" style="margin-top:20px;">FASE 2 — SOLICITUD DE VISA</div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Pagar la tarifa SEVIS I-901 — $350 USD</div>
+          <div class="step-desc">Se paga online en el sitio oficial del ICE (Immigration &amp; Customs Enforcement) usando tu SEVIS ID del I-20. Guarda el recibo — lo necesitas en la entrevista.</div>
+          <a class="step-link step-link-green" href="https://www.fmjfee.com/i901fee/" target="_blank" rel="noopener">💳 Pagar SEVIS Fee →</a>
+          <a class="step-link" href="https://www.ice.gov/sevis/i901" target="_blank" rel="noopener">ℹ️ Info oficial ICE →</a>
+          <div class="step-fee">💰 $350 USD — pagar DESPUÉS de recibir el I-20</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Completar el Formulario DS-160 — $185 USD</div>
+          <div class="step-desc">El DS-160 es la solicitud oficial de visa de no inmigrante del Departamento de Estado. Se completa 100% online. Al terminar descarga la página de confirmación con el código de barras — la necesitas para la entrevista.</div>
+          <a class="step-link step-link-green" href="https://ceac.state.gov/genniv/" target="_blank" rel="noopener">📝 Completar DS-160 →</a>
+          <a class="step-link" href="https://travel.state.gov/content/travel/en/us-visas/study/student-visa.html" target="_blank" rel="noopener">🌐 Visa de Estudiante — State Dept →</a>
+          <div class="step-fee">💰 $185 USD — MRV application fee</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">6</div>
+        <div class="step-content">
+          <div class="step-title">Agendar cita en la Embajada de EE.UU.</div>
+          <div class="step-desc">Agenda tu entrevista en la Embajada o Consulado de EE.UU. más cercano. En Panamá se hace en la Embajada de Ciudad de Panamá. Los tiempos de espera varían — solicita con anticipación. Si tienes fecha de inicio urgente puedes pedir cita expedita.</div>
+          <a class="step-link step-link-green" href="https://www.ustraveldocs.com/pa/pa-niv-appointmentschedule.asp" target="_blank" rel="noopener">📅 Agendar cita — Panama →</a>
+          <a class="step-link" href="https://pa.usembassy.gov/visas/" target="_blank" rel="noopener">🏛️ Embajada EE.UU. en Panamá →</a>
+          <a class="step-link" href="https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/wait-times.html" target="_blank" rel="noopener">⏱️ Tiempos de espera →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">7</div>
+        <div class="step-content">
+          <div class="step-title">Preparar todos los documentos para la entrevista</div>
+          <div class="step-desc">Ver lista completa de documentos en la sección de abajo. Organiza originales y copias. La entrevista típicamente dura 5-10 minutos.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">8</div>
+        <div class="step-content">
+          <div class="step-title">Entrevista consular en la Embajada</div>
+          <div class="step-desc">El cónsul verificará tu intención de estudiar, tu solvencia económica y tu vínculo con tu país de origen. Para atletas: sé claro que tienes scholarship, que irás a estudiar y a competir, y que planeas regresar al terminar tus estudios.</div>
+          <a class="step-link" href="https://pa.usembassy.gov/visas/important-information/" target="_blank" rel="noopener">📋 Info importante — Embajada Panama →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">9</div>
+        <div class="step-content">
+          <div class="step-title">Recibir la visa y planificar el viaje</div>
+          <div class="step-desc">Si aprueban la visa, recibirás tu pasaporte con la visa F-1 en pocos días. Con la F-1 puedes entrar a EE.UU. máximo <strong>30 días antes</strong> de la fecha de inicio del I-20. Al entrar, el oficial de migraciones te dará un I-94 — guárdalo.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS -->
+    <div class="guide-section">
+      <div class="guide-section-title">📎 Documentos requeridos para la entrevista</div>
+      <div class="doc-grid">
+        <div class="doc-item required">Pasaporte válido (6+ meses de vigencia)</div>
+        <div class="doc-item required">Formulario I-20 original</div>
+        <div class="doc-item required">Comprobante pago SEVIS I-901</div>
+        <div class="doc-item required">Confirmación DS-160 (con código de barras)</div>
+        <div class="doc-item required">Confirmación de cita de la embajada</div>
+        <div class="doc-item">Carta de aceptación universitaria</div>
+        <div class="doc-item">Carta de beca atlética (scholarship)</div>
+        <div class="doc-item">Certificación NCAA Eligibility Center</div>
+        <div class="doc-item">Estados de cuenta bancarios (solvencia)</div>
+        <div class="doc-item">Transcripciones académicas</div>
+        <div class="doc-item">Fotos tipo pasaporte (fondo blanco)</div>
+        <div class="doc-item">Visas anteriores de EE.UU. (si aplica)</div>
+      </div>
+    </div>
+
+    <!-- TARIFAS -->
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Resumen de costos (2026)</div>
+      <table class="fees-table">
+        <tr><th>Concepto</th><th>Monto</th><th>Dónde pagar</th></tr>
+        <tr><td>NCAA Eligibility Center (internacional)</td><td class="fee-amt">$170</td><td>web3.ncaa.org</td></tr>
+        <tr><td>SEVIS I-901 Fee</td><td class="fee-amt">$350</td><td>fmjfee.com</td></tr>
+        <tr><td>DS-160 MRV Application Fee</td><td class="fee-amt">$185</td><td>ustraveldocs.com</td></tr>
+        <tr><td style="font-weight:800;">TOTAL (mínimo estimado)</td><td class="fee-total">$705</td><td>+ gastos de viaje a embajada</td></tr>
+      </table>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="guide-section">
+      <div class="guide-section-title">⚠️ Notas importantes</div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Full-time enrollment obligatorio</strong>La visa F-1 requiere que el atleta esté matriculado a tiempo completo. Si baja de carga académica puede perder el estatus migratorio.</div>
+      </div>
+      <div class="guide-alert red">
+        <span class="guide-alert-icon">🚫</span>
+        <div><strong>Restricciones de trabajo</strong>La F-1 generalmente no permite trabajar fuera del campus ni recibir ingresos de fuentes en EE.UU. El NIL (Name, Image &amp; Likeness) está en evolución legal para atletas internacionales — consultar con el DSO de la universidad antes de firmar cualquier acuerdo NIL.</div>
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">📅</span>
+        <div><strong>Tiempo de entrada</strong>Con la visa F-1 puedes entrar a EE.UU. máximo 30 días antes de la fecha de inicio del I-20. No intentes entrar antes.</div>
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Cita expedita disponible</strong>Si el tiempo de espera para la cita es muy largo y tienes fecha de inicio de clases próxima, puedes solicitar una cita expedita en la embajada. Debes primero sacar la cita normal y luego solicitar la expedita.</div>
+      </div>
+    </div>
+
+    <div class="guide-section" style="padding-bottom:0;">
+      <div style="padding:12px 16px;background:var(--card2);border-radius:10px;font-size:10px;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--txt);">Fuentes oficiales:</strong>
+        <a href="https://travel.state.gov/content/travel/en/us-visas/study/student-visa.html" target="_blank" style="color:#4f46e5;margin:0 6px;">U.S. Dept. of State</a>·
+        <a href="https://studyinthestates.dhs.gov" target="_blank" style="color:#4f46e5;margin:0 6px;">DHS Study in the States</a>·
+        <a href="https://www.ice.gov/sevis/i901" target="_blank" style="color:#4f46e5;margin:0 6px;">ICE SEVIS</a>·
+        <a href="https://web3.ncaa.org/ecwr3/" target="_blank" style="color:#4f46e5;margin:0 6px;">NCAA Eligibility Center</a>·
+        <a href="https://pa.usembassy.gov/visas/" target="_blank" style="color:#4f46e5;margin:0 6px;">U.S. Embassy Panama</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.addEventListener('DOMContentLoaded',async()=>{
   const {data:{session}}=await sb.auth.getSession();
   if(session)initApp(session.user);
