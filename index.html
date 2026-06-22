@@ -401,7 +401,8 @@ async function showPlatform(user){
   const isMkt=MARKETING_EMAILS.includes(em);
   if(!isSD&&!isMkt&&!isIH){loadStats();subscribeStats();}
   if(isSD||isIH){const sa=document.getElementById('hub-stats');if(sa)sa.style.display='none';}
-  if(!isMkt){const fc=document.getElementById('fin-stats-card');if(fc)fc.style.display='block';loadFinanceStats();}
+  const FIN_STATS_ALLOWED=['stefano@playwithnewvision.com','ih@decolatam.com','sd@cervicalservices.com'];
+  if(FIN_STATS_ALLOWED.includes(em)){const fc=document.getElementById('fin-stats-card');if(fc)fc.style.display='block';loadFinanceStats();}
 }
 
 function updateClock(){
