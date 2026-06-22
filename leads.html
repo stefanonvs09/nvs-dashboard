@@ -972,17 +972,36 @@ function renderWeb(){
   q('#web-col-pending').innerHTML=pending.length?pending.map(a=>mkWebCard(a,false)).join(''):'<div style="text-align:center;color:var(--m);font-size:11px;padding:24px">Sin leads pendientes 🎉</div>';
   q('#web-col-done').innerHTML=done.length?done.map(a=>mkWebCard(a,true)).join(''):'<div style="text-align:center;color:var(--m);font-size:11px;padding:24px">—</div>';
 
-  // Recordatorio: leads sin contactar 3+ días
-  const today=new Date();
+  // Recordatorios de seguimiento
+  const todayStr=new Date().toISOString().slice(0,10);
+  const now=new Date();
+  const segRem=webAll
+    .filter(a=>a.seguimiento_fecha&&a.seguimiento_fecha<=todayStr)
+    .sort((a,b)=>a.seguimiento_fecha.localeCompare(b.seguimiento_fecha));
   const aged=webAll
     .filter(a=>!a.estado||a.estado==='Nuevo')
-    .map(a=>({...a,_days:Math.floor((today-new Date(a.created_at||today))/86400000)}))
+    .map(a=>({...a,_days:Math.floor((now-new Date(a.created_at||now))/86400000)}))
     .filter(a=>a._days>=3)
     .sort((a,b)=>b._days-a._days);
   const banner=q('#web-rem-banner');
+  const parts=[];
+  if(segRem.length){
+    parts.push(`<div class="web-rem-hd" style="color:var(--red)">📅 ${segRem.length} seguimiento${segRem.length>1?'s':''} pendiente${segRem.length>1?'s':''}</div>
+    <div class="web-rem-list">${segRem.map(a=>{
+      const isOverdue=a.seguimiento_fecha<todayStr;
+      const wa=(a.whatsapp+'').replace(/\D/g,'');
+      return`<div class="web-rem-row${isOverdue?' urgent':''}" onclick="openDP(${a.id})">
+        <div class="web-rem-info">
+          <span class="web-rem-nm">${esc(a.nombre)}</span>
+          <span class="web-rem-meta">${a.seguimiento_nota?esc(a.seguimiento_nota):[a.deporte,a.pais].filter(Boolean).map(esc).join(' · ')}</span>
+        </div>
+        <div class="web-rem-age ${isOverdue?'urgent':'warn'}">${isOverdue?'Atrasado':'Hoy'}</div>
+        ${wa?`<a class="web-rem-wa" href="https://wa.me/${wa}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp">💬</a>`:''}
+      </div>`;
+    }).join('')}</div>`);
+  }
   if(aged.length){
-    banner.style.display='block';
-    banner.innerHTML=`<div class="web-rem-hd">⏰ ${aged.length} lead${aged.length>1?'s':''} sin contactar — llevan 3+ días esperando</div>
+    parts.push(`<div class="web-rem-hd"${parts.length?' style="margin-top:12px"':''}>⏰ ${aged.length} lead${aged.length>1?'s':''} sin contactar — 3+ días esperando</div>
     <div class="web-rem-list">${aged.map(a=>{
       const isUrgent=a._days>=7;
       const wa=(a.whatsapp+'').replace(/\D/g,'');
@@ -994,10 +1013,10 @@ function renderWeb(){
         <div class="web-rem-age ${isUrgent?'urgent':'warn'}">${a._days}d</div>
         ${wa?`<a class="web-rem-wa" href="https://wa.me/${wa}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp">💬</a>`:''}
       </div>`;
-    }).join('')}</div>`;
-  } else {
-    banner.style.display='none';
+    }).join('')}</div>`);
   }
+  banner.style.display=parts.length?'block':'none';
+  if(parts.length)banner.innerHTML=parts.join('');
 }
 function mkWebCard(a,isDone){
   const sport=a.deporte?`<span class="tag tag-rec">${esc(a.deporte)}</span>`:'';
