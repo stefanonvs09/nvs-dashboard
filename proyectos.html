@@ -417,8 +417,15 @@ async function initApp(user){
 async function loadProjects(){
   const {data,error}=await sb.from('proyectos').select('*').order('created_at',{ascending:false});
   if(error){
-    if(error.code==='42P01'||error.message.includes('does not exist')){showSetupBanner();}
-    else toast('Error cargando datos','err');
+    const noTable=error.code==='42P01'||error.code==='PGRST116'||(error.message||'').toLowerCase().includes('does not exist');
+    if(noTable){showSetupBanner();}
+    else{
+      document.getElementById('proj-list').innerHTML=`<div class="sb-empty" style="padding:20px 12px;">
+        <div style="font-size:11px;color:#dc2626;font-weight:600;margin-bottom:8px;">Error al cargar</div>
+        <div style="font-size:10px;color:#94a3b8;margin-bottom:10px;word-break:break-all;">${error.message||'Error desconocido'}</div>
+        <button onclick="loadProjects()" style="background:var(--green);border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Reintentar</button>
+      </div>`;
+    }
     return;
   }
   PROJECTS=data||[];
@@ -540,8 +547,14 @@ async function createProject(){
   document.getElementById('m-nombre').style.borderColor='';
   const {data,error}=await sb.from('proyectos').insert({nombre,estado:document.getElementById('m-estado').value,color:newColor,descripcion:'',notas:''}).select().single();
   if(error){
-    if(error.code==='42P01'){showSetupBanner();toast('Crea las tablas primero','err');}
-    else toast('Error al crear','err');
+    const noTable=error.code==='42P01'||(error.message||'').toLowerCase().includes('does not exist');
+    if(noTable){closeNewModal();showSetupBanner();toast('Primero crea las tablas en Supabase','err');}
+    else{
+      document.getElementById('modal-new').querySelector('.btn-m-create').textContent='CREAR';
+      const errEl=document.getElementById('m-err')||Object.assign(document.createElement('div'),{id:'m-err',style:'color:#dc2626;font-size:11px;margin-top:8px;font-weight:600;text-align:center;'});
+      errEl.textContent='Error: '+(error.message||'no se pudo crear');
+      document.querySelector('.modal-foot').before(errEl);
+    }
     return;
   }
   PROJECTS.unshift(data);
