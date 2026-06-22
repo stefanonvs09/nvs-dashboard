@@ -253,6 +253,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .web-rem-age.urgent{background:rgba(220,38,38,0.10);color:var(--red);}
 .web-rem-wa{font-size:14px;text-decoration:none;flex-shrink:0;padding:3px 5px;border-radius:6px;transition:background .15s;}
 .web-rem-wa:hover{background:rgba(29,185,84,0.15);}
+.rec-avs{display:flex;align-items:center;gap:7px;margin-top:2px;}
+.rec-avs-lbl{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.rec-av{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:10px;font-weight:800;transition:transform .18s,box-shadow .18s;flex-shrink:0;line-height:1;}
+.rec-av:hover{transform:scale(1.18);box-shadow:0 4px 14px rgba(0,0,0,0.25);}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(18,18,18,0.96);backdrop-filter:blur(14px);border:1px solid var(--b2);border-radius:12px;padding:10px 22px;font-size:12px;font-weight:700;z-index:999;transition:transform .28s cubic-bezier(.34,1.5,.64,1);white-space:nowrap;box-shadow:0 16px 40px rgba(0,0,0,.55);}
@@ -1019,24 +1023,44 @@ function renderWeb(){
   banner.style.display=parts.length?'block':'none';
   if(parts.length)banner.innerHTML=parts.join('');
 }
+const WEB_RECRUITERS=[
+  {name:'Andrea Castillo', init:'An', color:'#db2777', txt:'#fff'},
+  {name:'Ariel Ching',     init:'Ar', color:'#7c3aed', txt:'#fff'},
+  {name:'Diego Julio',     init:'Di', color:'#3b82f6', txt:'#fff'},
+  {name:'Floyd Ransom',    init:'Fl', color:'#0d9488', txt:'#fff'},
+  {name:'Stefano',         init:'St', color:'#AAFF00', txt:'#000'},
+];
 function mkWebCard(a,isDone){
   const sport=a.deporte?`<span class="tag tag-rec">${esc(a.deporte)}</span>`:'';
   const pais=a.pais?`<span class="tag tag-pais">${esc(a.pais)}</span>`:'';
   const inPipeline=isDone&&(a.recruiter||'').trim();
-  const btnLabel=isDone?'↩ Marcar pendiente':'✓ Marcar como contactado';
-  const btnClass=isDone?'done':'pending';
   return `<div class="web-card${inPipeline?' web-card-pipeline':''}" onclick="openDP(${a.id})">
     <div class="web-card-nm">${esc(a.nombre)}${inPipeline?` <span style="font-size:9px;color:var(--green);font-weight:700">● Pipeline</span>`:''}</div>
     <div class="web-card-meta">${sport}${pais}
       ${a.whatsapp?`<span class="tag" style="background:rgba(29,185,84,0.1);color:#1DB954;border:1px solid rgba(29,185,84,0.2)">📱 ${esc(a.whatsapp)}</span>`:''}
       ${a.email?`<span class="tag" style="background:rgba(255,255,255,0.05);color:var(--m3);border:1px solid var(--b)">${esc(a.email)}</span>`:''}
     </div>
-    <div style="display:flex;gap:6px">
-      <button class="web-card-contact ${btnClass}" style="flex:1" onclick="event.stopPropagation();toggleContactado(${a.id},${isDone})">${btnLabel}</button>
-      ${isDone&&!inPipeline?`<button class="web-card-contact pending" style="flex:1.4;background:rgba(170,255,0,0.12);color:var(--green);border-color:rgba(170,255,0,0.25)" onclick="event.stopPropagation();openAssign(${a.id})">→ Asignar al Pipeline</button>`:''}
-      ${inPipeline?`<span style="font-size:9px;color:var(--m2);align-self:center;white-space:nowrap">👤 ${esc(a.recruiter)}</span>`:''}
-    </div>
+    ${!isDone
+      ? `<div class="rec-avs">
+          <span class="rec-avs-lbl">Asignar a:</span>
+          ${WEB_RECRUITERS.map(r=>`<button class="rec-av" style="background:${r.color};color:${r.txt}" title="${r.name}" onclick="event.stopPropagation();quickAssign(${a.id},'${r.name}')">${r.init}</button>`).join('')}
+        </div>`
+      : `<div style="display:flex;gap:6px">
+          <button class="web-card-contact done" style="flex:1" onclick="event.stopPropagation();toggleContactado(${a.id},true)">↩ Marcar pendiente</button>
+          ${!inPipeline?`<button class="web-card-contact pending" style="flex:1.4;background:rgba(170,255,0,0.12);color:var(--green);border-color:rgba(170,255,0,0.25)" onclick="event.stopPropagation();openAssign(${a.id})">→ Asignar al Pipeline</button>`:''}
+          ${inPipeline?`<span style="font-size:9px;color:var(--m2);align-self:center;white-space:nowrap">👤 ${esc(a.recruiter)}</span>`:''}
+        </div>`
+    }
   </div>`;
+}
+async function quickAssign(id,recruiter){
+  const {error}=await sb.from('leads').update({recruiter,estado:'Contactado'}).eq('id',id);
+  if(!error){
+    const a=ALL.find(x=>x.id===id);
+    if(a){a.recruiter=recruiter;a.estado='Contactado';}
+    applyFilters();renderWeb();
+    toast(`✓ Asignado a ${recruiter}`,'ok');
+  } else toast('Error','err');
 }
 async function toggleContactado(id,isDone){
   const ne=isDone?'Nuevo':'Contactado';
