@@ -287,6 +287,8 @@ async function doLogout(){
 }
 
 const SD_EMAIL='sd@cervicalservices.com';
+const MARKETING_EMAILS=['julio@playwithnewvision.com','andy@playwithnewvision.com','floyd@playwithnewvision.com'];
+const MARKETING_HIDDEN=['finanzas','pagos'];
 
 const ALL_MODULES=[
   {id:'finanzas', icon:'💰', name:'Dashboard Financiero', desc:'Ingresos, pagos, contratos y balance general de la agencia',
@@ -309,8 +311,14 @@ const ALL_MODULES=[
 const SD_MODULES=['finanzas','pagos'];
 
 function buildModules(email){
-  const isSD=email.toLowerCase()===SD_EMAIL;
-  const visible=isSD ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id)) : ALL_MODULES;
+  const em=email.toLowerCase();
+  const isSD=em===SD_EMAIL;
+  const isMkt=MARKETING_EMAILS.includes(em);
+  const visible=isSD
+    ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id))
+    : isMkt
+      ? ALL_MODULES.filter(m=>!MARKETING_HIDDEN.includes(m.id))
+      : ALL_MODULES;
   const list=document.getElementById('mod-list');
   list.innerHTML=visible.map(m=>{
     const style=`--row-accent:${m.accent};--row-accent-border:${m.border||m.accent};--row-icon-bg:${m.dim};`;
@@ -347,9 +355,11 @@ async function showPlatform(user){
   document.getElementById('hero-greeting').textContent=gr+', '+display;
   updateClock();setInterval(updateClock,30000);
   buildModules(user.email);
-  const isSD=user.email.toLowerCase()===SD_EMAIL;
-  if(!isSD){loadStats();subscribeStats();}
-  else{const sa=document.getElementById('hub-stats');if(sa)sa.style.display='none';}
+  const em=user.email.toLowerCase();
+  const isSD=em===SD_EMAIL;
+  const isMkt=MARKETING_EMAILS.includes(em);
+  if(!isSD&&!isMkt){loadStats();subscribeStats();}
+  else if(isSD){const sa=document.getElementById('hub-stats');if(sa)sa.style.display='none';}
 }
 
 function updateClock(){
