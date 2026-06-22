@@ -747,6 +747,7 @@ async function loadData(){
   ALL=data||[];
   buildFilters();
   applyFilters();
+  renderWeb();
   updateHomeStats();
   const wc=ALL.filter(a=>a.fuente==='Website').length;
   if(q('#web-pill'))q('#web-pill').textContent=wc;
