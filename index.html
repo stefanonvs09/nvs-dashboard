@@ -130,6 +130,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .aside-time{font-family:'Anton',sans-serif;font-size:34px;color:var(--txt);letter-spacing:1px;}
 .aside-date-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:500;}
 
+/* FIN STATS CARD */
+.fin-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);}
+.fin-row:last-of-type{border-bottom:none;}
+.fin-lbl{font-size:11px;font-weight:600;color:var(--muted);}
+.fin-val{font-size:13px;font-weight:800;color:var(--txt);font-family:'Inter',sans-serif;}
+.fin-val.green{color:#16a34a;}
+.fin-val.red{color:#dc2626;}
+.fin-divider{height:1px;background:var(--border);margin:6px 0;}
+.fin-balance-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;}
+.fin-balance-lbl{font-size:12px;font-weight:700;color:var(--txt);}
+.fin-balance-val{font-family:'Anton',sans-serif;font-size:20px;}
+.fin-margen-pill{display:inline-flex;align-items:center;justify-content:center;border-radius:99px;padding:4px 14px;font-size:12px;font-weight:800;margin-top:10px;width:100%;letter-spacing:.3px;}
+
 /* PIN MODAL */
 #pin-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.5);display:none;align-items:center;justify-content:center;z-index:600;backdrop-filter:blur(8px);}
 #pin-overlay.open{display:flex;}
@@ -219,6 +232,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         <div class="aside-live"><div class="live-dot"></div>En vivo</div>
       </div>
 
+      <!-- MARGEN DE GANANCIA -->
+      <div class="aside-card" id="fin-stats-card" style="--ac-top:linear-gradient(90deg,var(--green),transparent);display:none;">
+        <div class="aside-label">💰 Margen de Ganancia</div>
+        <div class="fin-row">
+          <span class="fin-lbl">Ingresos</span>
+          <span class="fin-val green" id="fin-ingresos">—</span>
+        </div>
+        <div class="fin-row">
+          <span class="fin-lbl">Gastos</span>
+          <span class="fin-val red" id="fin-gastos">—</span>
+        </div>
+        <div class="fin-balance-row">
+          <span class="fin-balance-lbl">Balance Neto</span>
+          <span class="fin-balance-val" id="fin-balance">—</span>
+        </div>
+        <div class="fin-margen-pill" id="fin-margen">— %</div>
+        <div class="aside-live" style="margin-top:10px;"><div class="live-dot"></div>En vivo · Todas las transacciones</div>
+      </div>
+
       <div class="aside-card" style="--ac-top:linear-gradient(90deg,#6366f1,transparent)">
         <div class="aside-label">Fecha y hora</div>
         <div class="aside-time" id="aside-time">—</div>
@@ -287,8 +319,11 @@ async function doLogout(){
 }
 
 const SD_EMAIL='sd@cervicalservices.com';
+const IH_EMAIL='ih@decolatam.com';
 const MARKETING_EMAILS=['julio@playwithnewvision.com','andy@playwithnewvision.com','floyd@playwithnewvision.com'];
 const MARKETING_HIDDEN=['finanzas','pagos'];
+const SD_MODULES=['finanzas','pagos','servicios'];
+const IH_MODULES=['finanzas'];
 
 const ALL_MODULES=[
   {id:'finanzas', icon:'💰', name:'Dashboard Financiero', desc:'Ingresos, pagos, contratos y balance general de la agencia',
@@ -312,17 +347,18 @@ const ALL_MODULES=[
    accent:'#8b5cf6', dim:'rgba(139,92,246,.08)', disabled:true},
 ];
 
-const SD_MODULES=['finanzas','pagos','servicios'];
-
 function buildModules(email){
   const em=email.toLowerCase();
   const isSD=em===SD_EMAIL;
+  const isIH=em===IH_EMAIL;
   const isMkt=MARKETING_EMAILS.includes(em);
-  const visible=isSD
-    ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id))
-    : isMkt
-      ? ALL_MODULES.filter(m=>!MARKETING_HIDDEN.includes(m.id))
-      : ALL_MODULES;
+  const visible=isIH
+    ? ALL_MODULES.filter(m=>IH_MODULES.includes(m.id))
+    : isSD
+      ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id))
+      : isMkt
+        ? ALL_MODULES.filter(m=>!MARKETING_HIDDEN.includes(m.id))
+        : ALL_MODULES;
   const list=document.getElementById('mod-list');
   list.innerHTML=visible.map(m=>{
     const style=`--row-accent:${m.accent};--row-accent-border:${m.border||m.accent};--row-icon-bg:${m.dim};`;
@@ -361,9 +397,11 @@ async function showPlatform(user){
   buildModules(user.email);
   const em=user.email.toLowerCase();
   const isSD=em===SD_EMAIL;
+  const isIH=em===IH_EMAIL;
   const isMkt=MARKETING_EMAILS.includes(em);
-  if(!isSD&&!isMkt){loadStats();subscribeStats();}
-  else if(isSD){const sa=document.getElementById('hub-stats');if(sa)sa.style.display='none';}
+  if(!isSD&&!isMkt&&!isIH){loadStats();subscribeStats();}
+  if(isSD||isIH){const sa=document.getElementById('hub-stats');if(sa)sa.style.display='none';}
+  if(!isMkt){loadFinanceStats();}
 }
 
 function updateClock(){
@@ -387,6 +425,35 @@ async function loadStats(){
 
 function subscribeStats(){
   sb.channel('placements-live').on('postgres_changes',{event:'*',schema:'public',table:'placements'},()=>loadStats()).subscribe();
+  sb.channel('trans-live').on('postgres_changes',{event:'*',schema:'public',table:'transacciones'},()=>loadFinanceStats()).subscribe();
+}
+
+async function loadFinanceStats(){
+  const card=document.getElementById('fin-stats-card');
+  if(!card)return;
+  const {data,error}=await sb.from('transacciones').select('ingreso,gasto');
+  if(error){return;}
+  const rows=data||[];
+  const ingresos=rows.reduce((s,r)=>s+(parseFloat(r.ingreso)||0),0);
+  const gastos=rows.reduce((s,r)=>s+(parseFloat(r.gasto)||0),0);
+  const balance=ingresos-gastos;
+  const margen=ingresos>0?((balance/ingresos)*100):0;
+  card.style.display='block';
+  document.getElementById('fin-ingresos').textContent='$'+fmtMoney(ingresos);
+  document.getElementById('fin-gastos').textContent='$'+fmtMoney(gastos);
+  const bEl=document.getElementById('fin-balance');
+  bEl.textContent=(balance>=0?'+':'')+' $'+fmtMoney(Math.abs(balance));
+  bEl.style.color=balance>=0?'#16a34a':'#dc2626';
+  const mEl=document.getElementById('fin-margen');
+  mEl.textContent='Margen: '+margen.toFixed(1)+'%';
+  if(margen>=50){mEl.style.background='rgba(170,255,0,.15)';mEl.style.color='#3a6b00';}
+  else if(margen>0){mEl.style.background='rgba(245,158,11,.15)';mEl.style.color='#92400e';}
+  else{mEl.style.background='rgba(239,68,68,.1)';mEl.style.color='#dc2626';}
+}
+function fmtMoney(n){
+  if(n>=1000000)return(n/1000000).toFixed(2)+'M';
+  if(n>=1000)return(n/1000).toFixed(1)+'K';
+  return n.toLocaleString('es-PA',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
 async function init(){
