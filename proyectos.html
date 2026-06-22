@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVS · Proyectos</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#AAFF00;--green-dim:rgba(170,255,0,0.12);--green-dk:#88CC00;
+  --bg:#f8fafc;--card:#ffffff;--card2:#f1f5f9;--border:rgba(0,0,0,0.08);
+  --muted:#64748b;--txt:#0f172a;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN */
+#login-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 15% 50%,rgba(170,255,0,.06) 0%,transparent 60%);}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);}
+.login-box{position:relative;z-index:1;width:360px;max-width:92vw;animation:fadeUp .5s both;}
+.login-logo-wrap{text-align:center;margin-bottom:28px;}
+.login-logo{font-family:'Anton',sans-serif;font-size:56px;color:#0f172a;letter-spacing:3px;}
+.login-logo span{color:var(--green);}
+.login-sub{font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:6px;}
+.login-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;padding:26px 22px;box-shadow:0 4px 20px rgba(0,0,0,.06);}
+.lf{width:100%;background:#f8fafc;border:1px solid rgba(0,0,0,.09);border-radius:10px;padding:13px 14px;color:var(--txt);font-size:13px;font-family:'Inter',sans-serif;margin-bottom:10px;outline:none;transition:border .2s;}
+.lf:focus{border-color:var(--green);background:#fff;}
+.lf::placeholder{color:#94a3b8;}
+.login-btn{width:100%;background:var(--green);color:#0f172a;border:none;border-radius:10px;padding:13px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.login-btn:hover{background:var(--green-dk);}
+.login-error{color:#dc2626;font-size:12px;margin-top:8px;min-height:14px;text-align:center;font-weight:600;}
+.login-spinner{width:16px;height:16px;border:2px solid rgba(15,23,42,.15);border-top-color:#0f172a;border-radius:50%;animation:spin .7s linear infinite;display:none;margin:8px auto 0;}
+
+/* LAYOUT */
+#app{display:none;height:100vh;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-back{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;padding:6px 10px;border-radius:8px;transition:all .15s;text-decoration:none;}
+.tb-back:hover{background:var(--card2);color:var(--txt);}
+.tb-divider{width:1px;height:16px;background:var(--border);}
+.tb-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;}
+.tb-title span{color:var(--green);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-user{display:flex;align-items:center;gap:7px;padding:5px 11px;background:var(--card2);border:1px solid var(--border);border-radius:99px;}
+.tb-avatar{width:20px;height:20px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#3a6b00;}
+.tb-uname{font-size:11px;font-weight:600;color:var(--txt);}
+.btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 12px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;font-weight:600;}
+.btn-logout:hover{border-color:rgba(0,0,0,.18);color:var(--txt);}
+
+/* MAIN SPLIT */
+.main-split{display:flex;flex:1;overflow:hidden;}
+
+/* LEFT: PROJECT LIST */
+.sidebar{
+  width:280px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-head{
+  padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sidebar-label{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.btn-new{
+  display:flex;align-items:center;gap:5px;background:var(--green);color:#0f172a;
+  border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s;
+}
+.btn-new:hover{background:var(--green-dk);}
+
+.sidebar-search{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.search-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--txt);font-family:'Inter',sans-serif;outline:none;transition:border .15s;}
+.search-input:focus{border-color:var(--green);}
+.search-input::placeholder{color:#94a3b8;}
+
+.proj-list{overflow-y:auto;flex:1;padding:8px 8px;}
+.proj-item{
+  display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px;
+  cursor:pointer;transition:all .15s;margin-bottom:2px;
+}
+.proj-item:hover{background:var(--card2);}
+.proj-item.active{background:rgba(170,255,0,.1);border:1px solid rgba(170,255,0,.25);}
+.proj-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.proj-item-body{flex:1;min-width:0;}
+.proj-item-name{font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.proj-item-meta{font-size:10px;color:var(--muted);margin-top:2px;}
+.proj-item-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.status-activo{background:rgba(170,255,0,.12);color:#3a6b00;}
+.status-pausa{background:rgba(234,179,8,.12);color:#92400e;}
+.status-completado{background:rgba(99,102,241,.12);color:#3730a3;}
+
+.sidebar-empty{padding:32px 16px;text-align:center;color:var(--muted);font-size:12px;}
+
+/* RIGHT: DOC PANEL */
+.doc-panel{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg);}
+
+.doc-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;color:var(--muted);animation:fadeIn .3s both;
+}
+.doc-empty-icon{font-size:48px;opacity:.4;}
+.doc-empty-title{font-size:15px;font-weight:600;color:#94a3b8;}
+.doc-empty-sub{font-size:12px;color:#cbd5e1;}
+
+/* DOC CONTENT */
+.doc-content{max-width:780px;width:100%;margin:0 auto;padding:40px 48px 80px;animation:fadeUp .25s both;}
+@media(max-width:700px){.doc-content{padding:24px 18px 60px;}}
+
+.doc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;}
+.doc-color-dot{width:14px;height:14px;border-radius:50%;cursor:pointer;margin-top:5px;flex-shrink:0;transition:transform .15s;}
+.doc-color-dot:hover{transform:scale(1.3);}
+.doc-status-wrap{display:flex;align-items:center;gap:8px;}
+.doc-status-sel{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:5px 10px;font-size:12px;font-weight:600;color:var(--txt);
+  font-family:'Inter',sans-serif;cursor:pointer;outline:none;transition:border .15s;
+}
+.doc-status-sel:focus{border-color:var(--green);}
+.doc-del-btn{background:transparent;border:1px solid rgba(220,38,38,.2);color:#dc2626;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
+.doc-del-btn:hover{background:rgba(220,38,38,.06);}
+
+.doc-title-input{
+  font-family:'Anton',sans-serif;font-size:38px;letter-spacing:.3px;line-height:1.1;
+  background:transparent;border:none;outline:none;width:100%;color:var(--txt);
+  margin-bottom:10px;caret-color:var(--green);
+}
+.doc-title-input::placeholder{color:#cbd5e1;}
+@media(max-width:700px){.doc-title-input{font-size:28px;}}
+
+.doc-meta-row{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.doc-meta-item{font-size:11px;color:var(--muted);}
+.doc-meta-item b{color:#475569;font-weight:600;}
+
+.doc-section{margin-bottom:28px;}
+.doc-section-label{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#94a3b8;margin-bottom:10px;}
+.doc-desc-input{
+  width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);
+  outline:none;resize:vertical;min-height:70px;transition:border .15s;line-height:1.6;
+}
+.doc-desc-input:focus{border-color:var(--green);}
+.doc-desc-input::placeholder{color:#94a3b8;}
+
+.doc-notes-input{
+  width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);
+  outline:none;resize:vertical;min-height:280px;transition:border .15s;line-height:1.8;
+}
+.doc-notes-input:focus{border-color:var(--green);}
+.doc-notes-input::placeholder{color:#94a3b8;}
+
+.doc-save-bar{
+  display:flex;align-items:center;gap:10px;margin-top:20px;
+  padding-top:16px;border-top:1px solid var(--border);
+}
+.btn-save{background:var(--green);color:#0f172a;border:none;border-radius:9px;padding:9px 22px;font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.5px;cursor:pointer;transition:background .15s;}
+.btn-save:hover{background:var(--green-dk);}
+.save-status{font-size:11px;font-weight:600;color:var(--muted);}
+.save-status.saved{color:#3a6b00;}
+
+/* COLOR PICKER POPOVER */
+.color-picker-pop{
+  position:absolute;background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:14px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:200;
+  display:none;grid-template-columns:repeat(5,1fr);gap:8px;
+}
+.color-picker-pop.open{display:grid;}
+.cp-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;transition:transform .12s;border:2px solid transparent;}
+.cp-swatch:hover{transform:scale(1.2);}
+.cp-swatch.selected{border-color:#0f172a;}
+
+/* NEW PROJECT MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(6px);}
+#modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:20px;padding:32px 28px;width:420px;max-width:94vw;box-shadow:0 8px 40px rgba(0,0,0,.12);animation:fadeUp .2s both;}
+.modal-title{font-family:'Anton',sans-serif;font-size:22px;margin-bottom:20px;}
+.modal-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:14px;}
+.modal-input{width:100%;background:#f8fafc;border:1px solid rgba(0,0,0,.09);border-radius:9px;padding:11px 13px;font-size:13px;color:var(--txt);font-family:'Inter',sans-serif;outline:none;transition:border .15s;}
+.modal-input:focus{border-color:var(--green);}
+.modal-input::placeholder{color:#94a3b8;}
+.modal-colors{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.mc-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;transition:transform .12s;border:2px solid transparent;}
+.mc-swatch:hover{transform:scale(1.15);}
+.mc-swatch.sel{border-color:#0f172a;}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.btn-cancel{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:9px 18px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;font-weight:600;}
+.btn-cancel:hover{border-color:rgba(0,0,0,.18);color:var(--txt);}
+.btn-create{background:var(--green);color:#0f172a;border:none;border-radius:9px;padding:9px 20px;font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;cursor:pointer;transition:background .15s;}
+.btn-create:hover{background:var(--green-dk);}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:900;pointer-events:none;}
+.toast{background:#0f172a;color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;animation:fadeUp .25s both;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.toast.ok{background:#166534;border-left:3px solid var(--green);}
+.toast.err{background:#7f1d1d;border-left:3px solid #f87171;}
+
+@media(max-width:640px){
+  .sidebar{width:100%;height:auto;max-height:45vh;border-right:none;border-bottom:1px solid var(--border);}
+  .main-split{flex-direction:column;}
+  .doc-content{padding:20px 14px 60px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay">
+  <div class="login-bg"><div class="login-grid"></div></div>
+  <div class="login-box">
+    <div class="login-logo-wrap">
+      <div class="login-logo">NV<span>S</span></div>
+      <div class="login-sub">Proyectos · New Vision Sports</div>
+    </div>
+    <div class="login-card">
+      <input id="login-email" class="lf" type="email" placeholder="Email" autocomplete="email">
+      <input id="login-password" class="lf" type="password" placeholder="Contraseña" autocomplete="current-password">
+      <button class="login-btn" id="login-btn" onclick="doLogin()">ENTRAR</button>
+      <div class="login-error" id="login-error"></div>
+      <div class="login-spinner" id="login-spinner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <div class="topbar">
+    <div class="tb-left">
+      <a class="tb-back" href="index.html">← Módulos</a>
+      <div class="tb-divider"></div>
+      <div class="tb-title">NV<span>S</span> · Proyectos</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-user">
+        <div class="tb-avatar" id="tb-avatar">—</div>
+        <span class="tb-uname" id="tb-uname">—</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Salir →</button>
+    </div>
+  </div>
+
+  <div class="main-split">
+
+    <!-- SIDEBAR: project list -->
+    <div class="sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-label">Proyectos</div>
+        <button class="btn-new" onclick="openNewModal()">+ Nuevo</button>
+      </div>
+      <div class="sidebar-search">
+        <input class="search-input" type="text" placeholder="Buscar proyectos..." id="search-input" oninput="filterProjects()">
+      </div>
+      <div class="proj-list" id="proj-list">
+        <div class="sidebar-empty">Cargando...</div>
+      </div>
+    </div>
+
+    <!-- DOC PANEL -->
+    <div class="doc-panel" id="doc-panel">
+      <div class="doc-empty" id="doc-empty">
+        <div class="doc-empty-icon">📁</div>
+        <div class="doc-empty-title">Selecciona un proyecto</div>
+        <div class="doc-empty-sub">O crea uno nuevo con el botón "+"</div>
+      </div>
+
+      <div class="doc-content" id="doc-content" style="display:none;">
+        <div class="doc-top">
+          <div style="position:relative;">
+            <div class="doc-color-dot" id="doc-color-dot" onclick="toggleColorPicker()"></div>
+            <div class="color-picker-pop" id="color-picker-pop"></div>
+          </div>
+          <div class="doc-status-wrap">
+            <select class="doc-status-sel" id="doc-status" onchange="autoSave()">
+              <option value="Activo">Activo</option>
+              <option value="En pausa">En pausa</option>
+              <option value="Completado">Completado</option>
+            </select>
+            <button class="doc-del-btn" onclick="deleteProject()">Eliminar</button>
+          </div>
+        </div>
+
+        <input class="doc-title-input" id="doc-title" type="text" placeholder="Nombre del proyecto..." maxlength="120" oninput="autoSave()">
+
+        <div class="doc-meta-row">
+          <div class="doc-meta-item">Creado <b id="doc-created">—</b></div>
+          <div class="doc-meta-item">Actualizado <b id="doc-updated">—</b></div>
+        </div>
+
+        <div class="doc-section">
+          <div class="doc-section-label">Descripción</div>
+          <textarea class="doc-desc-input" id="doc-desc" placeholder="Breve descripción del proyecto..." oninput="autoSave()"></textarea>
+        </div>
+
+        <div class="doc-section">
+          <div class="doc-section-label">Notas y detalles</div>
+          <textarea class="doc-notes-input" id="doc-notes" placeholder="Escribe aquí toda la información del proyecto — tareas, links, ideas, objetivos, fechas importantes..." oninput="autoSave()"></textarea>
+        </div>
+
+        <div class="doc-save-bar">
+          <button class="btn-save" onclick="saveNow()">Guardar</button>
+          <span class="save-status" id="save-status">Sin cambios</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- NEW PROJECT MODAL -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">Nuevo Proyecto</div>
+
+    <div class="modal-label">Nombre</div>
+    <input class="modal-input" id="m-nombre" type="text" placeholder="Ej: Campaña Instagram Q3" maxlength="120">
+
+    <div class="modal-label">Estado inicial</div>
+    <select class="modal-input" id="m-estado">
+      <option value="Activo">Activo</option>
+      <option value="En pausa">En pausa</option>
+    </select>
+
+    <div class="modal-label">Color</div>
+    <div class="modal-colors" id="modal-colors"></div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-create" onclick="createProject()">CREAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+const sb=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk');
+
+const COLORS=['#AAFF00','#6366f1','#f472b6','#0d9488','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#64748b'];
+
+let PROJECTS=[];
+let CURRENT=null;
+let saveTimer=null;
+let newColor=COLORS[0];
+
+/* ── LOGIN ── */
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-password').value;
+  const err=document.getElementById('login-error');
+  const spin=document.getElementById('login-spinner');
+  const btn=document.getElementById('login-btn');
+  err.textContent='';
+  if(!email||!pass){err.textContent='Ingresa email y contraseña.';return;}
+  btn.style.opacity='.6';btn.style.pointerEvents='none';spin.style.display='block';
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  spin.style.display='none';btn.style.opacity='';btn.style.pointerEvents='';
+  if(error){err.textContent='Credenciales incorrectas.';return;}
+  initApp(data.user);
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-overlay').style.display='flex';
+}
+
+/* ── INIT ── */
+async function initApp(user){
+  document.getElementById('login-overlay').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const name=user.email.split('@')[0];
+  const display=name.charAt(0).toUpperCase()+name.slice(1);
+  document.getElementById('tb-uname').textContent=display;
+  document.getElementById('tb-avatar').textContent=display.charAt(0).toUpperCase();
+  buildColorPickers();
+  await loadProjects();
+  subscribeRealtime();
+}
+
+async function checkSession(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session)initApp(session.user);
+  else document.getElementById('login-overlay').style.display='flex';
+}
+
+/* ── DATA ── */
+async function loadProjects(){
+  const {data,error}=await sb.from('proyectos').select('*').order('created_at',{ascending:false});
+  if(error){toast('Error cargando proyectos','err');return;}
+  PROJECTS=data||[];
+  renderList();
+}
+
+function renderList(filter=''){
+  const list=document.getElementById('proj-list');
+  const q=filter.toLowerCase();
+  const filtered=PROJECTS.filter(p=>p.nombre.toLowerCase().includes(q)||p.descripcion?.toLowerCase().includes(q)||'');
+  if(!filtered.length){list.innerHTML=`<div class="sidebar-empty">${q?'Sin resultados':'Sin proyectos aún'}</div>`;return;}
+  list.innerHTML=filtered.map(p=>{
+    const isActive=CURRENT&&CURRENT.id===p.id;
+    const sc=statusClass(p.estado);
+    return `<div class="proj-item${isActive?' active':''}" onclick="selectProject(${p.id})">
+      <div class="proj-dot" style="background:${p.color||'#AAFF00'}"></div>
+      <div class="proj-item-body">
+        <div class="proj-item-name">${esc(p.nombre)}</div>
+        <div class="proj-item-meta">${fmtDate(p.updated_at||p.created_at)}</div>
+      </div>
+      <span class="proj-item-status ${sc}">${p.estado||'Activo'}</span>
+    </div>`;
+  }).join('');
+}
+
+function filterProjects(){
+  renderList(document.getElementById('search-input').value);
+}
+
+function selectProject(id){
+  CURRENT=PROJECTS.find(p=>p.id===id);
+  if(!CURRENT)return;
+  renderList(document.getElementById('search-input').value);
+  openDoc(CURRENT);
+}
+
+function openDoc(p){
+  document.getElementById('doc-empty').style.display='none';
+  const dc=document.getElementById('doc-content');
+  dc.style.display='block';
+  dc.style.animation='none';
+  requestAnimationFrame(()=>{dc.style.animation='fadeUp .25s both';});
+
+  document.getElementById('doc-title').value=p.nombre||'';
+  document.getElementById('doc-desc').value=p.descripcion||'';
+  document.getElementById('doc-notes').value=p.notas||'';
+  document.getElementById('doc-status').value=p.estado||'Activo';
+  document.getElementById('doc-created').textContent=fmtDate(p.created_at);
+  document.getElementById('doc-updated').textContent=fmtDate(p.updated_at||p.created_at);
+  const dot=document.getElementById('doc-color-dot');
+  dot.style.background=p.color||'#AAFF00';
+  document.getElementById('save-status').textContent='Sin cambios';
+  document.getElementById('save-status').className='save-status';
+}
+
+/* ── SAVE ── */
+function autoSave(){
+  document.getElementById('save-status').textContent='Sin guardar...';
+  document.getElementById('save-status').className='save-status';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(saveNow,1800);
+}
+
+async function saveNow(){
+  if(!CURRENT)return;
+  clearTimeout(saveTimer);
+  const nombre=document.getElementById('doc-title').value.trim();
+  const desc=document.getElementById('doc-desc').value;
+  const notas=document.getElementById('doc-notes').value;
+  const estado=document.getElementById('doc-status').value;
+  const color=document.getElementById('doc-color-dot').style.background;
+  if(!nombre){toast('El nombre no puede estar vacío','err');return;}
+  const now=new Date().toISOString();
+  const {error}=await sb.from('proyectos').update({nombre,descripcion:desc,notas,estado,color,updated_at:now}).eq('id',CURRENT.id);
+  if(error){toast('Error al guardar','err');return;}
+  CURRENT={...CURRENT,nombre,descripcion:desc,notas,estado,color,updated_at:now};
+  PROJECTS=PROJECTS.map(p=>p.id===CURRENT.id?CURRENT:p);
+  document.getElementById('doc-updated').textContent=fmtDate(now);
+  document.getElementById('save-status').textContent='✓ Guardado';
+  document.getElementById('save-status').className='save-status saved';
+  renderList(document.getElementById('search-input').value);
+}
+
+/* ── CREATE ── */
+function openNewModal(){
+  newColor=COLORS[0];
+  document.getElementById('m-nombre').value='';
+  document.getElementById('m-estado').value='Activo';
+  document.querySelectorAll('.mc-swatch').forEach((s,i)=>s.classList.toggle('sel',i===0));
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('m-nombre').focus(),150);
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+
+async function createProject(){
+  const nombre=document.getElementById('m-nombre').value.trim();
+  const estado=document.getElementById('m-estado').value;
+  if(!nombre){document.getElementById('m-nombre').style.borderColor='#dc2626';return;}
+  document.getElementById('m-nombre').style.borderColor='';
+  const {data,error}=await sb.from('proyectos').insert({nombre,estado,color:newColor,descripcion:'',notas:''}).select().single();
+  if(error){toast('Error al crear','err');return;}
+  PROJECTS.unshift(data);
+  closeModal();
+  renderList();
+  selectProject(data.id);
+  toast('Proyecto creado','ok');
+}
+
+/* ── DELETE ── */
+async function deleteProject(){
+  if(!CURRENT)return;
+  if(!confirm(`¿Eliminar "${CURRENT.nombre}"? Esta acción no se puede deshacer.`))return;
+  const {error}=await sb.from('proyectos').delete().eq('id',CURRENT.id);
+  if(error){toast('Error al eliminar','err');return;}
+  PROJECTS=PROJECTS.filter(p=>p.id!==CURRENT.id);
+  CURRENT=null;
+  document.getElementById('doc-content').style.display='none';
+  document.getElementById('doc-empty').style.display='flex';
+  renderList();
+  toast('Proyecto eliminado','ok');
+}
+
+/* ── COLOR PICKER ── */
+function buildColorPickers(){
+  const pop=document.getElementById('color-picker-pop');
+  pop.innerHTML=COLORS.map(c=>`<div class="cp-swatch" style="background:${c}" onclick="setDocColor('${c}')"></div>`).join('');
+  const mc=document.getElementById('modal-colors');
+  mc.innerHTML=COLORS.map((c,i)=>`<div class="mc-swatch${i===0?' sel':''}" style="background:${c}" onclick="setNewColor('${c}',this)"></div>`).join('');
+}
+function toggleColorPicker(){
+  document.getElementById('color-picker-pop').classList.toggle('open');
+}
+function setDocColor(c){
+  if(!CURRENT)return;
+  document.getElementById('doc-color-dot').style.background=c;
+  document.getElementById('color-picker-pop').classList.remove('open');
+  autoSave();
+}
+function setNewColor(c,el){
+  newColor=c;
+  document.querySelectorAll('.mc-swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('color-picker-pop');
+  const dot=document.getElementById('doc-color-dot');
+  if(!pop.contains(e.target)&&!dot.contains(e.target))pop.classList.remove('open');
+});
+
+/* ── REALTIME ── */
+function subscribeRealtime(){
+  sb.channel('proyectos-live').on('postgres_changes',{event:'*',schema:'public',table:'proyectos'},payload=>{
+    if(payload.eventType==='INSERT'){
+      if(!PROJECTS.find(p=>p.id===payload.new.id)){PROJECTS.unshift(payload.new);renderList();}
+    } else if(payload.eventType==='UPDATE'){
+      PROJECTS=PROJECTS.map(p=>p.id===payload.new.id?payload.new:p);
+      if(CURRENT&&CURRENT.id===payload.new.id)CURRENT=payload.new;
+      renderList();
+    } else if(payload.eventType==='DELETE'){
+      PROJECTS=PROJECTS.filter(p=>p.id!==payload.old.id);
+      if(CURRENT&&CURRENT.id===payload.old.id){CURRENT=null;document.getElementById('doc-content').style.display='none';document.getElementById('doc-empty').style.display='flex';}
+      renderList();
+    }
+  }).subscribe();
+}
+
+/* ── HELPERS ── */
+function fmtDate(d){
+  if(!d)return '—';
+  const dt=new Date(d);
+  return dt.toLocaleDateString('es-PA',{day:'2-digit',month:'short',year:'numeric'});
+}
+function statusClass(s){
+  if(s==='Completado')return 'status-completado';
+  if(s==='En pausa')return 'status-pausa';
+  return 'status-activo';
+}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,type=''){
+  const w=document.getElementById('toast-wrap');
+  const t=document.createElement('div');
+  t.className='toast'+(type?' '+type:'');
+  t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('login-overlay').style.display==='flex')doLogin();
+  if(e.key==='Enter'&&document.getElementById('modal-overlay').classList.contains('open'))createProject();
+  if(e.key==='Escape'&&document.getElementById('modal-overlay').classList.contains('open'))closeModal();
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveNow();}
+});
+
+document.addEventListener('DOMContentLoaded',checkSession);
+</script>
+</body>
+</html>
