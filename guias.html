@@ -198,7 +198,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         </div>
         <div class="sb-cat-item active" id="cat-visado" onclick="setCategory('visado')">
           <span class="sb-cat-icon">✈️</span> Visado
-          <span class="sb-cat-badge">1</span>
+          <span class="sb-cat-badge">3</span>
         </div>
         <div class="sb-cat-item" id="cat-onboarding" onclick="setCategory('onboarding')">
           <span class="sb-cat-icon">🎓</span> Onboarding
@@ -285,7 +285,7 @@ function setCategory(cat){
 function renderContent(cat){
   const wrap=document.getElementById('guides-wrap');
   if(cat==='visado'||cat==='todas'){
-    wrap.innerHTML=renderVisadoGuide();
+    wrap.innerHTML=renderVisadoGuide()+renderCanadaGuide()+renderMexicoGuide();
     if(cat==='todas') wrap.innerHTML+=emptyOtherCats();
   } else {
     wrap.innerHTML=emptyState(cat);
@@ -455,6 +455,274 @@ function renderVisadoGuide(){
         <a href="https://www.ice.gov/sevis/i901" target="_blank" style="color:#4f46e5;margin:0 6px;">ICE SEVIS</a>·
         <a href="https://web3.ncaa.org/ecwr3/" target="_blank" style="color:#4f46e5;margin:0 6px;">NCAA Eligibility Center</a>·
         <a href="https://pa.usembassy.gov/visas/" target="_blank" style="color:#4f46e5;margin:0 6px;">U.S. Embassy Panama</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCanadaGuide(){
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(220,38,38,.08);">🍁</div>
+      <div>
+        <div class="guide-card-title">Study Permit — Estudiante Internacional en Canadá</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(220,38,38,.08);color:#b91c1c;">Study Permit</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">U Sports · CCAA</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Canadá</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">✅</span>
+        <div><strong>Punto de partida: ya tienes carta de aceptación</strong>
+        Esta guía comienza cuando ya recibiste la carta de aceptación oficial de una institución educativa canadiense acreditada (DLI — Designated Learning Institution). Sin esa carta no puedes iniciar el proceso del Study Permit.</div>
+      </div>
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es el Study Permit?</strong>
+        El Study Permit es el permiso de estudio emitido por Immigration, Refugees and Citizenship Canada (IRCC). Es obligatorio para estudios de más de 6 meses. Dependiendo de tu nacionalidad, es posible que también necesites una Visa de Residente Temporal (TRV) para entrar a Canadá — ambas se solicitan juntas.</div>
+      </div>
+
+      <div class="steps-title">PASOS PARA OBTENER EL STUDY PERMIT</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Verificar si tu institución es una DLI</div>
+          <div class="step-desc">Solo puedes obtener un Study Permit para estudiar en una Designated Learning Institution (DLI). Verifica que tu universidad o college esté en la lista oficial del gobierno canadiense.</div>
+          <a class="step-link step-link-green" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/prepare/designated-learning-institutions-list.html" target="_blank" rel="noopener">🔗 Lista de DLIs →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Crear cuenta en el portal IRCC y aplicar online</div>
+          <div class="step-desc">Crea una cuenta GCKey o Sign-In Partner en el portal de IRCC. Aplica al Study Permit online. Si tu nacionalidad requiere TRV (visa de entrada), selecciona ambos en la misma solicitud — así se procesan juntos. La mayoría de latinoamericanos necesita TRV.</div>
+          <a class="step-link step-link-green" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html" target="_blank" rel="noopener">📝 Aplicar — Portal IRCC →</a>
+          <a class="step-link" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html" target="_blank" rel="noopener">🌐 Info Study Permit →</a>
+          <div class="step-fee">💰 $150 CAD — Study Permit · + $100 CAD si necesitas TRV</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Dar biométricos en un Visa Application Centre (VAC)</div>
+          <div class="step-desc">Después de enviar la solicitud recibirás una carta pidiendo tus biométricos (huella dactilar + foto). Debes ir a un VAC autorizado en tu país. En Panamá, el VAC está operado por VFS Global.</div>
+          <a class="step-link" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/biometrics.html" target="_blank" rel="noopener">ℹ️ Info Biométricos →</a>
+          <a class="step-link" href="https://www.vfsglobal.ca/canada/Panama/" target="_blank" rel="noopener">📍 VAC Panamá — VFS Global →</a>
+          <div class="step-fee">💰 $85 CAD — Biometrics fee</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Esperar decisión y recibir aprobación</div>
+          <div class="step-desc">El tiempo de procesamiento varía según el país (semanas a varios meses). Monitorea el estado en tu cuenta IRCC. Si aprueban, recibirás una carta de introducción (Port of Entry Letter) — imprímela y llévala al viajar. El Study Permit físico se te entrega al entrar a Canadá.</div>
+          <a class="step-link" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-status.html" target="_blank" rel="noopener">🔍 Verificar estado de solicitud →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Viajar a Canadá y obtener el Study Permit</div>
+          <div class="step-desc">Al llegar al punto de entrada canadiense, el oficial de migraciones revisará tu Port of Entry Letter y documentos, y te emitirá el Study Permit físico. Puedes entrar hasta 90 días antes de la fecha de inicio indicada en tu carta de aceptación.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS CANADA -->
+    <div class="guide-section">
+      <div class="guide-section-title">📎 Documentos requeridos</div>
+      <div class="doc-grid">
+        <div class="doc-item required">Pasaporte válido</div>
+        <div class="doc-item required">Carta de aceptación de la DLI</div>
+        <div class="doc-item required">Prueba de solvencia económica</div>
+        <div class="doc-item required">Fotos tipo pasaporte</div>
+        <div class="doc-item">Carta de motivos (por qué Canadá)</div>
+        <div class="doc-item">Prueba de lazos con tu país de origen</div>
+        <div class="doc-item">Historial académico / transcripciones</div>
+        <div class="doc-item">Carta de beca atlética (si aplica)</div>
+      </div>
+    </div>
+
+    <!-- FEES CANADA -->
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Resumen de costos (2026)</div>
+      <table class="fees-table">
+        <tr><th>Concepto</th><th>Monto</th><th>Dónde pagar</th></tr>
+        <tr><td>Study Permit</td><td class="fee-amt">$150 CAD</td><td>ircc.canada.ca</td></tr>
+        <tr><td>Temporary Resident Visa (TRV)</td><td class="fee-amt">$100 CAD</td><td>ircc.canada.ca</td></tr>
+        <tr><td>Biometrics</td><td class="fee-amt">$85 CAD</td><td>VAC / VFS Global</td></tr>
+        <tr><td style="font-weight:800;">TOTAL estimado</td><td class="fee-total">~$335 CAD</td><td>≈ $250 USD</td></tr>
+      </table>
+    </div>
+
+    <!-- NOTAS CANADA -->
+    <div class="guide-section">
+      <div class="guide-section-title">⚠️ Notas importantes</div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Solvencia económica obligatoria</strong>Debes demostrar que puedes cubrir la colegiatura del primer año + al menos $10,000 CAD para gastos de manutención. Sin esto, el Study Permit puede ser rechazado.</div>
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">📅</span>
+        <div><strong>Tiempo de procesamiento variable</strong>Aplica con al menos 3-4 meses de anticipación. Los tiempos de procesamiento varían mucho — revisa los tiempos actuales en el portal IRCC antes de aplicar.</div>
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Work On Campus permitido</strong>Con el Study Permit puedes trabajar hasta 20 horas semanales on-campus durante el semestre y full-time en vacaciones. No requiere permiso adicional.</div>
+      </div>
+    </div>
+
+    <div class="guide-section" style="padding-bottom:0;">
+      <div style="padding:12px 16px;background:var(--card2);border-radius:10px;font-size:10px;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--txt);">Fuentes oficiales:</strong>
+        <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html" target="_blank" style="color:#4f46e5;margin:0 6px;">IRCC Study Permit</a>·
+        <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html" target="_blank" style="color:#4f46e5;margin:0 6px;">Aplicar online</a>·
+        <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/biometrics.html" target="_blank" style="color:#4f46e5;margin:0 6px;">Biométricos</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMexicoGuide(){
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(22,163,74,.08);">🇲🇽</div>
+      <div>
+        <div class="guide-card-title">Visa de Estudiante — Residente Temporal en México</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(22,163,74,.08);color:#15803d;">Residente Temporal</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">CONADEIP · UANL · TEC</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">México</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">✅</span>
+        <div><strong>Punto de partida: ya tienes carta de aceptación</strong>
+        Esta guía comienza cuando ya recibiste la carta de aceptación oficial de una institución educativa mexicana. Esa carta es el documento clave que necesitas para solicitar la visa de estudiante en el consulado mexicano de tu país.</div>
+      </div>
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué visa necesito?</strong>
+        Para estudios de más de 180 días en México necesitas una <strong>Visa de Residente Temporal</strong> con característica migratoria de estudiante. Se solicita en el consulado mexicano antes de viajar. Una vez en México, tienes 30 días para ir al INM y obtener tu Tarjeta de Residente Temporal.</div>
+      </div>
+
+      <div class="steps-title">PASOS PARA OBTENER LA VISA DE ESTUDIANTE</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Solicitar la visa en el Consulado Mexicano</div>
+          <div class="step-desc">Agenda tu cita en el Consulado General de México en tu país. En Panamá está ubicado en Ciudad de Panamá. Lleva todos tus documentos completos el día de la cita. La visa se solicita antes de viajar a México.</div>
+          <a class="step-link step-link-green" href="https://embamex.sre.gob.mx/panama/" target="_blank" rel="noopener">🏛️ Embajada México en Panamá →</a>
+          <a class="step-link" href="https://www.gob.mx/sre" target="_blank" rel="noopener">🌐 Secretaría de Relaciones Exteriores →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Preparar y entregar documentos en la cita</div>
+          <div class="step-desc">Ver lista completa de documentos en la sección de abajo. El consulado revisará tu expediente y tomará fotos y datos biométricos. El proceso de emisión suele tardar entre 5 y 10 días hábiles.</div>
+          <div class="step-fee">💰 ~$36 USD — tarifa consular (varía por consulado)</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Recibir la visa en el pasaporte y viajar a México</div>
+          <div class="step-desc">La visa de residente temporal se coloca como sticker en tu pasaporte. Con ella puedes entrar a México. Tienes 30 días naturales a partir de tu llegada para hacer el trámite ante el INM — no lo dejes para después.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Canje en el INM — Tarjeta de Residente Temporal</div>
+          <div class="step-desc">Dentro de los primeros 30 días en México debes acudir al Instituto Nacional de Migración (INM) más cercano para canjear la visa por la Tarjeta de Residente Temporal. Esta tarjeta es tu documento migratorio oficial mientras estudias.</div>
+          <a class="step-link step-link-green" href="https://www.inm.gob.mx" target="_blank" rel="noopener">🏛️ Portal INM →</a>
+          <a class="step-link" href="https://www.gob.mx/tramites/ficha/cambio-de-condicion-de-estancia-de-visitante-a-residente-temporal/INM344" target="_blank" rel="noopener">📋 Trámite Residente Temporal →</a>
+          <div class="step-fee">💰 ~$3,825 MXN (~$190 USD) — derechos INM</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Renovar anualmente</div>
+          <div class="step-desc">La Tarjeta de Residente Temporal se emite con vigencia de 1 año y se puede renovar hasta completar tus estudios (máximo 4 años seguidos). La renovación se hace también ante el INM antes de que venza tu tarjeta actual.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS MEXICO -->
+    <div class="guide-section">
+      <div class="guide-section-title">📎 Documentos requeridos (consulado)</div>
+      <div class="doc-grid">
+        <div class="doc-item required">Pasaporte válido (6+ meses vigencia)</div>
+        <div class="doc-item required">Carta de aceptación de la institución</div>
+        <div class="doc-item required">Prueba de solvencia económica</div>
+        <div class="doc-item required">Formulario de solicitud de visa</div>
+        <div class="doc-item">Fotos recientes (fondo blanco)</div>
+        <div class="doc-item">Carta de motivos / objetivos de estudio</div>
+        <div class="doc-item">Historial académico / transcripciones</div>
+        <div class="doc-item">Carta de beca atlética (si aplica)</div>
+        <div class="doc-item">Comprobante de domicilio en país de origen</div>
+        <div class="doc-item">Visas anteriores a México (si aplica)</div>
+      </div>
+    </div>
+
+    <!-- FEES MEXICO -->
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Resumen de costos (2026)</div>
+      <table class="fees-table">
+        <tr><th>Concepto</th><th>Monto</th><th>Dónde pagar</th></tr>
+        <tr><td>Tarifa consular (visa de residente temporal)</td><td class="fee-amt">~$36 USD</td><td>Consulado mexicano</td></tr>
+        <tr><td>Derechos INM — Tarjeta de Residente Temporal</td><td class="fee-amt">~$3,825 MXN</td><td>INM en México</td></tr>
+        <tr><td style="font-weight:800;">TOTAL estimado</td><td class="fee-total">~$225 USD</td><td>+ gastos de traslado</td></tr>
+      </table>
+    </div>
+
+    <!-- NOTAS MEXICO -->
+    <div class="guide-section">
+      <div class="guide-section-title">⚠️ Notas importantes</div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Canje INM en 30 días — obligatorio</strong>Si no realizas el canje de visa a Tarjeta de Residente Temporal dentro de los 30 días de llegada, tu estatus migratorio queda irregular. Es el error más común — programa este trámite desde antes de viajar.</div>
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">📅</span>
+        <div><strong>Renovación anual</strong>La tarjeta se renueva cada año. Inicia el trámite de renovación con al menos 30 días de anticipación al vencimiento para evitar interrupciones en tu estatus.</div>
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>CURP y RFC</strong>Una vez con tu tarjeta de residente temporal puedes tramitar tu CURP (Clave Única de Registro de Población) en línea — lo necesitarás para inscripciones, trámites universitarios y abrir cuenta bancaria en México.</div>
+      </div>
+    </div>
+
+    <div class="guide-section" style="padding-bottom:0;">
+      <div style="padding:12px 16px;background:var(--card2);border-radius:10px;font-size:10px;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--txt);">Fuentes oficiales:</strong>
+        <a href="https://www.gob.mx/sre" target="_blank" style="color:#4f46e5;margin:0 6px;">SRE México</a>·
+        <a href="https://www.inm.gob.mx" target="_blank" style="color:#4f46e5;margin:0 6px;">INM</a>·
+        <a href="https://embamex.sre.gob.mx/panama/" target="_blank" style="color:#4f46e5;margin:0 6px;">Embajada México en Panamá</a>·
+        <a href="https://www.gob.mx/tramites/ficha/cambio-de-condicion-de-estancia-de-visitante-a-residente-temporal/INM344" target="_blank" style="color:#4f46e5;margin:0 6px;">Trámite INM</a>
       </div>
     </div>
   </div>`;
