@@ -475,6 +475,27 @@ body{background:#f8fafc;color:#0f172a;}
 /* Mobile sidebar overlay */
 .sb-ov{background:rgba(15,23,42,0.4);}
 .hbg{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#334155;}
+
+/* ── ANALYTICS ── */
+.an-wrap{flex:1;overflow-y:auto;padding:20px 22px 40px;display:flex;flex-direction:column;gap:16px;}
+.an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;}
+.an-kpi{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:18px 20px;border-top-width:3px;}
+.an-kpi-n{font-family:'Anton',sans-serif;font-size:38px;line-height:1;letter-spacing:-.5px;margin-bottom:4px;}
+.an-kpi-l{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;}
+.an-kpi-sub{font-size:11px;color:#64748b;margin-top:5px;}
+.an-pipeline{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:20px 22px;}
+.an-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.an-card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:18px 20px;}
+.an-card-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#94a3b8;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.an-card-total{font-family:'Anton',sans-serif;font-size:13px;color:#0f172a;text-transform:none;letter-spacing:0;}
+.an-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.an-row:last-child{margin-bottom:0;}
+.an-lbl{font-size:11px;font-weight:600;color:#334155;width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.an-track{flex:1;height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
+.an-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+.an-n{font-size:11px;font-weight:700;color:#334155;width:26px;text-align:right;flex-shrink:0;}
+.an-pct{font-size:10px;color:#94a3b8;width:34px;text-align:right;flex-shrink:0;}
+@media(max-width:900px){.an-kpis{grid-template-columns:1fr 1fr;}.an-charts{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -564,6 +585,7 @@ body{background:#f8fafc;color:#0f172a;}
       <div class="view-btns">
         <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')" title="Kanban">⬛</button>
         <button class="vbtn" id="vbtn-l" onclick="setView('list')" title="Lista">☰</button>
+        <button class="vbtn" id="vbtn-an" onclick="setView('analytics')" title="Analytics" style="font-size:12px;padding:7px 9px;">📊</button>
       </div>
       <button class="btn-web" id="vbtn-w" onclick="setView('web')">🌐 Website Leads <span id="web-pill">—</span></button>
       <button class="btn-add" onclick="openAdd()">+ Lead</button>
@@ -599,6 +621,9 @@ body{background:#f8fafc;color:#0f172a;}
         <tbody id="list-body"></tbody>
       </table>
     </div>
+
+    <!-- ANALYTICS VIEW -->
+    <div id="view-analytics" style="display:none;flex:1;overflow:hidden;flex-direction:column;"></div>
 
     <!-- WEBSITE LEADS VIEW -->
     <div class="web-wrap" id="view-web" style="display:none">
@@ -779,6 +804,108 @@ async function loadData(){
   updateHomeStats();
   const wc=ALL.filter(a=>a.fuente==='Website').length;
   if(q('#web-pill'))q('#web-pill').textContent=wc;
+  if(curView==='analytics')renderAnalytics();
+}
+
+/* ANALYTICS */
+function renderAnalytics(){
+  const data=ALL;
+  const total=data.length;
+  const el=q('#view-analytics');
+  if(!el)return;
+  if(!total){el.innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px;">Sin datos</div>';return;}
+
+  const firmados=data.filter(a=>a.estado==='Firmado').length;
+  const perdidos=data.filter(a=>a.estado==='Perdido').length;
+  const activos=data.filter(a=>!['Firmado','Perdido'].includes(a.estado)).length;
+  const cvr=((firmados/total)*100).toFixed(1);
+
+  // Por estado
+  const byEst={};STAGES.forEach(s=>byEst[s.k]=0);
+  data.forEach(a=>{if(byEst[a.estado]!==undefined)byEst[a.estado]++;});
+  const maxEst=Math.max(...Object.values(byEst),1);
+
+  // Por deporte
+  const byDep={};data.forEach(a=>{if(a.deporte)byDep[a.deporte]=(byDep[a.deporte]||0)+1;});
+  const topDep=Object.entries(byDep).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxDep=topDep[0]?.[1]||1;
+
+  // Por país
+  const byPais={};data.forEach(a=>{if(a.pais)byPais[a.pais]=(byPais[a.pais]||0)+1;});
+  const topPais=Object.entries(byPais).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxPais=topPais[0]?.[1]||1;
+
+  // Por fuente
+  const byFue={};data.forEach(a=>{const f=a.fuente||'Manual';byFue[f]=(byFue[f]||0)+1;});
+  const topFue=Object.entries(byFue).sort((a,b)=>b[1]-a[1]);
+  const maxFue=topFue[0]?.[1]||1;
+
+  // Por recruiter
+  const byRec={};data.forEach(a=>{if(a.recruiter)byRec[a.recruiter]=(byRec[a.recruiter]||0)+1;});
+  const topRec=Object.entries(byRec).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxRec=topRec[0]?.[1]||1;
+
+  const barRows=(rows,color,total2)=>rows.map(([lbl,n],i)=>`
+    <div class="an-row">
+      <div class="an-lbl" title="${esc(lbl)}">${esc(lbl)}</div>
+      <div class="an-track"><div class="an-fill" style="width:${((n/rows[0][1])*100).toFixed(1)}%;background:${color}"></div></div>
+      <div class="an-n">${n}</div>
+      <div class="an-pct">${((n/total2)*100).toFixed(0)}%</div>
+    </div>`).join('');
+
+  el.innerHTML=`<div class="an-wrap">
+    <div class="an-kpis">
+      <div class="an-kpi" style="border-top-color:#94a3b8">
+        <div class="an-kpi-n">${total}</div>
+        <div class="an-kpi-l">Total Leads</div>
+        <div class="an-kpi-sub">${activos} en pipeline activo</div>
+      </div>
+      <div class="an-kpi" style="border-top-color:#AAFF00">
+        <div class="an-kpi-n" style="color:#3a6b00">${firmados}</div>
+        <div class="an-kpi-l">Firmados</div>
+        <div class="an-kpi-sub">de ${total} leads totales</div>
+      </div>
+      <div class="an-kpi" style="border-top-color:#6366f1">
+        <div class="an-kpi-n" style="color:#4f46e5">${cvr}%</div>
+        <div class="an-kpi-l">Conversión</div>
+        <div class="an-kpi-sub">Firmados ÷ Total</div>
+      </div>
+      <div class="an-kpi" style="border-top-color:#ef4444">
+        <div class="an-kpi-n" style="color:#dc2626">${perdidos}</div>
+        <div class="an-kpi-l">Perdidos</div>
+        <div class="an-kpi-sub">${((perdidos/total)*100).toFixed(1)}% del total</div>
+      </div>
+    </div>
+
+    <div class="an-pipeline">
+      <div class="an-card-title">Pipeline por estado <span class="an-card-total">${total} leads</span></div>
+      ${STAGES.map(s=>{const n=byEst[s.k]||0;const pct=((n/total)*100).toFixed(0);return`<div class="an-row">
+        <div class="an-lbl">${s.k}</div>
+        <div class="an-track"><div class="an-fill" style="width:${((n/maxEst)*100).toFixed(1)}%;background:${s.c}"></div></div>
+        <div class="an-n">${n}</div>
+        <div class="an-pct">${pct}%</div>
+      </div>`;}).join('')}
+    </div>
+
+    <div class="an-charts">
+      <div class="an-card">
+        <div class="an-card-title">Top Deportes <span class="an-card-total">${Object.keys(byDep).length} deportes</span></div>
+        ${topDep.map(([d,n])=>`<div class="an-row"><div class="an-lbl">${spIco(d)} ${esc(d)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxDep)*100).toFixed(1)}%;background:#6366f1"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">Top Países <span class="an-card-total">${Object.keys(byPais).length} países</span></div>
+        ${topPais.map(([p,n])=>`<div class="an-row"><div class="an-lbl">${esc(p)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxPais)*100).toFixed(1)}%;background:#0d9488"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">Por Fuente <span class="an-card-total">${Object.keys(byFue).length} fuentes</span></div>
+        ${topFue.map(([f,n])=>`<div class="an-row"><div class="an-lbl">${esc(f)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxFue)*100).toFixed(1)}%;background:#f59e0b"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>
+      ${topRec.length?`<div class="an-card">
+        <div class="an-card-title">Por Recruiter <span class="an-card-total">${topRec.length} recruiters</span></div>
+        ${topRec.map(([r,n],i)=>`<div class="an-row"><div class="an-lbl">${esc(r)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxRec)*100).toFixed(1)}%;background:${REC_COLORS[i%REC_COLORS.length]}"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>`:''}
+    </div>
+  </div>`;
 }
 function buildFilters(){
   const sports=[...new Set(ALL.map(a=>a.deporte).filter(Boolean))].sort();
@@ -800,11 +927,14 @@ function setView(v){
   q('#view-kanban').style.display=v==='kanban'?'':'none';
   q('#view-list').style.display=v==='list'?'':'none';
   q('#view-web').style.display=v==='web'?'flex':'none';
+  q('#view-analytics').style.display=v==='analytics'?'flex':'none';
   q('#vbtn-k').classList.toggle('active',v==='kanban');
   q('#vbtn-l').classList.toggle('active',v==='list');
   q('#vbtn-w').classList.toggle('active',v==='web');
+  q('#vbtn-an').classList.toggle('active',v==='analytics');
   q('#btn-back-wrap')&&(q('#btn-back-wrap').style.display=v==='web'?'':'none');
   if(v==='web'){renderWeb();return;}
+  if(v==='analytics'){renderAnalytics();return;}
   render();
 }
 
