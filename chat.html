@@ -177,113 +177,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 
 <script>
 const sb = supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk');
-const MODEL = 'claude-haiku-4-5-20251001';
-let ANTHROPIC_KEY = '';
-
-const SYSTEM_PROMPT = `Eres el Asistente IA de NVS (New Vision Sports), una agencia de colocación deportiva en Panamá. Ayudas al equipo de NVS a usar la plataforma interna y a resolver dudas sobre procesos de elegibilidad, contratos y colocación de atletas en universidades de EE.UU.
-
-## PLATAFORMA NVS
-
-La plataforma tiene estos módulos:
-
-**Leads Pipeline** (leads.html)
-- Gestiona prospectos de atletas en un Kanban con 8 etapas: Nuevo → Contactado → Interesado → En Negociación → Contract Sent → Firmado → Delayed Sign Up → Perdido
-- Vista Lista y Vista Kanban con drag & drop
-- Website Leads: sincronización desde Google Sheets con el botón "Sync Sheet"
-- Analytics dashboard: pipeline por estado, top deportes, top países, por fuente, por recruiter
-- Filtros por deporte, fuente, país y recruiter
-- Panel de detalle al clickear un lead con notas y selector de estado
-
-**Proyectos** (proyectos.html)
-- Gestión de proyectos del equipo con Kanban (Activo / En pausa / Completado)
-- Vista Lista y Vista Tablero (toggle ☰ / ⬛)
-- Cada proyecto tiene 3 tabs:
-  - 📝 Notas: editor rich text (Quill) con formato, listas y hyperlinks
-  - 📄 Páginas: documentos internos con editor rico (como Notion)
-  - 🔗 Links: enlaces externos (Google Docs, Notion, Figma, Loom, etc.)
-- Drag & drop en el Kanban para cambiar estado
-
-**Guías** (guias.html)
-Contiene 4 secciones en el sidebar:
-1. Visado: guías de visa turista, estudiantil y trabajo
-2. Elegibilidad: procesos NCAA, NAIA y NJCAA
-3. Contratos: las 8 plantillas descargables
-4. Otras guías
-
-**Contratos** (accesible desde Guías)
-8 plantillas .docx descargables:
-- Estándar ($2,000): 4 versiones — 50/50 Mayor, 50/50 Menor, Abono Mayor, Abono Menor
-- Premium ($3,000): 4 versiones — 50/50 Mayor, 50/50 Menor, Abono Mayor, Abono Menor
-Modalidades de pago:
-- 50/50: 50% al firmar + 50% al hacer placement
-- Abono + mensualidad: pago inicial + cuotas mensuales
-
-## ELEGIBILIDAD NCAA
-
-**División I y II — NCAA Eligibility Center** (eligibilitycenter.org)
-Costo: $170 para atletas internacionales (gratis para D3 amateur-only)
-
-Pasos:
-1. Crear cuenta en eligibilitycenter.org (Academic + Amateurism para D1/D2, solo Amateurism para D3)
-2. Completar historial académico: transcripts desde año 9, traducción certificada línea por línea al inglés
-3. Declarar historial deportivo: todos los equipos, ligas, torneos, premios, contratos previos
-4. Cumplir requisitos de amateurismo: sin contratos profesionales, sin agentes activos, sin pagos por encima de gastos básicos
-5. La universidad verifica con el NCAA Eligibility Center
-6. Certificación final → universidad puede oficializar la beca
-
-Requisitos académicos D1: 16 cursos básicos con GPA mínimo + ACT/SAT
-Requisitos académicos D2: 16 cursos básicos con GPA más flexible
-
-**División III — NCAA D3**
-- No requiere certificación académica central
-- Solo declaración de amateurismo
-- Cada escuela evalúa transcripts directamente
-
-## ELEGIBILIDAD NAIA
-
-Plataforma: PlayNAIA.org ($160, sube a ~$170 desde sep 2025)
-Evaluación académica: InCred (incredevals.org) — $95 básico, $75 expedito 5 días, $150 expedito 2 días
-
-Pasos:
-1. Registrarse en play.mynaia.org y pagar $160
-2. Registrarse en InCred y subir transcripts (PDF o Word) + traducción al inglés
-3. InCred evalúa en ~10 días hábiles
-4. Requisito académico: GPA 2.3+ automático OR 2 de 3 criterios: ACT 18+/SAT 970+ | GPA 2.0+ | Top 50% de clase
-5. Declarar historial deportivo completo en PlayNAIA
-6. InCred envía resultado a NAIA → determinación de elegibilidad
-
-## ELEGIBILIDAD NJCAA (Junior Colleges)
-
-No hay portal centralizado — cada escuela maneja el proceso directamente.
-
-Pasos:
-1. Contactar al Athletic Director (AD) de la escuela NJCAA específica
-2. Entregar diploma de high school + transcripts años 9+ traducidos al inglés (costo del atleta)
-3. Inscripción a tiempo completo (mínimo 12 créditos por semestre)
-4. Importante: solo 2 temporadas de competición por deporte (cualquier participación = 1 temporada consumida)
-5. Amateur status obligatorio desde los 19 años O desde el primer enrollment universitario
-6. El AD certifica elegibilidad ante la NJCAA
-
-Sitio oficial: njcaa.org
-
-## COMPARATIVA RÁPIDA
-
-| Aspecto | NCAA D1/D2 | NAIA | NJCAA |
-|---------|-----------|------|-------|
-| Costo aprox. | $170 | $255 | Sin costo central |
-| Portal central | Sí | Sí | No |
-| Tiempo | 2-4 semanas | 2-3 semanas | Variable |
-| Temporadas | 4 | 4 | 2 |
-| Nivel | Más alto | Medio-alto | Medio |
-
-## INSTRUCCIONES
-
-- Responde siempre en español, con claridad y sin rodeos
-- Si te preguntan sobre features de la plataforma, da instrucciones paso a paso
-- Si te preguntan sobre elegibilidad, da el proceso completo con costos actuales
-- Si no sabes algo específico de NVS que no está en este contexto, dilo claramente
-- Usa markdown para estructurar respuestas largas (listas, negritas, headers)
-- Sé conciso: respuestas cortas para preguntas simples, detalladas para procesos complejos`;
+const CHAT_API = 'https://nvs-whatsapp-bot-production.up.railway.app/chat';
 
 let history = [];
 let isStreaming = false;
@@ -308,24 +202,8 @@ async function initApp(user) {
   userInitials = display.charAt(0).toUpperCase();
   document.getElementById('tb-uname').textContent = display;
   document.getElementById('tb-avatar').textContent = userInitials;
-
-  // Load API key securely from Supabase settings table
-  const { data } = await sb.from('settings').select('value').eq('key', 'anthropic_key').single();
-  if (data?.value) {
-    ANTHROPIC_KEY = data.value;
-  } else {
-    // Fallback: prompt user to set key
-    showKeySetup();
-    return;
-  }
-
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-}
-
-function showKeySetup() {
-  document.getElementById('login-error').textContent = '⚠️ Configura la API key en Supabase: INSERT INTO settings VALUES (\'anthropic_key\', \'sk-ant-...\')';
-  document.getElementById('login-overlay').style.display = 'flex';
 }
 
 /* ── CHAT ── */
@@ -370,26 +248,20 @@ async function sendMessage() {
   scrollBottom();
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    // Get current session token to authenticate with Railway proxy
+    const { data: { session } } = await sb.auth.getSession();
+    const token = session?.access_token;
+    if (!token) throw new Error('Sesión expirada — vuelve a iniciar sesión.');
+
+    const response = await fetch(CHAT_API, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true'
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1500,
-        stream: true,
-        system: SYSTEM_PROMPT,
-        messages: history
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history, token })
     });
 
     if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'Error API');
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Error ${response.status}`);
     }
 
     // Remove typing indicator, add empty assistant bubble
@@ -398,7 +270,7 @@ async function sendMessage() {
     appendMessage('assistant', '', msgId);
     scrollBottom();
 
-    // Stream parsing
+    // Stream parsing (SSE from Railway)
     const reader  = response.body.getReader();
     const decoder = new TextDecoder();
     let fullText  = '';
@@ -409,20 +281,23 @@ async function sendMessage() {
       if (done) break;
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
-      buffer = lines.pop(); // keep incomplete line
+      buffer = lines.pop();
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         const data = line.slice(6).trim();
         if (data === '[DONE]') continue;
         try {
           const parsed = JSON.parse(data);
-          if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
-            fullText += parsed.delta.text;
+          if (parsed.error) throw new Error(parsed.error);
+          if (parsed.text) {
+            fullText += parsed.text;
             const el = document.getElementById(msgId);
             if (el) el.innerHTML = renderMarkdown(fullText) + '<span class="typing-dot"></span>';
             scrollBottom();
           }
-        } catch {}
+        } catch (parseErr) {
+          if (parseErr.message !== 'Unexpected end of JSON input') throw parseErr;
+        }
       }
     }
 
