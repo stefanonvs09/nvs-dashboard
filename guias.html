@@ -207,6 +207,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         </div>
         <div class="sb-cat-item" id="cat-onboarding" onclick="setCategory('onboarding')">
           <span class="sb-cat-icon">🎓</span> Onboarding
+          <span class="sb-cat-badge">2</span>
         </div>
         <div class="sb-cat-item" id="cat-contratos" onclick="setCategory('contratos')">
           <span class="sb-cat-icon">📄</span> Contratos
@@ -243,7 +244,7 @@ const CATS={
   todas:     {label:'Todas las Guías',       sub:'Recursos, procesos y documentación del equipo'},
   elegibilidad:{label:'Elegibilidad',         sub:'Requisitos y criterios para atletas'},
   visado:    {label:'Visado',                 sub:'Documentación y procesos de visa estudiantil para EE.UU.'},
-  onboarding:{label:'Onboarding',             sub:'Proceso de incorporación de nuevos atletas y clientes'},
+  onboarding:{label:'Onboarding',             sub:'Teléfono, banco y primeros pasos al llegar a EE.UU.'},
   contratos: {label:'Contratos',              sub:'Modelos y guías de contratos NVS'},
   pagos:     {label:'Pagos',                  sub:'Procesos y métodos de pago'},
   general:   {label:'General',               sub:'Recursos y documentación general'},
@@ -292,11 +293,13 @@ function renderContent(cat){
   const wrap=document.getElementById('guides-wrap');
   if(cat==='visado'||cat==='todas'){
     wrap.innerHTML=renderVisadoGuide()+renderCanadaGuide()+renderMexicoGuide();
-    if(cat==='todas') wrap.innerHTML+=renderElegibilidadSection()+renderContratosSection()+emptyOtherCats();
+    if(cat==='todas') wrap.innerHTML+=renderElegibilidadSection()+renderOnboardingSection()+renderContratosSection()+emptyOtherCats();
   } else if(cat==='contratos'){
     wrap.innerHTML=renderContratosSection();
   } else if(cat==='elegibilidad'){
     wrap.innerHTML=renderElegibilidadSection();
+  } else if(cat==='onboarding'){
+    wrap.innerHTML=renderOnboardingSection();
   } else {
     wrap.innerHTML=emptyState(cat);
   }
@@ -312,9 +315,307 @@ function emptyState(cat){
 }
 function emptyOtherCats(){
   return`<div style="margin-top:8px;padding:16px 20px;background:var(--card2);border-radius:12px;font-size:12px;color:var(--muted);text-align:center;">
-    Más guías de Elegibilidad, Onboarding y Pagos se agregarán próximamente.
+    Más guías de Pagos se agregarán próximamente.
   </div>`;
 }
+
+function renderOnboardingSection(){
+  return`
+
+  <!-- ══ TELÉFONO AMERICANO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(99,102,241,.1);">📱</div>
+      <div>
+        <div class="guide-card-title">Número de Teléfono Americano — Primera vez en EE.UU.</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5;">Prepago · Sin SSN</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">Boarding School · College</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Paso esencial</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">📌</span>
+        <div><strong>¿Por qué necesitas un número americano?</strong>
+        Coaches, staff universitario y compañeros de equipo se comunican exclusivamente por número de EE.UU. (SMS/iMessage). Además, la mayoría de plataformas universitarias, apps de pagos (Venmo, Zelle, Apple Pay), el portal de becas y cualquier cuenta americana requieren un número local. Sin un número americano, quedarás fuera de grupos de equipo, notificaciones y comunicados del athletic department desde el primer día.</div>
+      </div>
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Necesito SSN para sacar un número?</strong>
+        <strong>No.</strong> Los planes prepago no requieren Social Security Number. Solo necesitas tu pasaporte. Esto los hace perfectos para recién llegados — puedes tener número el mismo día que aterrizas.</div>
+      </div>
+
+      <div class="steps-title">OPCIONES RECOMENDADAS (SIN SSN)</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">T-Mobile Prepaid — La opción más rápida al llegar</div>
+          <div class="step-desc">T-Mobile tiene la mejor cobertura nacional y el proceso más sencillo para estudiantes internacionales. Puedes comprar una SIM prepago en cualquier T-Mobile Store, Target, Walmart o Best Buy. Solo necesitas el pasaporte. El plan "Simply Prepaid" ($40/mes) incluye datos ilimitados + llamadas y mensajes ilimitados a EE.UU.</div>
+          <div class="step-fee">💰 SIM gratis · Plan desde $40/mes (ilimitado)</div>
+          <a class="step-link step-link-green" href="https://prepaid.t-mobile.com" target="_blank" rel="noopener">📱 T-Mobile Prepaid →</a>
+          <a class="step-link" href="https://www.walmart.com/browse/cell-phones/t-mobile-prepaid" target="_blank" rel="noopener">🛒 SIM en Walmart →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Visible (Verizon) — $25/mes, todo online</div>
+          <div class="step-desc">Visible es una marca de Verizon 100% digital. Funciona con pasaporte extranjero y una tarjeta de crédito/débito. No requiere visitar una tienda — todo se gestiona por app. Plan único: $25/mes con datos, llamadas y mensajes ilimitados. Red Verizon = excelente cobertura en áreas rurales y pequeñas ciudades donde están muchas universidades.</div>
+          <div class="step-fee">💰 $25/mes todo incluido</div>
+          <a class="step-link step-link-green" href="https://www.visible.com" target="_blank" rel="noopener">📱 Visible →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Google Fi — Ideal si viajan entre países frecuentemente</div>
+          <div class="step-desc">Google Fi funciona con pasaporte extranjero sin SSN. Su ventaja clave: el número americano sigue funcionando cuando el atleta viaja a Panamá o cualquier otro país sin cargos adicionales. Plan "Flexible" desde $20/mes base + $10/GB usado. Perfecto para atletas que van a casa en vacaciones.</div>
+          <div class="step-fee">💰 Desde $20/mes + $10/GB</div>
+          <a class="step-link step-link-green" href="https://fi.google.com" target="_blank" rel="noopener">📱 Google Fi →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">AT&T Prepaid — Disponible en aeropuerto</div>
+          <div class="step-desc">AT&T tiene quioscos en los aeropuertos internacionales principales (JFK, MIA, LAX, ORD). Puedes salir del avión con SIM en mano. Los planes prepago van desde $30-65/mes según datos. No requiere SSN con pasaporte vigente.</div>
+          <div class="step-fee">💰 Desde $30/mes</div>
+          <a class="step-link step-link-green" href="https://www.att.com/prepaid/" target="_blank" rel="noopener">📱 AT&T Prepaid →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">🎒 Pasos concretos al llegar a EE.UU.</div>
+      <div class="steps-title" style="margin-top:0;margin-bottom:8px;">PROCESO PASO A PASO</div>
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Al aterrizar — Tienda o kiosco en el aeropuerto</div>
+          <div class="step-desc">Muchos aeropuertos tienen tiendas AT&T o T-Mobile en la zona de llegadas (post-customs). Si no, Walmart suele estar a 10-15 minutos del aeropuerto de cualquier ciudad universitaria.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Documentos — Solo el pasaporte</div>
+          <div class="step-desc">Para prepago solo te piden el pasaporte. En algunos casos te pedirán una dirección local — usa la dirección del dormitorio o boarding school si ya la tienes, o una dirección temporal.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Compatibilidad del teléfono — desbloqueado y bandas LTE</div>
+          <div class="step-desc">El teléfono debe estar <strong>desbloqueado</strong> (unlocked) para que acepte SIM de otro operador. Verificar que soporta bandas LTE de EE.UU. (B4, B12, B66 para T-Mobile; B17, B5 para AT&T). Teléfonos comprados en Panamá con operadores grandes generalmente funcionan.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Para menores (boarding school) — Plan prepago en nombre propio</div>
+          <div class="step-desc">Los menores de 18 años pueden comprar planes prepago con su pasaporte sin necesidad de un adulto presente. Los contratos postpago (plan mensual con contrato) sí requieren ser mayor de edad. La recomendación es siempre ir por el plan prepago.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Comparativa de opciones (2026)</div>
+      <table class="fees-table">
+        <tr><th>Operador</th><th>Precio/mes</th><th>SSN requerido</th><th>Red</th></tr>
+        <tr><td>T-Mobile Prepaid</td><td class="fee-amt">$40</td><td>No</td><td>T-Mobile (excelente)</td></tr>
+        <tr><td>Visible</td><td class="fee-amt">$25</td><td>No</td><td>Verizon (excelente)</td></tr>
+        <tr><td>Google Fi Flexible</td><td class="fee-amt">$20+</td><td>No</td><td>T-Mobile + Sprint</td></tr>
+        <tr><td>AT&T Prepaid</td><td class="fee-amt">$30+</td><td>No</td><td>AT&T (buena)</td></tr>
+        <tr><td>Mint Mobile</td><td class="fee-amt">$15</td><td>No</td><td>T-Mobile</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ CUENTA BANCARIA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(16,185,129,.1);">🏦</div>
+      <div>
+        <div class="guide-card-title">Cuenta Bancaria en EE.UU. — Boarding School y College</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(16,185,129,.1);color:#059669;">Sin SSN al inicio</span>
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5;">Menor de edad · 18+</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">NIL · Stipend · Pagos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>¿Para qué necesitas una cuenta bancaria americana?</strong>
+        <ul style="margin:6px 0 0 16px;font-size:12px;line-height:1.8;">
+          <li><strong>Stipend y housing allowance:</strong> algunas becas incluyen una asignación mensual para gastos — se deposita en cuenta americana</li>
+          <li><strong>NIL (Name, Image &amp; Likeness):</strong> todos los pagos de contratos de imagen se hacen a cuenta bancaria americana</li>
+          <li><strong>Apps de pago:</strong> Venmo, Zelle, Cash App y Apple Pay requieren cuenta bancaria de EE.UU.</li>
+          <li><strong>Gastos del día a día:</strong> alquiler, supermercado, Amazon, transporte — sin cargos de conversión</li>
+          <li><strong>Evitar cargos internacionales:</strong> usar tarjeta panameña en EE.UU. genera comisiones de 3-5% por transacción</li>
+        </ul></div>
+      </div>
+    </div>
+
+    <!-- BOARDING SCHOOL -->
+    <div class="guide-section">
+      <div class="guide-section-title">🎒 Para Menores de Edad — Boarding School (menos de 18 años)</div>
+      <div class="guide-body" style="padding-top:0;">
+        <div class="guide-alert blue">
+          <span class="guide-alert-icon">ℹ️</span>
+          <div><strong>Regla principal:</strong> en EE.UU. los menores no pueden ser titulares únicos de una cuenta bancaria. Necesitan un cotitular adulto (padre, madre o guardián legal). Esto se puede gestionar incluso desde Panamá en algunos bancos.</div>
+        </div>
+
+        <div class="steps-title">OPCIONES PARA MENORES</div>
+
+        <div class="step-item">
+          <div class="step-num active">1</div>
+          <div class="step-content">
+            <div class="step-title">Capital One MONEY Teen Checking — La más fácil remotamente</div>
+            <div class="step-desc">Capital One permite que el padre/guardián abra la cuenta 100% online desde cualquier país si ya tiene una cuenta Capital One, o abriendo una simultáneamente. El menor recibe su propia tarjeta de débito. Los padres pueden monitorear movimientos y establecer límites de gasto desde la app. <strong>Sin cargo mensual.</strong></div>
+            <div class="step-fee">✅ Se puede gestionar desde Panamá · Sin SSN del menor (en muchos estados)</div>
+            <a class="step-link step-link-green" href="https://www.capitalone.com/bank/checking-accounts/teen-checking-account/" target="_blank" rel="noopener">🏦 Capital One MONEY Teen →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">2</div>
+          <div class="step-content">
+            <div class="step-title">Chase First Banking (6–17 años)</div>
+            <div class="step-desc">Requiere que el padre tenga cuenta Chase. Se abre en una sucursal Chase con el menor presente. Si el padre no puede viajar, en algunos estados se acepta con el padre apareciendo vía videoconferencia verificada. El minor recibe tarjeta de débito propia. Sin cargo mensual.</div>
+            <div class="step-fee">Requiere visita a sucursal Chase · Padre con cuenta Chase previa</div>
+            <a class="step-link step-link-green" href="https://www.chase.com/personal/banking/first-banking" target="_blank" rel="noopener">🏦 Chase First Banking →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">3</div>
+          <div class="step-content">
+            <div class="step-title">Greenlight — Tarjeta de débito para menores sin cuenta bancaria obligatoria</div>
+            <div class="step-desc">Greenlight es una tarjeta de débito gestionada por padres, diseñada para menores. No es un banco tradicional pero funciona como tarjeta Mastercard en cualquier establecimiento. Los padres cargan dinero desde cualquier país. No requiere visita a ningún banco, se gestiona 100% por app. Plan familiar desde $4.99/mes para hasta 5 hijos.</div>
+            <div class="step-fee">💰 $4.99–$14.98/mes · Tarjeta Mastercard funcionando desde el día 1</div>
+            <a class="step-link step-link-green" href="https://www.greenlight.com" target="_blank" rel="noopener">💳 Greenlight →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">4</div>
+          <div class="step-content">
+            <div class="step-title">Wise (TransferWise) — Para recibir y enviar dinero internacional</div>
+            <div class="step-desc">Wise permite enviar y recibir dinero con tasa de cambio real sin comisiones bancarias. El padre puede enviar dinero desde Panamá directamente a la tarjeta Greenlight o cuenta bancaria del atleta con costos mínimos. Muy útil para el día a día mientras se organiza la cuenta bancaria formal.</div>
+            <a class="step-link step-link-green" href="https://wise.com" target="_blank" rel="noopener">💸 Wise →</a>
+          </div>
+        </div>
+
+        <div class="guide-alert yellow" style="margin-top:12px;">
+          <span class="guide-alert-icon">⚠️</span>
+          <div><strong>Consejo importante:</strong> La boarding school normalmente tiene una lista de bancos recomendados cerca del campus o convenios con bancos locales. Preguntar al advisor o admissions office de la escuela antes de llegar es el primer paso — ellos orientan a todos los estudiantes internacionales sobre este proceso.</div>
+        </div>
+      </div>
+
+      <div class="doc-grid" style="padding:0 20px 20px;">
+        <div class="doc-item required">Pasaporte del menor</div>
+        <div class="doc-item required">Pasaporte del padre/guardián</div>
+        <div class="doc-item required">Carta de aceptación boarding school</div>
+        <div class="doc-item">Dirección local de la boarding school</div>
+        <div class="doc-item">SSN o ITIN del padre (si aplica)</div>
+        <div class="doc-item">Prueba de matrícula (enrollment letter)</div>
+      </div>
+    </div>
+
+    <!-- COLLEGE -->
+    <div class="guide-section">
+      <div class="guide-section-title">🎓 Para Universitarios — College (18 años o más)</div>
+      <div class="guide-body" style="padding-top:0;">
+        <div class="guide-alert green">
+          <span class="guide-alert-icon">✅</span>
+          <div><strong>Buena noticia:</strong> los estudiantes universitarios internacionales pueden abrir cuentas bancarias individuales con solo el pasaporte + I-20 + I-94. El SSN <em>no</em> es obligatorio en la mayoría de bancos para abrir cuenta básica — puedes agregarlo después cuando lo obtengas.</div>
+        </div>
+
+        <div class="steps-title">CUENTAS RECOMENDADAS PARA UNIVERSITARIOS</div>
+
+        <div class="step-item">
+          <div class="step-num active">1</div>
+          <div class="step-content">
+            <div class="step-title">Chase College Checking — La más completa</div>
+            <div class="step-desc">Sin cargo mensual por <strong>5 años</strong> mientras seas estudiante universitario. Amplia red de ATMs. Chase acepta abrir cuenta con pasaporte + I-20 + I-94 sin SSN en muchos estados (verificar en sucursal local). Al tener SSN, se vincula directamente. Excelente app y Zelle integrado.</div>
+            <div class="step-fee">✅ $0/mes · 5 años sin cargos · Zelle incluido</div>
+            <a class="step-link step-link-green" href="https://www.chase.com/personal/banking/college-checking" target="_blank" rel="noopener">🏦 Chase College Checking →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">2</div>
+          <div class="step-content">
+            <div class="step-title">Bank of America Advantage SafeBalance — Muy aceptado con documentos F-1</div>
+            <div class="step-desc">Bank of America tiene un proceso bien establecido para estudiantes internacionales. Aceptan I-20 + I-94 + pasaporte sin SSN. Sin cargo mensual si eres estudiante menor de 25 años. Muy buena cobertura de ATMs en campus universitario.</div>
+            <div class="step-fee">✅ $0/mes hasta los 25 años</div>
+            <a class="step-link step-link-green" href="https://www.bankofamerica.com/deposits/checking/advantage-safebalance-banking/" target="_blank" rel="noopener">🏦 Bank of America →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">3</div>
+          <div class="step-content">
+            <div class="step-title">Wells Fargo College Checking</div>
+            <div class="step-desc">Amplia red de sucursales y ATMs, especialmente en el sur y oeste de EE.UU. Sin cargo mensual para estudiantes universitarios. Acepta documentos de estudiante internacional para abrir. Requiere visita presencial a la sucursal.</div>
+            <div class="step-fee">✅ $0/mes con depósito directo o saldo mínimo</div>
+            <a class="step-link step-link-green" href="https://www.wellsfargo.com/checking/college/" target="_blank" rel="noopener">🏦 Wells Fargo College →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">4</div>
+          <div class="step-content">
+            <div class="step-title">Wise + Cuenta Americana — Para transferencias con Panamá</div>
+            <div class="step-desc">Además de la cuenta bancaria, recomendamos tener una cuenta Wise (gratuita). Wise permite recibir dinero desde Panamá con tasas de cambio reales (mucho más barato que una transferencia bancaria tradicional). El atleta puede recibir dólares directamente y transferirlos a su cuenta Chase/BofA al instante.</div>
+            <div class="step-fee">✅ Gratis · Tasa de cambio real · Sin cargos ocultos</div>
+            <a class="step-link step-link-green" href="https://wise.com" target="_blank" rel="noopener">💸 Wise →</a>
+          </div>
+        </div>
+
+        <div class="guide-alert blue" style="margin-top:12px;">
+          <span class="guide-alert-icon">📋</span>
+          <div><strong>¿Cuándo conseguir el SSN?</strong> El Social Security Number (SSN) se puede obtener si el atleta tiene autorización de trabajo — sea por OPT, CPT, trabajo en campus, o assistantship. La mayoría de atletas becados en F-1 no tienen autorización de trabajo automáticamente. <strong>Hablar con el DSO (Designated School Official)</strong> de la universidad para ver cuándo y cómo aplica. Una vez obtenido, actualizar el banco — abre acceso a crédito, tarjetas de crédito y más servicios.</div>
+        </div>
+      </div>
+
+      <div class="doc-grid" style="padding:0 20px 20px;">
+        <div class="doc-item required">Pasaporte válido</div>
+        <div class="doc-item required">Visa F-1 o sello de entrada</div>
+        <div class="doc-item required">I-20 emitido por la universidad</div>
+        <div class="doc-item required">I-94 (Arrival/Departure Record)</div>
+        <div class="doc-item required">Dirección local (dorm o apartamento)</div>
+        <div class="doc-item">Student ID universitario</div>
+        <div class="doc-item">Carta de matrícula / enrollment verification</div>
+        <div class="doc-item">SSN o ITIN (si ya tienes, agiliza el proceso)</div>
+      </div>
+
+      <div style="padding:0 20px 20px;">
+        <div class="guide-section-title" style="margin-bottom:10px;">💰 Comparativa de cuentas universitarias (2026)</div>
+        <table class="fees-table">
+          <tr><th>Banco</th><th>Cargo mensual</th><th>Sin SSN</th><th>Ventaja clave</th></tr>
+          <tr><td>Chase College Checking</td><td class="fee-amt">$0 (5 años)</td><td>Sí</td><td>Zelle, app excelente, Zelle</td></tr>
+          <tr><td>Bank of America</td><td class="fee-amt">$0 (&lt;25 años)</td><td>Sí</td><td>Proceso F-1 establecido</td></tr>
+          <tr><td>Wells Fargo College</td><td class="fee-amt">$0 con req.</td><td>Sí</td><td>Cobertura sur/oeste USA</td></tr>
+          <tr><td>Capital One 360</td><td class="fee-amt">$0</td><td>Sí</td><td>100% online, sin sucursal</td></tr>
+          <tr><td>Wise</td><td class="fee-amt">$0</td><td>Sí</td><td>Transferencias internacionales baratas</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+`;}
+
 
 function renderElegibilidadSection(){
   return`
