@@ -187,9 +187,60 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .pin-cancel{background:none;border:none;color:#94a3b8;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;padding:8px 16px;font-weight:600;}
 .pin-cancel:hover{color:var(--muted);}
 
+/* ── MOBILE TOPBAR ── */
+#mob-topbar{
+  display:none;
+  align-items:center;gap:10px;
+  padding:11px 16px;
+  background:#fff;border-bottom:1px solid var(--border);
+  flex-shrink:0;position:relative;z-index:10;
+}
+#mob-hamburger{
+  background:none;border:none;cursor:pointer;
+  width:34px;height:34px;border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  transition:background .15s;
+}
+#mob-hamburger:hover{background:var(--bg);}
+#mob-hamburger span{display:block;width:18px;height:2px;background:var(--txt);border-radius:2px;transition:all .2s;}
+.drawer-open #mob-hamburger span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.drawer-open #mob-hamburger span:nth-child(2){opacity:0;}
+.drawer-open #mob-hamburger span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+#mob-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;flex:1;}
+#mob-title span{color:var(--green);}
+
+/* ── DRAWER BACKDROP ── */
+#drawer-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;
+  backdrop-filter:blur(2px);
+}
+#drawer-backdrop.open{display:block;}
+
 @media(max-width:720px){
-  #nav-sidebar{display:none;}
-  #hub-home{padding:24px 20px 40px;}
+  /* Platform: stack vertically */
+  #platform{flex-direction:column;}
+  #mob-topbar{display:flex;}
+
+  /* Sidebar becomes an off-canvas drawer */
+  #nav-sidebar{
+    position:fixed;top:0;left:-240px;z-index:60;
+    height:100vh;width:240px;min-width:240px;
+    box-shadow:4px 0 24px rgba(0,0,0,.15);
+    transition:left .28s cubic-bezier(.4,0,.2,1);
+    display:flex;
+  }
+  #nav-sidebar.open{left:0;}
+
+  /* Content takes full height below topbar */
+  #content-area{height:calc(100vh - 57px);}
+  #mod-frame{height:100%;}
+  #hub-home{padding:20px 16px 40px;height:100%;overflow-y:auto;}
+
+  /* Scale down stats grid */
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .stat-big{font-size:34px;}
+  .hub-title{font-size:26px;}
+  .hub-header{margin-bottom:20px;}
 }
 </style>
 </head>
@@ -213,10 +264,22 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
   </div>
 </div>
 
+<!-- DRAWER BACKDROP -->
+<div id="drawer-backdrop" onclick="closeDrawer()"></div>
+
 <!-- PLATFORM SHELL -->
 <div id="platform">
 
-  <!-- LEFT NAV SIDEBAR -->
+  <!-- MOBILE TOPBAR -->
+  <div id="mob-topbar">
+    <button id="mob-hamburger" onclick="toggleDrawer()">
+      <span></span><span></span><span></span>
+    </button>
+    <div id="mob-title">NV<span>S</span></div>
+    <span id="mob-mod-name" style="font-size:11px;font-weight:700;color:var(--muted);"></span>
+  </div>
+
+  <!-- LEFT NAV SIDEBAR (desktop) / DRAWER (mobile) -->
   <nav id="nav-sidebar">
     <div class="nav-brand">
       <div class="nav-logo">NV<span>S</span></div>
@@ -426,20 +489,26 @@ function selectModule(id, href){
   const frame=document.getElementById('mod-frame');
   const home=document.getElementById('hub-home');
 
+  const mobName=document.getElementById('mob-mod-name');
+
   if(id==='hub'){
     frame.style.display='none';
     home.style.display='block';
     document.title='NVS Platform';
+    if(mobName)mobName.textContent='';
   } else {
     home.style.display='none';
     frame.style.display='block';
-    document.title=(_modTitles[id]||id)+' · NVS';
+    const label=_modTitles[id]||id;
+    document.title=label+' · NVS';
+    if(mobName)mobName.textContent=label;
     if(frame.getAttribute('data-src')!==href){
       frame.onload=()=>_patchFrame(frame);
       frame.src=href;
       frame.setAttribute('data-src',href);
     }
   }
+  closeDrawer();
 }
 
 function _patchFrame(frame){
@@ -627,6 +696,23 @@ document.addEventListener('DOMContentLoaded',()=>{
     }).observe(titleEl,{childList:true,characterData:true,subtree:true});
   }
 });
+
+/* ── MOBILE DRAWER ── */
+function toggleDrawer(){
+  const sidebar=document.getElementById('nav-sidebar');
+  const backdrop=document.getElementById('drawer-backdrop');
+  const isOpen=sidebar.classList.contains('open');
+  if(isOpen){closeDrawer();}else{
+    sidebar.classList.add('open');
+    backdrop.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+}
+function closeDrawer(){
+  document.getElementById('nav-sidebar').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+  document.body.style.overflow='';
+}
 
 /* ── PIN ── */
 let _pinValue='',_pinTarget='',_pinKey='';
