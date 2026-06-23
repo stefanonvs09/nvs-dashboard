@@ -415,8 +415,9 @@ function buildNav(email){
   document.getElementById('nav-list').innerHTML=hubItem+items;
 }
 
+const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes'};
+
 function selectModule(id, href){
-  // Update active state
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   const navEl=document.getElementById('nav-'+id);
   if(navEl)navEl.classList.add('active');
@@ -428,14 +429,34 @@ function selectModule(id, href){
   if(id==='hub'){
     frame.style.display='none';
     home.style.display='block';
+    document.title='NVS Platform';
   } else {
     home.style.display='none';
     frame.style.display='block';
+    document.title=(_modTitles[id]||id)+' · NVS';
     if(frame.getAttribute('data-src')!==href){
+      frame.onload=()=>_patchFrame(frame);
       frame.src=href;
       frame.setAttribute('data-src',href);
     }
   }
+}
+
+function _patchFrame(frame){
+  document.title=(_modTitles[_activeId]||_activeId)+' · NVS';
+  try{
+    const doc=frame.contentDocument;
+    if(!doc)return;
+    const s=doc.createElement('style');
+    s.id='nvs-hub-patch';
+    if(doc.getElementById('nvs-hub-patch'))return;
+    s.textContent=`
+      .sb-foot{display:none!important;}
+      .sb-top .sb-logo,.sb-logo{display:none!important;}
+      .tb-back,a[href="index.html"],[href*="index.html"]{display:none!important;}
+    `;
+    doc.head.appendChild(s);
+  }catch(e){}
 }
 
 /* ── PLATFORM INIT ── */
@@ -595,7 +616,17 @@ document.addEventListener('keydown',e=>{
     if(e.key==='Escape')closePin();
   }
 });
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded',()=>{
+  init();
+  // Prevent iframe from overriding the parent tab title
+  const titleEl=document.querySelector('title');
+  if(titleEl){
+    new MutationObserver(()=>{
+      const expected=_activeId==='hub'?'NVS Platform':(_modTitles[_activeId]||_activeId)+' · NVS';
+      if(document.title!==expected)document.title=expected;
+    }).observe(titleEl,{childList:true,characterData:true,subtree:true});
+  }
+});
 
 /* ── PIN ── */
 let _pinValue='',_pinTarget='',_pinKey='';
