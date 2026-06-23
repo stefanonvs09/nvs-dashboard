@@ -334,6 +334,10 @@ function renderOnboardingSection(){
           <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Paso esencial</span>
         </div>
       </div>
+      <button class="guide-download-btn" onclick="printGuide('telefono')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
     </div>
 
     <div class="guide-body">
@@ -451,6 +455,10 @@ function renderOnboardingSection(){
           <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">NIL · Stipend · Pagos</span>
         </div>
       </div>
+      <button class="guide-download-btn" onclick="printGuide('banco')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
     </div>
 
     <div class="guide-body">
@@ -1575,6 +1583,47 @@ const PDF_CONTENT={
       {name:'Uruguay',flag:'🇺🇾',url:'https://embamex.sre.gob.mx/uruguay/'},
     ],
     countriesTitle:'Consulados de México por país — Embajada oficial SRE'
+  },
+  telefono:{
+    flag:'📱',country:'EE.UU. — Telecomunicaciones',
+    title:'Número de Teléfono Americano — Primera vez en EE.UU.',subtitle:'Sin SSN · Prepago · Boarding School y College',
+    intro:`<p>Al llegar a EE.UU. por primera vez, obtener un número de teléfono americano es el <strong>primer paso esencial</strong>. Coaches, staff universitario, compañeros de equipo y toda la infraestructura del athletic department se comunican exclusivamente por número de EE.UU. (SMS/iMessage/llamadas).</p><p>La buena noticia: los planes <strong>prepago no requieren SSN</strong>. Solo necesitas tu pasaporte. Puedes tener número el mismo día que aterrizas.</p>`,
+    steps:[
+      {n:'1',title:'T-Mobile Prepaid — La opción más rápida',body:`Disponible en cualquier T-Mobile Store, Target, Walmart o Best Buy. Solo el pasaporte. Plan "Simply Prepaid" (ilimitado): $40/mes. Mejor cobertura nacional.<br>→ <a href="https://prepaid.t-mobile.com" style="color:#4f46e5;">prepaid.t-mobile.com</a>`},
+      {n:'2',title:'Visible (Verizon) — $25/mes todo online',body:`100% digital (sin visitar tienda). Funciona con pasaporte extranjero y tarjeta de débito. Plan único: $25/mes. Red Verizon — excelente cobertura en áreas rurales donde están muchas universidades.<br>→ <a href="https://www.visible.com" style="color:#4f46e5;">visible.com</a>`},
+      {n:'3',title:'Google Fi — Ideal para quien viaja entre países',body:`Sin SSN, 100% con pasaporte. Ventaja clave: el número americano sigue funcionando en Panamá y otros países sin cargos adicionales. Plan Flexible desde $20/mes + $10/GB.<br>→ <a href="https://fi.google.com" style="color:#4f46e5;">fi.google.com</a>`},
+      {n:'4',title:'AT&T Prepaid — Disponible en aeropuerto',body:`Quioscos en los principales aeropuertos (JFK, MIA, LAX, ORD). Sales del avión con SIM en mano. Planes desde $30/mes. No requiere SSN con pasaporte vigente.<br>→ <a href="https://www.att.com/prepaid/" style="color:#4f46e5;">att.com/prepaid</a>`},
+      {n:'5',title:'Pasos concretos al llegar',body:'1) Al aterrizar: busca tienda AT&T/T-Mobile en zona de llegadas, o Walmart a 10-15 min del aeropuerto. 2) Documentos: solo el pasaporte; usa la dirección del dormitorio o boarding school. 3) Verifica que tu teléfono esté desbloqueado y soporte bandas LTE de EE.UU. (B4, B12, B66). 4) Menores de 18 años: los planes prepago no requieren adulto presente, los contratos postpago sí.'},
+    ],
+    docs:['Pasaporte vigente (único documento requerido para prepago)','Teléfono desbloqueado (unlocked) compatible con bandas LTE USA','Tarjeta de débito/crédito para pagar el plan','Dirección local (dormitorio, boarding school o temporal)'],
+    fees:[['T-Mobile Prepaid (ilimitado)','$40/mes','T-Mobile Store · Target · Walmart'],['Visible (Verizon)','$25/mes','App o web (100% online)'],['Google Fi Flexible','Desde $20/mes + $10/GB','app.fi.google.com'],['AT&T Prepaid','Desde $30/mes','AT&T Store · Aeropuerto'],['Mint Mobile (opción económica)','Desde $15/mes','mintmobile.com']],
+    notes:[
+      {type:'info',title:'Ninguno requiere SSN',body:'Todos los planes prepago listados aceptan pasaporte extranjero sin número de seguro social. Los planes postpago (con contrato mensual) sí lo requieren — evítalos el primer año.'},
+      {type:'warning',title:'Verifica que el teléfono esté desbloqueado',body:'Si compraste el teléfono en Panamá con Claro, Movistar o Tigo, puede estar bloqueado a ese operador. Pídele a tu operador panameño que lo desbloquee antes de viajar, o compra un teléfono desbloqueado.'},
+      {type:'tip',title:'Mint Mobile — opción ultra económica',body:'Mint Mobile ($15/mes, red T-Mobile) es la opción más económica, pero se compra 100% online y la SIM llega por correo. Útil si tienes la dirección del campus antes de viajar.'},
+      {type:'tip',title:'Número americano para menores (boarding school)',body:'Los menores de 18 años pueden comprar planes prepago con su pasaporte sin necesidad de un adulto presente — esto aplica para todas las opciones de la lista.'},
+    ],
+  },
+  banco:{
+    flag:'🏦',country:'EE.UU. — Banca',
+    title:'Cuenta Bancaria en EE.UU. — Boarding School y College',subtitle:'Sin SSN al inicio · Menor de edad · 18+ · NIL y Stipend',
+    intro:`<p>Una cuenta bancaria americana es imprescindible para recibir el <strong>stipend</strong> de la beca, cobrar contratos de <strong>NIL</strong>, usar Venmo/Zelle/Apple Pay, pagar el alquiler y el día a día sin los cargos de conversión de una tarjeta panameña (3–5% por transacción).</p><p>La buena noticia: la mayoría de bancos aceptan pasaporte + I-20 + I-94 para abrir cuenta básica. <strong>El SSN no es obligatorio para empezar</strong> — se puede agregar después.</p>`,
+    steps:[
+      {n:'1',title:'[Boarding School] Capital One MONEY Teen — La más fácil remotamente',body:`El padre/guardián abre la cuenta 100% online desde Panamá si ya tiene Capital One, o abriendo una simultáneamente. El menor recibe su propia tarjeta de débito. Los padres monitorean movimientos y establecer límites desde la app. Sin cargo mensual. Se puede gestionar sin SSN del menor en muchos estados.<br>→ <a href="https://www.capitalone.com/bank/checking-accounts/teen-checking-account/" style="color:#4f46e5;">Capital One MONEY Teen</a>`},
+      {n:'2',title:'[Boarding School] Chase First Banking — Para mayores de 6 años',body:`Requiere que el padre tenga cuenta Chase. Se abre en sucursal con el menor presente. Sin cargo mensual. En algunos estados el padre puede aparecer vía videoconferencia verificada.<br>→ <a href="https://www.chase.com/personal/banking/first-banking" style="color:#4f46e5;">Chase First Banking</a>`},
+      {n:'3',title:'[Boarding School] Greenlight — Tarjeta Mastercard sin banco tradicional',body:`No es un banco — es una tarjeta de débito gestionada por padres. Funciona como Mastercard en cualquier establecimiento. Los padres cargan dinero desde cualquier país, 100% por app. Plan familiar desde $4.99/mes para hasta 5 hijos. Solución inmediata para el día 1.<br>→ <a href="https://www.greenlight.com" style="color:#4f46e5;">greenlight.com</a>`},
+      {n:'4',title:'[College 18+] Chase College Checking — La más completa',body:`Sin cargo mensual por <strong>5 años</strong> como estudiante. Acepta pasaporte + I-20 + I-94 sin SSN en la mayoría de estados. Zelle integrado. Amplia red de ATMs. Al tener SSN, se vincula directamente.<br>→ <a href="https://www.chase.com/personal/banking/college-checking" style="color:#4f46e5;">Chase College Checking</a>`},
+      {n:'5',title:'[College 18+] Bank of America Advantage SafeBalance',body:`Proceso bien establecido para estudiantes F-1. Aceptan I-20 + I-94 + pasaporte sin SSN. Sin cargo mensual si eres estudiante menor de 25 años.<br>→ <a href="https://www.bankofamerica.com/deposits/checking/advantage-safebalance-banking/" style="color:#4f46e5;">Bank of America</a>`},
+      {n:'6',title:'Wise — Para transferencias desde Panamá',body:`Wise permite enviar y recibir dinero con tasa de cambio real sin comisiones bancarias. El padre envía desde Panamá directamente a la cuenta del atleta. Gratis para abrir. Complemento ideal a la cuenta principal.<br>→ <a href="https://wise.com" style="color:#4f46e5;">wise.com</a>`},
+    ],
+    docs:['Pasaporte vigente del atleta y del padre/guardián (si es menor)','I-20 emitido por la universidad (para college)','I-94 — Arrival/Departure Record (para college)','Carta de aceptación de la institución educativa','Dirección local (dormitorio, boarding school o apartamento)','Student ID universitario (si ya lo tienes)','SSN o ITIN del padre/guardián si aplica (boarding school)','Carta de matrícula / enrollment verification (opcional, agiliza)'],
+    fees:[['Capital One MONEY Teen','$0/mes','100% online desde cualquier país'],['Chase First Banking','$0/mes','Sucursal Chase — padre con cuenta previa'],['Greenlight','$4.99–$14.98/mes','Tarjeta Mastercard inmediata'],['Chase College Checking','$0 (5 años)','Sucursal Chase — pasaporte + I-20 + I-94'],['Bank of America SafeBalance','$0 (<25 años)','Sucursal BofA — pasaporte + I-20'],['Wise','$0','100% online — transferencias internacionales']],
+    notes:[
+      {type:'warning',title:'Menores no pueden ser titulares únicos',body:'En EE.UU., los menores de 18 años necesitan un cotitular adulto (padre/guardián legal) para abrir una cuenta bancaria tradicional. La boarding school tiene convenios con bancos locales — consultar al advisor antes de llegar.'},
+      {type:'info',title:'¿Cuándo conseguir el SSN?',body:'El SSN se puede obtener si el atleta tiene autorización de trabajo (OPT, CPT, trabajo en campus, assistantship). La mayoría de atletas F-1 no lo tienen automáticamente. Hablar con el DSO de la universidad. Una vez obtenido, actualizar el banco — abre acceso a crédito y más servicios.'},
+      {type:'tip',title:'Abrir cuenta antes de llegar (online)',body:'Capital One y Wise se pueden abrir 100% online antes del viaje. Greenlight también. Esto te da acceso a dinero desde el día 1 sin depender de encontrar una sucursal.'},
+      {type:'tip',title:'Wise como puente con Panamá',body:'Aunque tengas cuenta Chase o BofA, mantén una cuenta Wise activa. Los padres pueden enviarte dinero desde Panamá con tasas de cambio reales — mucho más económico que una transferencia bancaria tradicional (ACH o SWIFT).'},
+    ],
   }
 };
 
