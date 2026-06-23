@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -348,9 +348,12 @@ const SEED=[
 /* AUTH */
 async function doLogin(){
   q('#l-err').textContent='';
-  const {error}=await sb.auth.signInWithPassword({email:q('#l-em').value.trim(),password:q('#l-pw').value});
-  if(error){q('#l-err').textContent='Credenciales incorrectas.';}
-  else{q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();}
+  const {data,error}=await sb.auth.signInWithPassword({email:q('#l-em').value.trim(),password:q('#l-pw').value});
+  if(error){q('#l-err').textContent='Credenciales incorrectas.';return;}
+  if((data.user?.app_metadata?.blocked||[]).includes('pagos')){
+    await sb.auth.signOut();q('#l-err').textContent='No tienes acceso a este módulo.';return;
+  }
+  q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&q('#login-ov').style.display!=='none')doLogin();});
 
@@ -484,8 +487,15 @@ function toast(msg,type='ok'){
 }
 
 /* INIT */
-sb.auth.getSession().then(({data:{session}})=>{
-  if(session){q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();}
+sb.auth.getSession().then(async ({data:{session}})=>{
+  if(session){
+    if((session.user?.app_metadata?.blocked||[]).includes('pagos')){
+      await sb.auth.signOut();
+      q('#login-ov').style.display='flex';
+      q('#l-err').textContent='No tienes acceso a este módulo.';return;
+    }
+    q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();
+  }
 });
 </script>
 </body>
