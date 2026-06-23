@@ -210,26 +210,6 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--txt);d
 .dp-btn.d{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.25);}
 .dp-btn.d:hover{background:rgba(248,113,113,0.2);}
 
-/* ONBOARDING TRACKER */
-.ob-bar-wrap{height:5px;background:var(--card3);border-radius:99px;overflow:hidden;flex:1;}
-.ob-bar{height:100%;background:var(--green);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
-.ob-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.ob-pct{font-size:10px;font-weight:800;color:var(--green);flex-shrink:0;}
-.ob-item{display:flex;align-items:center;gap:8px;padding:7px 6px;border-radius:7px;cursor:pointer;transition:background .12s;user-select:none;}
-.ob-item:hover{background:var(--card3);}
-.ob-chk{width:16px;height:16px;border-radius:50%;border:2px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;transition:all .15s;}
-.ob-chk.on{background:var(--green);border-color:var(--green);color:#000;}
-.ob-ico{font-size:13px;flex-shrink:0;}
-.ob-lbl{font-size:11px;font-weight:600;color:var(--m2);flex:1;transition:color .15s;}
-.ob-lbl.on{color:var(--txt);text-decoration:line-through;color:var(--m);}
-.ob-date-row{padding:5px 6px;}
-.ob-date{width:100%;background:var(--card2);border:1px solid var(--b);border-radius:7px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:11px;padding:7px 10px;outline:none;transition:border .15s;}
-.ob-date:focus{border-color:rgba(170,255,0,.4);}
-.ob-date-lbl{font-size:10px;color:var(--m2);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
-.ob-setup{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--amber);}
-.ob-setup a{color:var(--amber);}
-.ob-setup code{display:block;font-size:9px;background:var(--card2);border-radius:4px;padding:6px 8px;margin-top:6px;white-space:pre-wrap;word-break:break-all;color:var(--m2);}
-
 /* MODAL */
 .m-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;}
 .m-ov.open{display:block;}
@@ -624,10 +604,6 @@ function openDP(id){
         <div class="dp-row"><span class="dp-rl">Responsable Pago</span><span class="dp-rv">${esc(a.notas)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Referido Por</span><span class="dp-rv">${esc(a.referido)||'—'}</span></div>
       </div>
-      <div class="dp-sec" style="border-top:1px solid var(--b);padding-top:16px;">
-        <div class="dp-sec-lbl">🎓 Onboarding · Proceso</div>
-        ${renderOnboarding(id, a.onboarding)}
-      </div>
     </div>
     <div class="dp-ft">
       <button class="dp-btn p" onclick="openEdit(${id})">✏ Editar</button>
@@ -709,73 +685,6 @@ async function delAth(id){
   if(!confirm('¿Eliminar este atleta permanentemente?')) return;
   const {error}=await sb.from('atletas').delete().eq('id',id);
   if(!error){closeDP();await loadData();toast('Atleta eliminado','ok');}
-  else toast('Error: '+error.message,'err');
-}
-
-/* ── ONBOARDING TRACKER ── */
-const ONBOARDING_STEPS=[
-  {k:'highlights',       lbl:'Highlights creados',             ico:'🎬'},
-  {k:'perfil_digital',   lbl:'Perfil digital publicado',       ico:'🌐'},
-  {k:'examen_ingles',    lbl:'Examen de inglés realizado',     ico:'📝'},
-  {k:'info_coaches',     lbl:'Info completa para coaches',     ico:'📋'},
-  {k:'coaches_interes',  lbl:'Coaches interesados',            ico:'🎯'},
-  {k:'proceso_escuela',  lbl:'Proceso con escuela iniciado',   ico:'🏫'},
-  {k:'i20_recibido',     lbl:'I-20 recibido',                  ico:'📄'},
-  {k:'entrevista_ok',    lbl:'Entrevista embajada completada', ico:'🏛️'},
-  {k:'listo_usa',        lbl:'Listo para viajar a EE.UU.',     ico:'✈️'},
-];
-
-function renderOnboarding(id, ob){
-  const d=ob||{};
-  const done=ONBOARDING_STEPS.filter(s=>d[s.k]).length;
-  const total=ONBOARDING_STEPS.length;
-  const pct=Math.round(done/total*100);
-  const items=ONBOARDING_STEPS.map(s=>{
-    const on=!!d[s.k];
-    return `<div class="ob-item" onclick="toggleOB(${id},'${s.k}',${!on})">
-      <div class="ob-chk${on?' on':''}">${on?'✓':''}</div>
-      <span class="ob-ico">${s.ico}</span>
-      <span class="ob-lbl${on?' on':''}">${s.lbl}</span>
-    </div>`;
-  }).join('');
-  const fechaVal=d.fecha_entrevista||'';
-  return `<div class="ob-head">
-      <div class="ob-bar-wrap"><div class="ob-bar" style="width:${pct}%"></div></div>
-      <span class="ob-pct">${done}/${total}</span>
-    </div>
-    <div id="ob-items-${id}">${items}</div>
-    <div class="ob-date-row">
-      <div class="ob-date-lbl">📅 Fecha entrevista embajada</div>
-      <input type="date" class="ob-date" value="${fechaVal}" onchange="saveOBDate(${id},this.value)" onclick="event.stopPropagation()">
-    </div>`;
-}
-
-async function toggleOB(id, key, val){
-  const a=ALL.find(x=>x.id===id); if(!a) return;
-  const ob={...(a.onboarding||{}),[key]:val};
-  const {error}=await sb.from('atletas').update({onboarding:ob}).eq('id',id);
-  if(error){
-    if(error.message&&error.message.includes('onboarding')){
-      const el=document.getElementById('ob-items-'+id);
-      if(el)el.innerHTML=`<div class="ob-setup">
-        <strong>⚠️ Columna no creada aún.</strong> Ejecuta este SQL en
-        <a href="https://supabase.com/dashboard/project/mwefvjvvitsondqghgsx/sql/new" target="_blank">Supabase SQL Editor →</a>
-        <code>ALTER TABLE atletas
-  ADD COLUMN IF NOT EXISTS onboarding jsonb DEFAULT '{}'::jsonb;</code>
-      </div>`;
-      return;
-    }
-    toast('Error: '+error.message,'err');return;
-  }
-  a.onboarding=ob;
-  openDP(id);
-}
-
-async function saveOBDate(id, date){
-  const a=ALL.find(x=>x.id===id); if(!a) return;
-  const ob={...(a.onboarding||{}),fecha_entrevista:date||null};
-  const {error}=await sb.from('atletas').update({onboarding:ob}).eq('id',id);
-  if(!error){a.onboarding=ob;toast('Fecha guardada ✓','ok');}
   else toast('Error: '+error.message,'err');
 }
 
