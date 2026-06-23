@@ -339,6 +339,10 @@ body{background:#f8fafc;color:#0f172a;}
 
 /* Mobile overlay */
 .sb-ov{background:rgba(15,23,42,0.4);}
+
+/* When loaded inside hub iframe — hide redundant branding & back link */
+body.in-iframe .sb-top{display:none!important;}
+body.in-iframe .sb-foot{display:none!important;}
 </style>
 </head>
 <body>
@@ -909,7 +913,10 @@ function toast(msg,type='ok'){
   const el=q('#toast');el.textContent=msg;el.className='toast '+type+' show';
   clearTimeout(_toastT);_toastT=setTimeout(()=>el.classList.remove('show'),2600);
 }
-window.addEventListener('DOMContentLoaded',init);
+window.addEventListener('DOMContentLoaded',()=>{
+  if(window.self!==window.top) document.body.classList.add('in-iframe');
+  init();
+});
 </script>
 </body>
 </html>
