@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NVS — AI Athletic Performance Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Anton&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #AAFF00;
+      --accent-dark: #3a6b00;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .logo { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: -0.5px; }
+    .logo em { color: var(--accent-dark); font-style: normal; }
+    .sep { width: 1px; height: 22px; background: var(--border); }
+    .header-title { font-size: 14px; font-weight: 600; }
+    .ai-badge {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--accent); color: var(--accent-dark);
+      font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
+      padding: 5px 12px; border-radius: 100px;
+    }
+
+    /* ── Main ── */
+    .main {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* ── Form Panel ── */
+    .panel-form {
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      height: 100%;
+      padding: 24px 20px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 13px; font-weight: 500; }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent-dark);
+      box-shadow: 0 0 0 3px rgba(170,255,0,0.12);
+      background: white;
+    }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .input-unit-row { display: flex; gap: 8px; }
+    .input-unit-row input { flex: 1; }
+
+    .unit-toggle {
+      display: flex;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .unit-toggle button {
+      padding: 0 12px;
+      font-size: 12px; font-weight: 600;
+      border: none; background: var(--bg); color: var(--muted);
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+    .unit-toggle button.active { background: var(--accent); color: var(--accent-dark); }
+
+    .height-row { display: grid; grid-template-columns: 1fr 24px 1fr; gap: 6px; align-items: center; }
+    .height-row .sep-in { text-align: center; font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    .divider { height: 1px; background: var(--border); }
+
+    .btn-generate {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: var(--accent-dark);
+      border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s;
+      letter-spacing: -0.2px;
+    }
+    .btn-generate:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(170,255,0,0.4); }
+    .btn-generate:active { transform: translateY(0); }
+    .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .form-hint { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+    /* ── Results Panel ── */
+    .panel-results {
+      overflow-y: auto;
+      height: 100%;
+      padding: 24px 28px 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Empty state */
+    .empty-state {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; text-align: center; padding: 60px 40px;
+      color: var(--muted);
+    }
+    .empty-icon {
+      width: 72px; height: 72px;
+      background: var(--card);
+      border: 2px dashed rgba(0,0,0,0.12);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--text); }
+    .empty-state p { font-size: 13px; max-width: 300px; line-height: 1.6; }
+
+    /* Loading */
+    .loading-state {
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 18px; padding: 80px 40px;
+    }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(170,255,0,0.2);
+      border-top: 3px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 15px; font-weight: 600; }
+    .loading-sub { font-size: 12px; color: var(--muted); }
+
+    /* Results container */
+    .results { display: none; flex-direction: column; gap: 20px; animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px;
+    }
+
+    /* ── Profile Card ── */
+    .profile-card {
+      background: var(--text);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      display: flex; align-items: center; gap: 18px;
+    }
+    .profile-avatar {
+      width: 60px; height: 60px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Anton', sans-serif; font-size: 22px;
+      color: var(--accent-dark); flex-shrink: 0;
+    }
+    .profile-body { flex: 1; min-width: 0; }
+    .profile-body h2 { font-family: 'Anton', sans-serif; font-size: 20px; color: white; letter-spacing: -0.3px; }
+    .profile-sport { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .ptag {
+      font-size: 11px; font-weight: 500;
+      padding: 3px 9px; border-radius: 100px;
+      background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85);
+    }
+    .profile-timeline {
+      font-size: 11px; color: rgba(255,255,255,0.45);
+      margin-top: 10px; line-height: 1.5;
+    }
+    .profile-div { text-align: right; flex-shrink: 0; }
+    .div-badge { font-family: 'Anton', sans-serif; font-size: 42px; color: var(--accent); line-height: 1; }
+    .div-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    /* ── Benchmarks ── */
+    .benchmark-note { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    table.bm { width: 100%; border-collapse: collapse; }
+    table.bm th {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+      text-transform: uppercase; color: var(--muted);
+      text-align: left; padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    table.bm th.c { text-align: center; }
+    table.bm td { padding: 11px 10px; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+    table.bm tr:last-child td { border-bottom: none; }
+    table.bm tr:hover td { background: rgba(0,0,0,0.015); }
+    .mn { font-weight: 600; }
+    .mnote { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .mv { text-align: center; font-weight: 500; color: var(--text); }
+    .mv.current { font-weight: 700; }
+
+    .sbadge {
+      display: inline-flex; align-items: center;
+      padding: 3px 9px; border-radius: 100px;
+      font-size: 10px; font-weight: 700; white-space: nowrap;
+    }
+    .s-exceeds_d1 { background: #d1fae5; color: #065f46; }
+    .s-meets_d1   { background: #dcfce7; color: #166534; }
+    .s-near_d1    { background: #fef3c7; color: #92400e; }
+    .s-meets_d2   { background: #dbeafe; color: #1e40af; }
+    .s-near_d2    { background: #e0e7ff; color: #3730a3; }
+    .s-meets_d3   { background: #f3f4f6; color: #374151; }
+    .s-developing { background: #fee2e2; color: #991b1b; }
+
+    /* ── Training Plan ── */
+    .phase-tabs {
+      display: flex; gap: 4px;
+      background: var(--bg); padding: 4px;
+      border-radius: 8px; margin-bottom: 18px;
+    }
+    .ptab {
+      flex: 1; padding: 8px 4px;
+      font-size: 12px; font-weight: 600;
+      text-align: center; border-radius: 6px;
+      cursor: pointer; color: var(--muted);
+      border: none; background: transparent;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s; line-height: 1.4;
+    }
+    .ptab.active { background: white; color: var(--text); box-shadow: var(--shadow); }
+
+    .phase-panel { display: none; }
+    .phase-panel.active { display: block; }
+
+    .phase-focus {
+      font-size: 12px; color: var(--muted); line-height: 1.6;
+      background: var(--bg); padding: 10px 14px;
+      border-radius: 8px; margin-bottom: 16px;
+    }
+
+    .week-grid { display: flex; flex-direction: column; gap: 6px; }
+    .week-row { display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: flex-start; }
+    .wday {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.4px; color: var(--muted);
+      padding-top: 7px;
+    }
+    .wwork {
+      font-size: 12px; color: var(--text); line-height: 1.55;
+      padding: 6px 12px; background: var(--bg);
+      border-radius: 6px; border-left: 3px solid var(--accent);
+    }
+    .wwork.rest { border-left-color: var(--border); color: var(--muted); }
+
+    .key-ex { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .key-ex-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px;
+    }
+    .ex-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ex-chip {
+      font-size: 11px; font-weight: 500;
+      padding: 4px 11px; border-radius: 100px;
+      background: rgba(170,255,0,0.1); color: var(--accent-dark);
+      border: 1px solid rgba(170,255,0,0.25);
+    }
+
+    /* ── Nutrition ── */
+    .cal-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .cal-num { font-family: 'Anton', sans-serif; font-size: 36px; line-height: 1; }
+    .cal-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .hydration {
+      display: flex; align-items: center; gap: 8px;
+      background: #eff6ff; padding: 9px 14px;
+      border-radius: 8px; font-size: 12px; color: #1e40af; font-weight: 500;
+    }
+
+    .macros-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; }
+    .macro-card {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 18px 10px; background: var(--bg); border-radius: 10px;
+    }
+    .macro-ring { position: relative; width: 74px; height: 74px; }
+    .macro-ring svg { transform: rotate(-90deg); width: 74px; height: 74px; }
+    .ring-bg { fill: none; stroke: rgba(0,0,0,0.06); stroke-width: 7; }
+    .ring-fill { fill: none; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 175; }
+    .macro-ring-pct {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-size: 15px; font-weight: 700;
+    }
+    .macro-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+    .macro-g { font-size: 20px; font-weight: 700; line-height: 1; }
+    .macro-g span { font-size: 12px; color: var(--muted); }
+    .macro-why { font-size: 10px; color: var(--muted); text-align: center; line-height: 1.4; }
+
+    .subsec { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 10px; }
+
+    /* Meal timeline */
+    .meal-timeline { display: flex; flex-direction: column; }
+    .meal-row { display: grid; grid-template-columns: 76px 20px 1fr auto; gap: 0 10px; align-items: flex-start; padding: 10px 0; }
+    .meal-time { font-size: 11px; font-weight: 600; color: var(--muted); text-align: right; padding-top: 3px; }
+    .meal-dot-col { display: flex; flex-direction: column; align-items: center; }
+    .mdot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent); border: 2px solid white;
+      box-shadow: 0 0 0 2px var(--accent-dark);
+      margin-top: 3px; flex-shrink: 0;
+    }
+    .mline { width: 2px; flex: 1; background: var(--border); margin-top: 4px; min-height: 16px; }
+    .meal-row:last-child .mline { display: none; }
+    .meal-info h4 { font-size: 13px; font-weight: 600; }
+    .meal-info p { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+    .meal-cal { font-size: 11px; font-weight: 600; color: var(--muted); white-space: nowrap; padding-top: 3px; }
+
+    /* Foods */
+    .foods-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .food-row { display: flex; align-items: center; gap: 10px; padding: 7px 12px; background: var(--bg); border-radius: 8px; }
+    .fdot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .fname { font-size: 12px; font-weight: 600; min-width: 130px; }
+    .fbenefit { font-size: 11px; color: var(--muted); }
+
+    /* Supplements */
+    .supp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 8px; }
+    .supp-card { padding: 12px 14px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); }
+    .sname { font-size: 12px; font-weight: 600; }
+    .sdose { font-size: 11px; color: var(--accent-dark); font-weight: 500; margin-top: 2px; }
+    .stiming { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Recommendations ── */
+    .recs { display: flex; flex-direction: column; gap: 8px; }
+    .rec {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 13px 15px; border-radius: 8px;
+    }
+    .rec.high   { background: #fff7ed; border-left: 3px solid #f97316; }
+    .rec.medium { background: #eff6ff; border-left: 3px solid #3b82f6; }
+    .rec.low    { background: var(--bg); border-left: 3px solid var(--border); }
+    .pbadge {
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 2px 7px; border-radius: 100px; flex-shrink: 0; margin-top: 2px;
+    }
+    .pbadge.high   { background: #fed7aa; color: #c2410c; }
+    .pbadge.medium { background: #bfdbfe; color: #1d4ed8; }
+    .pbadge.low    { background: #e2e8f0; color: #475569; }
+    .rec-body h4 { font-size: 13px; font-weight: 600; }
+    .rec-body p  { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+    .rec-tf { font-size: 11px; color: var(--accent-dark); font-weight: 600; margin-top: 4px; }
+
+    /* ── Insight Card ── */
+    .insight-card { background: var(--text); border-radius: var(--radius); padding: 24px; }
+    .ins-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .ins-text { font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.82); }
+    .ins-logo { margin-top: 18px; font-family: 'Anton', sans-serif; font-size: 14px; color: var(--accent); letter-spacing: 1px; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">NV<em>S</em></div>
+  <div class="sep"></div>
+  <div class="header-title">AI Athletic Performance Analyzer</div>
+  <div class="ai-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    </svg>
+    Powered by Claude AI
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ── Form Panel ── -->
+  <div class="panel-form">
+    <div class="section-label">Perfil del Atleta</div>
+
+    <div class="form-group">
+      <label>Nombre completo</label>
+      <input type="text" id="inp-name" placeholder="Ej: Carlos Rodríguez">
+    </div>
+
+    <div class="row2">
+      <div class="form-group">
+        <label>Deporte</label>
+        <select id="inp-sport" onchange="updatePositions()">
+          <option value="">Seleccionar...</option>
+          <option>Soccer</option>
+          <option>Basketball</option>
+          <option>Baseball</option>
+          <option>Football (American)</option>
+          <option>Track & Field</option>
+          <option>Swimming</option>
+          <option>Volleyball</option>
+          <option>Tennis</option>
+          <option>Wrestling</option>
+          <option>Lacrosse</option>
+          <option>Golf</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Posición</label>
+        <select id="inp-position">
+          <option value="">— primero el deporte</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-group">
+      <label>Peso</label>
+      <div class="input-unit-row">
+        <input type="number" id="inp-weight" placeholder="175" min="50" max="450">
+        <div class="unit-toggle">
+          <button id="btn-lbs" class="active" onclick="setWeightUnit('lbs')">lbs</button>
+          <button id="btn-kg" onclick="setWeightUnit('kg')">kg</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Altura</label>
+      <div class="height-row">
+        <input type="number" id="inp-feet" placeholder="6" min="3" max="8">
+        <span class="sep-in">ft</span>
+        <input type="number" id="inp-inches" placeholder="1" min="0" max="11">
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px;">pies y pulgadas (ft / in)</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row2">
+      <div class="form-group">
+        <label>Graduation Class</label>
+        <select id="inp-gradyear">
+          <option value="2025">2025</option>
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
+          <option value="2030">2030</option>
+          <option value="2031">2031</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nivel actual</label>
+        <select id="inp-level">
+          <option>Middle School</option>
+          <option>Freshman HS</option>
+          <option>Sophomore HS</option>
+          <option>Junior HS</option>
+          <option>Senior HS</option>
+          <option>Club / Academy</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="btn-gen" onclick="generateAnalysis()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      Generar Análisis AI
+    </button>
+
+    <div class="form-hint">
+      Benchmarks NCAA División I, II y III · Plan de entrenamiento 12 semanas · Plan nutricional personalizado
+    </div>
+  </div>
+
+  <!-- ── Results Panel ── -->
+  <div class="panel-results" id="panel-results">
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">🏆</div>
+      <h3>Análisis de Rendimiento AI</h3>
+      <p>Ingresa el perfil del atleta y presiona <strong>Generar Análisis AI</strong> para recibir un plan completo personalizado con benchmarks NCAA reales.</p>
+    </div>
+
+    <div class="loading-state" id="loading-state">
+      <div class="spinner"></div>
+      <div class="loading-text">Analizando perfil atlético...</div>
+      <div class="loading-sub">Consultando benchmarks NCAA · Generando plan de entrenamiento y nutrición</div>
+    </div>
+
+    <div class="results" id="results-area"></div>
+
+  </div>
+</div>
+
+<script>
+const PROXY_URL = 'https://nvs-whatsapp-bot-production.up.railway.app/ai-analyze';
+let weightUnit = 'lbs';
+
+const POSITIONS = {
+  'Soccer': ['Goalkeeper','Center Back','Right Back','Left Back','Defensive Midfielder','Central Midfielder','Attacking Midfielder','Right Winger','Left Winger','Striker'],
+  'Basketball': ['Point Guard','Shooting Guard','Small Forward','Power Forward','Center'],
+  'Baseball': ['Pitcher','Catcher','First Base','Second Base','Third Base','Shortstop','Left Field','Center Field','Right Field','Designated Hitter'],
+  'Football (American)': ['Quarterback','Running Back','Wide Receiver','Tight End','Offensive Lineman','Defensive Lineman','Linebacker','Cornerback','Safety','Kicker/Punter'],
+  'Track & Field': ['100m/200m Sprinter','400m Runner','800m/1500m Middle Distance','5K/10K Distance','110m/400m Hurdles','Long Jump','Triple Jump','High Jump','Pole Vault','Shot Put','Discus','Javelin'],
+  'Swimming': ['50m/100m Freestyle','200m+ Freestyle','Backstroke','Breaststroke','Butterfly','Individual Medley'],
+  'Volleyball': ['Setter','Outside Hitter','Middle Blocker','Right Side Hitter','Libero / Defensive Specialist'],
+  'Tennis': ['Singles','Doubles','All-around'],
+  'Wrestling': ['Folkstyle','Freestyle','Greco-Roman'],
+  'Lacrosse': ['Attack','Midfield','Defense','Goalie'],
+  'Golf': ['Golfer']
+};
+
+function setWeightUnit(u) {
+  weightUnit = u;
+  document.getElementById('btn-lbs').classList.toggle('active', u === 'lbs');
+  document.getElementById('btn-kg').classList.toggle('active', u === 'kg');
+}
+
+function updatePositions() {
+  const sport = document.getElementById('inp-sport').value;
+  const sel = document.getElementById('inp-position');
+  sel.innerHTML = '';
+  if (!sport || !POSITIONS[sport]) { sel.innerHTML = '<option value="">— primero el deporte</option>'; return; }
+  POSITIONS[sport].forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; sel.appendChild(o); });
+}
+
+async function generateAnalysis() {
+  const name    = document.getElementById('inp-name').value.trim();
+  const sport   = document.getElementById('inp-sport').value;
+  const pos     = document.getElementById('inp-position').value;
+  const weight  = parseFloat(document.getElementById('inp-weight').value);
+  const feet    = parseInt(document.getElementById('inp-feet').value) || 0;
+  const inches  = parseInt(document.getElementById('inp-inches').value) || 0;
+  const grad    = parseInt(document.getElementById('inp-gradyear').value);
+  const level   = document.getElementById('inp-level').value;
+
+  if (!name || !sport || !pos || !weight || (!feet && inches === 0)) {
+    alert('Por favor completa todos los campos antes de generar el análisis.'); return;
+  }
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('loading-state').style.display = 'flex';
+  document.getElementById('results-area').style.display = 'none';
+  document.getElementById('btn-gen').disabled = true;
+
+  const athleteData = { name, sport, position: pos, weight, weightUnit, feet, inches, gradYear: grad, level };
+  try {
+    const response = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(athleteData)
+    });
+    if (!response.ok) throw new Error('Error del servidor: ' + response.status);
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let done_flag = false;
+
+    while (!done_flag) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') { done_flag = true; break; }
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.error) throw new Error(parsed.error);
+          if (parsed.result) {
+            renderResults(parsed.result, athleteData);
+            done_flag = true;
+            break;
+          }
+        } catch (parseErr) {
+          if (parseErr.message.startsWith('Error:')) throw parseErr;
+        }
+      }
+    }
+  } catch (e) {
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'flex';
+    alert('Error al generar el análisis.\n\nError: ' + e.message);
+  } finally {
+    document.getElementById('btn-gen').disabled = false;
+  }
+}
+
+const STATUS_LABELS = {
+  exceeds_d1: '⭐ Supera D1',
+  meets_d1:   '✅ Cumple D1',
+  near_d1:    '🟡 Cerca de D1',
+  meets_d2:   '✅ Cumple D2',
+  near_d2:    '🔵 Cerca de D2',
+  meets_d3:   '✔ Cumple D3',
+  developing: '📈 En desarrollo'
+};
+
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAYS_ES = { Monday:'Lunes', Tuesday:'Martes', Wednesday:'Miércoles', Thursday:'Jueves', Friday:'Viernes', Saturday:'Sábado', Sunday:'Domingo' };
+
+function renderResults(data, athlete) {
+  const initials = athlete.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  const heightStr = `${athlete.feet}'${athlete.inches || 0}"`;
+  const weightStr = `${athlete.weight} ${athlete.weightUnit}`;
+  const div = data.divisionBenchmarks?.primaryDivisionTarget || 'D2';
+  const n = data.nutritionPlan || {};
+  const macros = n.macros || {};
+  const protein = macros.protein || {};
+  const carbs = macros.carbohydrates || {};
+  const fat = macros.fat || {};
+
+  // Circ for r=28 → 2π*28 ≈ 175.9
+  const C = 175.9;
+  const pOff = C - (C * (protein.percentage || 30) / 100);
+  const cOff = C - (C * (carbs.percentage || 45) / 100);
+  const fOff = C - (C * (fat.percentage || 25) / 100);
+
+  const phases = data.trainingPlan?.phases || [];
+
+  let html = '';
+
+  // ── 1. Profile Card
+  html += `
+  <div class="profile-card">
+    <div class="profile-avatar">${initials}</div>
+    <div class="profile-body">
+      <h2>${athlete.name}</h2>
+      <div class="profile-sport">${athlete.sport} &middot; ${athlete.position}</div>
+      <div class="profile-tags">
+        <span class="ptag">${heightStr}</span>
+        <span class="ptag">${weightStr}</span>
+        <span class="ptag">Class of ${athlete.gradYear}</span>
+        <span class="ptag">${athlete.level}</span>
+      </div>
+      <div class="profile-timeline">${data.athleteProfile?.targetTimeline || ''}</div>
+    </div>
+    <div class="profile-div">
+      <div class="div-badge">${div}</div>
+      <div class="div-label">Target Division</div>
+    </div>
+  </div>`;
+
+  // ── 2. Benchmarks
+  const metrics = data.divisionBenchmarks?.metrics || [];
+  if (metrics.length) {
+    html += `
+    <div class="card">
+      <div class="card-title">Benchmarks NCAA — ${athlete.sport} / ${athlete.position}</div>
+      <div class="benchmark-note">${data.divisionBenchmarks?.overallAssessment || ''}</div>
+      <table class="bm">
+        <thead>
+          <tr>
+            <th>Métrica</th>
+            <th class="c">Actual (est.)</th>
+            <th class="c">D1</th>
+            <th class="c">D2</th>
+            <th class="c">D3</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${metrics.map(m => `
+          <tr>
+            <td>
+              <div class="mn">${m.name}</div>
+              ${m.note ? `<div class="mnote">${m.note}</div>` : ''}
+            </td>
+            <td class="mv current">${m.currentEstimate} <span style="font-size:11px;color:var(--muted)">${m.unit}</span></td>
+            <td class="mv">${m.d1Target} <span style="font-size:11px;color:var(--muted)">${m.unit}</span></td>
+            <td class="mv">${m.d2Target} <span style="font-size:11px;color:var(--muted)">${m.unit}</span></td>
+            <td class="mv">${m.d3Target} <span style="font-size:11px;color:var(--muted)">${m.unit}</span></td>
+            <td><span class="sbadge s-${m.status}">${STATUS_LABELS[m.status] || m.status}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }
+
+  // ── 3. Training Plan
+  if (phases.length) {
+    html += `
+    <div class="card">
+      <div class="card-title">Plan de Entrenamiento — 12 Semanas</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">
+        <strong style="color:var(--text)">Objetivo:</strong> ${data.trainingPlan?.primaryGoal || ''}
+      </div>
+      <div class="phase-tabs">
+        ${phases.map((p, i) => `
+          <button class="ptab ${i === 0 ? 'active' : ''}" onclick="switchPhase(${i})" id="ptab-${i}">
+            Fase ${p.phase}<br><small style="font-weight:400;font-size:10px">${p.weeks}</small>
+          </button>`).join('')}
+      </div>
+      ${phases.map((p, i) => `
+        <div class="phase-panel ${i === 0 ? 'active' : ''}" id="phase-${i}">
+          <div class="phase-focus"><strong>${p.name}:</strong> ${p.focus}</div>
+          <div class="week-grid">
+            ${DAYS.map(day => {
+              const w = p.weeklySchedule?.[day] || '';
+              const isRest = /rest|descanso|recovery/i.test(w);
+              return `
+              <div class="week-row">
+                <div class="wday">${DAYS_ES[day]}</div>
+                <div class="wwork ${isRest ? 'rest' : ''}">${w || '—'}</div>
+              </div>`;
+            }).join('')}
+          </div>
+          ${p.keyExercises?.length ? `
+            <div class="key-ex">
+              <div class="key-ex-title">Ejercicios Clave</div>
+              <div class="ex-chips">
+                ${p.keyExercises.map(e => `<span class="ex-chip">${e}</span>`).join('')}
+              </div>
+            </div>` : ''}
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // ── 4. Nutrition
+  html += `
+  <div class="card">
+    <div class="card-title">Plan Nutricional Personalizado</div>
+    <div class="cal-row">
+      <div>
+        <div class="cal-num">${(n.dailyCalories || 0).toLocaleString()}</div>
+        <div class="cal-label">calorías diarias</div>
+      </div>
+      <div class="hydration">💧 ${n.hydration || '2.5–3L por día'}</div>
+    </div>
+    <div class="macros-row">
+      <div class="macro-card">
+        <div class="macro-ring">
+          <svg viewBox="0 0 74 74">
+            <circle class="ring-bg" cx="37" cy="37" r="28"/>
+            <circle class="ring-fill" cx="37" cy="37" r="28" stroke="#3b82f6" style="stroke-dashoffset:${pOff}"/>
+          </svg>
+          <div class="macro-ring-pct">${protein.percentage || 0}%</div>
+        </div>
+        <div class="macro-name">Proteína</div>
+        <div class="macro-g">${protein.grams || 0}<span>g</span></div>
+        <div class="macro-why">${protein.purpose || ''}</div>
+      </div>
+      <div class="macro-card">
+        <div class="macro-ring">
+          <svg viewBox="0 0 74 74">
+            <circle class="ring-bg" cx="37" cy="37" r="28"/>
+            <circle class="ring-fill" cx="37" cy="37" r="28" stroke="#f59e0b" style="stroke-dashoffset:${cOff}"/>
+          </svg>
+          <div class="macro-ring-pct">${carbs.percentage || 0}%</div>
+        </div>
+        <div class="macro-name">Carbohidratos</div>
+        <div class="macro-g">${carbs.grams || 0}<span>g</span></div>
+        <div class="macro-why">${carbs.purpose || ''}</div>
+      </div>
+      <div class="macro-card">
+        <div class="macro-ring">
+          <svg viewBox="0 0 74 74">
+            <circle class="ring-bg" cx="37" cy="37" r="28"/>
+            <circle class="ring-fill" cx="37" cy="37" r="28" stroke="#ec4899" style="stroke-dashoffset:${fOff}"/>
+          </svg>
+          <div class="macro-ring-pct">${fat.percentage || 0}%</div>
+        </div>
+        <div class="macro-name">Grasas</div>
+        <div class="macro-g">${fat.grams || 0}<span>g</span></div>
+        <div class="macro-why">${fat.purpose || ''}</div>
+      </div>
+    </div>
+
+    ${n.mealTiming?.length ? `
+    <div class="subsec" style="margin-bottom:12px">Distribución de Comidas</div>
+    <div class="meal-timeline">
+      ${n.mealTiming.map(m => `
+      <div class="meal-row">
+        <div class="meal-time">${m.time || ''}</div>
+        <div class="meal-dot-col"><div class="mdot"></div><div class="mline"></div></div>
+        <div class="meal-info">
+          <h4>${m.label || ''}</h4>
+          <p>${m.description || ''}</p>
+        </div>
+        <div class="meal-cal">${m.calories ? m.calories + ' cal' : ''}</div>
+      </div>`).join('')}
+    </div>` : ''}
+
+    ${n.topFoods?.length ? `
+    <div class="subsec" style="margin-top:22px;margin-bottom:8px">Alimentos Clave</div>
+    <div class="foods-list">
+      ${n.topFoods.map(f => `
+      <div class="food-row">
+        <div class="fdot"></div>
+        <div class="fname">${f.food || f}</div>
+        <div class="fbenefit">${f.benefit || ''}</div>
+      </div>`).join('')}
+    </div>` : ''}
+
+    ${n.supplements?.length ? `
+    <div class="subsec" style="margin-bottom:8px">Suplementación</div>
+    <div class="supp-grid">
+      ${n.supplements.map(s => `
+      <div class="supp-card">
+        <div class="sname">${s.name || s}</div>
+        ${s.dose ? `<div class="sdose">${s.dose}</div>` : ''}
+        ${s.timing ? `<div class="stiming">${s.timing}</div>` : ''}
+      </div>`).join('')}
+    </div>` : ''}
+  </div>`;
+
+  // ── 5. Recommendations
+  const recs = data.keyRecommendations || [];
+  if (recs.length) {
+    html += `
+    <div class="card">
+      <div class="card-title">Recomendaciones Clave</div>
+      <div class="recs">
+        ${recs.map(r => `
+        <div class="rec ${r.priority || 'medium'}">
+          <span class="pbadge ${r.priority || 'medium'}">${r.priority === 'high' ? 'Alta' : r.priority === 'medium' ? 'Media' : 'Baja'}</span>
+          <div class="rec-body">
+            <h4>${r.area || ''}</h4>
+            <p>${r.recommendation || ''}</p>
+            ${r.timeframe ? `<div class="rec-tf">⏱ ${r.timeframe}</div>` : ''}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ── 6. Recruitment Insight
+  if (data.recruitmentInsight) {
+    html += `
+    <div class="insight-card">
+      <div class="ins-label">✦ Mensaje para los Padres</div>
+      <div class="ins-text">${data.recruitmentInsight}</div>
+      <div class="ins-logo">NEW VISION SPORTS</div>
+    </div>`;
+  }
+
+  const area = document.getElementById('results-area');
+  area.innerHTML = html;
+  document.getElementById('loading-state').style.display = 'none';
+  area.style.display = 'flex';
+  document.getElementById('panel-results').scrollTop = 0;
+}
+
+function switchPhase(idx) {
+  document.querySelectorAll('.ptab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.phase-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+</script>
+
+</body>
+</html>
