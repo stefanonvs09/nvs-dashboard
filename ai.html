@@ -609,20 +609,47 @@ async function generateAnalysis() {
   document.getElementById('results-area').style.display = 'none';
   document.getElementById('btn-gen').disabled = true;
 
+  const athleteData = { name, sport, position: pos, weight, weightUnit, feet, inches, gradYear: grad, level };
   try {
-    const res = await fetch(PROXY_URL, {
+    const response = await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, sport, position: pos, weight, weightUnit, feet, inches, gradYear: grad, level })
+      body: JSON.stringify(athleteData)
     });
-    if (!res.ok) throw new Error('Error del servidor: ' + res.status);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    renderResults(data, { name, sport, position: pos, weight, weightUnit, feet, inches, gradYear: grad, level });
+    if (!response.ok) throw new Error('Error del servidor: ' + response.status);
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let done_flag = false;
+
+    while (!done_flag) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') { done_flag = true; break; }
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.error) throw new Error(parsed.error);
+          if (parsed.result) {
+            renderResults(parsed.result, athleteData);
+            done_flag = true;
+            break;
+          }
+        } catch (parseErr) {
+          if (parseErr.message.startsWith('Error:')) throw parseErr;
+        }
+      }
+    }
   } catch (e) {
     document.getElementById('loading-state').style.display = 'none';
     document.getElementById('empty-state').style.display = 'flex';
-    alert('No se pudo conectar con el servidor AI.\n\nAsegúrate de que el proxy está corriendo:\n\n  node nvs_ai_proxy.js\n\nError: ' + e.message);
+    alert('Error al generar el análisis.\n\nError: ' + e.message);
   } finally {
     document.getElementById('btn-gen').disabled = false;
   }
