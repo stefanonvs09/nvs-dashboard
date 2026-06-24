@@ -437,6 +437,7 @@ const ALL_MODULES=[
   {id:'tareas',   icon:'✅', name:'Tareas',               accent:'#06b6d4', href:'tareas.html'},
   {id:'guias',    icon:'📖', name:'Guías',                accent:'#8b5cf6', href:'guias.html'},
   {id:'chat',     icon:'🤖', name:'Asistente IA',         accent:'#06b6d4', href:'chat.html'},
+  {id:'ai',       icon:'⚡', name:'AI Performance',       accent:'#AAFF00', href:'ai.html'},
   {id:'reportes', icon:'📊', name:'Reportes',             accent:'#8b5cf6', disabled:true},
 ];
 
@@ -478,7 +479,7 @@ function buildNav(email){
   document.getElementById('nav-list').innerHTML=hubItem+items;
 }
 
-const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes'};
+const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',ai:'AI Performance Analyzer',reportes:'Reportes'};
 
 function selectModule(id, href){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
