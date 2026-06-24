@@ -219,6 +219,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         <div class="sb-cat-item" id="cat-general" onclick="setCategory('general')">
           <span class="sb-cat-icon">📁</span> General
         </div>
+        <div class="sb-cat-item" id="cat-examenes" onclick="setCategory('examenes')">
+          <span class="sb-cat-icon">📝</span> Exámenes
+          <span class="sb-cat-badge">4</span>
+        </div>
+        <div class="sb-cat-item" id="cat-calendario" onclick="setCategory('calendario')">
+          <span class="sb-cat-icon">📅</span> Calendario
+          <span class="sb-cat-badge">NEW</span>
+        </div>
       </div>
     </div>
 
@@ -248,6 +256,8 @@ const CATS={
   contratos: {label:'Contratos',              sub:'Modelos y guías de contratos NVS'},
   pagos:     {label:'Pagos',                  sub:'Procesos y métodos de pago'},
   general:   {label:'General',               sub:'Recursos y documentación general'},
+  examenes:  {label:'Exámenes',              sub:'TOEFL, SAT, ACT, Duolingo — costos, fechas y requisitos para universidades de EE.UU.'},
+  calendario:{label:'Calendario Atlético',   sub:'Fechas clave NCAA/NAIA, signing days, deadlines y periodos de reclutamiento'},
 };
 
 /* ── AUTH ── */
@@ -300,6 +310,10 @@ function renderContent(cat){
     wrap.innerHTML=renderElegibilidadSection();
   } else if(cat==='onboarding'){
     wrap.innerHTML=renderOnboardingSection();
+  } else if(cat==='examenes'){
+    wrap.innerHTML=renderExamenesSection();
+  } else if(cat==='calendario'){
+    wrap.innerHTML=renderCalendarioSection();
   } else {
     wrap.innerHTML=emptyState(cat);
   }
@@ -1723,6 +1737,371 @@ function printGuide(type){
 
   const win=window.open('','_blank','width=860,height=960');
   win.document.write(html);win.document.close();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EXÁMENES — TOEFL / SAT / ACT / DUOLINGO
+══════════════════════════════════════════════════════════════════ */
+function renderExamenesSection(){
+  return`
+  <!-- ══ INTRO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(99,102,241,.1);">📝</div>
+      <div>
+        <div class="guide-card-title">Exámenes Estandarizados para Universidades de EE.UU.</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(170,255,0,.12);color:#3a6b00;">NCAA · NAIA · NJCAA</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Internacional</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Cuáles necesita tu atleta?</strong> Depende de la universidad y la división. Las universidades D1/D2 suelen exigir demostración de inglés (TOEFL o Duolingo) para atletas internacionales. El SAT/ACT es requisito académico en muchas instituciones para becas y admisión. Siempre confirmar requisitos específicos con cada universidad.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOEFL ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(59,130,246,.1);">🏫</div>
+      <div>
+        <div class="guide-card-title">TOEFL iBT — Test of English as a Foreign Language</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(59,130,246,.1);color:#1d4ed8;">Inglés · Oficial</span>
+          <span class="guide-tag" style="background:rgba(170,255,0,.12);color:#3a6b00;">Más aceptado D1/D2</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$245 USD','Varía por país')}
+        ${examStat('⏱','Duración','~3 horas','4 secciones')}
+        ${examStat('📊','Escala','0 – 120','Puntaje total')}
+        ${examStat('📅','Validez','2 años','Desde la fecha del examen')}
+        ${examStat('💻','Modalidad','Online / Centro','TOEFL Home Edition disponible')}
+        ${examStat('🌎','Registro','ets.org/toefl','ETS — Educational Testing Service')}
+      </div>
+      <div class="steps-title">SECCIONES DEL EXAMEN</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${seccionItem('📖','Reading','30-40 min','3-4 pasajes + preguntas de comprensión','0-30 pts')}
+        ${seccionItem('🎧','Listening','41-57 min','Lecturas, conversaciones y conferencias','0-30 pts')}
+        ${seccionItem('🗣','Speaking','17 min','4 tareas de expresión oral grabadas','0-30 pts')}
+        ${seccionItem('✍️','Writing','50 min','2 tareas de escritura académica','0-30 pts')}
+      </div>
+      <div class="steps-title">PUNTAJES MÍNIMOS REQUERIDOS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${puntajeDiv('D1','79 – 100+','La mayoría exige 79+. Algunas top schools piden 100+')}
+        ${puntajeDiv('D2','61 – 80','Rango típico. Varía mucho por institución')}
+        ${puntajeDiv('D3 / NAIA','45 – 61','Muchas aceptan puntajes más bajos o eximen')}
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Consejo NVS:</strong> Registrarse con al menos 3 meses de anticipación. Se puede tomar el TOEFL Home Edition desde casa con cámara. Los resultados llegan en 4-8 días y se envían directamente a las universidades desde ets.org.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DUOLINGO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(34,197,94,.1);">🦜</div>
+      <div>
+        <div class="guide-card-title">Duolingo English Test (DET)</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(34,197,94,.1);color:#15803d;">Inglés · Online</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Más económico y rápido</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$65 USD','Fijo, sin importar país')}
+        ${examStat('⏱','Duración','~1 hora','Desde casa')}
+        ${examStat('📊','Escala','10 – 160','Puntaje total')}
+        ${examStat('📅','Validez','2 años','Desde la fecha')}
+        ${examStat('💻','Modalidad','Solo online','Cámara y micrófono requeridos')}
+        ${examStat('🌎','Registro','englishtest.duolingo.com','Resultados en 2 días')}
+      </div>
+      <div class="steps-title">PUNTAJES MÍNIMOS REQUERIDOS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${puntajeDiv('D1','100 – 120+','Equivalente aproximado a TOEFL 79+')}
+        ${puntajeDiv('D2','80 – 100','Depende de la universidad')}
+        ${puntajeDiv('D3 / NAIA','55 – 80','Muchas lo aceptan. Siempre verificar')}
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Ventaja clave:</strong> Solo $65, resultados en 48 horas y se puede tomar desde casa. Es aceptado por +4,500 universidades. Ideal como alternativa rápida al TOEFL. <strong>No todos los programas D1 lo aceptan</strong> — verificar siempre antes de recomendar.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SAT ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(168,85,247,.1);">🎓</div>
+      <div>
+        <div class="guide-card-title">SAT — Scholastic Assessment Test</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(168,85,247,.1);color:#7c3aed;">Académico · College Board</span>
+          <span class="guide-tag" style="background:rgba(59,130,246,.1);color:#1d4ed8;">Admisión y becas académicas</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$60 USD','Descuentos por necesidad disponibles')}
+        ${examStat('⏱','Duración','2h 14min','Digital, sin descanso')}
+        ${examStat('📊','Escala','400 – 1600','Math + Reading/Writing')}
+        ${examStat('📅','Validez','Sin vencimiento','Se acepta cualquier año')}
+        ${examStat('💻','Modalidad','Digital','En centros autorizados')}
+        ${examStat('🌎','Registro','collegeboard.org','6-8 fechas por año')}
+      </div>
+      <div class="steps-title">SECCIONES DEL SAT DIGITAL</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${seccionItem('📚','Reading & Writing','64 min','Comprensión lectora y gramática','200-800 pts')}
+        ${seccionItem('🔢','Math','70 min','Álgebra, geometría y estadística','200-800 pts')}
+      </div>
+      <div class="steps-title">PUNTAJES MÍNIMOS PARA BECAS NCAA</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${puntajeDiv('D1 Beca Completa','900 – 1000+','GPA alto puede compensar puntaje bajo')}
+        ${puntajeDiv('D2 Beca Parcial','820 – 900','Mínimo para elegibilidad académica')}
+        ${puntajeDiv('D3 / NAIA','700 – 820','Varía por institución')}
+      </div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Importante:</strong> Muchas universidades son "test-optional" post-COVID, pero un SAT alto <strong>aumenta significativamente</strong> las posibilidades de beca académica. Para atletas internacionales, el SAT puede ser exigido o recomendado además del TOEFL.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ACT ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(239,68,68,.1);">🧪</div>
+      <div>
+        <div class="guide-card-title">ACT — American College Testing</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(239,68,68,.1);color:#dc2626;">Académico · ACT Inc.</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Alternativa al SAT</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$93 USD','Con Writing: $118')}
+        ${examStat('⏱','Duración','2h 55min','4 secciones + Writing opcional')}
+        ${examStat('📊','Escala','1 – 36','Promedio de 4 secciones')}
+        ${examStat('📅','Validez','Sin vencimiento','Mejor puntaje cuenta')}
+        ${examStat('💻','Modalidad','Papel o Digital','En centros autorizados')}
+        ${examStat('🌎','Registro','act.org','~7 fechas por año')}
+      </div>
+      <div class="steps-title">SECCIONES DEL ACT</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${seccionItem('📖','English','45 min','Gramática, puntuación y estilo','1-36')}
+        ${seccionItem('🔢','Math','60 min','Pre-álgebra a trigonometría','1-36')}
+        ${seccionItem('📚','Reading','35 min','Comprensión de textos','1-36')}
+        ${seccionItem('🔬','Science','35 min','Interpretación de datos científicos','1-36')}
+      </div>
+      <div class="steps-title">EQUIVALENCIA SAT ↔ ACT</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+        ${equivItem('36 ACT','1600 SAT')}
+        ${equivItem('30 ACT','1360 SAT')}
+        ${equivItem('24 ACT','1160 SAT')}
+        ${equivItem('18 ACT','960 SAT')}
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>SAT vs ACT:</strong> Todas las universidades de EE.UU. aceptan ambos. El ACT incluye una sección de Ciencias que puede favorecer a estudiantes fuertes en esa área. Se recomienda hacer un examen de práctica de ambos y elegir el que mejor puntaje genere.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RESUMEN COMPARATIVO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(170,255,0,.15);">⚖️</div>
+      <div>
+        <div class="guide-card-title">Tabla Comparativa — ¿Cuál recomendar?</div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:var(--bg);">
+              <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Examen</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Costo</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Duración</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Escala</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Objetivo</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Online</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tablaRow('TOEFL iBT','$245','~3h','0-120','Inglés (oficial)','✅ Home Ed.')}
+            ${tablaRow('Duolingo DET','$65','~1h','10-160','Inglés (rápido)','✅ Siempre')}
+            ${tablaRow('SAT','$60','2h 14min','400-1600','Académico','❌ Centro')}
+            ${tablaRow('ACT','$93','2h 55min','1-36','Académico','✅ Parcial')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function examStat(icon,label,val,sub){
+  return`<div style="padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+    <div style="font-size:16px;margin-bottom:6px;">${icon}</div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:3px;">${label}</div>
+    <div style="font-size:14px;font-weight:700;color:var(--txt);">${val}</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:2px;">${sub}</div>
+  </div>`;
+}
+function seccionItem(icon,name,time,desc,pts){
+  return`<div style="padding:12px 14px;background:var(--bg);border-radius:8px;border-left:3px solid #AAFF00;">
+    <div style="font-size:13px;font-weight:700;margin-bottom:3px;">${icon} ${name}</div>
+    <div style="font-size:11px;color:var(--muted);">${time} · ${desc}</div>
+    <div style="font-size:11px;font-weight:700;color:#3a6b00;margin-top:4px;">${pts}</div>
+  </div>`;
+}
+function puntajeDiv(div,score,note){
+  const colors={D1:'#1d4ed8',D2:'#7c3aed'};
+  const bg={D1:'rgba(59,130,246,.08)',D2:'rgba(168,85,247,.08)'};
+  return`<div style="padding:14px;background:${bg[div]||'var(--bg)'};border-radius:8px;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:${colors[div]||'#374151'};margin-bottom:6px;">${div}</div>
+    <div style="font-size:18px;font-weight:700;font-family:'Anton',sans-serif;">${score}</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;">${note}</div>
+  </div>`;
+}
+function equivItem(act,sat){
+  return`<div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:13px;font-weight:700;">${act}</div>
+    <div style="font-size:10px;color:var(--muted);margin:3px 0;">≈</div>
+    <div style="font-size:13px;font-weight:700;color:#7c3aed;">${sat}</div>
+  </div>`;
+}
+function tablaRow(name,cost,dur,scale,obj,online){
+  return`<tr style="border-bottom:1px solid rgba(0,0,0,.04);">
+    <td style="padding:10px 12px;font-weight:700;">${name}</td>
+    <td style="padding:10px 12px;text-align:center;color:#3a6b00;font-weight:600;">${cost}</td>
+    <td style="padding:10px 12px;text-align:center;">${dur}</td>
+    <td style="padding:10px 12px;text-align:center;font-weight:600;">${scale}</td>
+    <td style="padding:10px 12px;text-align:center;">${obj}</td>
+    <td style="padding:10px 12px;text-align:center;">${online}</td>
+  </tr>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CALENDARIO ATLÉTICO — Fechas clave NCAA / NAIA / Signing Days
+══════════════════════════════════════════════════════════════════ */
+function renderCalendarioSection(){
+  const meses = [
+    { mes:'Julio – Agosto', color:'#f59e0b', bg:'rgba(245,158,11,.08)', eventos:[
+      {icon:'🏈',tag:'NCAA D1/D2',titulo:'Periodo de Contacto — Football',desc:'Los coaches pueden contactar oficialmente a prospectos de HS senior. Visitas oficiales permitidas.'},
+      {icon:'📋',tag:'NCAA',titulo:'Apertura del NCAA Eligibility Center',desc:'Prospectos de Class of 2026 deben registrarse antes del inicio del año escolar senior.'},
+      {icon:'🎾',tag:'NCAA D1',titulo:'Periodo de reclutamiento — Tennis, Golf',desc:'Coaches pueden contactar y hacer visitas. Peak de ofrecimiento de becas.'},
+    ]},
+    { mes:'Septiembre – Octubre', color:'#ef4444', bg:'rgba(239,68,68,.08)', eventos:[
+      {icon:'📅',tag:'NCAA D1/D2',titulo:'Periodo de contacto — Basketball (W)',desc:'Primer día permitido para comunicación directa de coaches con Class 2026.'},
+      {icon:'📝',tag:'TOEFL / SAT',titulo:'Fechas de exámenes recomendadas',desc:'Tomar TOEFL y SAT en Oct para tener resultados antes de las primeras aplicaciones universitarias en noviembre.'},
+      {icon:'🏊',tag:'NCAA D1',titulo:'Early evaluations — Swimming & Diving',desc:'Coaches visitan torneos y evaluaciones regionales. Momento clave para visibilidad.'},
+    ]},
+    { mes:'Noviembre', color:'#8b5cf6', bg:'rgba(139,92,246,.08)', eventos:[
+      {icon:'✍️',tag:'NCAA D1/D2 — CRÍTICO',titulo:'Early Signing Period — Football',desc:'Primera oportunidad de firmar NLI (National Letter of Intent). Solo 3 días: ~8-10 Nov.'},
+      {icon:'✍️',tag:'NCAA D1/D2 — CRÍTICO',titulo:'Early Signing Period — Basketball',desc:'Primera ventana de firma oficial para baloncesto masculino y femenino.'},
+      {icon:'✍️',tag:'NCAA D1/D2',titulo:'Early Signing Period — Mayoría de deportes',desc:'Baseball, Soccer, Tennis, Track, Swimming, Volleyball y más. Verificar fechas exactas en ncaa.org.'},
+      {icon:'🎓',tag:'Admisión',titulo:'Early Decision / Early Action — Aplicaciones',desc:'Deadline para aplicar bajo Early Decision en universidades competitivas. Resultados en diciembre.'},
+    ]},
+    { mes:'Diciembre – Enero', color:'#06b6d4', bg:'rgba(6,182,212,.08)', eventos:[
+      {icon:'📬',tag:'Admisión',titulo:'Notificaciones Early Decision',desc:'Universidades envían decisiones. Atletas con beca confirmada deben aceptar u obtener release.'},
+      {icon:'🏀',tag:'NCAA D1/D2',titulo:'Periodo de Contacto — Basketball intensivo',desc:'Coaches aseguran compromisos pendientes. Visitas oficiales pico.'},
+      {icon:'📝',tag:'NAIA',titulo:'Deadline NAIA Eligibility — Atletas internacionales',desc:'Deadline recomendado para completar proceso en PlayNAIA.org e InCred. Resultados toman 10 días hábiles.'},
+    ]},
+    { mes:'Febrero', color:'#ec4899', bg:'rgba(236,72,153,.08)', eventos:[
+      {icon:'✍️',tag:'NCAA D1/D2 — PRINCIPAL',titulo:'National Signing Day — Football',desc:'Primer miércoles de febrero. El día de firma más importante del año para football americano.'},
+      {icon:'✍️',tag:'NCAA D1/D2',titulo:'Regular Signing Period — Múltiples deportes',desc:'Segunda ventana de firma para Basketball, Soccer, Track & Field, Swimming y más.'},
+      {icon:'🔍',tag:'NVS',titulo:'Revisión de compromisos pendientes',desc:'Atletas sin universidad deben intensificar outreach. Muchas escuelas D2/D3 aún tienen becas disponibles.'},
+    ]},
+    { mes:'Marzo – Abril', color:'#10b981', bg:'rgba(16,185,129,.08)', eventos:[
+      {icon:'🏈',tag:'NCAA D1',titulo:'Spring Evaluation Period — Football',desc:'Coaches evalúan prospectos Class 2027 en sus escuelas y spring games. Primer contacto evaluativo.'},
+      {icon:'✍️',tag:'NCAA D1/D2 — PRINCIPAL',titulo:'Late Signing Period — Baseball, Softball',desc:'Ventana principal de firma para beisbol y softbol. Abril-Mayo.'},
+      {icon:'📋',tag:'NCAA',titulo:'Inicio del proceso — Class of 2027',desc:'Prospectos de HS junior deben registrar el Eligibility Center y comenzar a recolectar documentos académicos.'},
+      {icon:'🎓',tag:'Admisión',titulo:'National Decision Day — 1 de Mayo',desc:'Deadline para que estudiantes acepten oferta universitaria. Atletas ya deben tener NLI firmado o aceptación oficial.'},
+    ]},
+    { mes:'Mayo – Junio', color:'#3b82f6', bg:'rgba(59,130,246,.08)', eventos:[
+      {icon:'📊',tag:'NCAA',titulo:'Envío de transcripts finales',desc:'Seniors deben enviar transcripts del último año al Eligibility Center. Deadline típico: junio.'},
+      {icon:'🌍',tag:'Internacional',titulo:'Solicitud de visado estudiantil F-1',desc:'Con I-20 en mano, iniciar proceso de visa en embajada. Tiempo mínimo recomendado: 2-3 meses antes de arribo.'},
+      {icon:'🏃',tag:'NVS',titulo:'Evaluación Class 2027 — Torneos de verano',desc:'Temporada de showcase. Coaches D1/D2 asisten masivamente. Máxima visibilidad para prospectos junior.'},
+    ]},
+  ];
+
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(170,255,0,.15);">📅</div>
+      <div>
+        <div class="guide-card-title">Calendario Atlético NVS — Temporada de Reclutamiento</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(170,255,0,.12);color:#3a6b00;">NCAA D1 · D2 · D3</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">NAIA</span>
+          <span class="guide-tag" style="background:rgba(59,130,246,.1);color:#1d4ed8;">Atletas Internacionales</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">📌</span>
+        <div><strong>Cómo usar este calendario:</strong> Las fechas marcadas como <strong>CRÍTICO</strong> son las más importantes — un atleta que pierde el Early Signing Period puede perder su beca. Las fechas exactas cambian ligeramente cada año. Siempre verificar en <strong>ncaa.org/sports/2021/2/17/ncaa-signing-periods.aspx</strong></div>
+      </div>
+    </div>
+  </div>
+
+  ${meses.map(m=>`
+  <div class="guide-card" style="border-left:4px solid ${m.color};">
+    <div style="padding:16px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:800;font-family:'Anton',sans-serif;letter-spacing:.5px;">${m.mes}</div>
+    </div>
+    <div class="guide-body" style="display:flex;flex-direction:column;gap:12px;">
+      ${m.eventos.map(e=>`
+      <div style="padding:12px 14px;background:${m.bg};border-radius:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="font-size:18px;flex-shrink:0;">${e.icon}</span>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+              <span style="font-size:11px;font-weight:700;">${e.titulo}</span>
+              <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:${e.tag.includes('CRÍTICO')?'#fee2e2':'rgba(0,0,0,.06)'};color:${e.tag.includes('CRÍTICO')?'#dc2626':'var(--muted)'};">${e.tag}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">${e.desc}</div>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`).join('')}
+
+  <div class="guide-card" style="background:var(--txt);color:white;">
+    <div class="guide-body">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#AAFF00;margin-bottom:10px;">📌 Recursos Oficiales</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${recursoLink('NCAA Signing Periods','ncaa.org')}
+        ${recursoLink('NAIA Eligibility','playnaia.org')}
+        ${recursoLink('NCAA Eligibility Center','eligibilitycenter.org')}
+        ${recursoLink('NLI Program','nationalletter.org')}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function recursoLink(name, url){
+  return`<div style="padding:10px 14px;background:rgba(255,255,255,.08);border-radius:8px;">
+    <div style="font-size:12px;font-weight:700;color:white;">${name}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">${url}</div>
+  </div>`;
 }
 
 /* ── KEYBOARD ── */
