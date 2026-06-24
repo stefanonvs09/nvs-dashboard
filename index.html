@@ -437,7 +437,7 @@ const ALL_MODULES=[
   {id:'tareas',   icon:'✅', name:'Tareas',               accent:'#06b6d4', href:'tareas.html'},
   {id:'guias',    icon:'📖', name:'Guías',                accent:'#8b5cf6', href:'guias.html'},
   {id:'chat',     icon:'🤖', name:'Asistente IA',         accent:'#06b6d4', href:'chat.html'},
-  {id:'ai',       icon:'⚡', name:'AI Performance',       accent:'#AAFF00', href:'ai.html'},
+  {id:'ai',       icon:'⚡', name:'AI Performance',       accent:'#AAFF00', href:'ai.html', newTab:true},
   {id:'reportes', icon:'📊', name:'Reportes',             accent:'#8b5cf6', disabled:true},
 ];
 
@@ -467,6 +467,7 @@ function buildNav(email){
     const dis=m.disabled?' disabled':'';
     const click=m.pin
       ?`onclick="openModule('Dashboard Financiero','pin_finanzas','finanzas.html')"`
+      :m.newTab?`onclick="window.open('${m.href}','_blank')"`
       :m.href?`onclick="selectModule('${m.id}','${m.href}')"`:'';
     const style=`animation:slideIn .35s ${(0.05+i*0.04).toFixed(2)}s both;`;
     return `<div class="nav-item${dis}" id="nav-${m.id}" style="${style}" ${click}>
