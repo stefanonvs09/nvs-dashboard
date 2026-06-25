@@ -1834,7 +1834,34 @@ function renderExamenesSection(){
       </div>
       <div class="guide-alert green">
         <span class="guide-alert-icon">💡</span>
-        <div><strong>Ventaja clave:</strong> Solo $65, resultados en 48 horas y se puede tomar desde casa. Es aceptado por +4,500 universidades. Ideal como alternativa rápida al TOEFL. <strong>No todos los programas D1 lo aceptan</strong> — verificar siempre antes de recomendar.</div>
+        <div><strong>Ventaja clave:</strong> Solo $70, resultados en 48 horas y se puede tomar desde casa. Es aceptado por +4,500 universidades. Ideal como alternativa rápida al TOEFL. <strong>No todos los programas D1 lo aceptan</strong> — verificar siempre antes de recomendar.</div>
+      </div>
+
+      <!-- ── PRÁCTICA GRATIS ── -->
+      <div style="margin-top:18px;padding:18px 20px;background:rgba(34,197,94,.06);border:1.5px solid rgba(34,197,94,.25);border-radius:12px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:20px;">🆓</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#15803d;">Examen de Práctica GRATIS — Paso a Paso</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Duolingo ofrece una prueba gratuita de 15 minutos sin necesidad de pagar nada</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${detStep(1,'Entra a la web oficial','Ve a <strong>englishtest.duolingo.com</strong> desde tu computadora (no funciona en móvil). Haz clic en <strong>"Get started"</strong> o <strong>"Practice free"</strong>.','💻')}
+          ${detStep(2,'Crea tu cuenta gratis','Regístrate con tu email o con tu cuenta de Google. Solo necesitas email, contraseña y tu fecha de nacimiento. <strong>No se requiere tarjeta de crédito.</strong>','📧')}
+          ${detStep(3,'Configura tu perfil','Indica tu objetivo (estudiar en EE.UU., Canadá, etc.) y cómo te enteraste del examen. Toma menos de 1 minuto.','⚙️')}
+          ${detStep(4,'Ve a "Practice" en el menú','Desde tu dashboard, haz clic en <strong>"Practice"</strong> en la barra superior. Verás dos opciones: prueba rápida (15 min) y práctica completa por secciones.','📋')}
+          ${detStep(5,'Elige la prueba rápida (Quick Check)','Haz clic en <strong>"Quick Check"</strong> — es la prueba gratuita de 15 minutos que simula los tipos de preguntas reales del examen. Sin límite de intentos.','⚡')}
+          ${detStep(6,'Prepara tu equipo antes de empezar','Necesitas: computadora con cámara y micrófono, lugar silencioso con buena iluminación, auriculares recomendados. <strong>Desde 2025 también piden un segundo dispositivo</strong> (celular o tablet) como cámara secundaria de supervisión.','🎧')}
+          ${detStep(7,'Completa la prueba','Responde las preguntas de lectura, escritura, escucha y habla tal como en el examen real. La IA evalúa en tiempo real.','✍️')}
+          ${detStep(8,'Revisa tus resultados','Al terminar obtienes un puntaje estimado y retroalimentación por sección. Puedes repetirla todas las veces que quieras, <strong>completamente gratis.</strong>','📊')}
+        </div>
+
+        <div style="margin-top:14px;padding:10px 14px;background:rgba(15,23,42,.04);border-radius:8px;display:flex;align-items:flex-start;gap:8px;">
+          <span style="font-size:14px;flex-shrink:0;">🔗</span>
+          <div style="font-size:12px;color:var(--muted);">Link directo a la prueba rápida: <strong style="color:#15803d;">englishtest.duolingo.com/quick</strong> — también puedes practicar por secciones individuales en <strong style="color:#15803d;">englishtest.duolingo.com/prepare</strong></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1954,6 +1981,15 @@ function renderExamenesSection(){
   `;
 }
 
+function detStep(n,title,body,icon){
+  return`<div style="display:flex;gap:12px;align-items:flex-start;">
+    <div style="width:28px;height:28px;border-radius:50%;background:#15803d;color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${n}</div>
+    <div style="flex:1;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(0,0,0,.06);">
+      <div style="font-size:12px;font-weight:700;margin-bottom:3px;">${icon} ${title}</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">${body}</div>
+    </div>
+  </div>`;
+}
 function examStat(icon,label,val,sub){
   return`<div style="padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
     <div style="font-size:16px;margin-bottom:6px;">${icon}</div>
