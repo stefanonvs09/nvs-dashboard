@@ -353,7 +353,16 @@ function setView(v){
 async function loadEquipo(){
   const{data,error}=await sb.from('nvs_team_tasks')
     .select('*').order('created_at',{ascending:true});
-  if(error){console.error(error);return;}
+  if(error){
+    console.error(error);
+    document.getElementById('members-bar').innerHTML='<span style="font-size:11px;color:#dc2626;padding:4px 8px;">⚠️ Error cargando equipo</span>';
+    document.getElementById('equipo-scroll').innerHTML=`<div class="empty">
+      <div class="empty-icon">⚠️</div>
+      <div class="empty-title">No se pudo cargar la tabla</div>
+      <div class="empty-sub">Ejecuta el SQL de <strong>nvs_team_tasks</strong> en Supabase y recarga la página.<br><br><code style="font-size:10px;background:#f1f5f9;padding:4px 8px;border-radius:6px;">${error.message}</code></div>
+    </div>`;
+    return;
+  }
   TEAM_TASKS=data||[];
   renderMembersBar();
   renderEquipo();
