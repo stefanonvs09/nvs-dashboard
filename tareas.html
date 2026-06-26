@@ -267,9 +267,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 </div>
 
 <script>
+// Auth client — login/logout
 const sb = supabase.createClient(
   'https://mwefvjvvitsondqghgsx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZWZ2anZ2aXRzb25kcWdoZ3N4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTc5ODM3MSwiZXhwIjoyMDk3Mzc0MzcxfQ.kaI4cGXyYzWn9YLvrvOQLDyQ56qCG2EtzB_7rQ9xL2k'
+  'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk'
+);
+// Admin client — DB operations, bypasses RLS (no session stored)
+const db = supabase.createClient(
+  'https://mwefvjvvitsondqghgsx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZWZ2anZ2aXRzb25kcWdoZ3N4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTc5ODM3MSwiZXhwIjoyMDk3Mzc0MzcxfQ.kaI4cGXyYzWn9YLvrvOQLDyQ56qCG2EtzB_7rQ9xL2k',
+  { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
 /* ── STATE ── */
@@ -356,7 +363,7 @@ function setView(v){
    MIS TAREAS (personal)
 ═══════════════════════════════════════ */
 async function loadPersonal(){
-  const{data,error}=await sb.from('nvs_team_tasks')
+  const{data,error}=await db.from('nvs_team_tasks')
     .select('*')
     .eq('user_id',CURRENT_USER.id)
     .order('created_at',{ascending:true});
@@ -470,7 +477,7 @@ function showPForm(){P_FORM=true;renderPersonal();}
 function cancelPForm(){P_FORM=false;renderPersonal();}
 
 async function togglePersonal(id,current){
-  const{error}=await sb.from('nvs_team_tasks').update({completed:!current}).eq('id',id);
+  const{error}=await db.from('nvs_team_tasks').update({completed:!current}).eq('id',id);
   if(error){alert('Error: '+error.message);console.error(error);return;}
   const t=MY_TASKS.find(x=>x.id===id);
   if(t)t.completed=!current;
@@ -479,7 +486,7 @@ async function togglePersonal(id,current){
 
 async function deletePersonal(id){
   if(!confirm('¿Eliminar esta tarea?'))return;
-  const{error}=await sb.from('nvs_team_tasks').delete().eq('id',id);
+  const{error}=await db.from('nvs_team_tasks').delete().eq('id',id);
   if(error){alert('Error: '+error.message);console.error(error);return;}
   MY_TASKS=MY_TASKS.filter(t=>t.id!==id);
   renderPersonalHeader(); renderPersonal();
@@ -491,7 +498,7 @@ async function savePersonal(){
   if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
   const priority=(document.getElementById('pf-priority')||{}).value||'media';
   const due=(document.getElementById('pf-due')||{}).value||null;
-  const{data,error}=await sb.from('nvs_team_tasks').insert({
+  const{data,error}=await db.from('nvs_team_tasks').insert({
     user_id:CURRENT_USER.id, title, priority,
     due_date:due||null, completed:false
   }).select().single();
@@ -523,7 +530,7 @@ function setDept(dept){
 }
 async function loadSemanal(){
   const ws=isoDate(WEEK);
-  const{data,error}=await sb.from('nvs_weekly_tasks')
+  const{data,error}=await db.from('nvs_weekly_tasks')
     .select('*').eq('week_start',ws).order('created_at',{ascending:true});
   if(error){alert('Error: '+error.message);console.error(error);return;}
   SEM_TASKS={placement:[],marketing:[],onboarding:[]};
@@ -539,7 +546,7 @@ function updateSemCounts(){
   });
 }
 async function toggleSemanal(id,current){
-  const{error}=await sb.from('nvs_weekly_tasks').update({completed:!current}).eq('id',id);
+  const{error}=await db.from('nvs_weekly_tasks').update({completed:!current}).eq('id',id);
   if(error){alert('Error: '+error.message);console.error(error);return;}
   const t=SEM_TASKS[DEPT].find(x=>x.id===id);
   if(t)t.completed=!current;
@@ -547,7 +554,7 @@ async function toggleSemanal(id,current){
 }
 async function deleteSemanal(id){
   if(!confirm('¿Eliminar esta tarea?'))return;
-  const{error}=await sb.from('nvs_weekly_tasks').delete().eq('id',id);
+  const{error}=await db.from('nvs_weekly_tasks').delete().eq('id',id);
   if(error){alert('Error: '+error.message);console.error(error);return;}
   SEM_TASKS[DEPT]=SEM_TASKS[DEPT].filter(t=>t.id!==id);
   updateSemCounts();renderSemanal();
@@ -558,7 +565,7 @@ async function saveSemanal(){
   if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
   const assignee=(document.getElementById('sf-assignee')||{}).value||'';
   const priority=(document.getElementById('sf-priority')||{}).value||'media';
-  const{data,error}=await sb.from('nvs_weekly_tasks').insert({
+  const{data,error}=await db.from('nvs_weekly_tasks').insert({
     department:DEPT,week_start:isoDate(WEEK),
     title,assignee:assignee.trim(),priority,completed:false
   }).select().single();
