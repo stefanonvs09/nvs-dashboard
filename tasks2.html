@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVS · Tareas</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#AAFF00;--green-dim:rgba(170,255,0,0.12);--green-dk:#88CC00;
+  --bg:#f8fafc;--card:#fff;--card2:#f1f5f9;--border:rgba(0,0,0,0.08);
+  --muted:#64748b;--txt:#0f172a;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* LOGIN */
+#login-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 15% 50%,rgba(170,255,0,.06) 0%,transparent 60%);}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);}
+.login-box{position:relative;z-index:1;width:360px;max-width:92vw;animation:fadeUp .5s both;}
+.login-logo-wrap{text-align:center;margin-bottom:28px;}
+.login-logo{font-family:'Anton',sans-serif;font-size:56px;color:#0f172a;letter-spacing:3px;}
+.login-logo span{color:var(--green);}
+.login-sub{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;margin-top:6px;}
+.login-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;padding:26px 22px;box-shadow:0 4px 20px rgba(0,0,0,.06);}
+.lf{width:100%;background:#f8fafc;border:1px solid rgba(0,0,0,.09);border-radius:10px;padding:12px 14px;color:var(--txt);font-size:13px;font-family:'Inter',sans-serif;margin-bottom:10px;outline:none;transition:border .2s;}
+.lf:focus{border-color:var(--green);background:#fff;}
+.lf::placeholder{color:#94a3b8;}
+.login-btn{width:100%;background:var(--green);color:#0f172a;border:none;border-radius:10px;padding:13px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.login-btn:hover{background:var(--green-dk);}
+.login-error{color:#dc2626;font-size:12px;margin-top:8px;min-height:14px;text-align:center;font-weight:600;}
+.login-spinner{width:16px;height:16px;border:2px solid rgba(15,23,42,.15);border-top-color:#0f172a;border-radius:50%;animation:spin .7s linear infinite;display:none;margin:8px auto 0;}
+
+/* SHELL */
+#app{display:none;height:100vh;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:52px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tb-left{display:flex;align-items:center;gap:9px;}
+.tb-back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;padding:5px 9px;border-radius:7px;transition:all .15s;text-decoration:none;}
+.tb-back:hover{background:var(--card2);color:var(--txt);}
+.tb-divider{width:1px;height:16px;background:var(--border);}
+.tb-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;}
+.tb-title span{color:var(--green);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-user{display:flex;align-items:center;gap:7px;padding:5px 11px;background:var(--card2);border:1px solid var(--border);border-radius:99px;}
+.tb-avatar{width:20px;height:20px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#3a6b00;}
+.tb-uname{font-size:11px;font-weight:600;color:var(--txt);}
+.btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .15s;font-weight:600;font-family:'Inter',sans-serif;}
+.btn-logout:hover{border-color:rgba(0,0,0,.18);color:var(--txt);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+
+/* VIEW TABS */
+.view-tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
+.view-tab{flex:1;padding:13px 10px;text-align:center;cursor:pointer;font-size:13px;font-weight:800;color:var(--muted);border-bottom:3px solid transparent;transition:all .15s;user-select:none;}
+.view-tab:hover{color:var(--txt);background:var(--bg);}
+.view-tab.active{color:#0f172a;border-bottom-color:#AAFF00;}
+
+/* VIEWS */
+.view{flex:1;display:none;flex-direction:column;min-height:0;overflow:hidden;}
+.view.active{display:flex;}
+
+/* ═══ MIS TAREAS ═══ */
+.my-header{padding:16px 20px 12px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
+.my-header-row{display:flex;align-items:center;justify-content:space-between;}
+.my-header-name{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.3px;}
+.my-header-name span{color:var(--green);}
+.my-header-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.my-progress{margin-top:12px;}
+.my-progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.my-progress-label{font-size:11px;font-weight:600;color:var(--muted);}
+.my-progress-label strong{color:var(--txt);}
+.my-progress-pct{font-size:18px;font-weight:800;font-family:'Anton',sans-serif;color:#3a6b00;}
+.my-progress-track{height:6px;background:var(--card2);border-radius:99px;overflow:hidden;}
+.my-progress-fill{height:100%;background:linear-gradient(90deg,#88CC00,#AAFF00);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+.my-scroll{flex:1;overflow-y:auto;padding:16px 20px 80px;}
+
+/* ═══ SEMANAL ═══ */
+.week-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
+.week-arrow{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);transition:all .15s;font-family:'Inter',sans-serif;}
+.week-arrow:hover{background:var(--card2);color:var(--txt);}
+.week-center{text-align:center;}
+.week-label{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.3px;}
+.week-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:2px;background:var(--green-dim);color:#3a6b00;}
+.week-badge.past{background:var(--card2);color:var(--muted);}
+
+.dept-tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
+.dept-tab{flex:1;padding:10px 8px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;transition:all .15s;user-select:none;}
+.dept-tab:hover{background:var(--bg);}
+.dept-tab.active[data-dept="placement"]{color:#3a6b00;border-bottom-color:#AAFF00;background:rgba(170,255,0,.04);}
+.dept-tab.active[data-dept="marketing"]{color:#6d28d9;border-bottom-color:#8b5cf6;background:rgba(139,92,246,.04);}
+.dept-tab.active[data-dept="onboarding"]{color:#1d4ed8;border-bottom-color:#3b82f6;background:rgba(59,130,246,.04);}
+.tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 4px;border-radius:99px;font-size:9px;font-weight:800;margin-left:5px;background:var(--card2);color:var(--muted);}
+.dept-tab.active[data-dept="placement"] .tab-count{background:rgba(170,255,0,.2);color:#3a6b00;}
+.dept-tab.active[data-dept="marketing"] .tab-count{background:rgba(139,92,246,.15);color:#6d28d9;}
+.dept-tab.active[data-dept="onboarding"] .tab-count{background:rgba(59,130,246,.15);color:#1d4ed8;}
+
+.sem-progress{background:#fff;border:1px solid var(--border);border-radius:11px;padding:12px 15px;margin-bottom:12px;}
+.sem-progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.sem-progress-info{font-size:12px;font-weight:600;color:var(--muted);}
+.sem-progress-info strong{color:var(--txt);}
+.sem-pct{font-size:18px;font-weight:800;font-family:'Anton',sans-serif;}
+.pct-placement{color:#3a6b00;}.pct-marketing{color:#6d28d9;}.pct-onboarding{color:#1d4ed8;}
+.sem-track{height:6px;background:var(--card2);border-radius:99px;overflow:hidden;}
+.sem-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.fill-placement{background:linear-gradient(90deg,#88CC00,#AAFF00);}
+.fill-marketing{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
+.fill-onboarding{background:linear-gradient(90deg,#1d4ed8,#60a5fa);}
+
+.sem-scroll{flex:1;overflow-y:auto;padding:16px 18px 80px;}
+
+/* ═══ SHARED ═══ */
+.task-list{display:flex;flex-direction:column;gap:5px;}
+.task-item{display:flex;align-items:center;gap:10px;padding:11px 13px;background:#fff;border:1px solid var(--border);border-radius:10px;transition:all .13s;animation:slideUp .18s both;}
+.task-item:hover{border-color:rgba(0,0,0,.12);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.task-item.done{opacity:.45;}
+.task-cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.task-cb:hover{border-color:#AAFF00;}
+.task-cb.checked{border-color:#AAFF00;background:#AAFF00;}
+.task-cb .ck{display:none;width:12px;height:12px;}
+.task-cb.checked .ck{display:block;}
+.task-body{flex:1;min-width:0;}
+.task-title{font-size:13px;font-weight:600;line-height:1.3;}
+.task-item.done .task-title{text-decoration:line-through;color:var(--muted);}
+.task-meta{display:flex;align-items:center;gap:5px;margin-top:3px;flex-wrap:wrap;}
+.badge-assignee{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--card2);color:var(--muted);}
+.badge-due{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.badge-due.overdue{background:rgba(239,68,68,.1);color:#b91c1c;}
+.badge-due.today{background:rgba(245,158,11,.12);color:#b45309;}
+.badge-due.soon{background:rgba(59,130,246,.1);color:#1d4ed8;}
+.badge-due.normal{background:var(--card2);color:var(--muted);}
+.badge-pri{font-size:9px;font-weight:800;padding:2px 6px;border-radius:99px;text-transform:uppercase;letter-spacing:.4px;}
+.pri-alta{background:rgba(239,68,68,.1);color:#b91c1c;}
+.pri-media{background:rgba(245,158,11,.1);color:#b45309;}
+.pri-baja{background:rgba(148,163,184,.15);color:#64748b;}
+.task-del{opacity:0;width:24px;height:24px;border:none;background:transparent;cursor:pointer;color:#94a3b8;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .13s;flex-shrink:0;}
+.task-item:hover .task-del{opacity:1;}
+.task-del:hover{background:#fee2e2;color:#dc2626;}
+
+.section-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;padding:8px 2px 4px;}
+
+.add-btn{display:flex;align-items:center;gap:8px;padding:10px 13px;border:2px dashed var(--border);border-radius:10px;cursor:pointer;color:var(--muted);font-size:12px;font-weight:700;transition:all .15s;background:transparent;width:100%;margin-top:6px;font-family:'Inter',sans-serif;}
+.add-btn:hover{border-color:#AAFF00;color:#3a6b00;background:var(--green-dim);}
+
+.add-form{background:#fff;border:1px solid var(--border);border-radius:12px;padding:15px;margin-top:8px;animation:slideUp .15s both;box-shadow:0 4px 14px rgba(0,0,0,.06);}
+.f-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;}
+.tf{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--txt);outline:none;transition:border .2s;}
+.tf:focus{border-color:#AAFF00;background:#fff;}
+.tf::placeholder{color:#94a3b8;}
+.tf-row{display:flex;gap:8px;margin-top:8px;}
+.tf-sel{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'Inter',sans-serif;color:var(--txt);outline:none;cursor:pointer;}
+.tf-sel:focus{border-color:#AAFF00;}
+.form-btns{display:flex;gap:8px;margin-top:10px;}
+.btn-save{flex:1;background:#AAFF00;color:#0f172a;border:none;border-radius:8px;padding:10px;font-family:'Anton',sans-serif;font-size:13px;cursor:pointer;transition:background .2s;}
+.btn-save:hover{background:#88CC00;}
+.btn-cancel{padding:10px 14px;background:var(--card2);color:var(--muted);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-cancel:hover{background:#e2e8f0;}
+
+.empty{text-align:center;padding:40px 20px;color:var(--muted);animation:fadeIn .3s both;}
+.empty-icon{font-size:34px;margin-bottom:8px;}
+.empty-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.empty-sub{font-size:11px;line-height:1.5;}
+.loading-wrap{display:flex;align-items:center;justify-content:center;gap:10px;padding:50px;color:var(--muted);font-size:13px;}
+.spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:#AAFF00;border-radius:50%;animation:spin .7s linear infinite;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay">
+  <div class="login-bg"></div><div class="login-grid"></div>
+  <div class="login-box">
+    <div class="login-logo-wrap">
+      <div class="login-logo">NV<span>S</span></div>
+      <div class="login-sub">New Vision Sports · Tareas</div>
+    </div>
+    <div class="login-card">
+      <input id="login-email" class="lf" type="email" placeholder="Email" autocomplete="email">
+      <input id="login-password" class="lf" type="password" placeholder="Contraseña" autocomplete="current-password">
+      <button class="login-btn" id="login-btn" onclick="doLogin()">ENTRAR</button>
+      <div class="login-error" id="login-error"></div>
+      <div class="login-spinner" id="login-spinner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tb-left">
+      <a class="tb-back" href="index.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Hub
+      </a>
+      <div class="tb-divider"></div>
+      <div class="tb-title">NV<span>S</span> · Tareas</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-user">
+        <div class="tb-avatar" id="tb-avatar">?</div>
+        <div class="tb-uname" id="tb-uname">—</div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="view-tabs">
+      <div class="view-tab active" data-view="personal" onclick="setView('personal')">👤 Mis Tareas</div>
+      <div class="view-tab" data-view="semanal" onclick="setView('semanal')">📅 Semanal</div>
+    </div>
+
+    <!-- ═══ MIS TAREAS ═══ -->
+    <div id="view-personal" class="view active">
+      <div class="my-header">
+        <div class="my-header-row">
+          <div>
+            <div class="my-header-name" id="my-name">Tareas de <span>—</span></div>
+            <div class="my-header-sub" id="my-sub">Cargando...</div>
+          </div>
+        </div>
+        <div class="my-progress" id="my-progress-wrap" style="display:none;">
+          <div class="my-progress-row">
+            <div class="my-progress-label" id="my-progress-label">—</div>
+            <div class="my-progress-pct" id="my-progress-pct">0%</div>
+          </div>
+          <div class="my-progress-track">
+            <div class="my-progress-fill" id="my-progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="my-scroll" id="my-scroll">
+        <div class="loading-wrap"><div class="spin"></div> Cargando...</div>
+      </div>
+    </div>
+
+    <!-- ═══ SEMANAL ═══ -->
+    <div id="view-semanal" class="view">
+      <div class="week-nav">
+        <button class="week-arrow" onclick="changeWeek(-1)">&#8249;</button>
+        <div class="week-center">
+          <div class="week-label" id="week-label">—</div>
+          <div class="week-badge" id="week-badge">—</div>
+        </div>
+        <button class="week-arrow" onclick="changeWeek(1)">&#8250;</button>
+      </div>
+      <div class="dept-tabs">
+        <div class="dept-tab active" data-dept="placement" onclick="setDept('placement')">🎯 Placement<span class="tab-count" id="cnt-p">—</span></div>
+        <div class="dept-tab" data-dept="marketing" onclick="setDept('marketing')">📣 Marketing<span class="tab-count" id="cnt-m">—</span></div>
+        <div class="dept-tab" data-dept="onboarding" onclick="setDept('onboarding')">🎓 Onboarding<span class="tab-count" id="cnt-o">—</span></div>
+      </div>
+      <div class="sem-scroll" id="sem-scroll">
+        <div class="loading-wrap"><div class="spin"></div> Cargando...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const sb = supabase.createClient(
+  'https://mwefvjvvitsondqghgsx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZWZ2anZ2aXRzb25kcWdoZ3N4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTc5ODM3MSwiZXhwIjoyMDk3Mzc0MzcxfQ.kaI4cGXyYzWn9YLvrvOQLDyQ56qCG2EtzB_7rQ9xL2k'
+);
+
+/* ── STATE ── */
+let CURRENT_USER = null;
+let VIEW         = 'personal';
+
+// Personal
+let MY_TASKS   = [];
+let P_FORM     = false;
+
+// Semanal
+const DEPTS    = ['placement','marketing','onboarding'];
+let DEPT       = 'placement';
+let WEEK       = getMonday(new Date());
+let SEM_TASKS  = {placement:[],marketing:[],onboarding:[]};
+let S_FORM     = false;
+
+/* ── DATE ── */
+function getMonday(d){
+  const dt=new Date(d),day=dt.getDay();
+  dt.setDate(dt.getDate()-day+(day===0?-6:1));
+  dt.setHours(0,0,0,0);return dt;
+}
+function isoDate(d){return d.toISOString().split('T')[0];}
+function isThisWeek(d){return isoDate(d)===isoDate(getMonday(new Date()));}
+function weekRange(mon){
+  const sun=new Date(mon);sun.setDate(sun.getDate()+6);
+  const f=mon.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+  const t=sun.toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
+  return `${f} – ${t}`;
+}
+function dueBadge(str){
+  if(!str)return'';
+  const today=new Date();today.setHours(0,0,0,0);
+  const due=new Date(str+'T12:00:00');
+  const diff=Math.round((due-today)/(86400000));
+  const label=due.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+  if(diff<0) return`<span class="badge-due overdue">⚠ Vencida ${label}</span>`;
+  if(diff===0)return`<span class="badge-due today">Hoy</span>`;
+  if(diff<=3) return`<span class="badge-due soon">${label}</span>`;
+  return`<span class="badge-due normal">${label}</span>`;
+}
+
+/* ── AUTH ── */
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-password').value;
+  const err=document.getElementById('login-error');
+  const spin=document.getElementById('login-spinner');
+  const btn=document.getElementById('login-btn');
+  err.textContent='';
+  if(!email||!pass){err.textContent='Ingresa email y contraseña.';return;}
+  btn.style.opacity='.6';btn.style.pointerEvents='none';spin.style.display='block';
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  spin.style.display='none';btn.style.opacity='1';btn.style.pointerEvents='';
+  if(error){err.textContent='Credenciales incorrectas.';return;}
+  initApp(data.user);
+}
+async function doLogout(){await sb.auth.signOut();location.reload();}
+
+function initApp(user){
+  CURRENT_USER=user;
+  document.getElementById('login-overlay').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const name=user.email.split('@')[0];
+  const nameCapitalized=name.charAt(0).toUpperCase()+name.slice(1);
+  document.getElementById('tb-uname').textContent=nameCapitalized;
+  document.getElementById('tb-avatar').textContent=nameCapitalized[0];
+  document.getElementById('my-name').innerHTML=`Tareas de <span>${nameCapitalized}</span>`;
+  loadPersonal();
+  updateWeekUI();
+  loadSemanal();
+}
+
+/* ── VIEW SWITCH ── */
+function setView(v){
+  VIEW=v;
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));
+  document.getElementById('view-personal').classList.toggle('active',v==='personal');
+  document.getElementById('view-semanal').classList.toggle('active',v==='semanal');
+}
+
+/* ═══════════════════════════════════════
+   MIS TAREAS (personal)
+═══════════════════════════════════════ */
+async function loadPersonal(){
+  const{data,error}=await sb.from('nvs_team_tasks')
+    .select('*')
+    .eq('user_id',CURRENT_USER.id)
+    .order('created_at',{ascending:true});
+  if(error){
+    console.error(error);
+    document.getElementById('my-sub').textContent='Error al cargar — '+error.message;
+    document.getElementById('my-scroll').innerHTML=`<div class="empty">
+      <div class="empty-icon">⚠️</div>
+      <div class="empty-title">No se pudo cargar</div>
+      <div class="empty-sub">${esc(error.message)}<br><br>Verifica que la tabla <strong>nvs_team_tasks</strong> existe en Supabase con la columna <strong>user_id</strong>.</div>
+    </div>`;
+    return;
+  }
+  MY_TASKS=data||[];
+  renderPersonalHeader();
+  renderPersonal();
+}
+
+function renderPersonalHeader(){
+  const done=MY_TASKS.filter(t=>t.completed).length;
+  const total=MY_TASKS.length;
+  const pct=total?Math.round(done/total*100):0;
+  const pending=total-done;
+  document.getElementById('my-sub').textContent=
+    total===0?'Sin tareas aún — añade la primera abajo'
+    :`${pending} pendiente${pending!==1?'s':''} · ${done} completada${done!==1?'s':''}`;
+  const wrap=document.getElementById('my-progress-wrap');
+  if(total>0){
+    wrap.style.display='block';
+    document.getElementById('my-progress-label').innerHTML=`<strong>${done}</strong> de <strong>${total}</strong> completadas`;
+    document.getElementById('my-progress-pct').textContent=pct+'%';
+    document.getElementById('my-progress-fill').style.width=pct+'%';
+  } else {
+    wrap.style.display='none';
+  }
+}
+
+function renderPersonal(){
+  const pending=MY_TASKS.filter(t=>!t.completed);
+  const done=MY_TASKS.filter(t=>t.completed);
+  let html='<div class="task-list">';
+
+  if(MY_TASKS.length===0&&!P_FORM){
+    html+=`<div class="empty">
+      <div class="empty-icon">✅</div>
+      <div class="empty-title">Sin tareas todavía</div>
+      <div class="empty-sub">Añade tu primera tarea personal</div>
+    </div>`;
+  } else {
+    if(pending.length){
+      html+=`<div class="section-lbl">Pendientes — ${pending.length}</div>`;
+      pending.forEach((t,i)=>html+=pTaskRow(t,i));
+    }
+    if(done.length){
+      html+=`<div class="section-lbl" style="margin-top:8px;">Completadas — ${done.length}</div>`;
+      done.forEach((t,i)=>html+=pTaskRow(t,pending.length+i));
+    }
+  }
+  html+='</div>';
+
+  if(P_FORM){
+    html+=`<div class="add-form">
+      <div class="f-lbl">Nueva tarea personal</div>
+      <input id="pf-title" class="tf" type="text" placeholder="¿Qué tienes que hacer?" autocomplete="off">
+      <div class="tf-row">
+        <select id="pf-priority" class="tf-sel" style="flex:1;">
+          <option value="alta">🔴 Alta</option>
+          <option value="media" selected>🟡 Media</option>
+          <option value="baja">⚫ Baja</option>
+        </select>
+        <input id="pf-due" class="tf" type="date" style="margin:0;flex:1;" title="Fecha límite (opcional)">
+      </div>
+      <div class="form-btns">
+        <button class="btn-save" onclick="savePersonal()">Guardar</button>
+        <button class="btn-cancel" onclick="cancelPForm()">Cancelar</button>
+      </div>
+    </div>`;
+  } else {
+    html+=`<button class="add-btn" onclick="showPForm()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>Nueva tarea
+    </button>`;
+  }
+
+  document.getElementById('my-scroll').innerHTML=html;
+  if(P_FORM){const inp=document.getElementById('pf-title');if(inp)inp.focus();}
+}
+
+function pTaskRow(t,i){
+  return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s">
+    <div class="task-cb${t.completed?' checked':''}" onclick="togglePersonal('${t.id}',${t.completed})">
+      <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="task-body">
+      <div class="task-title">${esc(t.title)}</div>
+      <div class="task-meta">
+        <span class="badge-pri pri-${t.priority}">${priLabel(t.priority)}</span>
+        ${t.due_date&&!t.completed?dueBadge(t.due_date):''}
+      </div>
+    </div>
+    <button class="task-del" onclick="deletePersonal('${t.id}')" title="Eliminar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+      </svg>
+    </button>
+  </div>`;
+}
+
+function showPForm(){P_FORM=true;renderPersonal();}
+function cancelPForm(){P_FORM=false;renderPersonal();}
+
+async function togglePersonal(id,current){
+  const{error}=await sb.from('nvs_team_tasks').update({completed:!current}).eq('id',id);
+  if(error){alert('Error: '+error.message);console.error(error);return;}
+  const t=MY_TASKS.find(x=>x.id===id);
+  if(t)t.completed=!current;
+  renderPersonalHeader(); renderPersonal();
+}
+
+async function deletePersonal(id){
+  if(!confirm('¿Eliminar esta tarea?'))return;
+  const{error}=await sb.from('nvs_team_tasks').delete().eq('id',id);
+  if(error){alert('Error: '+error.message);console.error(error);return;}
+  MY_TASKS=MY_TASKS.filter(t=>t.id!==id);
+  renderPersonalHeader(); renderPersonal();
+}
+
+async function savePersonal(){
+  const titleEl=document.getElementById('pf-title');
+  const title=titleEl?titleEl.value.trim():'';
+  if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
+  const priority=(document.getElementById('pf-priority')||{}).value||'media';
+  const due=(document.getElementById('pf-due')||{}).value||null;
+  const{data,error}=await sb.from('nvs_team_tasks').insert({
+    user_id:CURRENT_USER.id, title, priority,
+    due_date:due||null, completed:false
+  }).select().single();
+  if(error){alert('Error: '+error.message);console.error(error);return;}
+  MY_TASKS.push(data);
+  P_FORM=false;
+  renderPersonalHeader(); renderPersonal();
+}
+
+/* ═══════════════════════════════════════
+   SEMANAL
+═══════════════════════════════════════ */
+function changeWeek(dir){
+  const d=new Date(WEEK);d.setDate(d.getDate()+dir*7);
+  WEEK=d;S_FORM=false;updateWeekUI();loadSemanal();
+}
+function updateWeekUI(){
+  document.getElementById('week-label').textContent=weekRange(WEEK);
+  const badge=document.getElementById('week-badge');
+  const now=getMonday(new Date());
+  if(isThisWeek(WEEK)){badge.textContent='📍 Semana actual';badge.className='week-badge';}
+  else if(WEEK<now){badge.textContent='← Anterior';badge.className='week-badge past';}
+  else{badge.textContent='Futura →';badge.className='week-badge past';}
+}
+function setDept(dept){
+  DEPT=dept;S_FORM=false;
+  document.querySelectorAll('.dept-tab').forEach(t=>t.classList.toggle('active',t.dataset.dept===dept));
+  renderSemanal();
+}
+async function loadSemanal(){
+  const ws=isoDate(WEEK);
+  const{data,error}=await sb.from('nvs_weekly_tasks')
+    .select('*').eq('week_start',ws).order('created_at',{ascending:true});
+  if(error){alert('Error: '+error.message);console.error(error);return;}
+  SEM_TASKS={placement:[],marketing:[],onboarding:[]};
+  (data||[]).forEach(t=>{if(SEM_TASKS[t.department])SEM_TASKS[t.department].push(t);});
+  updateSemCounts(); renderSemanal();
+}
+function updateSemCounts(){
+  const ids={placement:'cnt-p',marketing:'cnt-m',onboarding:'cnt-o'};
+  DEPTS.forEach(d=>{
+    const arr=SEM_TASKS[d];
+    const done=arr.filter(t=>t.completed).length;
+    document.getElementById(ids[d]).textContent=done+'/'+arr.length;
+  });
+}
+async function toggleSemanal(id,current){
+  const{error}=await sb.from('nvs_weekly_tasks').update({completed:!current}).eq('id',id);
+  if(error){alert('Error: '+error.message);console.error(error);return;}
+  const t=SEM_TASKS[DEPT].find(x=>x.id===id);
+  if(t)t.completed=!current;
+  updateSemCounts();renderSemanal();
+}
+async function deleteSemanal(id){
+  if(!confirm('¿Eliminar esta tarea?'))return;
+  const{error}=await sb.from('nvs_weekly_tasks').delete().eq('id',id);
+  if(error){alert('Error: '+error.message);console.error(error);return;}
+  SEM_TASKS[DEPT]=SEM_TASKS[DEPT].filter(t=>t.id!==id);
+  updateSemCounts();renderSemanal();
+}
+async function saveSemanal(){
+  const titleEl=document.getElementById('sf-title');
+  const title=titleEl?titleEl.value.trim():'';
+  if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
+  const assignee=(document.getElementById('sf-assignee')||{}).value||'';
+  const priority=(document.getElementById('sf-priority')||{}).value||'media';
+  const{data,error}=await sb.from('nvs_weekly_tasks').insert({
+    department:DEPT,week_start:isoDate(WEEK),
+    title,assignee:assignee.trim(),priority,completed:false
+  }).select().single();
+  if(error){alert('Error: '+error.message);console.error(error);return;}
+  SEM_TASKS[DEPT].push(data);
+  S_FORM=false;updateSemCounts();renderSemanal();
+}
+function renderSemanal(){
+  const tasks=SEM_TASKS[DEPT]||[];
+  const done=tasks.filter(t=>t.completed).length;
+  const total=tasks.length;
+  const pct=total?Math.round(done/total*100):0;
+  const dNames={placement:'Placement',marketing:'Marketing',onboarding:'Onboarding'};
+
+  let html=`<div class="sem-progress">
+    <div class="sem-progress-row">
+      <div class="sem-progress-info"><strong>${done}</strong> de <strong>${total}</strong> completadas esta semana</div>
+      <div class="sem-pct pct-${DEPT}">${pct}%</div>
+    </div>
+    <div class="sem-track"><div class="sem-fill fill-${DEPT}" style="width:${pct}%"></div></div>
+  </div><div class="task-list">`;
+
+  const pending=tasks.filter(t=>!t.completed);
+  const done_t=tasks.filter(t=>t.completed);
+
+  if(tasks.length===0&&!S_FORM){
+    html+=`<div class="empty"><div class="empty-icon">📋</div>
+      <div class="empty-title">Sin tareas esta semana</div>
+      <div class="empty-sub">Añade la primera tarea para ${dNames[DEPT]}</div></div>`;
+  } else {
+    if(pending.length){html+=`<div class="section-lbl">Pendientes — ${pending.length}</div>`;pending.forEach((t,i)=>html+=sTaskRow(t,i));}
+    if(done_t.length){html+=`<div class="section-lbl" style="margin-top:8px;">Completadas — ${done_t.length}</div>`;done_t.forEach((t,i)=>html+=sTaskRow(t,pending.length+i));}
+  }
+  html+=`</div>`;
+
+  if(S_FORM){
+    html+=`<div class="add-form">
+      <div class="f-lbl">Nueva tarea — ${dNames[DEPT]}</div>
+      <input id="sf-title" class="tf" type="text" placeholder="Nombre de la tarea…" autocomplete="off">
+      <div class="tf-row">
+        <input id="sf-assignee" class="tf" type="text" placeholder="Responsable" style="margin:0;flex:1;" autocomplete="off">
+        <select id="sf-priority" class="tf-sel">
+          <option value="alta">🔴 Alta</option>
+          <option value="media" selected>🟡 Media</option>
+          <option value="baja">⚫ Baja</option>
+        </select>
+      </div>
+      <div class="form-btns">
+        <button class="btn-save" onclick="saveSemanal()">Guardar tarea</button>
+        <button class="btn-cancel" onclick="cancelSForm()">Cancelar</button>
+      </div>
+    </div>`;
+  } else {
+    html+=`<button class="add-btn" onclick="showSForm()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>Nueva tarea — ${dNames[DEPT]}
+    </button>`;
+  }
+  document.getElementById('sem-scroll').innerHTML=html;
+  if(S_FORM){const inp=document.getElementById('sf-title');if(inp)inp.focus();}
+}
+function showSForm(){S_FORM=true;renderSemanal();}
+function cancelSForm(){S_FORM=false;renderSemanal();}
+
+function sTaskRow(t,i){
+  return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s">
+    <div class="task-cb${t.completed?' checked':''}" onclick="toggleSemanal('${t.id}',${t.completed})">
+      <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="task-body">
+      <div class="task-title">${esc(t.title)}</div>
+      <div class="task-meta">
+        ${t.assignee?`<span class="badge-assignee">👤 ${esc(t.assignee)}</span>`:''}
+        <span class="badge-pri pri-${t.priority}">${priLabel(t.priority)}</span>
+      </div>
+    </div>
+    <button class="task-del" onclick="deleteSemanal('${t.id}')" title="Eliminar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+      </svg>
+    </button>
+  </div>`;
+}
+
+/* ── HELPERS ── */
+function priLabel(p){return{alta:'● Alta',media:'● Media',baja:'● Baja'}[p]||p;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+document.addEventListener('keydown',e=>{
+  const lo=document.getElementById('login-overlay');
+  if(lo.style.display!=='none'){if(e.key==='Enter')doLogin();return;}
+  if(e.key==='Enter'){if(P_FORM)savePersonal();else if(S_FORM)saveSemanal();}
+  if(e.key==='Escape'){if(P_FORM)cancelPForm();else if(S_FORM)cancelSForm();}
+});
+document.addEventListener('DOMContentLoaded',async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(session)initApp(session.user);
+  else document.getElementById('login-overlay').style.display='flex';
+});
+</script>
+</body>
+</html>
