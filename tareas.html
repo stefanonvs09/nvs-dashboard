@@ -766,7 +766,7 @@ function sTaskRow(t,i){
 /* ── HELPERS ── */
 function priLabel(p){return{alta:'● Alta',media:'● Media',baja:'● Baja'}[p]||p;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-const TEAM=['Julio Blanco','Andrea Castillo','Stefano Cano','Diego Julio','Floyd Ramson','Ximena Botello','José Montilla'];
+const TEAM=['Julio Blanco','Andrea Castillo','Stefano Cano','Diego Julio','Floyd Ramson','Ximena Botello','José Montilla','Ariel Ching'];
 function getCheckedAssignees(prefix){return TEAM.filter(n=>document.getElementById(prefix+n.replace(/ /g,'_'))?.checked);}
 function teamChecks(prefix,selected){
   const sel=selected?selected.split(',').map(s=>s.trim()):[];
