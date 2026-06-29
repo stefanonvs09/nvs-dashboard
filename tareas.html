@@ -606,6 +606,14 @@ async function deleteSemanal(id){
   SEM_TASKS[DEPT]=SEM_TASKS[DEPT].filter(t=>t.id!==id);
   updateSemCounts();renderSemanal();
 }
+async function moveToNextWeek(id){
+  const next=new Date(WEEK);next.setDate(next.getDate()+7);
+  const nextIso=isoDate(next);
+  const{error}=await db.from('nvs_weekly_tasks').update({week_start:nextIso,completed:false}).eq('id',id);
+  if(error){alert('Error: '+error.message);return;}
+  SEM_TASKS[DEPT]=SEM_TASKS[DEPT].filter(t=>t.id!==id);
+  updateSemCounts();renderSemanal();
+}
 async function saveSemanal(){
   const titleEl=document.getElementById('sf-title');
   const title=titleEl?titleEl.value.trim():'';
@@ -747,6 +755,11 @@ function sTaskRow(t,i){
       </div>
     </div>
     <div style="display:flex;gap:4px;flex-shrink:0;">
+      <button class="task-del" onclick="moveToNextWeek('${t.id}')" title="Mover a siguiente semana" style="color:#64748b;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+        </svg>
+      </button>
       <button class="task-del" onclick="S_EDIT='${t.id}';S_FORM=false;renderSemanal()" title="Editar" style="color:#64748b;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
