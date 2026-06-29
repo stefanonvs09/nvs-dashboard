@@ -655,7 +655,16 @@ function renderSemanal(){
       <input id="sf-title" class="tf" type="text" placeholder="Nombre de la tarea…" autocomplete="off">
       <textarea id="sf-desc" class="tf" rows="2" placeholder="Descripción (opcional)" style="resize:none;font-family:inherit;font-size:13px;line-height:1.4;"></textarea>
       <div class="tf-row">
-        <input id="sf-assignee" class="tf" type="text" placeholder="Responsable" style="margin:0;flex:1;" autocomplete="off">
+        <select id="sf-assignee" class="tf-sel" style="flex:1;">
+          <option value="">— Sin asignar —</option>
+          <option value="Julio Blanco">Julio Blanco</option>
+          <option value="Andrea Castillo">Andrea Castillo</option>
+          <option value="Estefano Cano">Estefano Cano</option>
+          <option value="Diego Julio">Diego Julio</option>
+          <option value="Floyd Ramson">Floyd Ramson</option>
+          <option value="Jimena Botello">Jimena Botello</option>
+          <option value="José Montilla">José Montilla</option>
+        </select>
         <select id="sf-priority" class="tf-sel">
           <option value="alta">🔴 Alta</option>
           <option value="media" selected>🟡 Media</option>
@@ -703,7 +712,16 @@ function sTaskRow(t,i){
       <input id="se-title" class="tf" type="text" value="${esc(t.title)}" autocomplete="off">
       <textarea id="se-desc" class="tf" rows="2" style="resize:none;font-family:inherit;font-size:13px;line-height:1.4;">${esc(t.description||'')}</textarea>
       <div class="tf-row">
-        <input id="se-assignee" class="tf" type="text" value="${esc(t.assignee||'')}" placeholder="Responsable" style="margin:0;flex:1;" autocomplete="off">
+        <select id="se-assignee" class="tf-sel" style="flex:1;">
+          <option value=""${!t.assignee?' selected':''}>— Sin asignar —</option>
+          <option value="Julio Blanco"${t.assignee==='Julio Blanco'?' selected':''}>Julio Blanco</option>
+          <option value="Andrea Castillo"${t.assignee==='Andrea Castillo'?' selected':''}>Andrea Castillo</option>
+          <option value="Estefano Cano"${t.assignee==='Estefano Cano'?' selected':''}>Estefano Cano</option>
+          <option value="Diego Julio"${t.assignee==='Diego Julio'?' selected':''}>Diego Julio</option>
+          <option value="Floyd Ramson"${t.assignee==='Floyd Ramson'?' selected':''}>Floyd Ramson</option>
+          <option value="Jimena Botello"${t.assignee==='Jimena Botello'?' selected':''}>Jimena Botello</option>
+          <option value="José Montilla"${t.assignee==='José Montilla'?' selected':''}>José Montilla</option>
+        </select>
         <select id="se-priority" class="tf-sel">
           <option value="alta"${t.priority==='alta'?' selected':''}>🔴 Alta</option>
           <option value="media"${t.priority==='media'?' selected':''}>🟡 Media</option>
