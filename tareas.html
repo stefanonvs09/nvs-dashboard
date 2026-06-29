@@ -100,22 +100,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .dept-tab.active[data-dept="placement"]{color:#3a6b00;border-bottom-color:#AAFF00;background:rgba(170,255,0,.04);}
 .dept-tab.active[data-dept="marketing"]{color:#6d28d9;border-bottom-color:#8b5cf6;background:rgba(139,92,246,.04);}
 .dept-tab.active[data-dept="onboarding"]{color:#1d4ed8;border-bottom-color:#3b82f6;background:rgba(59,130,246,.04);}
+.dept-tab.active[data-dept="leads"]{color:#b45309;border-bottom-color:#f59e0b;background:rgba(245,158,11,.04);}
 .tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 4px;border-radius:99px;font-size:9px;font-weight:800;margin-left:5px;background:var(--card2);color:var(--muted);}
 .dept-tab.active[data-dept="placement"] .tab-count{background:rgba(170,255,0,.2);color:#3a6b00;}
 .dept-tab.active[data-dept="marketing"] .tab-count{background:rgba(139,92,246,.15);color:#6d28d9;}
 .dept-tab.active[data-dept="onboarding"] .tab-count{background:rgba(59,130,246,.15);color:#1d4ed8;}
+.dept-tab.active[data-dept="leads"] .tab-count{background:rgba(245,158,11,.15);color:#b45309;}
 
 .sem-progress{background:#fff;border:1px solid var(--border);border-radius:11px;padding:12px 15px;margin-bottom:12px;}
 .sem-progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
 .sem-progress-info{font-size:12px;font-weight:600;color:var(--muted);}
 .sem-progress-info strong{color:var(--txt);}
 .sem-pct{font-size:18px;font-weight:800;font-family:'Anton',sans-serif;}
-.pct-placement{color:#3a6b00;}.pct-marketing{color:#6d28d9;}.pct-onboarding{color:#1d4ed8;}
+.pct-placement{color:#3a6b00;}.pct-marketing{color:#6d28d9;}.pct-onboarding{color:#1d4ed8;}.pct-leads{color:#b45309;}
 .sem-track{height:6px;background:var(--card2);border-radius:99px;overflow:hidden;}
 .sem-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
 .fill-placement{background:linear-gradient(90deg,#88CC00,#AAFF00);}
 .fill-marketing{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
 .fill-onboarding{background:linear-gradient(90deg,#1d4ed8,#60a5fa);}
+.fill-leads{background:linear-gradient(90deg,#d97706,#fbbf24);}
 
 .sem-scroll{flex:1;overflow-y:auto;padding:16px 18px 80px;}
 
@@ -262,6 +265,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         <div class="dept-tab active" data-dept="placement" onclick="setDept('placement')">🎯 Placement<span class="tab-count" id="cnt-p">—</span></div>
         <div class="dept-tab" data-dept="marketing" onclick="setDept('marketing')">📣 Marketing<span class="tab-count" id="cnt-m">—</span></div>
         <div class="dept-tab" data-dept="onboarding" onclick="setDept('onboarding')">🎓 Onboarding<span class="tab-count" id="cnt-o">—</span></div>
+        <div class="dept-tab" data-dept="leads" onclick="setDept('leads')">🔥 Leads<span class="tab-count" id="cnt-l">—</span></div>
       </div>
       <div class="sem-scroll" id="sem-scroll">
         <div class="loading-wrap"><div class="spin"></div> Cargando...</div>
@@ -294,10 +298,10 @@ let P_FORM     = false;
 let P_EDIT     = null; // id of personal task being edited
 
 // Semanal
-const DEPTS    = ['placement','marketing','onboarding'];
+const DEPTS    = ['placement','marketing','onboarding','leads'];
 let DEPT       = 'placement';
 let WEEK       = getMonday(new Date());
-let SEM_TASKS  = {placement:[],marketing:[],onboarding:[]};
+let SEM_TASKS  = {placement:[],marketing:[],onboarding:[],leads:[]};
 let S_FORM     = false;
 let S_EDIT     = null; // id of semanal task being edited
 
@@ -584,12 +588,12 @@ async function loadSemanal(){
   const{data,error}=await db.from('nvs_weekly_tasks')
     .select('*').eq('week_start',ws).order('created_at',{ascending:true});
   if(error){alert('Error: '+error.message);console.error(error);return;}
-  SEM_TASKS={placement:[],marketing:[],onboarding:[]};
+  SEM_TASKS={placement:[],marketing:[],onboarding:[],leads:[]};
   (data||[]).forEach(t=>{if(SEM_TASKS[t.department])SEM_TASKS[t.department].push(t);});
   updateSemCounts(); renderSemanal();
 }
 function updateSemCounts(){
-  const ids={placement:'cnt-p',marketing:'cnt-m',onboarding:'cnt-o'};
+  const ids={placement:'cnt-p',marketing:'cnt-m',onboarding:'cnt-o',leads:'cnt-l'};
   DEPTS.forEach(d=>{
     const arr=SEM_TASKS[d];
     const done=arr.filter(t=>t.completed).length;
@@ -638,7 +642,7 @@ function renderSemanal(){
   const done=tasks.filter(t=>t.completed).length;
   const total=tasks.length;
   const pct=total?Math.round(done/total*100):0;
-  const dNames={placement:'Placement',marketing:'Marketing',onboarding:'Onboarding'};
+  const dNames={placement:'Placement',marketing:'Marketing',onboarding:'Onboarding',leads:'Leads'};
 
   let html=`<div class="sem-progress">
     <div class="sem-progress-row">
@@ -707,7 +711,7 @@ async function saveEditSemanal(id){
 }
 
 function sTaskRow(t,i){
-  const dNames={placement:'Placement',marketing:'Marketing',onboarding:'Onboarding'};
+  const dNames={placement:'Placement',marketing:'Marketing',onboarding:'Onboarding',leads:'Leads'};
   if(S_EDIT===t.id){
     return`<div class="add-form" style="margin-bottom:6px;">
       <div class="f-lbl">Editar tarea — ${dNames[DEPT]}</div>
