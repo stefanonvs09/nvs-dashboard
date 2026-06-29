@@ -582,6 +582,10 @@ body{background:#f8fafc;color:#0f172a;}
       <button class="btn-back" onclick="window.location='index.html'">← Módulos</button>
       <input class="tsearch" id="search" placeholder="🔍  Buscar lead..." oninput="applyFilters()">
       <span class="tcnt" id="cnt"></span>
+      <button id="btn-sort-status" onclick="toggleSortStatus()" title="Ordenar por estado" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:7px 12px;font-size:11px;font-weight:700;color:var(--m2);cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        Estado
+      </button>
       <div class="view-btns">
         <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')" title="Kanban">⬛</button>
         <button class="vbtn" id="vbtn-l" onclick="setView('list')" title="Lista">☰</button>
@@ -756,7 +760,8 @@ const esc   = s => (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;')
 
 const REC_COLORS = ['#AAFF00','#60a5fa','#fbbf24','#a78bfa','#2dd4bf','#f472b6','#fb923c','#f87171'];
 
-let ALL=[], FLT=[], SF='', curView='kanban', recFilter='', dragId=null, editId=null, curModule='';
+let ALL=[], FLT=[], SF='', curView='kanban', recFilter='', dragId=null, editId=null, curModule='', SORT_STATUS=false;
+const STATUS_ORDER={'Contactado':0,'Nuevo':1,'Interesado':2,'En Negociacion':3,'Contract Sent':4,'Delayed Sign Up':5,'Firmado':6,'Perdido':7};
 
 /* AUTH */
 async function init(){
@@ -961,6 +966,7 @@ function applyFilters(){
     if(qs&&!`${a.nombre} ${a.deporte} ${a.pais} ${a.ciudad} ${a.recruiter} ${a.notas}`.toLowerCase().includes(qs))return false;
     return true;
   });
+  if(SORT_STATUS) FLT.sort((a,b)=>(STATUS_ORDER[a.estado]??9)-(STATUS_ORDER[b.estado]??9));
   renderStats();
   render();
   q('#cnt').textContent=`${FLT.length} lead${FLT.length!==1?'s':''}`;
@@ -1244,6 +1250,12 @@ async function doAssign(recruiter){
   } else toast('Error: '+error.message,'err');
 }
 function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').classList.toggle('open');}
+function toggleSortStatus(){
+  SORT_STATUS=!SORT_STATUS;
+  const btn=q('#btn-sort-status');
+  if(btn){btn.style.background=SORT_STATUS?'rgba(170,255,0,0.12)':'rgba(255,255,255,0.05)';btn.style.borderColor=SORT_STATUS?'#AAFF00':'rgba(255,255,255,0.1)';btn.style.color=SORT_STATUS?'#AAFF00':'var(--m2)';}
+  applyFilters();
+}
 
 async function updateEst(id,ne){
   const {error}=await sb.from('leads').update({estado:ne,updated_at:new Date().toISOString()}).eq('id',id);
