@@ -392,6 +392,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 
 <script>
 const sb=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk');
+const db=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZWZ2anZ2aXRzb25kcWdoZ3N4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTc5ODM3MSwiZXhwIjoyMDk3Mzc0MzcxfQ.kaI4cGXyYzWn9YLvrvOQLDyQ56qCG2EtzB_7rQ9xL2k',{auth:{autoRefreshToken:false,persistSession:false}});
 
 /* ── AUTH ── */
 async function doLogin(){
@@ -558,7 +559,7 @@ async function showPlatform(user){
     const fc=document.getElementById('fin-stats-card');if(fc)fc.style.display='block';
     loadFinanceStats();
   }
-  if(!isSD&&!isIH)loadWeekTasks(user.email);
+  if(!isSD&&!isIH)loadWeekTasks(user);
 }
 
 /* ── CLOCK ── */
@@ -636,37 +637,31 @@ function fmtWeekDate(dateStr){
   const d=new Date(dateStr+'T12:00:00');
   return['dom','lun','mar','mié','jue','vie','sáb'][d.getDay()]+' '+d.getDate();
 }
-async function loadWeekTasks(email){
-  const em=email.toLowerCase();
-  const today=new Date();
-  const todayStr=today.toISOString().substring(0,10);
-  const endOfWeek=new Date(today);
-  const dow=today.getDay();
-  endOfWeek.setDate(today.getDate()+(dow===0?0:7-dow));
-  const endStr=endOfWeek.toISOString().substring(0,10);
-  const {data,error}=await sb.from('tareas')
-    .select('id,titulo,prioridad,fecha_vencimiento')
-    .eq('asignado_a',em).eq('completado',false)
-    .gte('fecha_vencimiento',todayStr).lte('fecha_vencimiento',endStr)
-    .order('fecha_vencimiento',{ascending:true}).limit(10);
+async function loadWeekTasks(user){
+  const todayStr=new Date().toISOString().substring(0,10);
+  const {data,error}=await db.from('nvs_team_tasks')
+    .select('id,title,priority,due_date')
+    .eq('user_id',user.id).eq('completed',false)
+    .order('due_date',{ascending:true,nullsFirst:false}).limit(10);
   if(error)return;
   const widget=document.getElementById('tasks-widget');
   const list=document.getElementById('tw-list');
   if(!widget||!list)return;
   widget.style.display='block';
   const tasks=data||[];
-  if(tasks.length===0){list.innerHTML='<div class="tw-empty">✅ Sin tareas pendientes<br>esta semana</div>';return;}
+  if(tasks.length===0){list.innerHTML='<div class="tw-empty">✅ Sin tareas pendientes</div>';return;}
   const shown=tasks.slice(0,5);
   const extra=tasks.length-shown.length;
-  const pc={Alta:'tw-prio-alta',Normal:'tw-prio-normal',Baja:'tw-prio-baja'};
+  const pc={alta:'tw-prio-alta',media:'tw-prio-normal',baja:'tw-prio-baja'};
   list.innerHTML=shown.map(t=>{
-    const isHoy=t.fecha_vencimiento===todayStr;
-    const dateLbl=isHoy?`<span class="tbadge-hoy">Hoy</span>`:`<span>${fmtWeekDate(t.fecha_vencimiento)}</span>`;
+    const isHoy=t.due_date===todayStr;
+    const isVencida=t.due_date&&t.due_date<todayStr;
+    const dateLbl=!t.due_date?'':(isVencida?`<span class="tbadge-hoy">Vencida</span>`:isHoy?`<span class="tbadge-hoy">Hoy</span>`:`<span>${fmtWeekDate(t.due_date)}</span>`);
     return `<div class="task-row" onclick="selectModule('tareas','tareas.html')">
       <div class="task-check"></div>
       <div class="task-body">
-        <div class="task-title">${t.titulo}</div>
-        <div class="task-meta"><span class="${pc[t.prioridad]||'tw-prio-normal'}">●</span>${dateLbl}</div>
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta"><span class="${pc[t.priority]||'tw-prio-normal'}">●</span>${dateLbl}</div>
       </div>
     </div>`;
   }).join('')+(extra>0?`<div style="text-align:center;padding:6px 0;font-size:10px;color:var(--muted);font-weight:700;">+${extra} más →</div>`:'');
