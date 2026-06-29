@@ -287,6 +287,7 @@ let VIEW         = 'personal';
 // Personal
 let MY_TASKS   = [];
 let P_FORM     = false;
+let P_EDIT     = null; // id of personal task being edited
 
 // Semanal
 const DEPTS    = ['placement','marketing','onboarding'];
@@ -294,6 +295,7 @@ let DEPT       = 'placement';
 let WEEK       = getMonday(new Date());
 let SEM_TASKS  = {placement:[],marketing:[],onboarding:[]};
 let S_FORM     = false;
+let S_EDIT     = null; // id of semanal task being edited
 
 /* ── DATE ── */
 function getMonday(d){
@@ -456,6 +458,25 @@ function renderPersonal(){
 }
 
 function pTaskRow(t,i){
+  if(P_EDIT===t.id){
+    return`<div class="add-form" style="margin-bottom:6px;">
+      <div class="f-lbl">Editar tarea</div>
+      <input id="pe-title" class="tf" type="text" value="${esc(t.title)}" autocomplete="off">
+      <textarea id="pe-desc" class="tf" rows="2" style="resize:none;font-family:inherit;font-size:13px;line-height:1.4;">${esc(t.description||'')}</textarea>
+      <div class="tf-row">
+        <select id="pe-priority" class="tf-sel" style="flex:1;">
+          <option value="alta"${t.priority==='alta'?' selected':''}>🔴 Alta</option>
+          <option value="media"${t.priority==='media'?' selected':''}>🟡 Media</option>
+          <option value="baja"${t.priority==='baja'?' selected':''}>⚫ Baja</option>
+        </select>
+        <input id="pe-due" class="tf" type="date" style="margin:0;flex:1;" value="${t.due_date||''}">
+      </div>
+      <div class="form-btns">
+        <button class="btn-save" onclick="saveEditPersonal('${t.id}')">Guardar</button>
+        <button class="btn-cancel" onclick="P_EDIT=null;renderPersonal()">Cancelar</button>
+      </div>
+    </div>`;
+  }
   return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s">
     <div class="task-cb${t.completed?' checked':''}" onclick="togglePersonal('${t.id}',${t.completed})">
       <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
@@ -468,16 +489,38 @@ function pTaskRow(t,i){
         ${t.due_date&&!t.completed?dueBadge(t.due_date):''}
       </div>
     </div>
-    <button class="task-del" onclick="deletePersonal('${t.id}')" title="Eliminar">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
-      </svg>
-    </button>
+    <div style="display:flex;gap:4px;flex-shrink:0;">
+      <button class="task-del" onclick="P_EDIT='${t.id}';P_FORM=false;renderPersonal()" title="Editar" style="color:#64748b;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
+      <button class="task-del" onclick="deletePersonal('${t.id}')" title="Eliminar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+        </svg>
+      </button>
+    </div>
   </div>`;
 }
 
-function showPForm(){P_FORM=true;renderPersonal();}
+function showPForm(){P_FORM=true;P_EDIT=null;renderPersonal();}
 function cancelPForm(){P_FORM=false;renderPersonal();}
+async function saveEditPersonal(id){
+  const titleEl=document.getElementById('pe-title');
+  const title=titleEl?titleEl.value.trim():'';
+  if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
+  const priority=(document.getElementById('pe-priority')||{}).value||'media';
+  const due=(document.getElementById('pe-due')||{}).value||null;
+  const description=(document.getElementById('pe-desc')||{}).value?.trim()||'';
+  const{data,error}=await db.from('nvs_team_tasks').update({title,priority,due_date:due||null,description}).eq('id',id).select().single();
+  if(error){alert('Error: '+error.message);return;}
+  const idx=MY_TASKS.findIndex(t=>t.id===id);
+  if(idx>-1)MY_TASKS[idx]=data;
+  P_EDIT=null;
+  renderPersonalHeader();renderPersonal();
+}
 
 async function togglePersonal(id,current){
   const{error}=await db.from('nvs_team_tasks').update({completed:!current}).eq('id',id);
@@ -634,10 +677,45 @@ function renderSemanal(){
   document.getElementById('sem-scroll').innerHTML=html;
   if(S_FORM){const inp=document.getElementById('sf-title');if(inp)inp.focus();}
 }
-function showSForm(){S_FORM=true;renderSemanal();}
+function showSForm(){S_FORM=true;S_EDIT=null;renderSemanal();}
 function cancelSForm(){S_FORM=false;renderSemanal();}
+async function saveEditSemanal(id){
+  const titleEl=document.getElementById('se-title');
+  const title=titleEl?titleEl.value.trim():'';
+  if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
+  const assignee=(document.getElementById('se-assignee')||{}).value?.trim()||'';
+  const priority=(document.getElementById('se-priority')||{}).value||'media';
+  const description=(document.getElementById('se-desc')||{}).value?.trim()||'';
+  const{data,error}=await db.from('nvs_weekly_tasks').update({title,assignee,priority,description}).eq('id',id).select().single();
+  if(error){alert('Error: '+error.message);return;}
+  const list=SEM_TASKS[DEPT];
+  const idx=list.findIndex(t=>t.id===id);
+  if(idx>-1)list[idx]=data;
+  S_EDIT=null;
+  updateSemCounts();renderSemanal();
+}
 
 function sTaskRow(t,i){
+  const dNames={placement:'Placement',marketing:'Marketing',onboarding:'Onboarding'};
+  if(S_EDIT===t.id){
+    return`<div class="add-form" style="margin-bottom:6px;">
+      <div class="f-lbl">Editar tarea — ${dNames[DEPT]}</div>
+      <input id="se-title" class="tf" type="text" value="${esc(t.title)}" autocomplete="off">
+      <textarea id="se-desc" class="tf" rows="2" style="resize:none;font-family:inherit;font-size:13px;line-height:1.4;">${esc(t.description||'')}</textarea>
+      <div class="tf-row">
+        <input id="se-assignee" class="tf" type="text" value="${esc(t.assignee||'')}" placeholder="Responsable" style="margin:0;flex:1;" autocomplete="off">
+        <select id="se-priority" class="tf-sel">
+          <option value="alta"${t.priority==='alta'?' selected':''}>🔴 Alta</option>
+          <option value="media"${t.priority==='media'?' selected':''}>🟡 Media</option>
+          <option value="baja"${t.priority==='baja'?' selected':''}>⚫ Baja</option>
+        </select>
+      </div>
+      <div class="form-btns">
+        <button class="btn-save" onclick="saveEditSemanal('${t.id}')">Guardar</button>
+        <button class="btn-cancel" onclick="S_EDIT=null;renderSemanal()">Cancelar</button>
+      </div>
+    </div>`;
+  }
   return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s">
     <div class="task-cb${t.completed?' checked':''}" onclick="toggleSemanal('${t.id}',${t.completed})">
       <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
@@ -650,11 +728,19 @@ function sTaskRow(t,i){
         <span class="badge-pri pri-${t.priority}">${priLabel(t.priority)}</span>
       </div>
     </div>
-    <button class="task-del" onclick="deleteSemanal('${t.id}')" title="Eliminar">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
-      </svg>
-    </button>
+    <div style="display:flex;gap:4px;flex-shrink:0;">
+      <button class="task-del" onclick="S_EDIT='${t.id}';S_FORM=false;renderSemanal()" title="Editar" style="color:#64748b;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
+      <button class="task-del" onclick="deleteSemanal('${t.id}')" title="Eliminar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+        </svg>
+      </button>
+    </div>
   </div>`;
 }
 
