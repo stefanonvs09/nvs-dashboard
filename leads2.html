@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVS · Leads</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#AAFF00;--green-bg:rgba(170,255,0,0.10);--green-dk:#88CC00;--green-glow:rgba(170,255,0,0.15);
+  --bg:#f8fafc;--sb:#ffffff;--card:#ffffff;--card2:#f1f5f9;--card3:#e2e8f0;
+  --b:rgba(0,0,0,0.08);--b2:rgba(0,0,0,0.14);
+  --txt:#0f172a;--m:#64748b;--m2:#64748b;--m3:#334155;
+  --blue:#3b82f6;--amber:#d97706;--purple:#7c3aed;--red:#dc2626;--teal:#0d9488;--pink:#db2777;--orange:#ea580c;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);display:flex;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.07);border-radius:2px;}
+
+/* HOME SCREEN */
+#home-screen{position:fixed;inset:0;z-index:500;background:radial-gradient(ellipse at 50% -5%,rgba(170,255,0,0.04) 0%,var(--bg) 60%);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;}
+.home-logo{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:48px;opacity:.7;}
+.home-logo span{color:var(--green);}
+.home-title{font-family:'Anton',sans-serif;font-size:clamp(32px,5vw,52px);text-align:center;letter-spacing:-.5px;line-height:1.1;margin-bottom:10px;}
+.home-sub{font-size:12px;color:var(--m2);font-weight:600;text-align:center;letter-spacing:.5px;margin-bottom:48px;}
+.home-cards{display:flex;gap:18px;width:100%;max-width:820px;}
+.home-card{flex:1;background:linear-gradient(155deg,#141414,#0e0e0e);border-radius:22px;padding:32px 28px;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.5,.64,1),box-shadow .25s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:0;}
+.home-card::before{content:'';position:absolute;inset:0;border-radius:22px;padding:1px;background:linear-gradient(135deg,var(--hc-color,rgba(255,255,255,0.12)),transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}
+.home-card:hover{transform:translateY(-8px) scale(1.01);box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px var(--hc-color,rgba(255,255,255,0.1));}
+.home-card-glow{position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:var(--hc-color,rgba(255,255,255,0.05));filter:blur(55px);opacity:.35;pointer-events:none;}
+.home-card-icon{font-size:36px;margin-bottom:18px;}
+.home-card-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:99px;padding:4px 12px;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--m2);margin-bottom:14px;}
+.home-card-tag span{width:5px;height:5px;border-radius:50%;background:var(--hc-color);}
+.home-card-title{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:-.3px;line-height:1.1;margin-bottom:8px;}
+.home-card-desc{font-size:11px;color:var(--m2);line-height:1.6;margin-bottom:24px;flex:1;}
+.home-card-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.06);padding-top:20px;margin-bottom:24px;}
+.home-stat{flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.05);}
+.home-stat:last-child{border-right:none;}
+.home-stat-n{font-family:'Anton',sans-serif;font-size:26px;color:var(--hc-color);line-height:1;}
+.home-stat-l{font-size:9px;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
+.home-card-btn{width:100%;padding:13px;border-radius:12px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.home-card-btn.green{background:var(--green);color:#000;box-shadow:0 0 28px rgba(170,255,0,0.25);}
+.home-card-btn.green:hover{background:var(--green-dk);box-shadow:0 0 44px rgba(170,255,0,0.4);}
+.home-card-btn.blue{background:rgba(96,165,250,0.15);color:var(--blue);border:1px solid rgba(96,165,250,0.3);}
+.home-card-btn.blue:hover{background:rgba(96,165,250,0.25);}
+@keyframes homeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.home-card{animation:homeIn .4s cubic-bezier(.34,1.5,.64,1) both;}
+.home-card:nth-child(2){animation-delay:.08s;}
+@media(max-width:640px){.home-cards{flex-direction:column;}.home-title{font-size:28px;}.home-card{padding:24px 20px;}}
+
+/* TOPBAR BACK BTN */
+.btn-back{background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;padding:7px 13px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;color:var(--m3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.btn-back:hover{border-color:var(--b2);color:var(--txt);}
+.btn-web{background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:8px 16px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;color:var(--blue);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .18s;display:flex;align-items:center;gap:8px;}
+.btn-web:hover,.btn-web.active{background:rgba(96,165,250,0.15);border-color:rgba(96,165,250,0.35);}
+.btn-web.active{background:rgba(96,165,250,0.18);}
+.btn-web span{background:rgba(96,165,250,0.2);color:var(--blue);border-radius:99px;padding:1px 8px;font-size:10px;}
+
+/* LOGIN */
+#login-ov{position:fixed;inset:0;background:radial-gradient(ellipse at 50% -10%,rgba(170,255,0,0.05) 0%,var(--bg) 55%);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.lbox{width:380px;background:rgba(14,14,14,0.96);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.09);border-radius:24px;padding:46px 42px;box-shadow:0 48px 96px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,0.04);}
+.lbox-logo{font-family:'Anton',sans-serif;font-size:58px;text-align:center;letter-spacing:2px;}
+.lbox-logo span{color:var(--green);text-shadow:0 0 28px var(--green-glow);}
+.lbox-sub{text-align:center;font-size:9px;letter-spacing:3px;color:var(--m2);text-transform:uppercase;margin-bottom:34px;margin-top:4px;}
+.lbox-err{color:var(--red);font-size:11px;text-align:center;min-height:16px;margin-bottom:6px;}
+.lf{margin-bottom:14px;}
+.lf label{display:block;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--m2);text-transform:uppercase;margin-bottom:5px;}
+.fi{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:10px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:13px;padding:11px 14px;outline:none;transition:border .15s,background .15s;}
+.fi:focus{border-color:rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);}
+.btn-g{background:var(--green);color:#000;border:none;border-radius:11px;padding:13px;width:100%;font-family:'Montserrat',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-top:8px;transition:all .2s ease;box-shadow:0 0 28px var(--green-glow);}
+.btn-g:hover{background:var(--green-dk);box-shadow:0 0 40px rgba(170,255,0,.38);transform:translateY(-1px);}
+
+/* APP */
+.app{display:flex;width:100%;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:222px;flex-shrink:0;background:var(--sb);border-right:1px solid var(--b);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.sb-top{padding:22px 18px 18px;border-bottom:1px solid var(--b);}
+.sb-logo{font-family:'Anton',sans-serif;font-size:34px;letter-spacing:1px;}
+.sb-logo span{color:var(--green);text-shadow:0 0 18px var(--green-glow);}
+.sb-logo-tag{display:block;font-size:8px;font-weight:700;letter-spacing:2.5px;color:var(--m2);text-transform:uppercase;margin-top:5px;}
+.sb-body{flex:1;overflow-y:auto;padding:16px 12px;}
+.sb-lbl{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--m);text-transform:uppercase;padding:0 8px;margin:18px 0 8px;}
+.sb-lbl:first-child{margin-top:0;}
+.fsel{display:block;width:100%;margin-bottom:8px;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;padding:9px 11px;outline:none;cursor:pointer;transition:border .15s;}
+.fsel:focus{border-color:var(--b2);}
+.sb-rec{display:flex;flex-direction:column;gap:3px;padding:0 2px;}
+.rec-tag{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:all .18s ease;font-size:11px;font-weight:600;color:var(--m3);}
+.rec-tag:hover{background:rgba(255,255,255,0.04);color:var(--txt);}
+.rec-tag.active{background:var(--green-bg);color:var(--green);box-shadow:inset 0 0 0 1px rgba(170,255,0,0.15);}
+.rec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 7px currentColor;}
+.sb-foot{padding:14px 18px;border-top:1px solid var(--b);}
+.sb-foot a{color:var(--m2);font-size:11px;font-weight:700;text-decoration:none;transition:color .15s;}
+.sb-foot a:hover{color:var(--txt);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--b);flex-shrink:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(24px);}
+.tsearch{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:10px;padding:9px 15px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;transition:all .15s;}
+.tsearch:focus{border-color:rgba(255,255,255,0.16);background:rgba(255,255,255,0.06);}
+.tcnt{font-size:11px;color:var(--m2);font-weight:600;white-space:nowrap;}
+.view-btns{display:flex;gap:4px;}
+.vbtn{background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:13px;transition:all .15s;}
+.vbtn.active{background:var(--green-bg);border-color:rgba(170,255,0,0.25);}
+.btn-add{background:var(--green);color:#000;border:none;border-radius:10px;padding:9px 20px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s ease;box-shadow:0 0 22px var(--green-glow);}
+.btn-add:hover{background:var(--green-dk);box-shadow:0 0 36px rgba(170,255,0,.42);transform:translateY(-1px);}
+
+/* STATS BAR */
+.stats-bar{display:flex;border-bottom:1px solid var(--b);flex-shrink:0;}
+.stat{flex:1;padding:12px 8px;cursor:pointer;transition:background .15s;text-align:center;border-right:1px solid var(--b);position:relative;}
+.stat:last-child{border-right:none;}
+.stat:hover{background:rgba(255,255,255,0.02);}
+.stat.sf{background:rgba(255,255,255,0.025);}
+.stat.sf::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;border-radius:2px 2px 0 0;background:currentColor;opacity:.5;}
+.stat-n{font-family:'Anton',sans-serif;font-size:26px;line-height:1;letter-spacing:-.5px;}
+.stat-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--m2);margin-top:3px;}
+
+/* KANBAN */
+.kboard-wrap{flex:1;overflow-x:auto;overflow-y:hidden;padding:14px;}
+.kboard{display:flex;gap:12px;height:100%;min-width:max-content;}
+.kol{width:264px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(13,13,13,0.85);backdrop-filter:blur(12px);border-radius:16px;border:1px solid rgba(255,255,255,0.055);overflow:hidden;max-height:100%;}
+.kol-hd{padding:13px 15px;display:flex;align-items:center;gap:9px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.045);background:rgba(255,255,255,0.02);}
+.kol-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.kol-nm{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;flex:1;}
+.kol-cnt{background:rgba(255,255,255,0.07);color:var(--m3);font-size:9px;font-weight:800;padding:3px 9px;border-radius:99px;letter-spacing:.3px;}
+.kol-bd{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:7px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.05) transparent;}
+.kol-bd.dov{background:rgba(170,255,0,0.03);outline:1.5px dashed rgba(170,255,0,0.22);outline-offset:-3px;border-radius:10px;}
+.kol-empty{display:flex;align-items:center;justify-content:center;flex:1;min-height:60px;color:var(--m);font-size:11px;font-weight:600;text-align:center;padding:16px;}
+
+/* CARDS */
+.card{background:linear-gradient(160deg,#1b1b1b 0%,#141414 100%);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:13px;cursor:grab;transition:transform .3s cubic-bezier(.34,1.5,.64,1),box-shadow .22s ease,border-color .2s ease;border-top-width:2.5px;user-select:none;}
+.card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-5px);box-shadow:0 28px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,0.06);}
+.card.dragging{opacity:.14;cursor:grabbing;transform:scale(0.97);}
+.card-top{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.ava{width:37px;height:37px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#000;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.55);}
+.card-nm{font-size:12px;font-weight:800;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.1px;}
+.card-sp{font-size:10px;color:var(--m2);margin-top:1px;}
+.card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.tag{font-size:8px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;}
+.tag-src{background:rgba(96,165,250,0.1);color:var(--blue);border:1px solid rgba(96,165,250,0.18);}
+.tag-rec{background:rgba(167,139,250,0.1);color:var(--purple);border:1px solid rgba(167,139,250,0.18);}
+.tag-pais{background:rgba(45,212,191,0.1);color:var(--teal);border:1px solid rgba(45,212,191,0.18);}
+.tag-dup{background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.card-ft{display:flex;align-items:center;gap:6px;}
+.card-notas{font-size:9px;color:var(--m);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.btn-wa{display:inline-flex;align-items:center;gap:3px;background:#1DB954;color:#fff;border:none;border-radius:7px;padding:5px 9px;font-size:9px;font-weight:700;cursor:pointer;text-decoration:none;flex-shrink:0;transition:all .18s ease;box-shadow:0 2px 10px rgba(29,185,84,.3);}
+.btn-wa:hover{background:#17a34a;transform:scale(1.06);}
+
+/* LIST VIEW */
+.list-wrap{flex:1;overflow:auto;padding:14px;}
+.list-table{width:100%;border-collapse:collapse;}
+.list-table th{background:rgba(255,255,255,0.03);backdrop-filter:blur(8px);padding:10px 14px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--m2);border-bottom:1px solid var(--b);position:sticky;top:0;}
+.list-table td{padding:10px 14px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.035);vertical-align:middle;}
+.list-table tr:hover td{background:rgba(255,255,255,0.02);cursor:pointer;}
+.td-nm{font-weight:700;}
+.td-est{white-space:nowrap;}
+
+/* DETAIL PANEL */
+.dp-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:100;display:none;}
+.dp-ov.open{display:block;}
+.dp{position:fixed;top:0;right:-440px;width:410px;height:100vh;background:var(--sb);border-left:1px solid var(--b);z-index:101;transition:right .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
+.dp.open{right:0;}
+.dp-hd{padding:22px 20px 17px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:14px;flex-shrink:0;background:linear-gradient(160deg,#1e1e1e 0%,#171717 100%);}
+.dp-ava{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#000;flex-shrink:0;box-shadow:0 8px 24px rgba(0,0,0,.55);}
+.dp-nm{font-weight:800;font-size:17px;line-height:1.2;letter-spacing:-.2px;}
+.dp-sub{font-size:11px;color:var(--m2);margin-top:4px;}
+.dp-x{margin-left:auto;background:rgba(255,255,255,0.06);border:1px solid var(--b);color:var(--m2);font-size:17px;cursor:pointer;padding:4px 9px;line-height:1;transition:all .15s;border-radius:8px;}
+.dp-x:hover{color:var(--txt);background:rgba(255,255,255,0.1);}
+.dp-body{flex:1;overflow-y:auto;padding:16px 20px;}
+.dp-sec{margin-bottom:16px;}
+.dp-sec-lbl{font-size:8px;font-weight:700;letter-spacing:1.8px;color:var(--m);text-transform:uppercase;margin-bottom:10px;}
+.dp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.dp-row:last-child{border-bottom:none;}
+.dp-rl{font-size:10px;color:var(--m2);font-weight:600;}
+.dp-rv{font-size:11px;font-weight:700;text-align:right;max-width:60%;}
+.dp-rv a{color:var(--green);text-decoration:none;}
+.dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;transition:border .15s;}
+.dp-sel:focus{border-color:var(--b2);}
+.dp-notas{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;padding:10px;outline:none;resize:vertical;min-height:80px;margin-top:8px;transition:border .15s;}
+.dp-notas:focus{border-color:rgba(255,255,255,0.15);}
+.dp-ft{padding:15px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
+.dp-btn{flex:1;padding:11px;border-radius:10px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;cursor:pointer;border:none;transition:all .18s ease;}
+.dp-btn.p{background:var(--green);color:#000;box-shadow:0 0 18px var(--green-glow);}
+.dp-btn.p:hover{background:var(--green-dk);box-shadow:0 0 28px rgba(170,255,0,.42);}
+.dp-btn.d{background:rgba(248,113,113,0.08);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+.dp-btn.d:hover{background:rgba(248,113,113,0.16);}
+.dp-dup{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.22);border-radius:10px;padding:11px 14px;font-size:11px;color:var(--amber);margin-bottom:14px;line-height:1.65;}
+
+/* MODAL */
+.m-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);z-index:200;display:none;}
+.m-ov.open{display:block;}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:560px;max-width:96vw;max-height:90vh;overflow-y:auto;background:var(--sb);border:1px solid rgba(255,255,255,0.1);border-radius:20px;z-index:201;display:none;box-shadow:0 48px 96px rgba(0,0,0,.75);}
+.modal.open{display:block;}
+.m-hd{padding:20px 22px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(255,255,255,0.02);}
+.m-ttl{font-weight:800;font-size:15px;letter-spacing:-.2px;}
+.m-x{background:rgba(255,255,255,0.06);border:1px solid var(--b);color:var(--m2);font-size:19px;cursor:pointer;line-height:1;border-radius:8px;padding:2px 8px;transition:all .15s;}
+.m-x:hover{color:var(--txt);background:rgba(255,255,255,0.1);}
+.m-body{padding:22px;}
+.mf{margin-bottom:14px;}
+.mf label{display:block;font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--m2);text-transform:uppercase;margin-bottom:5px;}
+.mf-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mf-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.m-ft{padding:14px 22px;border-top:1px solid var(--b);display:flex;gap:8px;justify-content:flex-end;background:rgba(255,255,255,0.02);}
+.btn-cancel{background:rgba(255,255,255,0.04);border:1px solid var(--b);color:var(--m2);border-radius:10px;padding:10px 18px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;}
+.btn-cancel:hover{background:rgba(255,255,255,0.08);color:var(--txt);}
+.btn-save{background:var(--green);color:#000;border:none;border-radius:10px;padding:10px 26px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s ease;box-shadow:0 0 22px var(--green-glow);}
+.btn-save:hover{background:var(--green-dk);box-shadow:0 0 34px rgba(170,255,0,.44);}
+
+/* WEB LEADS VIEW */
+.web-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:14px;gap:12px;}
+.web-header{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.web-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:-.3px;}
+.web-badge{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.25);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:800;}
+.web-cols{display:flex;gap:12px;flex:1;overflow:hidden;}
+.web-col{flex:1;display:flex;flex-direction:column;background:rgba(13,13,13,0.85);border-radius:14px;border:1px solid rgba(255,255,255,0.055);overflow:hidden;}
+.web-col-hd{padding:13px 15px;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);flex-shrink:0;}
+.web-col-dot{width:8px;height:8px;border-radius:50%;}
+.web-col-nm{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;flex:1;}
+.web-col-cnt{background:rgba(255,255,255,0.07);color:var(--m3);font-size:9px;font-weight:800;padding:2px 9px;border-radius:99px;}
+.web-col-bd{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:7px;}
+.web-card{background:linear-gradient(155deg,#1b1b1b,#141414);border:1px solid rgba(255,255,255,0.07);border-left:3px solid var(--blue);border-radius:12px;padding:13px;cursor:pointer;transition:transform .28s cubic-bezier(.34,1.5,.64,1),box-shadow .2s;}
+.web-card:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(0,0,0,.65);}
+.web-card-nm{font-size:13px;font-weight:800;margin-bottom:5px;}
+.web-card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
+.web-card-contact{width:100%;padding:8px;border-radius:9px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;cursor:pointer;border:none;transition:all .18s;text-align:center;}
+.web-card-contact.pending{background:rgba(170,255,0,0.12);color:var(--green);border:1px solid rgba(170,255,0,0.25);}
+.web-card-contact.pending:hover{background:rgba(170,255,0,0.22);}
+.web-card-contact.done{background:rgba(255,255,255,0.05);color:var(--m2);border:1px solid var(--b);}
+.web-card-contact.done:hover{background:rgba(248,113,113,0.1);color:var(--red);border-color:rgba(248,113,113,0.2);}
+
+.assign-btn{background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:10px;padding:11px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;color:var(--m3);cursor:pointer;transition:all .15s;}
+.assign-btn:hover{background:rgba(170,255,0,0.1);border-color:rgba(170,255,0,0.3);color:var(--green);}
+
+/* WEB LEADS REMINDER */
+.web-rem{padding:0 14px 10px;flex-shrink:0;}
+.web-rem-hd{font-size:10px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.web-rem-list{display:flex;flex-direction:column;gap:5px;}
+.web-rem-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(217,119,6,0.07);border:1px solid rgba(217,119,6,0.18);border-radius:9px;cursor:pointer;transition:background .15s;}
+.web-rem-row:hover{background:rgba(217,119,6,0.13);}
+.web-rem-row.urgent{background:rgba(220,38,38,0.07);border-color:rgba(220,38,38,0.18);}
+.web-rem-row.urgent:hover{background:rgba(220,38,38,0.12);}
+.web-rem-info{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
+.web-rem-nm{font-size:12px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.web-rem-meta{font-size:10px;color:var(--m);white-space:nowrap;}
+.web-rem-age{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;flex-shrink:0;}
+.web-rem-age.ok{background:rgba(170,255,0,0.12);color:#3a6b00;}
+.web-rem-age.warn{background:rgba(217,119,6,0.12);color:var(--amber);}
+.web-rem-age.urgent{background:rgba(220,38,38,0.10);color:var(--red);}
+.web-rem-wa{font-size:14px;text-decoration:none;flex-shrink:0;padding:3px 5px;border-radius:6px;transition:background .15s;}
+.web-rem-wa:hover{background:rgba(29,185,84,0.15);}
+.rec-avs{display:flex;align-items:center;gap:7px;margin-top:2px;}
+.rec-avs-lbl{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.rec-av{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:10px;font-weight:800;transition:transform .18s,box-shadow .18s;flex-shrink:0;line-height:1;}
+.rec-av:hover{transform:scale(1.18);box-shadow:0 4px 14px rgba(0,0,0,0.25);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(18,18,18,0.96);backdrop-filter:blur(14px);border:1px solid var(--b2);border-radius:12px;padding:10px 22px;font-size:12px;font-weight:700;z-index:999;transition:transform .28s cubic-bezier(.34,1.5,.64,1);white-space:nowrap;box-shadow:0 16px 40px rgba(0,0,0,.55);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{color:var(--green);}
+.toast.err{color:var(--red);}
+
+/* MOBILE */
+.sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49;backdrop-filter:blur(2px);}
+.sb-ov.open{display:block;}
+.hbg{display:none;background:rgba(255,255,255,0.05);border:1px solid var(--b);border-radius:9px;padding:7px 10px;font-size:17px;cursor:pointer;line-height:1;color:var(--m3);flex-shrink:0;}
+@media(max-width:768px){
+  .hbg{display:flex;align-items:center;}
+  .sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:50;width:240px;transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:8px 0 32px rgba(0,0,0,.6);}
+  .sidebar.mob-open{left:0;}
+  .topbar{padding:10px 12px;gap:7px;flex-wrap:nowrap;}
+  .tsearch{font-size:12px;padding:8px 11px;}
+  .tcnt{display:none;}
+  .btn-add{padding:8px 13px;font-size:11px;}
+  .stats-bar{overflow-x:auto;flex-wrap:nowrap;}
+  .stat{flex:0 0 auto;min-width:72px;padding:10px 6px;}
+  .stat-n{font-size:20px;}
+  .stat-l{font-size:7px;}
+  .kol{width:85vw;max-width:340px;}
+  .dp{width:100%;right:-100%;border-radius:0;}
+  .dp.open{right:0;}
+  .modal{top:auto;bottom:0;left:0;right:0;transform:none;width:100%;max-width:100%;max-height:92vh;border-radius:20px 20px 0 0;}
+  .mf-2,.mf-3{grid-template-columns:1fr;}
+  .lbox{width:94vw;padding:36px 24px;}
+}
+/* ══ SEGUIMIENTO ══ */
+.seg-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:4px;}
+.seg-badge.overdue{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.2);}
+.seg-badge.today{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);}
+.seg-badge.upcoming{background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.18);}
+
+/* LIGHT THEME */
+body{background:#f8fafc;color:#0f172a;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);}
+
+/* Login */
+#login-ov{background:#f8fafc;}
+.lbox{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.lbox-logo{color:#0f172a;}
+.lbox-logo span{color:#AAFF00;text-shadow:none;}
+.lbox-sub{color:#64748b;}
+.lbox-err{color:#dc2626;}
+.lf label{color:#64748b;}
+.fi{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;}
+.fi::placeholder{color:#94a3b8;}
+.fi:focus{border-color:#AAFF00;background:#fff;box-shadow:0 0 0 3px rgba(170,255,0,0.12);}
+.btn-g{background:#AAFF00;color:#0f172a;box-shadow:none;}
+.btn-g:hover{background:#99ee00;box-shadow:none;}
+
+/* Home screen */
+#home-screen{background:#f8fafc;}
+.home-logo{color:#0f172a;}
+.home-logo span{color:#AAFF00;}
+.home-title{color:#0f172a;}
+.home-sub{color:#64748b;}
+.home-card{background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.08);}
+.home-card::before{display:none;}
+.home-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.10);}
+.home-card-glow{display:none;}
+.home-card-tag{background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:#64748b;}
+.home-card-title{color:#0f172a;}
+.home-card-desc{color:#64748b;}
+.home-card-stats{border-top:1px solid rgba(0,0,0,0.06);}
+.home-stat{border-right:1px solid rgba(0,0,0,0.05);}
+.home-stat-l{color:#64748b;}
+.home-card-btn.green{background:#AAFF00;color:#0f172a;box-shadow:none;}
+.home-card-btn.green:hover{background:#99ee00;box-shadow:none;}
+.home-card-btn.blue{background:rgba(59,130,246,0.08);color:#3b82f6;border:1px solid rgba(59,130,246,0.2);}
+
+/* Sidebar */
+.sidebar{background:#ffffff;border-right:1px solid rgba(0,0,0,0.07);}
+.sb-top{border-bottom:1px solid rgba(0,0,0,0.07);}
+.sb-logo{color:#0f172a;}
+.sb-logo span{color:#AAFF00;text-shadow:none;}
+.sb-logo-tag{color:#64748b;}
+.sb-lbl{color:#94a3b8;}
+.fsel{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;}
+.fsel:focus{border-color:rgba(0,0,0,0.18);}
+.rec-tag{color:#334155;}
+.rec-tag:hover{background:rgba(0,0,0,0.04);color:#0f172a;}
+.rec-tag.active{background:rgba(170,255,0,0.12);color:#3a6b00;box-shadow:inset 0 0 0 1px rgba(170,255,0,0.3);}
+.sb-foot{border-top:1px solid rgba(0,0,0,0.07);}
+.sb-foot a{color:#64748b;}
+.sb-foot a:hover{color:#0f172a;}
+
+/* Topbar */
+.topbar{background:#ffffff;box-shadow:0 1px 0 rgba(0,0,0,0.07);backdrop-filter:none;}
+.btn-back{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#334155;}
+.btn-back:hover{border-color:rgba(0,0,0,0.16);color:#0f172a;}
+.btn-web{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);color:#3b82f6;}
+.btn-web:hover,.btn-web.active{background:rgba(59,130,246,0.12);border-color:rgba(59,130,246,0.3);}
+.btn-web span{background:rgba(59,130,246,0.12);color:#3b82f6;}
+.tsearch{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;transition:border .15s,box-shadow .15s;}
+.tsearch:focus{border-color:#AAFF00;background:#fff;box-shadow:0 0 0 3px rgba(170,255,0,0.10);}
+.tcnt{color:#64748b;}
+.vbtn{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);}
+.vbtn.active{background:rgba(170,255,0,0.12);border-color:rgba(170,255,0,0.3);}
+.btn-add{background:#AAFF00;color:#0f172a;border:none;box-shadow:none;}
+.btn-add:hover{background:#99ee00;box-shadow:none;}
+
+/* Stats bar */
+.stats-bar{background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.07);}
+.stat{border-right:1px solid rgba(0,0,0,0.07);}
+.stat:hover{background:rgba(0,0,0,0.02);}
+.stat.sf{background:rgba(0,0,0,0.025);}
+.stat-l{color:#64748b;}
+
+/* Kanban columns */
+.kol{background:#f1f5f9;border:1px solid rgba(0,0,0,0.07);backdrop-filter:none;}
+.kol-hd{border-bottom:1px solid rgba(0,0,0,0.06);background:rgba(0,0,0,0.02);}
+.kol-nm{color:#334155;}
+.kol-cnt{background:rgba(0,0,0,0.06);color:#64748b;}
+.kol-bd{scrollbar-color:rgba(0,0,0,0.08) transparent;}
+.kol-bd.dov{background:rgba(170,255,0,0.05);outline-color:rgba(170,255,0,0.4);}
+.kol-empty{color:#94a3b8;}
+
+/* Cards */
+.card{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.card:hover{border-color:rgba(0,0,0,0.14);box-shadow:0 4px 16px rgba(0,0,0,0.10);}
+.card-nm{color:#0f172a;}
+.card-sp{color:#64748b;}
+.card-notas{color:#64748b;}
+.ava{color:#0f172a;}
+
+/* Tags */
+.tag{background:rgba(0,0,0,0.05);color:#64748b;}
+.tag-src{background:rgba(59,130,246,0.08);color:#3b82f6;border:1px solid rgba(59,130,246,0.15);}
+.tag-rec{background:rgba(124,58,237,0.08);color:#7c3aed;border:1px solid rgba(124,58,237,0.15);}
+.tag-pais{background:rgba(13,148,136,0.08);color:#0d9488;border:1px solid rgba(13,148,136,0.15);}
+.tag-dup{background:rgba(217,119,6,0.08);color:#d97706;border:1px solid rgba(217,119,6,0.18);}
+
+/* WhatsApp btn */
+.btn-wa{color:#22c55e;}
+/* Seguimiento inputs */
+.dp-inp{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;border-radius:8px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;outline:none;}
+.dp-inp:focus{border-color:rgba(170,255,0,0.5);background:#fff;}
+/* Modal form inputs */
+.msel,.minp,.mtarea{background:#f8fafc !important;border:1px solid rgba(0,0,0,0.09) !important;color:#0f172a !important;}
+.msel:focus,.minp:focus,.mtarea:focus{border-color:rgba(170,255,0,0.5) !important;}
+
+/* List view */
+.list-table th{background:#f8fafc;backdrop-filter:none;color:#64748b;border-bottom:1px solid rgba(0,0,0,0.08);}
+.list-table td{border-bottom:1px solid rgba(0,0,0,0.05);color:#0f172a;}
+.list-table tr:hover td{background:rgba(0,0,0,0.02);}
+
+/* Detail panel */
+.dp-ov{background:rgba(15,23,42,0.5);}
+.dp{background:#ffffff;border-left:1px solid rgba(0,0,0,0.08);}
+.dp-hd{background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.07);}
+.dp-nm{color:#0f172a;}
+.dp-sub{color:#64748b;}
+.dp-x{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#64748b;}
+.dp-x:hover{color:#0f172a;background:#e2e8f0;}
+.dp-sec-lbl{color:#94a3b8;}
+.dp-row{border-bottom:1px solid rgba(0,0,0,0.05);}
+.dp-rl{color:#64748b;}
+.dp-rv{color:#0f172a;}
+.dp-sel{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;}
+.dp-sel:focus{border-color:rgba(0,0,0,0.18);}
+.dp-notas{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;}
+.dp-notas:focus{border-color:rgba(0,0,0,0.18);}
+.dp-ft{border-top:1px solid rgba(0,0,0,0.07);}
+.dp-btn.p{background:#AAFF00;color:#0f172a;box-shadow:none;}
+.dp-btn.p:hover{background:#99ee00;box-shadow:none;}
+.dp-dup{background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.18);color:#d97706;}
+
+/* Modal */
+.m-ov{background:rgba(15,23,42,0.5);}
+#assign-ov{background:rgba(15,23,42,0.5) !important;}
+#assign-ov > div{background:#ffffff !important;border:1px solid rgba(0,0,0,0.08) !important;}
+#assign-ov > div > div:first-child{color:#0f172a !important;}
+#assign-ov > div > div:nth-child(2){color:#64748b !important;}
+#assign-ov > div > div:nth-child(2) strong{color:#334155 !important;}
+#assign-ov > div > div:nth-child(3){color:#94a3b8 !important;}
+.modal{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 4px 16px rgba(0,0,0,0.10);}
+.m-hd{background:#f8fafc;border-bottom:1px solid rgba(0,0,0,0.07);}
+.m-ttl{color:#0f172a;}
+.m-x{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#64748b;}
+.m-x:hover{color:#0f172a;background:#e2e8f0;}
+.m-ft{background:#f8fafc;border-top:1px solid rgba(0,0,0,0.07);}
+.btn-cancel{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#334155;}
+.btn-cancel:hover{background:#e2e8f0;color:#0f172a;}
+.btn-save{background:#AAFF00;color:#0f172a;box-shadow:none;}
+.btn-save:hover{background:#99ee00;box-shadow:none;}
+.mf label{color:#64748b;}
+.assign-btn{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#334155;}
+.assign-btn:hover{background:rgba(170,255,0,0.10);border-color:rgba(170,255,0,0.3);color:#3a6b00;}
+#assign-ov > div > button:last-child{color:#64748b !important;border:1px solid rgba(0,0,0,0.08) !important;}
+
+/* Web leads view */
+.web-col{background:#f1f5f9;border:1px solid rgba(0,0,0,0.07);}
+.web-col-hd{background:rgba(0,0,0,0.02);border-bottom:1px solid rgba(0,0,0,0.06);}
+.web-col-nm{color:#334155;}
+.web-col-cnt{background:rgba(0,0,0,0.06);color:#64748b;}
+.web-card{background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-left:3px solid var(--blue);}
+.web-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.10);}
+.web-card-nm{color:#0f172a;}
+.web-card-contact.pending{background:rgba(170,255,0,0.10);color:#3a6b00;border:1px solid rgba(170,255,0,0.3);}
+.web-card-contact.done{background:rgba(0,0,0,0.04);color:#64748b;border:1px solid rgba(0,0,0,0.08);}
+.web-badge{background:rgba(59,130,246,0.08);color:#3b82f6;border:1px solid rgba(59,130,246,0.18);}
+.web-col-dot[style*="#AAFF00"]{box-shadow:none !important;}
+.web-rem-row{background:rgba(217,119,6,0.05);border-color:rgba(217,119,6,0.15);}
+.web-rem-row.urgent{background:rgba(220,38,38,0.05);border-color:rgba(220,38,38,0.15);}
+.web-rem-nm{color:#0f172a;}
+
+/* Toast */
+.toast{background:#ffffff;border:1px solid rgba(0,0,0,0.10);box-shadow:0 4px 16px rgba(0,0,0,0.10);color:#0f172a;}
+.toast.ok{color:#3a6b00;}
+.toast.err{color:#dc2626;}
+
+/* Mobile sidebar overlay */
+.sb-ov{background:rgba(15,23,42,0.4);}
+.hbg{background:#f1f5f9;border:1px solid rgba(0,0,0,0.08);color:#334155;}
+
+/* ── ANALYTICS ── */
+.an-wrap{flex:1;overflow-y:auto;padding:20px 22px 40px;display:flex;flex-direction:column;gap:16px;}
+.an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;}
+.an-kpi{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:18px 20px;border-top-width:3px;}
+.an-kpi-n{font-family:'Anton',sans-serif;font-size:38px;line-height:1;letter-spacing:-.5px;margin-bottom:4px;}
+.an-kpi-l{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;}
+.an-kpi-sub{font-size:11px;color:#64748b;margin-top:5px;}
+.an-pipeline{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:20px 22px;}
+.an-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.an-card{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:18px 20px;}
+.an-card-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#94a3b8;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.an-card-total{font-family:'Anton',sans-serif;font-size:13px;color:#0f172a;text-transform:none;letter-spacing:0;}
+.an-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.an-row:last-child{margin-bottom:0;}
+.an-lbl{font-size:11px;font-weight:600;color:#334155;width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.an-track{flex:1;height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
+.an-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+.an-n{font-size:11px;font-weight:700;color:#334155;width:26px;text-align:right;flex-shrink:0;}
+.an-pct{font-size:10px;color:#94a3b8;width:34px;text-align:right;flex-shrink:0;}
+@media(max-width:900px){.an-kpis{grid-template-columns:1fr 1fr;}.an-charts{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-ov">
+  <div class="lbox">
+    <div class="lbox-logo">NV<span>S</span></div>
+    <div class="lbox-sub">Leads Dashboard</div>
+    <div class="lbox-err" id="l-err"></div>
+    <div class="lf"><label>Email</label><input class="fi" id="l-em" type="email" placeholder="tu@email.com"></div>
+    <div class="lf"><label>Contraseña</label><input class="fi" id="l-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-g" onclick="doLogin()">Entrar →</button>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="home-screen">
+  <div class="home-logo">NV<span>S</span></div>
+  <div class="home-title">Leads Pipeline</div>
+  <div class="home-sub">Selecciona un módulo para continuar</div>
+  <div class="home-cards">
+
+    <!-- RECRUITERS -->
+    <div class="home-card" style="--hc-color:#AAFF00" onclick="enterModule('recruiters')">
+      <div class="home-card-glow"></div>
+      <div class="home-card-icon">👥</div>
+      <div class="home-card-tag"><span></span>Pipeline Principal</div>
+      <div class="home-card-title">Leads de<br>Recruiters</div>
+      <div class="home-card-desc">Leads gestionados directamente por el equipo de recruiters. Kanban completo con etapas, filtros y panel de detalle.</div>
+      <div class="home-card-stats">
+        <div class="home-stat"><div class="home-stat-n" id="hs-rec-total">—</div><div class="home-stat-l">Total</div></div>
+        <div class="home-stat"><div class="home-stat-n" id="hs-rec-new">—</div><div class="home-stat-l">Nuevos</div></div>
+        <div class="home-stat"><div class="home-stat-n" id="hs-rec-signed">—</div><div class="home-stat-l">Firmados</div></div>
+      </div>
+      <button class="home-card-btn green">Entrar →</button>
+    </div>
+
+    <!-- WEBSITE -->
+    <div class="home-card" style="--hc-color:#60a5fa" onclick="enterModule('web')">
+      <div class="home-card-glow"></div>
+      <div class="home-card-icon">🌐</div>
+      <div class="home-card-tag"><span></span>Orgánico</div>
+      <div class="home-card-title">Leads del<br>Website</div>
+      <div class="home-card-desc">Leads que llegan directamente desde el formulario de PlayWithNewVision.com. Sincronización automática en tiempo real.</div>
+      <div class="home-card-stats">
+        <div class="home-stat"><div class="home-stat-n" id="hs-web-total">—</div><div class="home-stat-l">Total</div></div>
+        <div class="home-stat"><div class="home-stat-n" id="hs-web-pending">—</div><div class="home-stat-l">Por Contactar</div></div>
+        <div class="home-stat"><div class="home-stat-n" id="hs-web-done">—</div><div class="home-stat-l">Contactados</div></div>
+      </div>
+      <button class="home-card-btn blue">Entrar →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-top">
+      <div class="sb-logo">NV<span>S</span><span class="sb-logo-tag">Leads Pipeline</span></div>
+    </div>
+    <div class="sb-body">
+      <div class="sb-lbl">Filtros</div>
+      <select class="fsel" id="f-sport" onchange="applyFilters()"><option value="">🏅 Todos los deportes</option></select>
+      <select class="fsel" id="f-src" onchange="applyFilters()">
+        <option value="">📥 Todas las fuentes</option>
+        <option>Manual</option><option>Google Sheets</option><option>Referido</option><option>Instagram</option><option>WhatsApp</option>
+      </select>
+      <select class="fsel" id="f-pais" onchange="applyFilters()"><option value="">🌎 Todos los países</option></select>
+
+      <div class="sb-lbl" style="margin-top:20px">Recruiters</div>
+      <div class="sb-rec" id="rec-list"></div>
+    </div>
+    <div class="sb-foot"><a href="index.html">← Volver al Hub</a></div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hbg" onclick="toggleSidebar()" title="Filtros">☰</button>
+      <button class="btn-back" onclick="window.location='index.html'">← Módulos</button>
+      <input class="tsearch" id="search" placeholder="🔍  Buscar lead..." oninput="applyFilters()">
+      <span class="tcnt" id="cnt"></span>
+      <button id="btn-sort-status" onclick="toggleSortStatus()" title="Ordenar por estado" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:7px 12px;font-size:11px;font-weight:700;color:var(--m2);cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        Estado
+      </button>
+      <div class="view-btns">
+        <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')" title="Kanban">⬛</button>
+        <button class="vbtn" id="vbtn-l" onclick="setView('list')" title="Lista">☰</button>
+        <button class="vbtn" id="vbtn-an" onclick="setView('analytics')" title="Analytics" style="font-size:12px;padding:7px 9px;">📊</button>
+      </div>
+      <button class="btn-web" id="vbtn-w" onclick="setView('web')">🌐 Website Leads <span id="web-pill">—</span></button>
+      <button class="btn-add" onclick="openAdd()">+ Lead</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat" id="sf-all" onclick="sfClick('')"><div class="stat-n" id="st-tot">—</div><div class="stat-l">Total</div></div>
+      <div class="stat" id="sf-nue" onclick="sfClick('Nuevo')" style="--c:#6b7280"><div class="stat-n" id="st-nue" style="color:#9ca3af">—</div><div class="stat-l">Nuevos</div></div>
+      <div class="stat" id="sf-con" onclick="sfClick('Contactado')" style="--c:var(--blue)"><div class="stat-n" id="st-con" style="color:var(--blue)">—</div><div class="stat-l">Contactados</div></div>
+      <div class="stat" id="sf-int" onclick="sfClick('Interesado')" style="--c:var(--amber)"><div class="stat-n" id="st-int" style="color:var(--amber)">—</div><div class="stat-l">Interesados</div></div>
+      <div class="stat" id="sf-neg" onclick="sfClick('En Negociacion')" style="--c:var(--purple)"><div class="stat-n" id="st-neg" style="color:var(--purple)">—</div><div class="stat-l">En Negociación</div></div>
+      <div class="stat" id="sf-con2" onclick="sfClick('Contract Sent')" style="--c:var(--teal)"><div class="stat-n" id="st-con2" style="color:var(--teal)">—</div><div class="stat-l">Contract Sent</div></div>
+      <div class="stat" id="sf-fir" onclick="sfClick('Firmado')" style="--c:var(--green)"><div class="stat-n" id="st-fir" style="color:var(--green)">—</div><div class="stat-l">Firmados</div></div>
+      <div class="stat" id="sf-del" onclick="sfClick('Delayed Sign Up')" style="--c:var(--orange)"><div class="stat-n" id="st-del" style="color:var(--orange)">—</div><div class="stat-l">Delayed</div></div>
+      <div class="stat" id="sf-per" onclick="sfClick('Perdido')" style="--c:var(--red)"><div class="stat-n" id="st-per" style="color:var(--red)">—</div><div class="stat-l">Perdidos</div></div>
+    </div>
+
+    <!-- KANBAN VIEW -->
+    <div class="kboard-wrap" id="view-kanban">
+      <div class="kboard" id="kboard"></div>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div class="list-wrap" id="view-list" style="display:none">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th>Nombre</th><th>Deporte</th><th>País</th><th>Estado</th>
+            <th>Recruiter</th><th>Fuente</th><th>Fecha</th><th>WA</th>
+          </tr>
+        </thead>
+        <tbody id="list-body"></tbody>
+      </table>
+    </div>
+
+    <!-- ANALYTICS VIEW -->
+    <div id="view-analytics" style="display:none;flex:1;overflow:hidden;flex-direction:column;"></div>
+
+    <!-- WEBSITE LEADS VIEW -->
+    <div class="web-wrap" id="view-web" style="display:none">
+      <div class="web-header">
+        <div class="web-title">🌐 Website Leads</div>
+        <div class="web-badge" id="web-cnt-badge">0 leads</div>
+        <input class="tsearch" id="web-search" placeholder="Buscar..." oninput="renderWeb()" style="max-width:220px;padding:7px 12px;font-size:12px;">
+        <button id="sync-btn" onclick="syncFromSheet()" style="margin-left:auto;background:rgba(170,255,0,0.1);color:#aaff00;border:1px solid rgba(170,255,0,0.3);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;">⟳ Sync Sheet</button>
+      </div>
+      <div class="web-rem" id="web-rem-banner" style="display:none"></div>
+      <div class="web-cols">
+        <div class="web-col">
+          <div class="web-col-hd">
+            <div class="web-col-dot" style="background:#AAFF00;box-shadow:0 0 7px #AAFF0077"></div>
+            <div class="web-col-nm" style="color:#AAFF00">Por Contactar</div>
+            <div class="web-col-cnt" id="web-cnt-pending">0</div>
+          </div>
+          <div class="web-col-bd" id="web-col-pending"></div>
+        </div>
+        <div class="web-col">
+          <div class="web-col-hd">
+            <div class="web-col-dot" style="background:#60a5fa;box-shadow:0 0 7px #60a5fa77"></div>
+            <div class="web-col-nm" style="color:#60a5fa">Contactado</div>
+            <div class="web-col-cnt" id="web-cnt-done">0</div>
+          </div>
+          <div class="web-col-bd" id="web-col-done"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sb-ov" id="sb-ov" onclick="toggleSidebar()"></div>
+
+<!-- ASSIGN TO RECRUITER MODAL -->
+<div id="assign-ov" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeAssign()">
+  <div style="background:#111;border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:28px 26px;min-width:290px;max-width:340px;width:90%">
+    <div style="font-family:'Anton',sans-serif;font-size:19px;margin-bottom:4px">Asignar al Pipeline</div>
+    <div style="font-size:12px;color:var(--m2);margin-bottom:20px">Lead: <strong id="assign-nm" style="color:var(--m3)"></strong></div>
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--m);margin-bottom:10px">Selecciona el recruiter</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="assign-grid">
+      <button class="assign-btn" onclick="doAssign('Andy')">👤 Andy</button>
+      <button class="assign-btn" onclick="doAssign('Ariel')">👤 Ariel</button>
+      <button class="assign-btn" onclick="doAssign('Floyd')">👤 Floyd</button>
+      <button class="assign-btn" onclick="doAssign('Julio')">👤 Julio</button>
+      <button class="assign-btn" onclick="doAssign('Marketing')">👤 Marketing</button>
+      <button class="assign-btn" onclick="doAssign('Stefano')">👤 Stefano</button>
+    </div>
+    <button onclick="closeAssign()" style="width:100%;margin-top:14px;padding:10px;background:transparent;border:1px solid var(--b);border-radius:10px;color:var(--m);font-size:11px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif">Cancelar</button>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="dp-ov" id="dp-ov" onclick="closeDP()"></div>
+<div class="dp" id="dp"></div>
+
+<!-- MODAL ADD/EDIT -->
+<div class="m-ov" id="m-ov" onclick="closeMod()"></div>
+<div class="modal" id="modal">
+  <div class="m-hd">
+    <span class="m-ttl" id="m-ttl">Nuevo Lead</span>
+    <button class="m-x" onclick="closeMod()">×</button>
+  </div>
+  <div class="m-body">
+    <div class="mf-2">
+      <div class="mf"><label>Nombre *</label><input class="fi" id="m-nombre" placeholder="Nombre completo"></div>
+      <div class="mf"><label>Deporte</label><input class="fi" id="m-deporte" placeholder="Soccer, Volleyball..."></div>
+    </div>
+    <div class="mf-2">
+      <div class="mf"><label>WhatsApp</label><input class="fi" id="m-wa" placeholder="+507 6xxx-xxxx"></div>
+      <div class="mf"><label>Email</label><input class="fi" id="m-email" type="email" placeholder="email@ejemplo.com"></div>
+    </div>
+    <div class="mf-3">
+      <div class="mf"><label>País</label><input class="fi" id="m-pais" placeholder="Panamá, Colombia..."></div>
+      <div class="mf"><label>Ciudad</label><input class="fi" id="m-ciudad" placeholder="Ciudad de Panamá..."></div>
+      <div class="mf"><label>Edad</label><input class="fi" id="m-edad" type="number" placeholder="17"></div>
+    </div>
+    <div class="mf-2">
+      <div class="mf"><label>Posición</label><input class="fi" id="m-posicion" placeholder="Delantero, Libero..."></div>
+      <div class="mf"><label>Presupuesto</label><input class="fi" id="m-presupuesto" placeholder="$1,000 - $3,000"></div>
+    </div>
+    <div class="mf-2">
+      <div class="mf"><label>Estado</label>
+        <select class="fi" id="m-estado">
+          <option>Nuevo</option><option>Contactado</option><option>Interesado</option>
+          <option>En Negociacion</option><option>Firmado</option><option>Perdido</option>
+        </select>
+      </div>
+      <div class="mf"><label>Fuente</label>
+        <select class="fi" id="m-fuente">
+          <option>Manual</option><option>Google Sheets</option><option>Referido</option>
+          <option>Instagram</option><option>WhatsApp</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf"><label>Recruiter / Responsable</label><input class="fi" id="m-recruiter" placeholder="Nombre del recruiter o 'Yo'"></div>
+    <div class="mf"><label>Notas</label><textarea class="fi" id="m-notas" rows="3" placeholder="Observaciones, intereses, seguimiento..."></textarea></div>
+  </div>
+  <div class="m-ft">
+    <button class="btn-cancel" onclick="closeMod()">Cancelar</button>
+    <button class="btn-save" onclick="saveLead()">Guardar Lead</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL = 'https://mwefvjvvitsondqghgsx.supabase.co';
+const SB_KEY = 'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+const STAGES = [
+  {k:'Nuevo',          c:'#6b7280', av:'rgba(107,114,128,0.85)'},
+  {k:'Contactado',     c:'#60a5fa', av:'rgba(96,165,250,0.85)'},
+  {k:'Interesado',     c:'#fbbf24', av:'rgba(251,191,36,0.85)'},
+  {k:'En Negociacion', c:'#a78bfa', av:'rgba(167,139,250,0.85)'},
+  {k:'Contract Sent',  c:'#2dd4bf', av:'rgba(45,212,191,0.85)'},
+  {k:'Firmado',        c:'#AAFF00', av:'rgba(170,255,0,0.85)'},
+  {k:'Delayed Sign Up',c:'#fb923c', av:'rgba(251,146,60,0.85)'},
+  {k:'Perdido',        c:'#f87171', av:'rgba(248,113,113,0.85)'},
+];
+const S2C  = Object.fromEntries(STAGES.map(s=>[s.k,s.c]));
+const S2AV = Object.fromEntries(STAGES.map(s=>[s.k,s.av]));
+
+const SP_EM = {Soccer:'⚽',Volleyball:'🏐',Volley:'🏐',Basketball:'🏀',Baseball:'⚾','Flag Football':'🏈',Gimnasia:'🤸',Tennis:'🎾',Atletismo:'🏃',Natacion:'🏊'};
+const spIco = d => SP_EM[d]||'🏅';
+const ini   = n => (n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+const esc   = s => (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const REC_COLORS = ['#AAFF00','#60a5fa','#fbbf24','#a78bfa','#2dd4bf','#f472b6','#fb923c','#f87171'];
+
+let ALL=[], FLT=[], SF='', curView='kanban', recFilter='', dragId=null, editId=null, curModule='', SORT_STATUS=false;
+const STATUS_ORDER={'Contactado':0,'Nuevo':1,'Interesado':2,'En Negociacion':3,'Contract Sent':4,'Delayed Sign Up':5,'Firmado':6,'Perdido':7};
+
+/* AUTH */
+async function init(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(session) showApp(); else q('#login-ov').style.display='flex';
+}
+async function doLogin(){
+  const {error} = await sb.auth.signInWithPassword({email:q('#l-em').value.trim(),password:q('#l-pw').value});
+  if(error){q('#l-err').textContent=error.message;} else showApp();
+}
+function showApp(){q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();setupRT();}
+function updateHomeStats(){}
+
+/* SYNC FROM GOOGLE SHEET */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiQXQwgPprDR7a7ddThLORj0H36lePQdkbPKPg3bNOeI-syFhHbtdBCxL3NYH9Jdwq3Q/exec';
+async function syncFromSheet(){
+  const btn = q('#sync-btn');
+  btn.textContent = '⏳ Sincronizando...';
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?action=sync');
+    const json = await res.json();
+    if(json.inserted > 0){
+      btn.textContent = '✅ ' + json.inserted + ' nuevo(s)';
+      setTimeout(loadData, 1000);
+    } else {
+      btn.textContent = '✅ Al día';
+    }
+  } catch(err) {
+    btn.textContent = '❌ Error';
+    console.error('Sync error:', err);
+  }
+  setTimeout(()=>{ btn.textContent='⟳ Sync Sheet'; btn.disabled=false; btn.style.opacity='1'; }, 3000);
+}
+
+/* DATA */
+async function loadData(){
+  const {data,error} = await sb.from('leads').select('*').order('created_at',{ascending:false});
+  if(error){console.error(error);return;}
+  ALL=data||[];
+  buildFilters();
+  applyFilters();
+  renderWeb();
+  updateHomeStats();
+  const wc=ALL.filter(a=>a.fuente==='Website').length;
+  if(q('#web-pill'))q('#web-pill').textContent=wc;
+  if(curView==='analytics')renderAnalytics();
+}
+
+/* ANALYTICS */
+function renderAnalytics(){
+  const data=ALL;
+  const total=data.length;
+  const el=q('#view-analytics');
+  if(!el)return;
+  if(!total){el.innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px;">Sin datos</div>';return;}
+
+  const firmados=data.filter(a=>a.estado==='Firmado').length;
+  const perdidos=data.filter(a=>a.estado==='Perdido').length;
+  const activos=data.filter(a=>!['Firmado','Perdido'].includes(a.estado)).length;
+  const cvr=((firmados/total)*100).toFixed(1);
+
+  // Por estado
+  const byEst={};STAGES.forEach(s=>byEst[s.k]=0);
+  data.forEach(a=>{if(byEst[a.estado]!==undefined)byEst[a.estado]++;});
+  const maxEst=Math.max(...Object.values(byEst),1);
+
+  // Por deporte
+  const byDep={};data.forEach(a=>{if(a.deporte)byDep[a.deporte]=(byDep[a.deporte]||0)+1;});
+  const topDep=Object.entries(byDep).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxDep=topDep[0]?.[1]||1;
+
+  // Por país
+  const byPais={};data.forEach(a=>{if(a.pais)byPais[a.pais]=(byPais[a.pais]||0)+1;});
+  const topPais=Object.entries(byPais).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxPais=topPais[0]?.[1]||1;
+
+  // Por fuente
+  const byFue={};data.forEach(a=>{const f=a.fuente||'Manual';byFue[f]=(byFue[f]||0)+1;});
+  const topFue=Object.entries(byFue).sort((a,b)=>b[1]-a[1]);
+  const maxFue=topFue[0]?.[1]||1;
+
+  // Por recruiter
+  const byRec={};data.forEach(a=>{if(a.recruiter)byRec[a.recruiter]=(byRec[a.recruiter]||0)+1;});
+  const topRec=Object.entries(byRec).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxRec=topRec[0]?.[1]||1;
+
+  const barRows=(rows,color,total2)=>rows.map(([lbl,n],i)=>`
+    <div class="an-row">
+      <div class="an-lbl" title="${esc(lbl)}">${esc(lbl)}</div>
+      <div class="an-track"><div class="an-fill" style="width:${((n/rows[0][1])*100).toFixed(1)}%;background:${color}"></div></div>
+      <div class="an-n">${n}</div>
+      <div class="an-pct">${((n/total2)*100).toFixed(0)}%</div>
+    </div>`).join('');
+
+  el.innerHTML=`<div class="an-wrap">
+    <div class="an-kpis">
+      <div class="an-kpi" style="border-top-color:#94a3b8">
+        <div class="an-kpi-n">${total}</div>
+        <div class="an-kpi-l">Total Leads</div>
+        <div class="an-kpi-sub">${activos} en pipeline activo</div>
+      </div>
+      <div class="an-kpi" style="border-top-color:#AAFF00">
+        <div class="an-kpi-n" style="color:#3a6b00">${firmados}</div>
+        <div class="an-kpi-l">Firmados</div>
+        <div class="an-kpi-sub">de ${total} leads totales</div>
+      </div>
+      <div class="an-kpi" style="border-top-color:#6366f1">
+        <div class="an-kpi-n" style="color:#4f46e5">${cvr}%</div>
+        <div class="an-kpi-l">Conversión</div>
+        <div class="an-kpi-sub">Firmados ÷ Total</div>
+      </div>
+      <div class="an-kpi" style="border-top-color:#ef4444">
+        <div class="an-kpi-n" style="color:#dc2626">${perdidos}</div>
+        <div class="an-kpi-l">Perdidos</div>
+        <div class="an-kpi-sub">${((perdidos/total)*100).toFixed(1)}% del total</div>
+      </div>
+    </div>
+
+    <div class="an-pipeline">
+      <div class="an-card-title">Pipeline por estado <span class="an-card-total">${total} leads</span></div>
+      ${STAGES.map(s=>{const n=byEst[s.k]||0;const pct=((n/total)*100).toFixed(0);return`<div class="an-row">
+        <div class="an-lbl">${s.k}</div>
+        <div class="an-track"><div class="an-fill" style="width:${((n/maxEst)*100).toFixed(1)}%;background:${s.c}"></div></div>
+        <div class="an-n">${n}</div>
+        <div class="an-pct">${pct}%</div>
+      </div>`;}).join('')}
+    </div>
+
+    <div class="an-charts">
+      <div class="an-card">
+        <div class="an-card-title">Top Deportes <span class="an-card-total">${Object.keys(byDep).length} deportes</span></div>
+        ${topDep.map(([d,n])=>`<div class="an-row"><div class="an-lbl">${spIco(d)} ${esc(d)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxDep)*100).toFixed(1)}%;background:#6366f1"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">Top Países <span class="an-card-total">${Object.keys(byPais).length} países</span></div>
+        ${topPais.map(([p,n])=>`<div class="an-row"><div class="an-lbl">${esc(p)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxPais)*100).toFixed(1)}%;background:#0d9488"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">Por Fuente <span class="an-card-total">${Object.keys(byFue).length} fuentes</span></div>
+        ${topFue.map(([f,n])=>`<div class="an-row"><div class="an-lbl">${esc(f)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxFue)*100).toFixed(1)}%;background:#f59e0b"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>
+      ${topRec.length?`<div class="an-card">
+        <div class="an-card-title">Por Recruiter <span class="an-card-total">${topRec.length} recruiters</span></div>
+        ${topRec.map(([r,n],i)=>`<div class="an-row"><div class="an-lbl">${esc(r)}</div><div class="an-track"><div class="an-fill" style="width:${((n/maxRec)*100).toFixed(1)}%;background:${REC_COLORS[i%REC_COLORS.length]}"></div></div><div class="an-n">${n}</div><div class="an-pct">${((n/total)*100).toFixed(0)}%</div></div>`).join('')}
+      </div>`:''}
+    </div>
+  </div>`;
+}
+function buildFilters(){
+  const sports=[...new Set(ALL.map(a=>a.deporte).filter(Boolean))].sort();
+  q('#f-sport').innerHTML='<option value="">🏅 Todos los deportes</option>'+sports.map(s=>`<option>${s}</option>`).join('');
+  const paises=[...new Set(ALL.map(a=>a.pais).filter(Boolean))].sort();
+  q('#f-pais').innerHTML='<option value="">🌎 Todos los países</option>'+paises.map(p=>`<option>${p}</option>`).join('');
+  const recs=[...new Set(ALL.map(a=>a.recruiter).filter(Boolean))].sort();
+  q('#rec-list').innerHTML=`<div class="rec-tag ${recFilter===''?'active':''}" onclick="setRec('')"><div class="rec-dot" style="background:#555;box-shadow:none"></div>Todos</div>`+
+    recs.map((r,i)=>`<div class="rec-tag ${recFilter===r?'active':''}" onclick="setRec('${r.replace(/'/g,"\\'")}')"><div class="rec-dot" style="background:${REC_COLORS[i%REC_COLORS.length]};color:${REC_COLORS[i%REC_COLORS.length]}"></div>${r}</div>`).join('');
+}
+let _rt=null;
+function setupRT(){
+  sb.channel('leads-rt').on('postgres_changes',{event:'*',schema:'public',table:'leads'},()=>{clearTimeout(_rt);_rt=setTimeout(loadData,600);}).subscribe();
+}
+
+/* VIEW */
+function setView(v){
+  curView=v;
+  q('#view-kanban').style.display=v==='kanban'?'':'none';
+  q('#view-list').style.display=v==='list'?'':'none';
+  q('#view-web').style.display=v==='web'?'flex':'none';
+  q('#view-analytics').style.display=v==='analytics'?'flex':'none';
+  q('#vbtn-k').classList.toggle('active',v==='kanban');
+  q('#vbtn-l').classList.toggle('active',v==='list');
+  q('#vbtn-w').classList.toggle('active',v==='web');
+  q('#vbtn-an').classList.toggle('active',v==='analytics');
+  q('#btn-back-wrap')&&(q('#btn-back-wrap').style.display=v==='web'?'':'none');
+  if(v==='web'){renderWeb();return;}
+  if(v==='analytics'){renderAnalytics();return;}
+  render();
+}
+
+/* FILTERS */
+function sfClick(k){
+  SF=SF===k?'':k;
+  document.querySelectorAll('.stat').forEach(el=>el.classList.remove('sf'));
+  const map={'':'sf-all','Nuevo':'sf-nue','Contactado':'sf-con','Interesado':'sf-int','En Negociacion':'sf-neg','Contract Sent':'sf-con2','Delayed Sign Up':'sf-del','Firmado':'sf-fir','Perdido':'sf-per'};
+  q('#'+map[SF])?.classList.add('sf');
+  applyFilters();
+}
+function setRec(r){recFilter=r;buildFilters();applyFilters();}
+function applyFilters(){
+  const qs=(q('#search')?.value||'').toLowerCase();
+  const sp=q('#f-sport')?.value||'';
+  const src=q('#f-src')?.value||'';
+  const pa=q('#f-pais')?.value||'';
+  FLT=ALL.filter(a=>{
+    if(SF&&a.estado!==SF)return false;
+    if(recFilter&&a.recruiter!==recFilter)return false;
+    if(sp&&a.deporte!==sp)return false;
+    if(src&&a.fuente!==src)return false;
+    if(pa&&a.pais!==pa)return false;
+    if(qs&&!`${a.nombre} ${a.deporte} ${a.pais} ${a.ciudad} ${a.recruiter} ${a.notas}`.toLowerCase().includes(qs))return false;
+    return true;
+  });
+  if(SORT_STATUS) FLT.sort((a,b)=>(STATUS_ORDER[a.estado]??9)-(STATUS_ORDER[b.estado]??9));
+  renderStats();
+  render();
+  q('#cnt').textContent=`${FLT.length} lead${FLT.length!==1?'s':''}`;
+}
+
+/* STATS */
+function renderStats(){
+  const cn=k=>ALL.filter(a=>a.estado===k).length;
+  q('#st-tot').textContent=ALL.length;
+  q('#st-nue').textContent=cn('Nuevo');
+  q('#st-con').textContent=cn('Contactado');
+  q('#st-int').textContent=cn('Interesado');
+  q('#st-neg').textContent=cn('En Negociacion');
+  q('#st-con2').textContent=cn('Contract Sent');
+  q('#st-del').textContent=cn('Delayed Sign Up');
+  q('#st-fir').textContent=cn('Firmado');
+  q('#st-per').textContent=cn('Perdido');
+}
+
+function render(){if(curView==='web'){renderWeb();return;}curView==='kanban'?renderKanban():renderList();}
+
+/* KANBAN */
+function renderKanban(){
+  q('#kboard').innerHTML=STAGES.map(st=>{
+    const cards=FLT.filter(a=>a.estado===st.k);
+    return `<div class="kol">
+      <div class="kol-hd">
+        <div class="kol-dot" style="background:${st.c};box-shadow:0 0 8px ${st.c}66"></div>
+        <div class="kol-nm" style="color:${st.c}">${st.k}</div>
+        <div class="kol-cnt">${cards.length}</div>
+      </div>
+      <div class="kol-bd" id="col-${st.k.replace(/\s/g,'-')}"
+        ondragover="event.preventDefault();this.classList.add('dov')"
+        ondragleave="this.classList.remove('dov')"
+        ondrop="onDrop(event,'${st.k}')">
+        ${cards.length?cards.map(mkCard).join(''):'<div class="kol-empty">Sin leads</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mkCard(a){
+  const col=S2C[a.estado]||'#888', av=S2AV[a.estado]||'rgba(255,255,255,0.7)';
+  const waN=(a.whatsapp||'').replace(/\D/g,'');
+  return `<div class="card" draggable="true" id="lc-${a.id}"
+    style="border-top-color:${col}"
+    onclick="openDP(${a.id})"
+    ondragstart="dragId=${a.id};this.classList.add('dragging')"
+    ondragend="this.classList.remove('dragging')">
+    <div class="card-top">
+      <div class="ava" style="background:${av}">${ini(a.nombre)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-nm">${esc(a.nombre)||'—'}</div>
+        <div class="card-sp">${spIco(a.deporte)} ${esc(a.deporte)||'—'}${a.pais?' · '+esc(a.pais):''}</div>
+      </div>
+    </div>
+    <div class="card-meta">
+      ${a.fuente?`<span class="tag tag-src">${esc(a.fuente)}</span>`:''}
+      ${a.recruiter?`<span class="tag tag-rec">👤 ${esc(a.recruiter)}</span>`:''}
+      ${a.presupuesto?`<span class="tag tag-pais">💰 ${esc(a.presupuesto)}</span>`:''}
+      ${a.duplicate_with?`<span class="tag tag-dup" title="También en: ${esc(a.duplicate_with)}">⚠ También: ${esc(a.duplicate_with)}</span>`:''}
+    </div>
+    ${segBadge(a)}
+    <div class="card-ft">
+      <span class="card-notas">${a.notas?'📝 '+esc(a.notas):a.edad?'Edad: '+a.edad:''}</span>
+      ${waN?`<a class="btn-wa" href="https://wa.me/${waN}" target="_blank" onclick="event.stopPropagation()">💬</a>`:''}
+    </div>
+  </div>`;
+}
+
+/* LIST */
+function renderList(){
+  q('#list-body').innerHTML=FLT.map(a=>{
+    const col=S2C[a.estado]||'#888';
+    const waN=(a.whatsapp||'').replace(/\D/g,'');
+    return `<tr onclick="openDP(${a.id})">
+      <td class="td-nm">${a.duplicate_with?`<span title="Duplicado: también en ${esc(a.duplicate_with)}" style="color:var(--amber);margin-right:5px;font-size:10px">⚠</span>`:''}${esc(a.nombre)||'—'}</td>
+      <td>${spIco(a.deporte)} ${esc(a.deporte)||'—'}</td>
+      <td>${esc(a.pais)||'—'}</td>
+      <td class="td-est"><span style="color:${col};font-weight:700;font-size:11px">${esc(a.estado)||'—'}</span></td>
+      <td style="color:var(--m3)">${esc(a.recruiter)||'—'}</td>
+      <td style="color:var(--m3);font-size:11px">${esc(a.fuente)||'—'}</td>
+      <td style="color:var(--m);font-size:10px">${(a.created_at||'').substring(0,10)}</td>
+      <td>${waN?`<a class="btn-wa" href="https://wa.me/${waN}" target="_blank" onclick="event.stopPropagation()">💬</a>`:''}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--m);padding:40px">Sin leads</td></tr>';
+}
+
+/* DRAG & DROP */
+async function onDrop(e, newEst){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dov');
+  if(!dragId||!newEst)return;
+  const a=ALL.find(x=>x.id===dragId);
+  if(!a||a.estado===newEst){dragId=null;return;}
+  const {error}=await sb.from('leads').update({estado:newEst,updated_at:new Date().toISOString()}).eq('id',dragId);
+  if(!error){a.estado=newEst;applyFilters();if(q('#dp').classList.contains('open'))openDP(dragId);toast('Estado actualizado ✓','ok');if(newEst==='Firmado')sendToCRM(a);}
+  else toast('Error: '+error.message,'err');
+  dragId=null;
+}
+
+/* DETAIL PANEL */
+function openDP(id){
+  const a=ALL.find(x=>x.id===id);if(!a)return;
+  editId=id;
+  const col=S2C[a.estado]||'#888', av=S2AV[a.estado]||'rgba(255,255,255,0.7)';
+  const waN=(a.whatsapp||'').replace(/\D/g,'');
+  q('#dp').innerHTML=`
+    <div class="dp-hd">
+      <div class="dp-ava" style="background:${av}">${ini(a.nombre)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="dp-nm">${esc(a.nombre)||'—'}</div>
+        <div class="dp-sub">${spIco(a.deporte)} ${esc(a.deporte)||'—'}${a.pais?' · '+esc(a.pais):''}${a.edad?' · '+a.edad+' años':''}</div>
+      </div>
+      <button class="dp-x" onclick="closeDP()">×</button>
+    </div>
+    <div class="dp-body">
+      ${a.duplicate_with?`<div class="dp-dup">⚠ Lead duplicado — también registrado por:<br><strong>${esc(a.duplicate_with)}</strong></div>`:''}
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Estado</div>
+        <select class="dp-sel" onchange="updateEst(${id},this.value)">
+          ${STAGES.map(s=>`<option ${a.estado===s.k?'selected':''}>${s.k}</option>`).join('')}
+        </select>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Contacto</div>
+        <div class="dp-row"><span class="dp-rl">WhatsApp</span><span class="dp-rv">${waN?`<a href="https://wa.me/${waN}" target="_blank">${esc(a.whatsapp)}</a>`:esc(a.whatsapp)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Email</span><span class="dp-rv">${esc(a.email)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Ciudad</span><span class="dp-rv">${esc(a.ciudad)||'—'}</span></div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Detalle</div>
+        <div class="dp-row"><span class="dp-rl">Posición</span><span class="dp-rv">${esc(a.posicion)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Presupuesto</span><span class="dp-rv" style="color:var(--green)">${esc(a.presupuesto)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="color:var(--purple)">${esc(a.recruiter)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Fuente</span><span class="dp-rv">${esc(a.fuente)||'—'}</span></div>
+        <div class="dp-row"><span class="dp-rl">Agregado</span><span class="dp-rv" style="color:var(--m2)">${(a.created_at||'').substring(0,10)}</span></div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">📅 Seguimiento</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" class="dp-inp" id="dp-seg-fecha" value="${a.seguimiento_fecha||''}" onchange="saveSeg(${id})" style="flex:1;min-width:130px">
+          <input type="text" class="dp-inp" id="dp-seg-nota" value="${esc(a.seguimiento_nota||'')}" placeholder="Nota del seguimiento..." onblur="saveSeg(${id})" style="flex:2;min-width:160px">
+        </div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Notas</div>
+        <textarea class="dp-notas" id="dp-notas-ta" onblur="saveNotas(${id})">${esc(a.notas||'')}</textarea>
+      </div>
+    </div>
+    <div class="dp-ft">
+      <button class="dp-btn p" onclick="openEdit(${id})">✏ Editar</button>
+      <button class="dp-btn d" onclick="delLead(${id})">🗑 Eliminar</button>
+    </div>`;
+  q('#dp').classList.add('open');q('#dp-ov').classList.add('open');
+}
+function closeDP(){q('#dp').classList.remove('open');q('#dp-ov').classList.remove('open');editId=null;}
+
+/* WEBSITE LEADS */
+function renderWeb(){
+  const qs=(q('#web-search')?.value||'').toLowerCase();
+  const webAll=ALL.filter(a=>a.fuente==='Website');
+  const web=webAll.filter(a=>!qs||`${a.nombre} ${a.deporte} ${a.pais} ${a.email} ${a.whatsapp}`.toLowerCase().includes(qs));
+  const pending=web.filter(a=>!a.estado||a.estado==='Nuevo');
+  const done=web.filter(a=>a.estado&&a.estado!=='Nuevo');
+  q('#web-cnt-badge').textContent=webAll.length+' leads';
+  q('#web-cnt-pending').textContent=pending.length;
+  q('#web-cnt-done').textContent=done.length;
+  q('#web-col-pending').innerHTML=pending.length?pending.map(a=>mkWebCard(a,false)).join(''):'<div style="text-align:center;color:var(--m);font-size:11px;padding:24px">Sin leads pendientes 🎉</div>';
+  q('#web-col-done').innerHTML=done.length?done.map(a=>mkWebCard(a,true)).join(''):'<div style="text-align:center;color:var(--m);font-size:11px;padding:24px">—</div>';
+
+  // Recordatorios de seguimiento
+  const todayStr=new Date().toISOString().slice(0,10);
+  const now=new Date();
+  const segRem=webAll
+    .filter(a=>a.seguimiento_fecha&&a.seguimiento_fecha<=todayStr)
+    .sort((a,b)=>a.seguimiento_fecha.localeCompare(b.seguimiento_fecha));
+  const aged=webAll
+    .filter(a=>!a.estado||a.estado==='Nuevo')
+    .map(a=>({...a,_days:Math.floor((now-new Date(a.created_at||now))/86400000)}))
+    .sort((a,b)=>b._days-a._days);
+  const banner=q('#web-rem-banner');
+  const parts=[];
+  if(segRem.length){
+    parts.push(`<div class="web-rem-hd" style="color:var(--red)">📅 ${segRem.length} seguimiento${segRem.length>1?'s':''} pendiente${segRem.length>1?'s':''}</div>
+    <div class="web-rem-list">${segRem.map(a=>{
+      const isOverdue=a.seguimiento_fecha<todayStr;
+      const wa=(a.whatsapp+'').replace(/\D/g,'');
+      return`<div class="web-rem-row${isOverdue?' urgent':''}" onclick="openDP(${a.id})">
+        <div class="web-rem-info">
+          <span class="web-rem-nm">${esc(a.nombre)}</span>
+          <span class="web-rem-meta">${a.seguimiento_nota?esc(a.seguimiento_nota):[a.deporte,a.pais].filter(Boolean).map(esc).join(' · ')}</span>
+        </div>
+        <div class="web-rem-age ${isOverdue?'urgent':'warn'}">${isOverdue?'Atrasado':'Hoy'}</div>
+        ${wa?`<a class="web-rem-wa" href="https://wa.me/${wa}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp">💬</a>`:''}
+      </div>`;
+    }).join('')}</div>`);
+  }
+  if(aged.length){
+    parts.push(`<div class="web-rem-hd"${parts.length?' style="margin-top:12px"':''}>⏰ ${aged.length} lead${aged.length>1?'s':''} pendiente${aged.length>1?'s':''} de contactar</div>
+    <div class="web-rem-list">${aged.map(a=>{
+      const isUrgent=a._days>=7;
+      const wa=(a.whatsapp+'').replace(/\D/g,'');
+      return`<div class="web-rem-row${isUrgent?' urgent':''}" onclick="openDP(${a.id})">
+        <div class="web-rem-info">
+          <span class="web-rem-nm">${esc(a.nombre)}</span>
+          ${a.deporte||a.pais?`<span class="web-rem-meta">${[a.deporte,a.pais].filter(Boolean).map(esc).join(' · ')}</span>`:''}
+        </div>
+        <div class="web-rem-age ${isUrgent?'urgent':a._days>=2?'warn':'ok'}">${a._days===0?'Hoy':a._days+'d'}</div>
+        ${wa?`<a class="web-rem-wa" href="https://wa.me/${wa}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp">💬</a>`:''}
+      </div>`;
+    }).join('')}</div>`);
+  }
+  banner.style.display=parts.length?'block':'none';
+  if(parts.length)banner.innerHTML=parts.join('');
+}
+const WEB_RECRUITERS=[
+  {name:'Andrea Castillo', init:'An', color:'#db2777', txt:'#fff'},
+  {name:'Ariel Ching',     init:'Ar', color:'#7c3aed', txt:'#fff'},
+  {name:'Diego Julio',     init:'Di', color:'#3b82f6', txt:'#fff'},
+  {name:'Floyd Ransom',    init:'Fl', color:'#0d9488', txt:'#fff'},
+  {name:'Stefano',         init:'St', color:'#AAFF00', txt:'#000'},
+];
+function mkWebCard(a,isDone){
+  const sport=a.deporte?`<span class="tag tag-rec">${esc(a.deporte)}</span>`:'';
+  const pais=a.pais?`<span class="tag tag-pais">${esc(a.pais)}</span>`:'';
+  const inPipeline=isDone&&(a.recruiter||'').trim();
+  return `<div class="web-card${inPipeline?' web-card-pipeline':''}" onclick="openDP(${a.id})">
+    <div class="web-card-nm">${esc(a.nombre)}${inPipeline?` <span style="font-size:9px;color:var(--green);font-weight:700">● Pipeline</span>`:''}</div>
+    <div class="web-card-meta">${sport}${pais}
+      ${a.whatsapp?`<span class="tag" style="background:rgba(29,185,84,0.1);color:#1DB954;border:1px solid rgba(29,185,84,0.2)">📱 ${esc(a.whatsapp)}</span>`:''}
+      ${a.email?`<span class="tag" style="background:rgba(255,255,255,0.05);color:var(--m3);border:1px solid var(--b)">${esc(a.email)}</span>`:''}
+    </div>
+    ${!isDone
+      ? `<div class="rec-avs">
+          <span class="rec-avs-lbl">Asignar a:</span>
+          ${WEB_RECRUITERS.map(r=>`<button class="rec-av" style="background:${r.color};color:${r.txt}" title="${r.name}" onclick="event.stopPropagation();quickAssign(${a.id},'${r.name}')">${r.init}</button>`).join('')}
+        </div>`
+      : `<div style="display:flex;gap:6px">
+          <button class="web-card-contact done" style="flex:1" onclick="event.stopPropagation();toggleContactado(${a.id},true)">↩ Marcar pendiente</button>
+          ${!inPipeline?`<button class="web-card-contact pending" style="flex:1.4;background:rgba(170,255,0,0.12);color:var(--green);border-color:rgba(170,255,0,0.25)" onclick="event.stopPropagation();openAssign(${a.id})">→ Asignar al Pipeline</button>`:''}
+          ${inPipeline?`<span style="font-size:9px;color:var(--m2);align-self:center;white-space:nowrap">👤 ${esc(a.recruiter)}</span>`:''}
+        </div>`
+    }
+  </div>`;
+}
+async function quickAssign(id,recruiter){
+  const {error}=await sb.from('leads').update({recruiter,estado:'Contactado'}).eq('id',id);
+  if(!error){
+    const a=ALL.find(x=>x.id===id);
+    if(a){a.recruiter=recruiter;a.estado='Contactado';}
+    applyFilters();renderWeb();
+    toast(`✓ Asignado a ${recruiter}`,'ok');
+  } else toast('Error','err');
+}
+async function toggleContactado(id,isDone){
+  const ne=isDone?'Nuevo':'Contactado';
+  const {error}=await sb.from('leads').update({estado:ne}).eq('id',id);
+  if(!error){const a=ALL.find(x=>x.id===id);if(a)a.estado=ne;renderWeb();toast(isDone?'Marcado como pendiente':'¡Contactado! ✓','ok');}
+  else toast('Error','err');
+}
+
+/* ASIGNAR AL PIPELINE */
+const RECRUITERS=['Andy','Ariel','Floyd','Julio','Marketing','Stefano'];
+let _assignId=null;
+function openAssign(id){
+  _assignId=id;
+  const a=ALL.find(x=>x.id===id);
+  q('#assign-nm').textContent=a?a.nombre:'';
+  q('#assign-ov').style.display='flex';
+}
+function closeAssign(){q('#assign-ov').style.display='none';_assignId=null;}
+async function doAssign(recruiter){
+  if(!_assignId)return;
+  const {error}=await sb.from('leads').update({recruiter,estado:'Contactado'}).eq('id',_assignId);
+  if(!error){
+    const a=ALL.find(x=>x.id===_assignId);
+    if(a){a.recruiter=recruiter;a.estado='Contactado';}
+    closeAssign();applyFilters();renderWeb();
+    toast(`✓ Asignado a ${recruiter} — ya está en el pipeline`,'ok');
+  } else toast('Error: '+error.message,'err');
+}
+function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').classList.toggle('open');}
+function toggleSortStatus(){
+  SORT_STATUS=!SORT_STATUS;
+  const btn=q('#btn-sort-status');
+  if(btn){btn.style.background=SORT_STATUS?'rgba(170,255,0,0.12)':'rgba(255,255,255,0.05)';btn.style.borderColor=SORT_STATUS?'#AAFF00':'rgba(255,255,255,0.1)';btn.style.color=SORT_STATUS?'#AAFF00':'var(--m2)';}
+  applyFilters();
+}
+
+async function updateEst(id,ne){
+  const {error}=await sb.from('leads').update({estado:ne,updated_at:new Date().toISOString()}).eq('id',id);
+  if(!error){const a=ALL.find(x=>x.id===id);if(a){a.estado=ne;if(ne==='Firmado')sendToCRM(a);}applyFilters();toast('Estado actualizado ✓','ok');}
+  else toast('Error','err');
+}
+
+async function sendToCRM(lead){
+  const {data:exists}=await sb.from('placements').select('id').ilike('nombre',lead.nombre).limit(1);
+  if(exists&&exists.length>0){toast('Ya existe en el CRM: '+lead.nombre,'ok');return;}
+  const payload={
+    nombre:       lead.nombre,
+    deporte:      lead.deporte||'',
+    posicion:     lead.posicion||'',
+    nacionalidad: lead.pais||'',
+    budget:       lead.presupuesto||'',
+    working_with: lead.recruiter||'',
+    notas:        lead.notas||'',
+    commit_status:'Prospecto',
+  };
+  const {error}=await sb.from('placements').insert(payload);
+  if(!error)toast('✓ '+lead.nombre+' agregado al APL CRM','ok');
+  else toast('Error al crear en CRM: '+error.message,'err');
+}
+async function saveNotas(id){
+  const val=q('#dp-notas-ta')?.value||'';
+  await sb.from('leads').update({notas:val,updated_at:new Date().toISOString()}).eq('id',id);
+  const a=ALL.find(x=>x.id===id);if(a)a.notas=val;
+}
+async function saveSeg(id){
+  const fecha=q('#dp-seg-fecha')?.value||null;
+  const nota=q('#dp-seg-nota')?.value||'';
+  const {error}=await sb.from('leads').update({seguimiento_fecha:fecha||null,seguimiento_nota:nota,updated_at:new Date().toISOString()}).eq('id',id);
+  if(!error){const a=ALL.find(x=>x.id===id);if(a){a.seguimiento_fecha=fecha;a.seguimiento_nota=nota;}applyFilters();toast('Seguimiento guardado ✓','ok');}
+  else toast('Error: agrega las columnas en Supabase primero','err');
+}
+function segBadge(a){
+  if(!a.seguimiento_fecha)return '';
+  const today=new Date().toISOString().slice(0,10);
+  const f=a.seguimiento_fecha;
+  if(f<today)return `<div class="seg-badge overdue">⚠ Atrasado · ${f}</div>`;
+  if(f===today)return `<div class="seg-badge today">📅 Hoy · ${f}</div>`;
+  return `<div class="seg-badge upcoming">📅 ${f}</div>`;
+}
+
+/* MODAL */
+function openAdd(){
+  editId=null;q('#m-ttl').textContent='Nuevo Lead';
+  ['nombre','deporte','wa','email','pais','ciudad','posicion','presupuesto','recruiter'].forEach(f=>q('#m-'+f).value='');
+  q('#m-edad').value='';q('#m-notas').value='';
+  setFi('#m-estado','Nuevo');setFi('#m-fuente','Manual');
+  q('#m-ov').classList.add('open');q('#modal').classList.add('open');
+}
+function openEdit(id){
+  const a=ALL.find(x=>x.id===id);if(!a)return;
+  editId=id;q('#m-ttl').textContent='Editar Lead';
+  q('#m-nombre').value=a.nombre||'';q('#m-deporte').value=a.deporte||'';
+  q('#m-wa').value=a.whatsapp||'';q('#m-email').value=a.email||'';
+  q('#m-pais').value=a.pais||'';q('#m-ciudad').value=a.ciudad||'';
+  q('#m-edad').value=a.edad||'';q('#m-posicion').value=a.posicion||'';
+  q('#m-presupuesto').value=a.presupuesto||'';q('#m-recruiter').value=a.recruiter||'';
+  q('#m-notas').value=a.notas||'';
+  setFi('#m-estado',a.estado||'Nuevo');setFi('#m-fuente',a.fuente||'Manual');
+  q('#m-ov').classList.add('open');q('#modal').classList.add('open');
+}
+function closeMod(){q('#m-ov').classList.remove('open');q('#modal').classList.remove('open');}
+
+async function saveLead(){
+  const nombre=q('#m-nombre').value.trim();
+  if(!nombre){toast('Ingresa el nombre','err');return;}
+  const payload={
+    nombre, deporte:q('#m-deporte').value.trim(), whatsapp:q('#m-wa').value.trim(),
+    email:q('#m-email').value.trim(), pais:q('#m-pais').value.trim(),
+    ciudad:q('#m-ciudad').value.trim(), edad:parseInt(q('#m-edad').value)||null,
+    posicion:q('#m-posicion').value.trim(), presupuesto:q('#m-presupuesto').value.trim(),
+    estado:q('#m-estado').value, fuente:q('#m-fuente').value,
+    recruiter:q('#m-recruiter').value.trim(), notas:q('#m-notas').value.trim(),
+    updated_at:new Date().toISOString()
+  };
+  let error;
+  if(editId){({error}=await sb.from('leads').update(payload).eq('id',editId));}
+  else{({error}=await sb.from('leads').insert(payload));}
+  if(error){toast('Error: '+error.message,'err');return;}
+  closeMod();await loadData();
+  if(editId)openDP(editId);
+  toast(editId?'Lead actualizado ✓':'Lead agregado ✓','ok');
+}
+
+async function delLead(id){
+  if(!confirm('¿Eliminar este lead?'))return;
+  const {error}=await sb.from('leads').delete().eq('id',id);
+  if(!error){closeDP();await loadData();toast('Lead eliminado','ok');}
+  else toast('Error: '+error.message,'err');
+}
+
+/* UTIL */
+const q=s=>document.querySelector(s);
+const setFi=(sel,v)=>{const e=q(sel);if(e)e.value=v;};
+let _toastT=null;
+function toast(msg,type='ok'){
+  const el=q('#toast');el.textContent=msg;el.className='toast '+type+' show';
+  clearTimeout(_toastT);_toastT=setTimeout(()=>el.classList.remove('show'),2500);
+}
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
