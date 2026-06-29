@@ -134,6 +134,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .task-item.done .task-title{text-decoration:line-through;color:var(--muted);}
 .task-desc{font-size:11.5px;color:var(--muted);line-height:1.4;margin-top:2px;white-space:pre-wrap;word-break:break-word;}
 .task-meta{display:flex;align-items:center;gap:5px;margin-top:3px;flex-wrap:wrap;}
+.assignee-checks{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px;}
+.acheck{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text);background:var(--card2);border:1.5px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;transition:border-color .15s,background .15s;}
+.acheck:has(input:checked){background:rgba(170,255,0,.12);border-color:#AAFF00;}
+.acheck input{accent-color:#3a6b00;width:13px;height:13px;cursor:pointer;}
 .badge-assignee{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--card2);color:var(--muted);}
 .badge-due{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
 .badge-due.overdue{background:rgba(239,68,68,.1);color:#b91c1c;}
@@ -618,12 +622,12 @@ async function saveSemanal(){
   const titleEl=document.getElementById('sf-title');
   const title=titleEl?titleEl.value.trim():'';
   if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
-  const assignee=(document.getElementById('sf-assignee')||{}).value||'';
+  const assignee=getCheckedAssignees('sf_').join(', ');
   const priority=(document.getElementById('sf-priority')||{}).value||'media';
   const description=(document.getElementById('sf-desc')||{}).value?.trim()||'';
   const{data,error}=await db.from('nvs_weekly_tasks').insert({
     department:DEPT,week_start:isoDate(WEEK),
-    title,assignee:assignee.trim(),priority,completed:false,description
+    title,assignee,priority,completed:false,description
   }).select().single();
   if(error){alert('Error: '+error.message);console.error(error);return;}
   SEM_TASKS[DEPT].push(data);
@@ -662,23 +666,13 @@ function renderSemanal(){
       <div class="f-lbl">Nueva tarea — ${dNames[DEPT]}</div>
       <input id="sf-title" class="tf" type="text" placeholder="Nombre de la tarea…" autocomplete="off">
       <textarea id="sf-desc" class="tf" rows="2" placeholder="Descripción (opcional)" style="resize:none;font-family:inherit;font-size:13px;line-height:1.4;"></textarea>
-      <div class="tf-row">
-        <select id="sf-assignee" class="tf-sel" style="flex:1;">
-          <option value="">— Sin asignar —</option>
-          <option value="Julio Blanco">Julio Blanco</option>
-          <option value="Andrea Castillo">Andrea Castillo</option>
-          <option value="Stefano Cano">Stefano Cano</option>
-          <option value="Diego Julio">Diego Julio</option>
-          <option value="Floyd Ramson">Floyd Ramson</option>
-          <option value="Ximena Botello">Ximena Botello</option>
-          <option value="José Montilla">José Montilla</option>
-        </select>
-        <select id="sf-priority" class="tf-sel">
-          <option value="alta">🔴 Alta</option>
-          <option value="media" selected>🟡 Media</option>
-          <option value="baja">⚫ Baja</option>
-        </select>
-      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Responsables</div>
+      ${teamChecks('sf_','')}
+      <select id="sf-priority" class="tf-sel" style="width:100%;">
+        <option value="alta">🔴 Alta</option>
+        <option value="media" selected>🟡 Media</option>
+        <option value="baja">⚫ Baja</option>
+      </select>
       <div class="form-btns">
         <button class="btn-save" onclick="saveSemanal()">Guardar tarea</button>
         <button class="btn-cancel" onclick="cancelSForm()">Cancelar</button>
@@ -700,7 +694,7 @@ async function saveEditSemanal(id){
   const titleEl=document.getElementById('se-title');
   const title=titleEl?titleEl.value.trim():'';
   if(!title){if(titleEl){titleEl.focus();titleEl.style.borderColor='#dc2626';}return;}
-  const assignee=(document.getElementById('se-assignee')||{}).value?.trim()||'';
+  const assignee=getCheckedAssignees('se_').join(', ');
   const priority=(document.getElementById('se-priority')||{}).value||'media';
   const description=(document.getElementById('se-desc')||{}).value?.trim()||'';
   const{data,error}=await db.from('nvs_weekly_tasks').update({title,assignee,priority,description}).eq('id',id).select().single();
@@ -719,23 +713,13 @@ function sTaskRow(t,i){
       <div class="f-lbl">Editar tarea — ${dNames[DEPT]}</div>
       <input id="se-title" class="tf" type="text" value="${esc(t.title)}" autocomplete="off">
       <textarea id="se-desc" class="tf" rows="2" style="resize:none;font-family:inherit;font-size:13px;line-height:1.4;">${esc(t.description||'')}</textarea>
-      <div class="tf-row">
-        <select id="se-assignee" class="tf-sel" style="flex:1;">
-          <option value=""${!t.assignee?' selected':''}>— Sin asignar —</option>
-          <option value="Julio Blanco"${t.assignee==='Julio Blanco'?' selected':''}>Julio Blanco</option>
-          <option value="Andrea Castillo"${t.assignee==='Andrea Castillo'?' selected':''}>Andrea Castillo</option>
-          <option value="Stefano Cano"${t.assignee==='Stefano Cano'?' selected':''}>Stefano Cano</option>
-          <option value="Diego Julio"${t.assignee==='Diego Julio'?' selected':''}>Diego Julio</option>
-          <option value="Floyd Ramson"${t.assignee==='Floyd Ramson'?' selected':''}>Floyd Ramson</option>
-          <option value="Ximena Botello"${t.assignee==='Ximena Botello'?' selected':''}>Ximena Botello</option>
-          <option value="José Montilla"${t.assignee==='José Montilla'?' selected':''}>José Montilla</option>
-        </select>
-        <select id="se-priority" class="tf-sel">
-          <option value="alta"${t.priority==='alta'?' selected':''}>🔴 Alta</option>
-          <option value="media"${t.priority==='media'?' selected':''}>🟡 Media</option>
-          <option value="baja"${t.priority==='baja'?' selected':''}>⚫ Baja</option>
-        </select>
-      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Responsables</div>
+      ${teamChecks('se_',t.assignee||'')}
+      <select id="se-priority" class="tf-sel" style="width:100%;">
+        <option value="alta"${t.priority==='alta'?' selected':''}>🔴 Alta</option>
+        <option value="media"${t.priority==='media'?' selected':''}>🟡 Media</option>
+        <option value="baja"${t.priority==='baja'?' selected':''}>⚫ Baja</option>
+      </select>
       <div class="form-btns">
         <button class="btn-save" onclick="saveEditSemanal('${t.id}')">Guardar</button>
         <button class="btn-cancel" onclick="S_EDIT=null;renderSemanal()">Cancelar</button>
@@ -750,7 +734,7 @@ function sTaskRow(t,i){
       <div class="task-title">${esc(t.title)}</div>
       ${t.description?`<div class="task-desc">${esc(t.description)}</div>`:''}
       <div class="task-meta">
-        ${t.assignee?`<span class="badge-assignee">👤 ${esc(t.assignee)}</span>`:''}
+        ${t.assignee?t.assignee.split(',').map(a=>`<span class="badge-assignee">👤 ${esc(a.trim())}</span>`).join(''):''}
         <span class="badge-pri pri-${t.priority}">${priLabel(t.priority)}</span>
       </div>
     </div>
@@ -778,6 +762,16 @@ function sTaskRow(t,i){
 /* ── HELPERS ── */
 function priLabel(p){return{alta:'● Alta',media:'● Media',baja:'● Baja'}[p]||p;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+const TEAM=['Julio Blanco','Andrea Castillo','Stefano Cano','Diego Julio','Floyd Ramson','Ximena Botello','José Montilla'];
+function getCheckedAssignees(prefix){return TEAM.filter(n=>document.getElementById(prefix+n.replace(/ /g,'_'))?.checked);}
+function teamChecks(prefix,selected){
+  const sel=selected?selected.split(',').map(s=>s.trim()):[];
+  return`<div class="assignee-checks">`+TEAM.map(n=>{
+    const id=prefix+n.replace(/ /g,'_');
+    const chk=sel.includes(n)?'checked':'';
+    return`<label class="acheck"><input type="checkbox" id="${id}" ${chk}><span>${n}</span></label>`;
+  }).join('')+`</div>`;
+}
 
 document.addEventListener('keydown',e=>{
   const lo=document.getElementById('login-overlay');
