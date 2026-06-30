@@ -1641,6 +1641,66 @@ const PDF_CONTENT={
   }
 };
 
+function printExamenes(){
+  const today=new Date().toLocaleDateString('es-PA',{year:'numeric',month:'long',day:'numeric'});
+  const exams=[
+    {icon:'🏫',color:'#1d4ed8',bg:'rgba(59,130,246,.08)',name:'TOEFL iBT',sub:'Test of English as a Foreign Language',stats:[['💵','Costo','$215–$255 Latam / $270 EE.UU.'],['⏱','Duración','~3 horas · 4 secciones'],['📊','Escala','0 – 120 puntos'],['📅','Validez','2 años']],scores:[['D1','80–100+','Varía según universidad y deporte'],['D2','61–79','Mínimo recomendado para becas']],note:'El más aceptado en D1/D2. Obligatorio en la mayoría de universidades para atletas internacionales no nativos de inglés.'},
+    {icon:'🟩',color:'#15803d',bg:'rgba(170,255,0,.08)',name:'Duolingo English Test',sub:'Alternativa rápida y online',stats:[['💵','Costo','$70 USD (desde feb 2025)'],['⏱','Duración','~60 minutos'],['📊','Escala','10 – 160 puntos'],['📅','Validez','2 años']],scores:[['D1','105–120+','Aceptado por +4,500 univ. (no todas D1)'],['D2','90–105','Verificar antes de recomendar']],note:'100% online desde casa. Resultados en 48 horas. No todos los programas D1 lo aceptan — verificar siempre.'},
+    {icon:'📐',color:'#7c3aed',bg:'rgba(139,92,246,.08)',name:'SAT',sub:'Scholastic Assessment Test',stats:[['💵','Costo','$68 doméstico / $111 internacional'],['⏱','Duración','2 h 14 min (sin ensayo)'],['📊','Escala','400 – 1600 puntos'],['📅','Validez','Sin límite oficial']],scores:[['D1','1000–1200+','Varía por universidad y deporte'],['D2','900–1050','Requisito académico — no de inglés']],note:'Prueba académica (no de inglés). Requisito de admisión y becas académicas en muchas universidades. Aplica junto al TOEFL/Duolingo.'},
+    {icon:'📋',color:'#b45309',bg:'rgba(245,158,11,.08)',name:'ACT',sub:'American College Testing',stats:[['💵','Costo','$68 sin ensayo / $93 con ensayo'],['⏱','Duración','2 h 55 min (sin ensayo)'],['📊','Escala','1 – 36 puntos'],['📅','Validez','Sin límite oficial']],scores:[['D1','19–24+','Equivalente a SAT 1000–1200'],['D2','16–20','Aceptado igual que el SAT en todas las univ.']],note:'Alternativa directa al SAT. Aceptado igualmente en todas las universidades. Incluye sección de Ciencias que el SAT no tiene.'},
+  ];
+  const duoSteps=[
+    {n:'1',title:'Entra a la web oficial',body:'Ve a <strong>englishtest.duolingo.com</strong> desde tu computadora (no funciona en móvil). Haz clic en "Get started" o "Practice free".'},
+    {n:'2',title:'Crea tu cuenta gratis',body:'Regístrate con tu email o con tu cuenta de Google. Solo necesitas email, contraseña y tu fecha de nacimiento. No se requiere tarjeta de crédito.'},
+    {n:'3',title:'Configura tu perfil',body:'Indica tu objetivo (estudiar en EE.UU., Canadá, etc.) y cómo te enteraste del examen. Toma menos de 1 minuto.'},
+    {n:'4',title:'Ve a "Practice" en el menú',body:'Desde tu dashboard, haz clic en "Practice" en la barra superior. Verás dos opciones: prueba rápida (15 min) y práctica completa por secciones.'},
+    {n:'5',title:'Elige la prueba rápida (Quick Check)',body:'Haz clic en "Quick Check" — es la prueba gratuita de 15 minutos que simula los tipos de preguntas reales del examen. Sin límite de intentos.'},
+    {n:'6',title:'Prepara tu equipo antes de empezar',body:'Necesitas: computadora con cámara y micrófono, lugar silencioso con buena iluminación, auriculares recomendados. <strong>Desde 2025 también piden un segundo dispositivo</strong> (celular o tablet) como cámara secundaria.'},
+    {n:'7',title:'Completa la prueba',body:'Responde las preguntas de lectura, escritura, escucha y habla tal como en el examen real. La IA evalúa en tiempo real.'},
+    {n:'8',title:'Revisa tus resultados',body:'Al terminar obtienes un puntaje estimado y retroalimentación por sección. Puedes repetirla todas las veces que quieras, <strong>completamente gratis</strong>.'},
+  ];
+  const examsHtml=exams.map(e=>`
+    <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:14px;background:${e.bg};page-break-inside:avoid;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:22px;">${e.icon}</span>
+        <div><div style="font-size:14px;font-weight:800;color:${e.color};">${e.name}</div><div style="font-size:10px;color:#64748b;">${e.sub}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px;">
+        ${e.stats.map(s=>`<div style="background:#fff;border-radius:7px;padding:8px;border:1px solid #e2e8f0;text-align:center;"><div style="font-size:14px;">${s[0]}</div><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin:2px 0;">${s[1]}</div><div style="font-size:10.5px;font-weight:700;color:#0f172a;">${s[2]}</div></div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+        ${e.scores.map(s=>`<div style="background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #e2e8f0;"><div style="font-size:9px;font-weight:800;color:${e.color};letter-spacing:.5px;">${s[0]}</div><div style="font-size:13px;font-weight:800;color:#0f172a;">${s[1]}</div><div style="font-size:9.5px;color:#64748b;">${s[2]}</div></div>`).join('')}
+      </div>
+      <div style="font-size:10.5px;color:#475569;line-height:1.6;background:#fff;border-radius:7px;padding:8px 10px;border-left:3px solid ${e.color};">${e.note}</div>
+    </div>`).join('');
+  const stepsHtml=duoSteps.map(s=>`
+    <div style="display:flex;gap:12px;margin-bottom:12px;page-break-inside:avoid;">
+      <div style="width:24px;height:24px;border-radius:50%;background:#AAFF00;color:#0f172a;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${s.n}</div>
+      <div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:2px;">${s.title}</div><div style="font-size:10.5px;color:#475569;line-height:1.7;">${s.body}</div></div>
+    </div>`).join('');
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>NVS · Exámenes de Inglés</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#0f172a;font-size:12px;}@page{margin:14mm 14mm 16mm 14mm;size:A4;}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.no-print{display:none!important;}}.page{max-width:740px;margin:0 auto;padding:20px 24px;}.print-btn{position:fixed;bottom:18px;right:18px;background:#0f172a;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+  </style></head><body>
+  <div class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #AAFF00;padding-bottom:12px;margin-bottom:16px;">
+      <div><div style="font-size:28px;font-weight:900;letter-spacing:3px;">NV<span style="color:#AAFF00;">S</span></div><div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#64748b;margin-top:2px;">New Vision Sports · Agencia de Colocación Deportiva</div></div>
+      <div style="text-align:right;"><div style="font-size:16px;font-weight:800;color:#0f172a;">📝 Guía de Exámenes</div><div style="font-size:8px;color:#94a3b8;margin-top:3px;">${today}</div></div>
+    </div>
+    <div style="margin-bottom:14px;"><div style="font-size:19px;font-weight:900;color:#0f172a;">Exámenes Estandarizados para EE.UU.</div><div style="font-size:10px;color:#64748b;margin-top:2px;">TOEFL · Duolingo English Test · SAT · ACT — Costos, puntajes y requisitos 2025–2026</div></div>
+    <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 8px 8px 0;padding:10px 13px;margin-bottom:16px;font-size:10.5px;color:#1d4ed8;line-height:1.6;">ℹ️ <strong>¿Cuáles necesita tu atleta?</strong> Las universidades D1/D2 suelen exigir demostración de inglés (TOEFL o Duolingo) para atletas internacionales. El SAT/ACT es requisito académico. Siempre confirmar con cada universidad.</div>
+    ${examsHtml}
+    <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin:18px 0 12px;">🆓 Examen de Práctica GRATIS — Duolingo English Test (Paso a Paso)</div>
+    ${stepsHtml}
+    <div style="background:#f0fdf4;border-radius:8px;padding:10px 13px;margin-top:10px;font-size:10.5px;color:#15803d;">🔗 Link directo: <strong>englishtest.duolingo.com/quick</strong> — práctica por secciones: <strong>englishtest.duolingo.com/prepare</strong></div>
+    <div style="margin-top:24px;padding-top:10px;border-top:2px solid #AAFF00;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:9px;color:#94a3b8;">© ${new Date().getFullYear()} New Vision Sports · Documento interno — uso exclusivo del equipo NVS</div>
+      <div style="font-size:9px;color:#94a3b8;">playwithnewvision.com</div>
+    </div>
+  </div>
+  <button class="print-btn no-print" onclick="window.print()">⬇ Descargar PDF</button>
+  </body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();
+}
 function printGuide(type){
   const g=PDF_CONTENT[type];if(!g)return;
   const today=new Date().toLocaleDateString('es-PA',{year:'numeric',month:'long',day:'numeric'});
@@ -1748,13 +1808,17 @@ function renderExamenesSection(){
   <div class="guide-card">
     <div class="guide-card-header">
       <div class="guide-card-icon" style="background:rgba(99,102,241,.1);">📝</div>
-      <div>
+      <div style="flex:1;">
         <div class="guide-card-title">Exámenes Estandarizados para Universidades de EE.UU.</div>
         <div class="guide-card-meta">
           <span class="guide-tag" style="background:rgba(170,255,0,.12);color:#3a6b00;">NCAA · NAIA · NJCAA</span>
           <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Internacional</span>
         </div>
       </div>
+      <button class="guide-download-btn" onclick="printExamenes()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
     </div>
     <div class="guide-body">
       <div class="guide-alert blue">
