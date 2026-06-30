@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVS · Guías</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#AAFF00;--green-dim:rgba(170,255,0,0.12);--green-dk:#88CC00;
+  --bg:#f8fafc;--card:#fff;--card2:#f1f5f9;--border:rgba(0,0,0,0.08);
+  --muted:#64748b;--txt:#0f172a;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN */
+#login-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 15% 50%,rgba(170,255,0,.06) 0%,transparent 60%);}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);}
+.login-box{position:relative;z-index:1;width:360px;max-width:92vw;animation:fadeUp .5s both;}
+.login-logo-wrap{text-align:center;margin-bottom:28px;}
+.login-logo{font-family:'Anton',sans-serif;font-size:56px;color:#0f172a;letter-spacing:3px;}
+.login-logo span{color:var(--green);}
+.login-sub{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;margin-top:6px;}
+.login-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;padding:26px 22px;box-shadow:0 4px 20px rgba(0,0,0,.06);}
+.lf{width:100%;background:#f8fafc;border:1px solid rgba(0,0,0,.09);border-radius:10px;padding:12px 14px;color:var(--txt);font-size:13px;font-family:'Inter',sans-serif;margin-bottom:10px;outline:none;transition:border .2s;}
+.lf:focus{border-color:var(--green);background:#fff;}
+.lf::placeholder{color:#94a3b8;}
+.login-btn{width:100%;background:var(--green);color:#0f172a;border:none;border-radius:10px;padding:13px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.login-btn:hover{background:var(--green-dk);}
+.login-error{color:#dc2626;font-size:12px;margin-top:8px;min-height:14px;text-align:center;font-weight:600;}
+.login-spinner{width:16px;height:16px;border:2px solid rgba(15,23,42,.15);border-top-color:#0f172a;border-radius:50%;animation:spin .7s linear infinite;display:none;margin:8px auto 0;}
+
+/* SHELL */
+#app{display:none;height:100vh;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:52px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;z-index:50;}
+.tb-left{display:flex;align-items:center;gap:9px;}
+.tb-back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;padding:5px 9px;border-radius:7px;transition:all .15s;text-decoration:none;}
+.tb-back:hover{background:var(--card2);color:var(--txt);}
+.tb-divider{width:1px;height:16px;background:var(--border);}
+.tb-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;}
+.tb-title span{color:var(--green);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-user{display:flex;align-items:center;gap:7px;padding:5px 11px;background:var(--card2);border:1px solid var(--border);border-radius:99px;}
+.tb-avatar{width:20px;height:20px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#3a6b00;}
+.tb-uname{font-size:11px;font-weight:600;color:var(--txt);}
+.btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .15s;font-weight:600;font-family:'Inter',sans-serif;}
+.btn-logout:hover{border-color:rgba(0,0,0,.18);color:var(--txt);}
+
+/* SPLIT */
+.split{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:230px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:16px 14px 12px;border-bottom:1px solid var(--border);}
+.sb-head-title{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.3px;margin-bottom:2px;}
+.sb-head-sub{font-size:10px;color:var(--muted);}
+.sb-cats{flex:1;overflow-y:auto;padding:8px;}
+.sb-cat-lbl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;padding:10px 8px 6px;}
+.sb-cat-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:all .14s;font-size:12px;font-weight:600;color:var(--muted);border:1px solid transparent;margin-bottom:1px;}
+.sb-cat-item:hover{background:var(--card2);color:var(--txt);}
+.sb-cat-item.active{background:var(--green-dim);color:#3a6b00;border-color:rgba(170,255,0,.25);}
+.sb-cat-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sb-cat-badge{margin-left:auto;font-size:9px;font-weight:800;background:rgba(170,255,0,.2);color:#3a6b00;padding:2px 6px;border-radius:99px;}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.main-head{padding:18px 28px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;}
+.main-head-row{display:flex;align-items:center;justify-content:space-between;}
+.main-head-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.3px;}
+.main-head-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.guides-wrap{flex:1;overflow-y:auto;padding:24px 28px 48px;}
+
+/* EMPTY STATE */
+.guides-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 20px;color:#94a3b8;animation:fadeIn .3s both;}
+.guides-empty-icon{font-size:48px;opacity:.3;}
+.guides-empty-title{font-size:14px;font-weight:700;color:#cbd5e1;}
+.guides-empty-sub{font-size:12px;color:#cbd5e1;text-align:center;max-width:260px;line-height:1.6;}
+.guides-empty-badge{background:var(--green-dim);color:#3a6b00;border-radius:99px;padding:5px 14px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
+
+/* ── GUIDE CARD ── */
+.guide-card{background:#fff;border:1px solid var(--border);border-radius:16px;margin-bottom:20px;overflow:hidden;animation:fadeUp .3s both;}
+.guide-card-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px;}
+.guide-card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.guide-card-title{font-family:'Anton',sans-serif;font-size:19px;letter-spacing:.3px;margin-bottom:4px;}
+.guide-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.guide-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;}
+
+/* STEPS */
+.guide-body{padding:20px 24px;}
+.steps-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;margin-bottom:14px;}
+.step-item{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--green-dim);color:#3a6b00;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;border:1px solid rgba(170,255,0,.3);}
+.step-num.active{background:var(--green);color:#0f172a;}
+.step-content{flex:1;}
+.step-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.step-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;font-weight:700;color:#4f46e5;text-decoration:none;padding:4px 10px;background:rgba(99,102,241,.08);border-radius:6px;transition:all .15s;}
+.step-link:hover{background:rgba(99,102,241,.15);color:#3730a3;}
+.step-link-green{color:#3a6b00;background:var(--green-dim);}
+.step-link-green:hover{background:rgba(170,255,0,.2);}
+.step-fee{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:11px;font-weight:800;color:#92400e;background:rgba(245,158,11,.12);padding:4px 10px;border-radius:6px;}
+
+/* SECTION DIVIDER */
+.guide-section{padding:0 24px 20px;}
+.guide-section-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* DOCS CHECKLIST */
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.doc-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card2);border-radius:8px;font-size:11px;font-weight:600;color:var(--txt);}
+.doc-item::before{content:'📎';font-size:12px;flex-shrink:0;}
+.doc-item.required::before{content:'⚠️';}
+
+/* FEES TABLE */
+.fees-table{width:100%;border-collapse:collapse;font-size:12px;}
+.fees-table th{text-align:left;padding:8px 12px;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;border-bottom:1px solid var(--border);}
+.fees-table td{padding:10px 12px;border-bottom:1px solid var(--card2);color:var(--txt);font-weight:500;}
+.fees-table tr:last-child td{border-bottom:none;font-weight:800;color:#0f172a;}
+.fees-table .fee-amt{font-weight:800;color:#3a6b00;}
+.fees-table .fee-total{color:#3a6b00;font-family:'Anton',sans-serif;font-size:15px;}
+
+/* ALERTS */
+.guide-alert{display:flex;gap:12px;padding:14px 16px;border-radius:10px;margin-bottom:12px;font-size:12px;line-height:1.6;}
+.guide-alert.yellow{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+.guide-alert.blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;}
+.guide-alert.green{background:var(--green-dim);border:1px solid rgba(170,255,0,.3);color:#3a6b00;}
+.guide-alert.red{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;}
+.guide-alert-icon{font-size:16px;flex-shrink:0;}
+.guide-alert strong{display:block;font-weight:700;margin-bottom:2px;}
+
+.guide-download-btn{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:7px 14px;background:#0f172a;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;flex-shrink:0;}
+.guide-download-btn:hover{background:#1e293b;}
+.guide-download-btn svg{flex-shrink:0;}
+
+@media(max-width:640px){
+  .sidebar{display:none;}
+  .main-head,.guides-wrap{padding-left:16px;padding-right:16px;}
+  .doc-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay">
+  <div class="login-bg"><div class="login-grid"></div></div>
+  <div class="login-box">
+    <div class="login-logo-wrap">
+      <div class="login-logo">NV<span>S</span></div>
+      <div class="login-sub">Guías · New Vision Sports</div>
+    </div>
+    <div class="login-card">
+      <input id="login-email" class="lf" type="email" placeholder="Email" autocomplete="email">
+      <input id="login-password" class="lf" type="password" placeholder="Contraseña" autocomplete="current-password">
+      <button class="login-btn" id="login-btn" onclick="doLogin()">ENTRAR</button>
+      <div class="login-error" id="login-error"></div>
+      <div class="login-spinner" id="login-spinner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tb-left">
+      <a class="tb-back" href="index.html">← Módulos</a>
+      <div class="tb-divider"></div>
+      <div class="tb-title">NV<span>S</span> · Guías</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-user">
+        <div class="tb-avatar" id="tb-avatar">—</div>
+        <span class="tb-uname" id="tb-uname">—</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Salir →</button>
+    </div>
+  </div>
+
+  <div class="split">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-head">
+        <div class="sb-head-title">Biblioteca de Guías</div>
+        <div class="sb-head-sub">Recursos para el equipo NVS</div>
+      </div>
+      <div class="sb-cats">
+        <div class="sb-cat-lbl">Categorías</div>
+        <div class="sb-cat-item" id="cat-todas" onclick="setCategory('todas')">
+          <span class="sb-cat-icon">📚</span> Todas
+        </div>
+        <div class="sb-cat-item" id="cat-elegibilidad" onclick="setCategory('elegibilidad')">
+          <span class="sb-cat-icon">✅</span> Elegibilidad
+          <span class="sb-cat-badge">3</span>
+        </div>
+        <div class="sb-cat-item active" id="cat-visado" onclick="setCategory('visado')">
+          <span class="sb-cat-icon">✈️</span> Visado
+          <span class="sb-cat-badge">3</span>
+        </div>
+        <div class="sb-cat-item" id="cat-onboarding" onclick="setCategory('onboarding')">
+          <span class="sb-cat-icon">🎓</span> Onboarding
+          <span class="sb-cat-badge">2</span>
+        </div>
+        <div class="sb-cat-item" id="cat-contratos" onclick="setCategory('contratos')">
+          <span class="sb-cat-icon">📄</span> Contratos
+          <span class="sb-cat-badge">8</span>
+        </div>
+        <div class="sb-cat-item" id="cat-pagos" onclick="setCategory('pagos')">
+          <span class="sb-cat-icon">💸</span> Pagos
+        </div>
+        <div class="sb-cat-item" id="cat-general" onclick="setCategory('general')">
+          <span class="sb-cat-icon">📁</span> General
+        </div>
+        <div class="sb-cat-item" id="cat-examenes" onclick="setCategory('examenes')">
+          <span class="sb-cat-icon">📝</span> Exámenes
+          <span class="sb-cat-badge">4</span>
+        </div>
+        <div class="sb-cat-item" id="cat-calendario" onclick="setCategory('calendario')">
+          <span class="sb-cat-icon">📅</span> Calendario
+          <span class="sb-cat-badge">NEW</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-area">
+      <div class="main-head">
+        <div class="main-head-title" id="main-title">Visado</div>
+        <div class="main-head-sub" id="main-sub">Documentación y procesos de visa estudiantil para EE.UU.</div>
+      </div>
+
+      <div class="guides-wrap" id="guides-wrap">
+        <!-- Content rendered by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const sb=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk');
+let CURRENT_CAT='visado';
+
+const CATS={
+  todas:     {label:'Todas las Guías',       sub:'Recursos, procesos y documentación del equipo'},
+  elegibilidad:{label:'Elegibilidad',         sub:'Requisitos y criterios para atletas'},
+  visado:    {label:'Visado',                 sub:'Documentación y procesos de visa estudiantil para EE.UU.'},
+  onboarding:{label:'Onboarding',             sub:'Teléfono, banco y primeros pasos al llegar a EE.UU.'},
+  contratos: {label:'Contratos',              sub:'Modelos y guías de contratos NVS'},
+  pagos:     {label:'Pagos',                  sub:'Procesos y métodos de pago'},
+  general:   {label:'General',               sub:'Recursos y documentación general'},
+  examenes:  {label:'Exámenes',              sub:'TOEFL, SAT, ACT, Duolingo — costos, fechas y requisitos para universidades de EE.UU.'},
+  calendario:{label:'Calendario Atlético',   sub:'Fechas clave NCAA/NAIA, signing days, deadlines y periodos de reclutamiento'},
+};
+
+/* ── AUTH ── */
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-password').value;
+  const err=document.getElementById('login-error');
+  const spin=document.getElementById('login-spinner');
+  const btn=document.getElementById('login-btn');
+  err.textContent='';
+  if(!email||!pass){err.textContent='Ingresa email y contraseña.';return;}
+  btn.style.opacity='.6';btn.style.pointerEvents='none';spin.style.display='block';
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  spin.style.display='none';btn.style.opacity='';btn.style.pointerEvents='';
+  if(error){err.textContent='Credenciales incorrectas.';return;}
+  initApp(data.user);
+}
+async function doLogout(){await sb.auth.signOut();location.reload();}
+async function initApp(user){
+  document.getElementById('login-overlay').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const name=user.email.split('@')[0];
+  const d=name.charAt(0).toUpperCase()+name.slice(1);
+  document.getElementById('tb-uname').textContent=d;
+  document.getElementById('tb-avatar').textContent=d.charAt(0).toUpperCase();
+  setCategory('visado');
+}
+
+/* ── CATEGORIES ── */
+function setCategory(cat){
+  CURRENT_CAT=cat;
+  document.querySelectorAll('.sb-cat-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('cat-'+cat);
+  if(el)el.classList.add('active');
+  const c=CATS[cat]||CATS.todas;
+  document.getElementById('main-title').textContent=c.label;
+  document.getElementById('main-sub').textContent=c.sub;
+  renderContent(cat);
+}
+
+/* ── RENDER ── */
+function renderContent(cat){
+  const wrap=document.getElementById('guides-wrap');
+  if(cat==='visado'||cat==='todas'){
+    wrap.innerHTML=renderVisadoGuide()+renderCanadaGuide()+renderMexicoGuide();
+    if(cat==='todas') wrap.innerHTML+=renderElegibilidadSection()+renderOnboardingSection()+renderContratosSection()+emptyOtherCats();
+  } else if(cat==='contratos'){
+    wrap.innerHTML=renderContratosSection();
+  } else if(cat==='elegibilidad'){
+    wrap.innerHTML=renderElegibilidadSection();
+  } else if(cat==='onboarding'){
+    wrap.innerHTML=renderOnboardingSection();
+  } else if(cat==='examenes'){
+    wrap.innerHTML=renderExamenesSection();
+  } else if(cat==='calendario'){
+    wrap.innerHTML=renderCalendarioSection();
+  } else {
+    wrap.innerHTML=emptyState(cat);
+  }
+}
+
+function emptyState(cat){
+  return`<div class="guides-empty">
+    <div class="guides-empty-icon">📖</div>
+    <div class="guides-empty-title">Sin guías aún</div>
+    <div class="guides-empty-sub">El contenido para esta sección se agregará próximamente.</div>
+    <div class="guides-empty-badge">Próximamente</div>
+  </div>`;
+}
+function emptyOtherCats(){
+  return`<div style="margin-top:8px;padding:16px 20px;background:var(--card2);border-radius:12px;font-size:12px;color:var(--muted);text-align:center;">
+    Más guías de Pagos se agregarán próximamente.
+  </div>`;
+}
+
+function renderOnboardingSection(){
+  return`
+
+  <!-- ══ TELÉFONO AMERICANO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(99,102,241,.1);">📱</div>
+      <div>
+        <div class="guide-card-title">Número de Teléfono Americano — Primera vez en EE.UU.</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5;">Prepago · Sin SSN</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">Boarding School · College</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Paso esencial</span>
+        </div>
+      </div>
+      <button class="guide-download-btn" onclick="printGuide('telefono')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">📌</span>
+        <div><strong>¿Por qué necesitas un número americano?</strong>
+        Coaches, staff universitario y compañeros de equipo se comunican exclusivamente por número de EE.UU. (SMS/iMessage). Además, la mayoría de plataformas universitarias, apps de pagos (Venmo, Zelle, Apple Pay), el portal de becas y cualquier cuenta americana requieren un número local. Sin un número americano, quedarás fuera de grupos de equipo, notificaciones y comunicados del athletic department desde el primer día.</div>
+      </div>
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Necesito SSN para sacar un número?</strong>
+        <strong>No.</strong> Los planes prepago no requieren Social Security Number. Solo necesitas tu pasaporte. Esto los hace perfectos para recién llegados — puedes tener número el mismo día que aterrizas.</div>
+      </div>
+
+      <div class="steps-title">OPCIONES RECOMENDADAS (SIN SSN)</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">T-Mobile Prepaid — La opción más rápida al llegar</div>
+          <div class="step-desc">T-Mobile tiene la mejor cobertura nacional y el proceso más sencillo para estudiantes internacionales. Puedes comprar una SIM prepago en cualquier T-Mobile Store, Target, Walmart o Best Buy. Solo necesitas el pasaporte. El plan "Simply Prepaid" ($40/mes) incluye datos ilimitados + llamadas y mensajes ilimitados a EE.UU.</div>
+          <div class="step-fee">💰 SIM gratis · Plan desde $40/mes (ilimitado)</div>
+          <a class="step-link step-link-green" href="https://prepaid.t-mobile.com" target="_blank" rel="noopener">📱 T-Mobile Prepaid →</a>
+          <a class="step-link" href="https://www.walmart.com/browse/cell-phones/t-mobile-prepaid" target="_blank" rel="noopener">🛒 SIM en Walmart →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Visible (Verizon) — $25/mes, todo online</div>
+          <div class="step-desc">Visible es una marca de Verizon 100% digital. Funciona con pasaporte extranjero y una tarjeta de crédito/débito. No requiere visitar una tienda — todo se gestiona por app. Plan único: $25/mes con datos, llamadas y mensajes ilimitados. Red Verizon = excelente cobertura en áreas rurales y pequeñas ciudades donde están muchas universidades.</div>
+          <div class="step-fee">💰 $25/mes todo incluido</div>
+          <a class="step-link step-link-green" href="https://www.visible.com" target="_blank" rel="noopener">📱 Visible →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Google Fi — Ideal si viajan entre países frecuentemente</div>
+          <div class="step-desc">Google Fi funciona con pasaporte extranjero sin SSN. Su ventaja clave: el número americano sigue funcionando cuando el atleta viaja a Panamá o cualquier otro país sin cargos adicionales. Plan "Flexible" desde $20/mes base + $10/GB usado. Perfecto para atletas que van a casa en vacaciones.</div>
+          <div class="step-fee">💰 Desde $20/mes + $10/GB</div>
+          <a class="step-link step-link-green" href="https://fi.google.com" target="_blank" rel="noopener">📱 Google Fi →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">AT&T Prepaid — Disponible en aeropuerto</div>
+          <div class="step-desc">AT&T tiene quioscos en los aeropuertos internacionales principales (JFK, MIA, LAX, ORD). Puedes salir del avión con SIM en mano. Los planes prepago van desde $30-65/mes según datos. No requiere SSN con pasaporte vigente.</div>
+          <div class="step-fee">💰 Desde $30/mes</div>
+          <a class="step-link step-link-green" href="https://www.att.com/prepaid/" target="_blank" rel="noopener">📱 AT&T Prepaid →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">🎒 Pasos concretos al llegar a EE.UU.</div>
+      <div class="steps-title" style="margin-top:0;margin-bottom:8px;">PROCESO PASO A PASO</div>
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Al aterrizar — Tienda o kiosco en el aeropuerto</div>
+          <div class="step-desc">Muchos aeropuertos tienen tiendas AT&T o T-Mobile en la zona de llegadas (post-customs). Si no, Walmart suele estar a 10-15 minutos del aeropuerto de cualquier ciudad universitaria.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Documentos — Solo el pasaporte</div>
+          <div class="step-desc">Para prepago solo te piden el pasaporte. En algunos casos te pedirán una dirección local — usa la dirección del dormitorio o boarding school si ya la tienes, o una dirección temporal.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Compatibilidad del teléfono — desbloqueado y bandas LTE</div>
+          <div class="step-desc">El teléfono debe estar <strong>desbloqueado</strong> (unlocked) para que acepte SIM de otro operador. Verificar que soporta bandas LTE de EE.UU. (B4, B12, B66 para T-Mobile; B17, B5 para AT&T). Teléfonos comprados en Panamá con operadores grandes generalmente funcionan.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Para menores (boarding school) — Plan prepago en nombre propio</div>
+          <div class="step-desc">Los menores de 18 años pueden comprar planes prepago con su pasaporte sin necesidad de un adulto presente. Los contratos postpago (plan mensual con contrato) sí requieren ser mayor de edad. La recomendación es siempre ir por el plan prepago.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Comparativa de opciones (2026)</div>
+      <table class="fees-table">
+        <tr><th>Operador</th><th>Precio/mes</th><th>SSN requerido</th><th>Red</th></tr>
+        <tr><td>T-Mobile Prepaid</td><td class="fee-amt">$40</td><td>No</td><td>T-Mobile (excelente)</td></tr>
+        <tr><td>Visible</td><td class="fee-amt">$25</td><td>No</td><td>Verizon (excelente)</td></tr>
+        <tr><td>Google Fi Flexible</td><td class="fee-amt">$20+</td><td>No</td><td>T-Mobile + Sprint</td></tr>
+        <tr><td>AT&T Prepaid</td><td class="fee-amt">$30+</td><td>No</td><td>AT&T (buena)</td></tr>
+        <tr><td>Mint Mobile</td><td class="fee-amt">$15</td><td>No</td><td>T-Mobile</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ CUENTA BANCARIA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(16,185,129,.1);">🏦</div>
+      <div>
+        <div class="guide-card-title">Cuenta Bancaria en EE.UU. — Boarding School y College</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(16,185,129,.1);color:#059669;">Sin SSN al inicio</span>
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5;">Menor de edad · 18+</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">NIL · Stipend · Pagos</span>
+        </div>
+      </div>
+      <button class="guide-download-btn" onclick="printGuide('banco')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>¿Para qué necesitas una cuenta bancaria americana?</strong>
+        <ul style="margin:6px 0 0 16px;font-size:12px;line-height:1.8;">
+          <li><strong>Stipend y housing allowance:</strong> algunas becas incluyen una asignación mensual para gastos — se deposita en cuenta americana</li>
+          <li><strong>NIL (Name, Image &amp; Likeness):</strong> todos los pagos de contratos de imagen se hacen a cuenta bancaria americana</li>
+          <li><strong>Apps de pago:</strong> Venmo, Zelle, Cash App y Apple Pay requieren cuenta bancaria de EE.UU.</li>
+          <li><strong>Gastos del día a día:</strong> alquiler, supermercado, Amazon, transporte — sin cargos de conversión</li>
+          <li><strong>Evitar cargos internacionales:</strong> usar tarjeta panameña en EE.UU. genera comisiones de 3-5% por transacción</li>
+        </ul></div>
+      </div>
+    </div>
+
+    <!-- BOARDING SCHOOL -->
+    <div class="guide-section">
+      <div class="guide-section-title">🎒 Para Menores de Edad — Boarding School (menos de 18 años)</div>
+      <div class="guide-body" style="padding-top:0;">
+        <div class="guide-alert blue">
+          <span class="guide-alert-icon">ℹ️</span>
+          <div><strong>Regla principal:</strong> en EE.UU. los menores no pueden ser titulares únicos de una cuenta bancaria. Necesitan un cotitular adulto (padre, madre o guardián legal). Esto se puede gestionar incluso desde Panamá en algunos bancos.</div>
+        </div>
+
+        <div class="steps-title">OPCIONES PARA MENORES</div>
+
+        <div class="step-item">
+          <div class="step-num active">1</div>
+          <div class="step-content">
+            <div class="step-title">Capital One MONEY Teen Checking — La más fácil remotamente</div>
+            <div class="step-desc">Capital One permite que el padre/guardián abra la cuenta 100% online desde cualquier país si ya tiene una cuenta Capital One, o abriendo una simultáneamente. El menor recibe su propia tarjeta de débito. Los padres pueden monitorear movimientos y establecer límites de gasto desde la app. <strong>Sin cargo mensual.</strong></div>
+            <div class="step-fee">✅ Se puede gestionar desde Panamá · Sin SSN del menor (en muchos estados)</div>
+            <a class="step-link step-link-green" href="https://www.capitalone.com/bank/checking-accounts/teen-checking-account/" target="_blank" rel="noopener">🏦 Capital One MONEY Teen →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">2</div>
+          <div class="step-content">
+            <div class="step-title">Chase First Banking (6–17 años)</div>
+            <div class="step-desc">Requiere que el padre tenga cuenta Chase. Se abre en una sucursal Chase con el menor presente. Si el padre no puede viajar, en algunos estados se acepta con el padre apareciendo vía videoconferencia verificada. El minor recibe tarjeta de débito propia. Sin cargo mensual.</div>
+            <div class="step-fee">Requiere visita a sucursal Chase · Padre con cuenta Chase previa</div>
+            <a class="step-link step-link-green" href="https://www.chase.com/personal/banking/first-banking" target="_blank" rel="noopener">🏦 Chase First Banking →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">3</div>
+          <div class="step-content">
+            <div class="step-title">Greenlight — Tarjeta de débito para menores sin cuenta bancaria obligatoria</div>
+            <div class="step-desc">Greenlight es una tarjeta de débito gestionada por padres, diseñada para menores. No es un banco tradicional pero funciona como tarjeta Mastercard en cualquier establecimiento. Los padres cargan dinero desde cualquier país. No requiere visita a ningún banco, se gestiona 100% por app. Plan familiar desde $4.99/mes para hasta 5 hijos.</div>
+            <div class="step-fee">💰 $4.99–$14.98/mes · Tarjeta Mastercard funcionando desde el día 1</div>
+            <a class="step-link step-link-green" href="https://www.greenlight.com" target="_blank" rel="noopener">💳 Greenlight →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">4</div>
+          <div class="step-content">
+            <div class="step-title">Wise (TransferWise) — Para recibir y enviar dinero internacional</div>
+            <div class="step-desc">Wise permite enviar y recibir dinero con tasa de cambio real sin comisiones bancarias. El padre puede enviar dinero desde Panamá directamente a la tarjeta Greenlight o cuenta bancaria del atleta con costos mínimos. Muy útil para el día a día mientras se organiza la cuenta bancaria formal.</div>
+            <a class="step-link step-link-green" href="https://wise.com" target="_blank" rel="noopener">💸 Wise →</a>
+          </div>
+        </div>
+
+        <div class="guide-alert yellow" style="margin-top:12px;">
+          <span class="guide-alert-icon">⚠️</span>
+          <div><strong>Consejo importante:</strong> La boarding school normalmente tiene una lista de bancos recomendados cerca del campus o convenios con bancos locales. Preguntar al advisor o admissions office de la escuela antes de llegar es el primer paso — ellos orientan a todos los estudiantes internacionales sobre este proceso.</div>
+        </div>
+      </div>
+
+      <div class="doc-grid" style="padding:0 20px 20px;">
+        <div class="doc-item required">Pasaporte del menor</div>
+        <div class="doc-item required">Pasaporte del padre/guardián</div>
+        <div class="doc-item required">Carta de aceptación boarding school</div>
+        <div class="doc-item">Dirección local de la boarding school</div>
+        <div class="doc-item">SSN o ITIN del padre (si aplica)</div>
+        <div class="doc-item">Prueba de matrícula (enrollment letter)</div>
+      </div>
+    </div>
+
+    <!-- COLLEGE -->
+    <div class="guide-section">
+      <div class="guide-section-title">🎓 Para Universitarios — College (18 años o más)</div>
+      <div class="guide-body" style="padding-top:0;">
+        <div class="guide-alert green">
+          <span class="guide-alert-icon">✅</span>
+          <div><strong>Buena noticia:</strong> los estudiantes universitarios internacionales pueden abrir cuentas bancarias individuales con solo el pasaporte + I-20 + I-94. El SSN <em>no</em> es obligatorio en la mayoría de bancos para abrir cuenta básica — puedes agregarlo después cuando lo obtengas.</div>
+        </div>
+
+        <div class="steps-title">CUENTAS RECOMENDADAS PARA UNIVERSITARIOS</div>
+
+        <div class="step-item">
+          <div class="step-num active">1</div>
+          <div class="step-content">
+            <div class="step-title">Chase College Checking — La más completa</div>
+            <div class="step-desc">Sin cargo mensual por <strong>5 años</strong> mientras seas estudiante universitario. Amplia red de ATMs. Chase acepta abrir cuenta con pasaporte + I-20 + I-94 sin SSN en muchos estados (verificar en sucursal local). Al tener SSN, se vincula directamente. Excelente app y Zelle integrado.</div>
+            <div class="step-fee">✅ $0/mes · 5 años sin cargos · Zelle incluido</div>
+            <a class="step-link step-link-green" href="https://www.chase.com/personal/banking/college-checking" target="_blank" rel="noopener">🏦 Chase College Checking →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">2</div>
+          <div class="step-content">
+            <div class="step-title">Bank of America Advantage SafeBalance — Muy aceptado con documentos F-1</div>
+            <div class="step-desc">Bank of America tiene un proceso bien establecido para estudiantes internacionales. Aceptan I-20 + I-94 + pasaporte sin SSN. Sin cargo mensual si eres estudiante menor de 25 años. Muy buena cobertura de ATMs en campus universitario.</div>
+            <div class="step-fee">✅ $0/mes hasta los 25 años</div>
+            <a class="step-link step-link-green" href="https://www.bankofamerica.com/deposits/checking/advantage-safebalance-banking/" target="_blank" rel="noopener">🏦 Bank of America →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">3</div>
+          <div class="step-content">
+            <div class="step-title">Wells Fargo College Checking</div>
+            <div class="step-desc">Amplia red de sucursales y ATMs, especialmente en el sur y oeste de EE.UU. Sin cargo mensual para estudiantes universitarios. Acepta documentos de estudiante internacional para abrir. Requiere visita presencial a la sucursal.</div>
+            <div class="step-fee">✅ $0/mes con depósito directo o saldo mínimo</div>
+            <a class="step-link step-link-green" href="https://www.wellsfargo.com/checking/college/" target="_blank" rel="noopener">🏦 Wells Fargo College →</a>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num active">4</div>
+          <div class="step-content">
+            <div class="step-title">Wise + Cuenta Americana — Para transferencias con Panamá</div>
+            <div class="step-desc">Además de la cuenta bancaria, recomendamos tener una cuenta Wise (gratuita). Wise permite recibir dinero desde Panamá con tasas de cambio reales (mucho más barato que una transferencia bancaria tradicional). El atleta puede recibir dólares directamente y transferirlos a su cuenta Chase/BofA al instante.</div>
+            <div class="step-fee">✅ Gratis · Tasa de cambio real · Sin cargos ocultos</div>
+            <a class="step-link step-link-green" href="https://wise.com" target="_blank" rel="noopener">💸 Wise →</a>
+          </div>
+        </div>
+
+        <div class="guide-alert blue" style="margin-top:12px;">
+          <span class="guide-alert-icon">📋</span>
+          <div><strong>¿Cuándo conseguir el SSN?</strong> El Social Security Number (SSN) se puede obtener si el atleta tiene autorización de trabajo — sea por OPT, CPT, trabajo en campus, o assistantship. La mayoría de atletas becados en F-1 no tienen autorización de trabajo automáticamente. <strong>Hablar con el DSO (Designated School Official)</strong> de la universidad para ver cuándo y cómo aplica. Una vez obtenido, actualizar el banco — abre acceso a crédito, tarjetas de crédito y más servicios.</div>
+        </div>
+      </div>
+
+      <div class="doc-grid" style="padding:0 20px 20px;">
+        <div class="doc-item required">Pasaporte válido</div>
+        <div class="doc-item required">Visa F-1 o sello de entrada</div>
+        <div class="doc-item required">I-20 emitido por la universidad</div>
+        <div class="doc-item required">I-94 (Arrival/Departure Record)</div>
+        <div class="doc-item required">Dirección local (dorm o apartamento)</div>
+        <div class="doc-item">Student ID universitario</div>
+        <div class="doc-item">Carta de matrícula / enrollment verification</div>
+        <div class="doc-item">SSN o ITIN (si ya tienes, agiliza el proceso)</div>
+      </div>
+
+      <div style="padding:0 20px 20px;">
+        <div class="guide-section-title" style="margin-bottom:10px;">💰 Comparativa de cuentas universitarias (2026)</div>
+        <table class="fees-table">
+          <tr><th>Banco</th><th>Cargo mensual</th><th>Sin SSN</th><th>Ventaja clave</th></tr>
+          <tr><td>Chase College Checking</td><td class="fee-amt">$0 (5 años)</td><td>Sí</td><td>Zelle, app excelente, Zelle</td></tr>
+          <tr><td>Bank of America</td><td class="fee-amt">$0 (&lt;25 años)</td><td>Sí</td><td>Proceso F-1 establecido</td></tr>
+          <tr><td>Wells Fargo College</td><td class="fee-amt">$0 con req.</td><td>Sí</td><td>Cobertura sur/oeste USA</td></tr>
+          <tr><td>Capital One 360</td><td class="fee-amt">$0</td><td>Sí</td><td>100% online, sin sucursal</td></tr>
+          <tr><td>Wise</td><td class="fee-amt">$0</td><td>Sí</td><td>Transferencias internacionales baratas</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+`;}
+
+
+function renderElegibilidadSection(){
+  return`
+  <!-- ══ NCAA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(0,93,160,.12);">🏛️</div>
+      <div>
+        <div class="guide-card-title">Elegibilidad NCAA — National Collegiate Athletic Association</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(0,93,160,.1);color:#005da0;">Division I · II · III</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">Eligibility Center</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">$170 USD internacional</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es el NCAA Eligibility Center?</strong><br>
+        Es el organismo oficial de la NCAA que certifica que un atleta cumple con los requisitos académicos y de amateurismo antes de poder competir en una universidad D1, D2 o D3. Sin esta certificación, el atleta no puede practicar, competir ni recibir becas deportivas su primer año.</div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(170,255,0,.06);border-color:rgba(170,255,0,.2);">
+        <span class="guide-alert-icon">🎓</span>
+        <div><strong>Tipos de cuenta según División</strong><br>
+        <strong>D1 / D2</strong>: Cuenta de Certificación Académica + Amateurismo → costo $170 USD (internacional)<br>
+        <strong>D3</strong>: Solo Certificación de Amateurismo → no requiere revisión académica central, la hace la universidad directamente</div>
+      </div>
+
+      <div class="steps-title">PROCESO PASO A PASO — NCAA ELIGIBILITY CENTER</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Crear cuenta en el NCAA Eligibility Center</div>
+          <div class="step-desc">Visita el sitio oficial y crea tu cuenta. Necesitas: nombre completo, fecha de nacimiento, email, dirección, y el nombre de las escuelas donde estudiaste. El proceso de registro toma entre 30 y 45 minutos. Puedes guardar y continuar después.</div>
+          <a class="step-link step-link-green" href="https://web3.ncaa.org/ecwr3/" target="_blank" rel="noopener">🔗 NCAA Eligibility Center (Registro oficial) →</a>
+          <a class="step-link" href="https://www.ncaa.org/sports/2018/5/15/initial-eligibility-steps-for-international-students.aspx" target="_blank" rel="noopener">📋 Pasos para estudiantes internacionales →</a>
+          <div class="step-fee">💰 $170 USD — pago con tarjeta de débito, crédito o e-check</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Declarar historial académico completo</div>
+          <div class="step-desc">Debes reportar TODAS las escuelas secundarias donde estudiaste desde 9° grado en adelante. El NCAA Eligibility Center evaluará si tus materias equivalen a los cursos "core" requeridos. Los cursos mínimos incluyen: inglés, matemáticas, ciencias, ciencias sociales e idioma nativo.</div>
+          <div class="step-fee">📌 Mínimo de cursos core exigidos: varía por país — la NCAA tiene una guía de equivalencias por nación</div>
+          <a class="step-link" href="https://s3.amazonaws.com/fs.ncaa.org/Docs/eligibility_center/International_Information/International_Guide.pdf" target="_blank" rel="noopener">📄 Guía Internacional de Estándares Académicos 2025-26 →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Enviar transcripts oficiales al NCAA Eligibility Center</div>
+          <div class="step-desc">Los documentos académicos deben ser enviados directamente por tu escuela secundaria. Si el país no tiene inglés como idioma nativo, debes enviar: (1) copia oficial en el idioma original y (2) traducción certificada línea por línea al inglés. Sin estos documentos el proceso no puede iniciar.</div>
+          <div class="step-fee">⚠️ La traducción debe ser certificada — no sirve Google Translate ni traducción sin sello notarial</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Certificación de Amateurismo (D1 y D2)</div>
+          <div class="step-desc">Debes declarar todo tu historial deportivo: equipos, ligas, torneos, contratos, agentes, patrocinadores, premios en efectivo recibidos. El amateurismo se pierde si: firmaste un contrato profesional, tuviste un agente activo que te representó a cambio de dinero, recibiste pagos más allá de gastos de viaje/hospedaje, o aceptaste dinero de premios que supere los gastos necesarios.</div>
+          <div class="step-fee">⚠️ Excepción: tenistas pueden ganar hasta $10,000/año en premios sin perder elegibilidad</div>
+          <a class="step-link" href="https://www.ncsasports.org/ncaa-eligibility-center/amateurism-rules" target="_blank" rel="noopener">📋 Reglas de amateurismo explicadas →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Requisitos académicos mínimos (D1/D2)</div>
+          <div class="step-desc">Para ser elegible el primer año debes cumplir AMBAS condiciones: (1) completar el número mínimo de cursos core requeridos según tu país + (2) tener GPA y puntaje ACT/SAT dentro de la escala deslizante de la NCAA. A mayor GPA, menor puntaje de test aceptado, y viceversa. La universidad te guiará sobre los requisitos específicos de tu país.</div>
+          <a class="step-link" href="https://fs.ncaa.org/Docs/eligibility_center/Student_Resources/CBSA.pdf" target="_blank" rel="noopener">📄 Guía para el Atleta Estudiante 2025-26 →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">6</div>
+        <div class="step-content">
+          <div class="step-title">Esperar la certificación y confirmación de beca</div>
+          <div class="step-desc">Una vez que el Eligibility Center recibe todos los documentos, procesa la certificación. La universidad (a través de su Compliance Office) recibe el resultado. Solo cuando el atleta tiene certificación aprobada la universidad puede hacer oficial la beca deportiva y el atleta puede entrenar y competir oficialmente.</div>
+          <div class="step-fee">⏱ El proceso puede tardar semanas — envía los documentos lo antes posible</div>
+        </div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.2);">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Regla 40-60-80 (D1) — Progreso Académico Continuo</strong><br>
+        Una vez en la universidad, para mantener la elegibilidad debes completar: 40% de los créditos requeridos para graduarte al final del 2° año, 60% al final del 3°, y 80% al final del 4°. Si no cumples, pierdes el derecho a competir.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ NAIA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(234,88,12,.1);">🏅</div>
+      <div>
+        <div class="guide-card-title">Elegibilidad NAIA — National Association of Intercollegiate Athletics</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(234,88,12,.1);color:#ea580c;">PlayNAIA</span>
+          <span class="guide-tag" style="background:rgba(234,88,12,.08);color:#c2410c;">InCred Evaluation</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">$160–170 USD + $95 InCred</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es la NAIA?</strong><br>
+        La NAIA es una asociación con más de 250 universidades pequeñas. Su proceso de elegibilidad es más flexible y accesible que la NCAA. Para atletas internacionales, toda la evaluación académica pasa por InCred Evaluations, empresa integrada directamente con el sistema PlayNAIA.</div>
+      </div>
+
+      <div class="steps-title">PROCESO PASO A PASO — NAIA ELIGIBILITY CENTER</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Registrarse en PlayNAIA.org</div>
+          <div class="step-desc">Ingresa a PlayNAIA.org, crea tu cuenta con tu email y completa tu perfil. Este es el portal central donde vas a trackear todo tu proceso de elegibilidad. El registro toma solo unos minutos.</div>
+          <a class="step-link step-link-green" href="https://play.mynaia.org" target="_blank" rel="noopener">🔗 PlayNAIA — Registro oficial →</a>
+          <a class="step-link" href="https://www.naia.org/findyourpath/international/index" target="_blank" rel="noopener">🌍 Guía para estudiantes internacionales →</a>
+          <div class="step-fee">💰 $160 USD (a partir de septiembre 2025: $170 USD) — no reembolsable</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Registrarse en InCred Evaluations</div>
+          <div class="step-desc">Todos los atletas internacionales DEBEN completar una evaluación de credenciales a través de InCred. InCred analiza tus notas del bachillerato y las convierte al sistema GPA americano. Ve a InCredEvals.org, crea tu cuenta y selecciona la evaluación de high school básica.</div>
+          <a class="step-link step-link-green" href="https://www.incredevals.org/students/" target="_blank" rel="noopener">🔗 InCred Evaluations — Portal de estudiantes →</a>
+          <div class="step-fee">💰 Basic Evaluation: $95 USD · Expedito 5 días: $75 adicional · Expedito 2 días: $150 adicional</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Subir documentos académicos a InCred</div>
+          <div class="step-desc">Sube tus transcripts en formato PDF o Word directamente al portal de InCred. Si tus documentos no están en inglés, debes incluir una traducción al inglés. InCred acepta documentos electrónicos, lo que agiliza el proceso. Una vez recibido el expediente completo (documentos + pago), InCred completa la evaluación en aproximadamente 10 días hábiles.</div>
+          <div class="step-fee">⚠️ Envía los documentos lo antes posible — 2 meses antes del inicio del semestre si puedes</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Requisitos académicos para ser elegible (Freshmen)</div>
+          <div class="step-desc">Eres elegible automáticamente si tienes <strong>GPA 2.3 o superior</strong> (en escala americana). Si tu GPA está entre 2.0 y 2.29, debes cumplir al menos 2 de estos 3 criterios:</div>
+          <div style="margin:8px 0 4px;padding:10px 14px;background:var(--green-dim);border-radius:8px;font-size:12px;">
+            ✅ <strong>Puntaje ACT 18+</strong> o <strong>SAT 970+</strong><br>
+            ✅ <strong>GPA mínimo 2.0</strong> (en escala americana)<br>
+            ✅ <strong>Top 50%</strong> de tu clase de graduación
+          </div>
+          <div class="step-fee">📌 InCred convierte tu GPA al sistema americano automáticamente</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Declarar historial deportivo completo</div>
+          <div class="step-desc">En tu perfil de PlayNAIA debes declarar todos los equipos, ligas, eventos y competencias en los que has participado, sin importar el nivel. Esto es fundamental para que la NAIA determine si ya usaste alguna temporada de elegibilidad previamente.</div>
+          <div class="step-fee">⚠️ No ocultes ningún equipo — la NAIA verifica esta información y ocultarla puede costarte la elegibilidad</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">6</div>
+        <div class="step-content">
+          <div class="step-title">InCred envía resultado → NAIA determina elegibilidad</div>
+          <div class="step-desc">Una vez InCred completa la evaluación, envía el resultado directamente a la NAIA. El sistema PlayNAIA se actualiza y puedes ver el estado de tu elegibilidad en tiempo real. La universidad recibe la notificación y puede confirmar formalmente tu inscripción deportiva.</div>
+          <a class="step-link" href="https://play.mynaia.org/media/f04dhiia/naia_ec_guide_international_students.pdf" target="_blank" rel="noopener">📄 Guía oficial NAIA para estudiantes internacionales →</a>
+        </div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(170,255,0,.06);border-color:rgba(170,255,0,.2);">
+        <span class="guide-alert-icon">📌</span>
+        <div><strong>Temporadas de elegibilidad NAIA</strong><br>
+        La NAIA otorga <strong>4 temporadas de elegibilidad en 5 años</strong> (igual que la NCAA D1/D2). Si ya competiste a nivel universitario o semi-profesional en tu país, es posible que ya hayas usado temporadas. Declara todo en PlayNAIA para un cálculo preciso.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ NJCAA ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(20,184,166,.1);">🏫</div>
+      <div>
+        <div class="guide-card-title">Elegibilidad NJCAA — National Junior College Athletic Association</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(20,184,166,.1);color:#0d9488;">Junior College · Community College</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">Sin registro centralizado</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Máx. 2 temporadas</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es la NJCAA?</strong><br>
+        La NJCAA agrupa más de 500 junior colleges y community colleges. A diferencia de NCAA y NAIA, no tiene un portal centralizado de elegibilidad — el proceso se hace directamente con el Athletic Department (AD) de la escuela. Es la opción más accesible académicamente y una excelente puerta de entrada al sistema universitario americano.</div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.25);">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Importante para atletas internacionales</strong><br>
+        La NJCAA permite solo <strong>2 temporadas de competición</strong> por deporte. Cualquier participación en un partido oficial (aunque sea una sola jugada) cuenta como temporada consumida. Si solo te vistes pero no juegas, no se consume temporada.</div>
+      </div>
+
+      <div class="steps-title">PROCESO PASO A PASO — NJCAA</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Contactar directamente al Athletic Department de la escuela</div>
+          <div class="step-desc">No hay portal único de registro. Una vez que el coach te ofrece un lugar en el equipo, trabajas directamente con el Athletic Director (AD) de esa escuela. El AD es quien gestiona y certifica tu elegibilidad ante la NJCAA. Pregúntale exactamente qué documentos necesitan.</div>
+          <a class="step-link step-link-green" href="https://www.njcaa.org/eligibility/index" target="_blank" rel="noopener">🔗 NJCAA — Información de elegibilidad oficial →</a>
+          <a class="step-link" href="https://www.njcaa.org/compete/faqs" target="_blank" rel="noopener">❓ NJCAA FAQs de elegibilidad →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Entregar diploma de high school y transcripts</div>
+          <div class="step-desc">Debes demostrar que eres graduado de bachillerato con diploma académico reconocido. Para atletas internacionales: transcripts de los años 9° en adelante, traducidos al inglés. La traducción corre por cuenta del atleta. Si también asististe a una universidad fuera de EE.UU., debes entregar también esos transcripts universitarios.</div>
+          <div class="step-fee">⚠️ Los transcripts deben mostrar notas, materias y año de graduación claramente</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Inscribirse a tiempo completo (mínimo 12 créditos)</div>
+          <div class="step-desc">Para competir en la NJCAA debes estar inscrito como estudiante de tiempo completo en la institución. La NJCAA define tiempo completo como 12 o más créditos por semestre. Puedes combinar distintas modalidades de cursos (regular, fast track, mini-term) dentro del mismo semestre para alcanzar los 12 créditos.</div>
+          <div class="step-fee">📌 Debes estar inscrito ANTES de la primera competición de la temporada</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Verificar temporadas de elegibilidad disponibles</div>
+          <div class="step-desc">La NJCAA permite exactamente 2 temporadas de elegibilidad por deporte. Si competiste a nivel universitario o intercolegial fuera de EE.UU., es posible que ya hayas usado 1 temporada. Discute tu historial deportivo con el AD para saber cuántas temporadas te quedan disponibles.</div>
+          <div class="step-fee">⚠️ Una sola participación en partido oficial (hasta 1 turno al bate, 1 jugada) = 1 temporada consumida</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Status de Amateur — obligatorio desde los 19 años</div>
+          <div class="step-desc">Debes mantener estatus de amateur. Esto se vuelve obligatorio desde que cumples 19 años O desde el momento en que te inscribes por primera vez en una universidad (lo que ocurra primero). Antes de ese punto, haber jugado en ligas semiprofesionales o recibido pagos puede ser permitido dependiendo del deporte y el contexto.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">6</div>
+        <div class="step-content">
+          <div class="step-title">El AD certifica tu elegibilidad ante la NJCAA</div>
+          <div class="step-desc">Una vez completados todos los pasos, el Athletic Director de tu escuela envía la documentación a la NJCAA y certifica formalmente tu elegibilidad. A partir de ese momento puedes entrenar y competir oficialmente representando a la institución.</div>
+          <a class="step-link" href="https://www.njcaa.org/governance/handbook/index" target="_blank" rel="noopener">📄 NJCAA Handbook 2025-26 →</a>
+          <a class="step-link" href="mailto:compliance@njcaa.org">📧 Contacto directo NJCAA Compliance →</a>
+        </div>
+      </div>
+
+      <div class="guide-alert" style="background:rgba(170,255,0,.06);border-color:rgba(170,255,0,.2);">
+        <span class="guide-alert-icon">🎯</span>
+        <div><strong>NJCAA como trampolín</strong><br>
+        Muchos atletas internacionales usan 1-2 años en una NJCAA school para adaptarse al sistema americano, mejorar su inglés y nivel académico, y luego transferirse a una universidad NCAA D1/D2 o NAIA. La NJCAA es un punto de entrada excelente para quienes no califican académicamente para NCAA desde el inicio.</div>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+function renderContratosSection(){
+  const BASE='https://stefanonvs09.github.io/nvs-dashboard/contratos/';
+  const contracts=[
+    {plan:'Estándar',planColor:'#60a5fa',planDim:'rgba(96,165,250,.1)',age:'Mayor de edad',ageIcon:'👤',pay:'50% + 50%',
+     price:'USD 2,000',p1:'USD 1,000 al firmar',p2:'USD 1,000 al commit',
+     fields:['Nombre completo del atleta/deudor','Nacionalidad','Cédula de identidad','Nombre en línea de firma'],
+     file:'estandar-50-50-mayor.docx',dl:'Contrato NVS - Estandar 50+50 Mayor.docx'},
+    {plan:'Estándar',planColor:'#60a5fa',planDim:'rgba(96,165,250,.1)',age:'Menor de edad',ageIcon:'🧑‍🎓',pay:'50% + 50%',
+     price:'USD 2,000',p1:'USD 1,000 al firmar',p2:'USD 1,000 al commit',
+     fields:['Nombre y cédula del PADRE/TUTOR (deudor)','Nacionalidad del padre/tutor','Nombre y cédula del ATLETA (menor)','Nacionalidad del atleta','Nombre del padre en "representado por su padre X"','Nombre en línea de firma'],
+     file:'estandar-50-50-menor.docx',dl:'Contrato NVS - Estandar 50+50 Menor.docx'},
+    {plan:'Estándar',planColor:'#60a5fa',planDim:'rgba(96,165,250,.1)',age:'Mayor de edad',ageIcon:'👤',pay:'Abono + Mensualidad',
+     price:'USD 2,000',p1:'USD 500 abono al firmar',p2:'USD 100/mes cada día 15',p3:'Saldo restante al commit',
+     fields:['Nombre completo del atleta/deudor','Nacionalidad','Cédula de identidad','Nombre en línea de firma'],
+     file:'estandar-abono-mayor.docx',dl:'Contrato NVS - Estandar Abono Mayor.docx'},
+    {plan:'Estándar',planColor:'#60a5fa',planDim:'rgba(96,165,250,.1)',age:'Menor de edad',ageIcon:'🧑‍🎓',pay:'Abono + Mensualidad',
+     price:'USD 2,000',p1:'USD 500 abono al firmar',p2:'USD 100/mes cada día 15',p3:'Saldo restante al commit',
+     fields:['Nombre y cédula del PADRE/TUTOR (deudor)','Nacionalidad del padre/tutor','Nombre y cédula del ATLETA (menor)','Nacionalidad del atleta','Nombre en línea de firma'],
+     file:'estandar-abono-menor.docx',dl:'Contrato NVS - Estandar Abono Menor.docx'},
+    {plan:'Premium',planColor:'#a78bfa',planDim:'rgba(167,139,250,.1)',age:'Mayor de edad',ageIcon:'👤',pay:'50% + 50%',
+     price:'USD 3,000',p1:'USD 1,500 al firmar',p2:'USD 1,500 al commit',
+     fields:['Nombre completo del atleta/deudor','Nacionalidad','Cédula de identidad','Nombre en línea de firma'],
+     file:'premium-50-50-mayor.docx',dl:'Contrato NVS - Premium 50+50 Mayor.docx'},
+    {plan:'Premium',planColor:'#a78bfa',planDim:'rgba(167,139,250,.1)',age:'Menor de edad',ageIcon:'🧑‍🎓',pay:'50% + 50%',
+     price:'USD 3,000',p1:'USD 1,500 al firmar',p2:'USD 1,500 al commit',
+     fields:['Nombre y cédula del PADRE/TUTOR (deudor)','Nacionalidad del padre/tutor','Nombre y cédula del ATLETA (menor)','Nacionalidad del atleta','Nombre en línea de firma'],
+     file:'premium-50-50-menor.docx',dl:'Contrato NVS - Premium 50+50 Menor.docx'},
+    {plan:'Premium',planColor:'#a78bfa',planDim:'rgba(167,139,250,.1)',age:'Mayor de edad',ageIcon:'👤',pay:'Abono + Mensualidad',
+     price:'USD 3,000',p1:'USD 500 abono al firmar',p2:'USD 100/mes cada día 15',p3:'Saldo restante al commit',
+     fields:['Nombre completo del atleta/deudor','Nacionalidad','Cédula de identidad','Nombre en línea de firma'],
+     file:'premium-abono-mayor.docx',dl:'Contrato NVS - Premium Abono Mayor.docx'},
+    {plan:'Premium',planColor:'#a78bfa',planDim:'rgba(167,139,250,.1)',age:'Menor de edad',ageIcon:'🧑‍🎓',pay:'Abono + Mensualidad',
+     price:'USD 3,000',p1:'USD 500 abono al firmar',p2:'USD 100/mes cada día 15',p3:'Saldo restante al commit',
+     fields:['Nombre y cédula del PADRE/TUTOR (deudor)','Nacionalidad del padre/tutor','Nombre y cédula del ATLETA (menor)','Nacionalidad del atleta','Nombre en línea de firma'],
+     file:'premium-abono-menor.docx',dl:'Contrato NVS - Premium Abono Menor.docx'},
+  ];
+
+  const alert=`<div class="guide-alert" style="background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.25);margin-bottom:8px;">
+    <span class="guide-alert-icon">⚠️</span>
+    <div><strong>Estas son plantillas — reemplaza todos los campos X antes de enviar</strong><br>
+    Abre el .docx en Word · usa <strong>Ctrl+H</strong> para buscar y reemplazar cada <strong>X</strong> por el dato real · verifica que no quede ninguna X con <strong>Ctrl+F → "X"</strong></div>
+  </div>`;
+
+  const cards=contracts.map(c=>{
+    const paySteps=`
+      <div style="display:flex;flex-direction:column;gap:5px;margin:10px 0 12px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="width:7px;height:7px;border-radius:50%;background:#aaff00;flex-shrink:0;display:inline-block;"></span><strong>${c.p1}</strong></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="width:7px;height:7px;border-radius:50%;background:#60a5fa;flex-shrink:0;display:inline-block;"></span><strong>${c.p2}</strong></div>
+        ${c.p3?`<div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="width:7px;height:7px;border-radius:50%;background:#fbbf24;flex-shrink:0;display:inline-block;"></span><strong>${c.p3}</strong></div>`:''}
+      </div>`;
+    const fieldsList=c.fields.map(f=>`<div style="display:flex;gap:7px;align-items:flex-start;margin-bottom:4px;font-size:11px;"><span style="background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.2);border-radius:4px;padding:1px 6px;font-weight:800;font-size:10px;flex-shrink:0;">X</span><span style="color:#555;">${f}</span></div>`).join('');
+    return`
+    <div class="guide-card" style="margin-bottom:14px;">
+      <div class="guide-card-header">
+        <div class="guide-card-icon" style="background:${c.planDim};">📄</div>
+        <div style="flex:1;">
+          <div class="guide-card-title">${c.plan} · ${c.pay} · ${c.age}</div>
+          <div class="guide-card-meta">
+            <span class="guide-tag" style="background:${c.planDim};color:${c.planColor};">${c.plan} — ${c.price}</span>
+            <span class="guide-tag" style="background:rgba(45,212,191,.1);color:#0d9488;">${c.age}</span>
+            <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">${c.pay}</span>
+          </div>
+        </div>
+        <a class="guide-download-btn" href="${BASE}${c.file}" download="${c.dl}" style="text-decoration:none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Word
+        </a>
+      </div>
+      <div class="guide-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <div class="steps-title" style="margin-top:0;">ESTRUCTURA DE PAGO</div>
+            ${paySteps}
+          </div>
+          <div>
+            <div class="steps-title" style="margin-top:0;">CAMPOS X A RELLENAR</div>
+            <div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-radius:8px;padding:10px 12px;margin-top:10px;">
+              ${fieldsList}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return`
+  <div class="guide-card" style="margin-bottom:14px;">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(170,255,0,.12);">📄</div>
+      <div>
+        <div class="guide-card-title">Contratos NVS — 8 Plantillas Oficiales</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(96,165,250,.1);color:#3b82f6;">Estándar · USD 2,000</span>
+          <span class="guide-tag" style="background:rgba(167,139,250,.1);color:#7c3aed;">Premium · USD 3,000</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">Mayor y Menor de edad</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      ${alert}
+      <div class="steps-title">DIFERENCIA ESTÁNDAR vs PREMIUM</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:12px 14px;">
+          <div style="font-weight:700;color:#60a5fa;font-size:12px;margin-bottom:6px;">⚡ ESTÁNDAR — USD 2,000</div>
+          <div style="font-size:11px;color:#555;line-height:1.6;">Asesoría, highlights, perfil digital, orientación académica y deportiva. Acompañamiento hasta el <strong>commit</strong> oficial con la universidad.</div>
+        </div>
+        <div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.2);border-radius:10px;padding:12px 14px;">
+          <div style="font-weight:700;color:#a78bfa;font-size:12px;margin-bottom:6px;">👑 PREMIUM — USD 3,000</div>
+          <div style="font-size:11px;color:#555;line-height:1.6;">Todo lo del Estándar + seguimiento durante toda la etapa universitaria, asesoría en transferencias y acompañamiento integral hasta la <strong>graduación</strong>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  ${cards}`;
+}
+
+function renderVisadoGuide(){
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(99,102,241,.1);">✈️</div>
+      <div>
+        <div class="guide-card-title">Visa F-1 — Atleta Estudiante (NCAA · NAIA · NJCAA)</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5;">F-1 Student Visa</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">NCAA · NAIA · NJCAA</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">EE.UU.</span>
+        </div>
+      </div>
+      <button class="guide-download-btn" onclick="printGuide('usa')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">✅</span>
+        <div><strong>Punto de partida: ya tienes el I-20</strong>
+        Esta guía comienza en el momento en que ya fuiste aceptado por una universidad D1, firmaste tu carta de scholarship y la escuela te emitió el Formulario I-20 (Certificate of Eligibility for Nonimmigrant Student Status). El I-20 lo envía la oficina de estudiantes internacionales de la universidad (DSO) y contiene tu SEVIS ID (empieza con "N"). Sin ese documento no puedes iniciar el proceso de visa.</div>
+      </div>
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es la Visa F-1?</strong>
+        La F-1 es la visa de estudiante no inmigrante de EE.UU. Es el tipo de visa que necesitan todos los atletas internacionales para estudiar y competir en universidades afiliadas a NCAA, NAIA o NJCAA. No es una visa deportiva — el atleta entra como <em>estudiante</em> que practica deporte.</div>
+      </div>
+
+      <div class="steps-title">PASOS PARA OBTENER LA VISA F-1</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Pagar la tarifa SEVIS I-901 — $350 USD</div>
+          <div class="step-desc">Usa el SEVIS ID de tu I-20 para pagar en el sitio oficial del ICE (Immigration &amp; Customs Enforcement). Guarda el recibo de pago — lo necesitas en la entrevista.</div>
+          <a class="step-link step-link-green" href="https://www.fmjfee.com/i901fee/" target="_blank" rel="noopener">💳 Pagar SEVIS Fee →</a>
+          <a class="step-link" href="https://www.ice.gov/sevis/i901" target="_blank" rel="noopener">ℹ️ Info oficial ICE →</a>
+          <div class="step-fee">💰 $350 USD</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Completar el Formulario DS-160</div>
+          <div class="step-desc">El DS-160 es la solicitud oficial de visa del Departamento de Estado. Se completa 100% online. Al terminar descarga la página de confirmación con el código de barras — la necesitas para la entrevista. Hay que pagar el MRV fee al completarlo.</div>
+          <a class="step-link step-link-green" href="https://ceac.state.gov/genniv/" target="_blank" rel="noopener">📝 Completar DS-160 →</a>
+          <a class="step-link" href="https://travel.state.gov/content/travel/en/us-visas/study/student-visa.html" target="_blank" rel="noopener">🌐 Visa de Estudiante — State Dept →</a>
+          <div class="step-fee">💰 $185 USD — MRV application fee</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Agendar cita en la Embajada de EE.UU.</div>
+          <div class="step-desc">Agenda la entrevista en la Embajada de EE.UU. Los tiempos de espera varían — solicita con la mayor anticipación posible. Si la fecha de inicio del I-20 es próxima, puedes solicitar una cita expedita una vez que ya tengas cita normal asignada.</div>
+          <a class="step-link step-link-green" href="https://www.ustraveldocs.com/pa/pa-niv-appointmentschedule.asp" target="_blank" rel="noopener">📅 Agendar cita — Panamá →</a>
+          <a class="step-link" href="https://pa.usembassy.gov/visas/" target="_blank" rel="noopener">🏛️ Embajada EE.UU. en Panamá →</a>
+          <a class="step-link" href="https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/wait-times.html" target="_blank" rel="noopener">⏱️ Tiempos de espera →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Preparar los documentos para la entrevista</div>
+          <div class="step-desc">Reúne todos los documentos con anticipación. Organiza originales y copias. Ver lista completa en la sección de abajo. La entrevista dura típicamente 5-10 minutos.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">5</div>
+        <div class="step-content">
+          <div class="step-title">Entrevista consular en la Embajada</div>
+          <div class="step-desc">El cónsul verificará tu intención de estudiar, tu solvencia económica y tu vínculo con tu país de origen. Para atletas: sé claro que tienes scholarship, que irás a estudiar y a competir, y que planeas regresar al terminar tus estudios.</div>
+          <a class="step-link" href="https://pa.usembassy.gov/visas/important-information/" target="_blank" rel="noopener">📋 Info importante — Embajada Panamá →</a>
+          <a class="step-link" href="https://studyinthestates.dhs.gov/2017/01/f-1-student-athletes-learn-about-ncaa" target="_blank" rel="noopener">📘 F-1 Athletes &amp; NCAA — DHS →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <div class="step-title">Recibir la visa y planificar el viaje</div>
+          <div class="step-desc">Si aprueban la visa, recibirás tu pasaporte con la visa F-1 en pocos días. Con la F-1 puedes entrar a EE.UU. máximo <strong>30 días antes</strong> de la fecha de inicio del I-20. Al entrar, el oficial de migraciones te dará un I-94 — guárdalo.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS -->
+    <div class="guide-section">
+      <div class="guide-section-title">📎 Documentos requeridos para la entrevista</div>
+      <div class="doc-grid">
+        <div class="doc-item required">Pasaporte válido (6+ meses de vigencia)</div>
+        <div class="doc-item required">Formulario I-20 original</div>
+        <div class="doc-item required">Comprobante pago SEVIS I-901</div>
+        <div class="doc-item required">Confirmación DS-160 (con código de barras)</div>
+        <div class="doc-item required">Confirmación de cita de la embajada</div>
+        <div class="doc-item">Carta de aceptación universitaria</div>
+        <div class="doc-item">Carta de beca atlética (scholarship)</div>
+        <div class="doc-item">Certificación NCAA Eligibility Center</div>
+        <div class="doc-item">Estados de cuenta bancarios (solvencia)</div>
+        <div class="doc-item">Transcripciones académicas</div>
+        <div class="doc-item">Fotos tipo pasaporte (fondo blanco)</div>
+        <div class="doc-item">Visas anteriores de EE.UU. (si aplica)</div>
+      </div>
+    </div>
+
+    <!-- TARIFAS -->
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Resumen de costos (2026)</div>
+      <table class="fees-table">
+        <tr><th>Concepto</th><th>Monto</th><th>Dónde pagar</th></tr>
+        <tr><td>SEVIS I-901 Fee</td><td class="fee-amt">$350</td><td>fmjfee.com</td></tr>
+        <tr><td>DS-160 MRV Application Fee</td><td class="fee-amt">$185</td><td>ceac.state.gov</td></tr>
+        <tr><td style="font-weight:800;">TOTAL (mínimo estimado)</td><td class="fee-total">$535</td><td>+ gastos de viaje a embajada</td></tr>
+      </table>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="guide-section">
+      <div class="guide-section-title">⚠️ Notas importantes</div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Full-time enrollment obligatorio</strong>La visa F-1 requiere que el atleta esté matriculado a tiempo completo. Si baja de carga académica puede perder el estatus migratorio.</div>
+      </div>
+      <div class="guide-alert red">
+        <span class="guide-alert-icon">🚫</span>
+        <div><strong>Restricciones de trabajo</strong>La F-1 generalmente no permite trabajar fuera del campus ni recibir ingresos de fuentes en EE.UU. El NIL (Name, Image &amp; Likeness) está en evolución legal para atletas internacionales — consultar con el DSO de la universidad antes de firmar cualquier acuerdo NIL.</div>
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">📅</span>
+        <div><strong>Tiempo de entrada</strong>Con la visa F-1 puedes entrar a EE.UU. máximo 30 días antes de la fecha de inicio del I-20. No intentes entrar antes.</div>
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Cita expedita disponible</strong>Si el tiempo de espera para la cita es muy largo y tienes fecha de inicio de clases próxima, puedes solicitar una cita expedita en la embajada. Debes primero sacar la cita normal y luego solicitar la expedita.</div>
+      </div>
+    </div>
+
+    <div class="guide-section" style="padding-bottom:0;">
+      <div style="padding:12px 16px;background:var(--card2);border-radius:10px;font-size:10px;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--txt);">Fuentes oficiales:</strong>
+        <a href="https://travel.state.gov/content/travel/en/us-visas/study/student-visa.html" target="_blank" style="color:#4f46e5;margin:0 6px;">U.S. Dept. of State</a>·
+        <a href="https://studyinthestates.dhs.gov" target="_blank" style="color:#4f46e5;margin:0 6px;">DHS Study in the States</a>·
+        <a href="https://www.ice.gov/sevis/i901" target="_blank" style="color:#4f46e5;margin:0 6px;">ICE SEVIS</a>·
+        <a href="https://web3.ncaa.org/ecwr3/" target="_blank" style="color:#4f46e5;margin:0 6px;">NCAA Eligibility Center</a>·
+        <a href="https://pa.usembassy.gov/visas/" target="_blank" style="color:#4f46e5;margin:0 6px;">U.S. Embassy Panama</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCanadaGuide(){
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(220,38,38,.08);">🍁</div>
+      <div>
+        <div class="guide-card-title">Study Permit — Estudiante Internacional en Canadá</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(220,38,38,.08);color:#b91c1c;">Study Permit</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">U Sports · CCAA</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Canadá</span>
+        </div>
+      </div>
+      <button class="guide-download-btn" onclick="printGuide('canada')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">✅</span>
+        <div><strong>Punto de partida: ya tienes carta de aceptación</strong>
+        Esta guía comienza cuando ya recibiste la carta de aceptación oficial de una institución educativa canadiense acreditada (DLI — Designated Learning Institution). Sin esa carta no puedes iniciar el proceso del Study Permit.</div>
+      </div>
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué es el Study Permit?</strong>
+        El Study Permit es el permiso de estudio emitido por Immigration, Refugees and Citizenship Canada (IRCC). Es obligatorio para estudios de más de 6 meses. Dependiendo de tu nacionalidad, es posible que también necesites una Visa de Residente Temporal (TRV) para entrar a Canadá — ambas se solicitan juntas.</div>
+      </div>
+
+      <div class="steps-title">PASOS PARA OBTENER EL STUDY PERMIT</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Verificar si tu institución es una DLI</div>
+          <div class="step-desc">Solo puedes obtener un Study Permit para estudiar en una Designated Learning Institution (DLI). Verifica que tu universidad o college esté en la lista oficial del gobierno canadiense.</div>
+          <a class="step-link step-link-green" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/prepare/designated-learning-institutions-list.html" target="_blank" rel="noopener">🔗 Lista de DLIs →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Crear cuenta en el portal IRCC y aplicar online</div>
+          <div class="step-desc">Crea una cuenta GCKey o Sign-In Partner en el portal de IRCC. Aplica al Study Permit online. Si tu nacionalidad requiere TRV (visa de entrada), selecciona ambos en la misma solicitud — así se procesan juntos. La mayoría de latinoamericanos necesita TRV.</div>
+          <a class="step-link step-link-green" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html" target="_blank" rel="noopener">📝 Aplicar — Portal IRCC →</a>
+          <a class="step-link" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html" target="_blank" rel="noopener">🌐 Info Study Permit →</a>
+          <div class="step-fee">💰 $150 CAD — Study Permit · + $100 CAD si necesitas TRV</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Dar biométricos en un Visa Application Centre (VAC)</div>
+          <div class="step-desc">Después de enviar la solicitud recibirás una carta pidiendo tus biométricos (huella dactilar + foto). Debes ir a un VAC autorizado en tu país. En Panamá, el VAC está operado por VFS Global.</div>
+          <a class="step-link" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/biometrics.html" target="_blank" rel="noopener">ℹ️ Info Biométricos →</a>
+          <a class="step-link" href="https://www.vfsglobal.ca/canada/Panama/" target="_blank" rel="noopener">📍 VAC Panamá — VFS Global →</a>
+          <div class="step-fee">💰 $85 CAD — Biometrics fee</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Esperar decisión y recibir aprobación</div>
+          <div class="step-desc">El tiempo de procesamiento varía según el país (semanas a varios meses). Monitorea el estado en tu cuenta IRCC. Si aprueban, recibirás una carta de introducción (Port of Entry Letter) — imprímela y llévala al viajar. El Study Permit físico se te entrega al entrar a Canadá.</div>
+          <a class="step-link" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-status.html" target="_blank" rel="noopener">🔍 Verificar estado de solicitud →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Viajar a Canadá y obtener el Study Permit</div>
+          <div class="step-desc">Al llegar al punto de entrada canadiense, el oficial de migraciones revisará tu Port of Entry Letter y documentos, y te emitirá el Study Permit físico. Puedes entrar hasta 90 días antes de la fecha de inicio indicada en tu carta de aceptación.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS CANADA -->
+    <div class="guide-section">
+      <div class="guide-section-title">📎 Documentos requeridos</div>
+      <div class="doc-grid">
+        <div class="doc-item required">Pasaporte válido</div>
+        <div class="doc-item required">Carta de aceptación de la DLI</div>
+        <div class="doc-item required">Prueba de solvencia económica</div>
+        <div class="doc-item required">Fotos tipo pasaporte</div>
+        <div class="doc-item">Carta de motivos (por qué Canadá)</div>
+        <div class="doc-item">Prueba de lazos con tu país de origen</div>
+        <div class="doc-item">Historial académico / transcripciones</div>
+        <div class="doc-item">Carta de beca atlética (si aplica)</div>
+      </div>
+    </div>
+
+    <!-- FEES CANADA -->
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Resumen de costos (2026)</div>
+      <table class="fees-table">
+        <tr><th>Concepto</th><th>Monto</th><th>Dónde pagar</th></tr>
+        <tr><td>Study Permit</td><td class="fee-amt">$150 CAD</td><td>ircc.canada.ca</td></tr>
+        <tr><td>Temporary Resident Visa (TRV)</td><td class="fee-amt">$100 CAD</td><td>ircc.canada.ca</td></tr>
+        <tr><td>Biometrics</td><td class="fee-amt">$85 CAD</td><td>VAC / VFS Global</td></tr>
+        <tr><td style="font-weight:800;">TOTAL estimado</td><td class="fee-total">~$335 CAD</td><td>≈ $250 USD</td></tr>
+      </table>
+    </div>
+
+    <!-- NOTAS CANADA -->
+    <div class="guide-section">
+      <div class="guide-section-title">⚠️ Notas importantes</div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Solvencia económica obligatoria</strong>Debes demostrar que puedes cubrir la colegiatura del primer año + al menos $10,000 CAD para gastos de manutención. Sin esto, el Study Permit puede ser rechazado.</div>
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">📅</span>
+        <div><strong>Tiempo de procesamiento variable</strong>Aplica con al menos 3-4 meses de anticipación. Los tiempos de procesamiento varían mucho — revisa los tiempos actuales en el portal IRCC antes de aplicar.</div>
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Work On Campus permitido</strong>Con el Study Permit puedes trabajar hasta 20 horas semanales on-campus durante el semestre y full-time en vacaciones. No requiere permiso adicional.</div>
+      </div>
+    </div>
+
+    <div class="guide-section" style="padding-bottom:0;">
+      <div style="padding:12px 16px;background:var(--card2);border-radius:10px;font-size:10px;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--txt);">Fuentes oficiales:</strong>
+        <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html" target="_blank" style="color:#4f46e5;margin:0 6px;">IRCC Study Permit</a>·
+        <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html" target="_blank" style="color:#4f46e5;margin:0 6px;">Aplicar online</a>·
+        <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/biometrics.html" target="_blank" style="color:#4f46e5;margin:0 6px;">Biométricos</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMexicoGuide(){
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(22,163,74,.08);">🇲🇽</div>
+      <div>
+        <div class="guide-card-title">Visa de Estudiante — Residente Temporal en México</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(22,163,74,.08);color:#15803d;">Residente Temporal</span>
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00;">CONADEIP · UANL · TEC</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">México</span>
+        </div>
+      </div>
+      <button class="guide-download-btn" onclick="printGuide('mexico')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+    </div>
+
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">✅</span>
+        <div><strong>Punto de partida: ya tienes carta de aceptación</strong>
+        Esta guía comienza cuando ya recibiste la carta de aceptación oficial de una institución educativa mexicana. Esa carta es el documento clave que necesitas para solicitar la visa de estudiante en el consulado mexicano de tu país.</div>
+      </div>
+
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Qué visa necesito?</strong>
+        Para estudios de más de 180 días en México necesitas una <strong>Visa de Residente Temporal</strong> con característica migratoria de estudiante. Se solicita en el consulado mexicano antes de viajar. Una vez en México, tienes 30 días para ir al INM y obtener tu Tarjeta de Residente Temporal.</div>
+      </div>
+
+      <div class="steps-title">PASOS PARA OBTENER LA VISA DE ESTUDIANTE</div>
+
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-content">
+          <div class="step-title">Solicitar la visa en el Consulado Mexicano</div>
+          <div class="step-desc">Agenda tu cita en el Consulado General de México en tu país. En Panamá está ubicado en Ciudad de Panamá. Lleva todos tus documentos completos el día de la cita. La visa se solicita antes de viajar a México.</div>
+          <a class="step-link step-link-green" href="https://embamex.sre.gob.mx/panama/" target="_blank" rel="noopener">🏛️ Embajada México en Panamá →</a>
+          <a class="step-link" href="https://www.gob.mx/sre" target="_blank" rel="noopener">🌐 Secretaría de Relaciones Exteriores →</a>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">2</div>
+        <div class="step-content">
+          <div class="step-title">Preparar y entregar documentos en la cita</div>
+          <div class="step-desc">Ver lista completa de documentos en la sección de abajo. El consulado revisará tu expediente y tomará fotos y datos biométricos. El proceso de emisión suele tardar entre 5 y 10 días hábiles.</div>
+          <div class="step-fee">💰 ~$36 USD — tarifa consular (varía por consulado)</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">3</div>
+        <div class="step-content">
+          <div class="step-title">Recibir la visa en el pasaporte y viajar a México</div>
+          <div class="step-desc">La visa de residente temporal se coloca como sticker en tu pasaporte. Con ella puedes entrar a México. Tienes 30 días naturales a partir de tu llegada para hacer el trámite ante el INM — no lo dejes para después.</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num active">4</div>
+        <div class="step-content">
+          <div class="step-title">Canje en el INM — Tarjeta de Residente Temporal</div>
+          <div class="step-desc">Dentro de los primeros 30 días en México debes acudir al Instituto Nacional de Migración (INM) más cercano para canjear la visa por la Tarjeta de Residente Temporal. Esta tarjeta es tu documento migratorio oficial mientras estudias.</div>
+          <a class="step-link step-link-green" href="https://www.inm.gob.mx" target="_blank" rel="noopener">🏛️ Portal INM →</a>
+          <a class="step-link" href="https://www.gob.mx/tramites/ficha/cambio-de-condicion-de-estancia-de-visitante-a-residente-temporal/INM344" target="_blank" rel="noopener">📋 Trámite Residente Temporal →</a>
+          <div class="step-fee">💰 ~$3,825 MXN (~$190 USD) — derechos INM</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Renovar anualmente</div>
+          <div class="step-desc">La Tarjeta de Residente Temporal se emite con vigencia de 1 año y se puede renovar hasta completar tus estudios (máximo 4 años seguidos). La renovación se hace también ante el INM antes de que venza tu tarjeta actual.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS MEXICO -->
+    <div class="guide-section">
+      <div class="guide-section-title">📎 Documentos requeridos (consulado)</div>
+      <div class="doc-grid">
+        <div class="doc-item required">Pasaporte válido (6+ meses vigencia)</div>
+        <div class="doc-item required">Carta de aceptación de la institución</div>
+        <div class="doc-item required">Prueba de solvencia económica</div>
+        <div class="doc-item required">Formulario de solicitud de visa</div>
+        <div class="doc-item">Fotos recientes (fondo blanco)</div>
+        <div class="doc-item">Carta de motivos / objetivos de estudio</div>
+        <div class="doc-item">Historial académico / transcripciones</div>
+        <div class="doc-item">Carta de beca atlética (si aplica)</div>
+        <div class="doc-item">Comprobante de domicilio en país de origen</div>
+        <div class="doc-item">Visas anteriores a México (si aplica)</div>
+      </div>
+    </div>
+
+    <!-- FEES MEXICO -->
+    <div class="guide-section">
+      <div class="guide-section-title">💰 Resumen de costos (2026)</div>
+      <table class="fees-table">
+        <tr><th>Concepto</th><th>Monto</th><th>Dónde pagar</th></tr>
+        <tr><td>Tarifa consular (visa de residente temporal)</td><td class="fee-amt">~$36 USD</td><td>Consulado mexicano</td></tr>
+        <tr><td>Derechos INM — Tarjeta de Residente Temporal</td><td class="fee-amt">~$3,825 MXN</td><td>INM en México</td></tr>
+        <tr><td style="font-weight:800;">TOTAL estimado</td><td class="fee-total">~$225 USD</td><td>+ gastos de traslado</td></tr>
+      </table>
+    </div>
+
+    <!-- NOTAS MEXICO -->
+    <div class="guide-section">
+      <div class="guide-section-title">⚠️ Notas importantes</div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Canje INM en 30 días — obligatorio</strong>Si no realizas el canje de visa a Tarjeta de Residente Temporal dentro de los 30 días de llegada, tu estatus migratorio queda irregular. Es el error más común — programa este trámite desde antes de viajar.</div>
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">📅</span>
+        <div><strong>Renovación anual</strong>La tarjeta se renueva cada año. Inicia el trámite de renovación con al menos 30 días de anticipación al vencimiento para evitar interrupciones en tu estatus.</div>
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>CURP y RFC</strong>Una vez con tu tarjeta de residente temporal puedes tramitar tu CURP (Clave Única de Registro de Población) en línea — lo necesitarás para inscripciones, trámites universitarios y abrir cuenta bancaria en México.</div>
+      </div>
+    </div>
+
+    <div class="guide-section" style="padding-bottom:0;">
+      <div style="padding:12px 16px;background:var(--card2);border-radius:10px;font-size:10px;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--txt);">Fuentes oficiales:</strong>
+        <a href="https://www.gob.mx/sre" target="_blank" style="color:#4f46e5;margin:0 6px;">SRE México</a>·
+        <a href="https://www.inm.gob.mx" target="_blank" style="color:#4f46e5;margin:0 6px;">INM</a>·
+        <a href="https://embamex.sre.gob.mx/panama/" target="_blank" style="color:#4f46e5;margin:0 6px;">Embajada México en Panamá</a>·
+        <a href="https://www.gob.mx/tramites/ficha/cambio-de-condicion-de-estancia-de-visitante-a-residente-temporal/INM344" target="_blank" style="color:#4f46e5;margin:0 6px;">Trámite INM</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── PDF PRINT ── */
+const LNK=(url,txt)=>`<a href="${url}" target="_blank" style="color:#4f46e5;font-weight:700;text-decoration:underline;">${txt}</a>`;
+const PDF_CONTENT={
+  usa:{
+    flag:'🇺🇸',country:'Estados Unidos de América',
+    title:'Visa F-1 — Atleta Estudiante Internacional',subtitle:'NCAA · NAIA · NJCAA',
+    intro:`<p>Esta guía cubre el proceso de la Visa F-1 de estudiante no inmigrante de EE.UU. para atletas internacionales aceptados en instituciones afiliadas a la NCAA, NAIA o NJCAA. <strong>El proceso inicia una vez que ya tienes el Formulario I-20</strong> emitido por la oficina de estudiantes internacionales de tu universidad (DSO), lo cual confirma que fuiste aceptado y estás oficialmente inscrito.</p><p>La F-1 no es una visa deportiva — el atleta entra como <em>estudiante</em> que practica deporte. Presentarla incorrectamente puede resultar en rechazo.</p>`,
+    steps:[
+      {n:'1',title:'Pagar la tarifa SEVIS I-901 — $350 USD',body:`Usa el SEVIS ID de tu I-20 para pagar en el sitio oficial del ICE. Imprime y guarda el recibo — lo necesitarás en la entrevista.<br>→ ${LNK('https://www.fmjfee.com/i901fee/','fmjfee.com/i901fee')} · ${LNK('https://www.ice.gov/sevis/i901','ice.gov — info SEVIS')}`},
+      {n:'2',title:'Completar el Formulario DS-160',body:`Solicitud oficial de visa del Departamento de Estado. 100% en línea. Al finalizar, descarga e imprime la confirmación con código de barras. El MRV fee de $185 USD se paga durante este proceso.<br>→ ${LNK('https://ceac.state.gov/genniv/','ceac.state.gov/genniv')} · ${LNK('https://travel.state.gov/content/travel/en/us-visas/study/student-visa.html','Visa Estudiante — State Dept')}`},
+      {n:'3',title:'Agendar cita en la Embajada de EE.UU.',body:`Agenda la entrevista en la Embajada o Consulado de EE.UU. de tu país (ver listado por país más abajo). Los tiempos varían — solicita con anticipación. Si tu fecha de inicio es próxima, pide cita expedita.<br>→ ${LNK('https://www.usembassy.gov/','usembassy.gov — directorio mundial')} · ${LNK('https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/wait-times.html','Tiempos de espera actuales')}`},
+      {n:'4',title:'Preparar los documentos para la entrevista',body:'Reúne originales y copias de todos los documentos listados. La entrevista dura ~5-10 minutos. Prepárate para explicar tu programa de estudios, tu beca y tu plan de retornar a tu país al terminar.'},
+      {n:'5',title:'Entrevista consular en la Embajada',body:`El cónsul evaluará tu intención de estudiar, solvencia económica y vínculos con tu país. Para atletas: confirma que tienes beca, que tu propósito es estudiar y que el deporte es complementario. Referencia:<br>→ ${LNK('https://studyinthestates.dhs.gov/2017/01/f-1-student-athletes-learn-about-ncaa','DHS — F-1 Student Athletes & NCAA')}`},
+      {n:'6',title:'Recibir la visa y planificar el viaje',body:'Con la F-1 aprobada puedes entrar a EE.UU. máximo <strong>30 días antes</strong> de la fecha de inicio de tu I-20. Al entrar, el oficial de migraciones te dará un I-94 digital — guárdalo en todo momento.'},
+    ],
+    docs:['Pasaporte válido (mínimo 6 meses más allá de tu estadía)','Formulario I-20 original firmado por el DSO','Comprobante de pago SEVIS I-901 ($350 USD)','Confirmación DS-160 con código de barras impreso','Confirmación de cita de la embajada','Carta oficial de aceptación universitaria','Carta de beca atlética (scholarship) si aplica','Certificación NCAA / NAIA / NJCAA Eligibility','Estados de cuenta bancarios (últimos 3-6 meses)','Transcripciones académicas (con traducción si aplica)','Fotos tipo pasaporte fondo blanco, recientes','Visas anteriores a EE.UU. si las tuviste'],
+    fees:[['SEVIS I-901 Fee','$350 USD',LNK('https://www.fmjfee.com/i901fee/','fmjfee.com/i901fee')],['DS-160 MRV Application Fee','$185 USD',LNK('https://ceac.state.gov/genniv/','ceac.state.gov/genniv')],['TOTAL estimado','$535 USD','+ gastos traslado a embajada']],
+    notes:[
+      {type:'warning',title:'Full-time enrollment obligatorio',body:'La F-1 exige matriculación a tiempo completo cada semestre. Reducir la carga académica sin autorización del DSO puede causar pérdida del estatus migratorio.'},
+      {type:'alert',title:'Restricciones de trabajo y NIL',body:'La F-1 generalmente no permite trabajar fuera del campus. El NIL (Name, Image & Likeness) está en evolución legal para internacionales — consultar con el DSO antes de firmar cualquier acuerdo comercial.'},
+      {type:'info',title:'Regla de los 30 días de entrada',body:'Solo puedes ingresar a EE.UU. dentro de los 30 días previos a la fecha de inicio del I-20. Entrar antes puede resultar en rechazo en el puerto de entrada.'},
+      {type:'tip',title:'Cita expedita disponible',body:'Si el tiempo de espera es muy largo respecto a tu fecha de inicio, solicita cita expedita una vez tengas cita normal asignada, justificando la urgencia con tu I-20.'},
+    ],
+    countries:[
+      {name:'Panamá',flag:'🇵🇦',url:'https://www.ustraveldocs.com/pa/'},
+      {name:'Colombia',flag:'🇨🇴',url:'https://www.ustraveldocs.com/co/'},
+      {name:'Venezuela',flag:'🇻🇪',url:'https://www.ustraveldocs.com/ve/'},
+      {name:'Brasil',flag:'🇧🇷',url:'https://www.ustraveldocs.com/br/'},
+      {name:'Argentina',flag:'🇦🇷',url:'https://www.ustraveldocs.com/ar/'},
+      {name:'México',flag:'🇲🇽',url:'https://www.ustraveldocs.com/mx/'},
+      {name:'Perú',flag:'🇵🇪',url:'https://www.ustraveldocs.com/pe/'},
+      {name:'Chile',flag:'🇨🇱',url:'https://www.ustraveldocs.com/cl/'},
+      {name:'Ecuador',flag:'🇪🇨',url:'https://www.ustraveldocs.com/ec/'},
+      {name:'Rep. Dominicana',flag:'🇩🇴',url:'https://www.ustraveldocs.com/do/'},
+      {name:'Guatemala',flag:'🇬🇹',url:'https://www.ustraveldocs.com/gt/'},
+      {name:'Costa Rica',flag:'🇨🇷',url:'https://www.ustraveldocs.com/cr/'},
+      {name:'Honduras',flag:'🇭🇳',url:'https://www.ustraveldocs.com/hn/'},
+      {name:'El Salvador',flag:'🇸🇻',url:'https://www.ustraveldocs.com/sv/'},
+      {name:'Nicaragua',flag:'🇳🇮',url:'https://www.ustraveldocs.com/ni/'},
+      {name:'Bolivia',flag:'🇧🇴',url:'https://www.ustraveldocs.com/bo/'},
+      {name:'Paraguay',flag:'🇵🇾',url:'https://www.ustraveldocs.com/py/'},
+      {name:'Uruguay',flag:'🇺🇾',url:'https://www.ustraveldocs.com/uy/'},
+    ],
+    countriesTitle:'Citas por Embajada — Portal USTravelDocs por país'
+  },
+  canada:{
+    flag:'🍁',country:'Canadá',
+    title:'Study Permit — Estudiante Internacional en Canadá',subtitle:'U Sports · CCAA · Instituciones Canadienses',
+    intro:`<p>Esta guía cubre el proceso del Study Permit (Permiso de Estudio) emitido por IRCC (Immigration, Refugees and Citizenship Canada). Es obligatorio para estudiar más de 6 meses en Canadá. <strong>El proceso inicia una vez que ya tienes la carta de aceptación oficial</strong> de una DLI (Designated Learning Institution).</p><p>La mayoría de ciudadanos latinoamericanos necesitan también una Temporary Resident Visa (TRV) para entrar a Canadá. Ambas se solicitan juntas en la misma aplicación.</p>`,
+    steps:[
+      {n:'1',title:'Verificar que tu institución es una DLI',body:`Solo puedes solicitar el Study Permit para estudiar en una Designated Learning Institution. Verifica la lista oficial antes de aplicar.<br>→ ${LNK('https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/prepare/designated-learning-institutions-list.html','Lista oficial de DLIs — canada.ca')}`},
+      {n:'2',title:'Crear cuenta IRCC y aplicar en línea',body:`Crea una cuenta GCKey en el portal de IRCC. Aplica al Study Permit (+ TRV si tu país lo requiere — se seleccionan juntos). Tarifas: $150 CAD Study Permit + $100 CAD TRV si aplica.<br>→ ${LNK('https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html','Aplicar online — IRCC')} · ${LNK('https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html','Información general Study Permit')}`},
+      {n:'3',title:'Dar biométricos en un VAC autorizado',body:`Después de enviar la solicitud recibirás una carta de IRCC para dar biométricos (huellas + foto) en un Visa Application Centre (VAC) de tu país. Costo: $85 CAD.<br>→ ${LNK('https://www.canada.ca/en/immigration-refugees-citizenship/services/biometrics/give-biometrics.html','Cómo y dónde dar biométricos')} · ${LNK('https://www.vfsglobal.ca/canada/','VFS Global — VAC por país')}`},
+      {n:'4',title:'Esperar decisión y recibir el POE Letter',body:`El tiempo de procesamiento varía por país y época (semanas a meses). Monitorea en tu cuenta IRCC. Si aprueban, recibirás una Port of Entry (POE) Letter — imprímela y llévala al viajar. El Study Permit físico se emite al cruzar la frontera.<br>→ ${LNK('https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-status.html','Verificar estado de mi solicitud')}`},
+      {n:'5',title:'Viajar a Canadá y obtener el Study Permit',body:'El oficial de migraciones revisa tu POE Letter y documentos al llegar. Te emite el Study Permit físico en ese momento. Puedes entrar hasta 90 días antes de tu fecha de inicio de estudios.'},
+    ],
+    docs:['Pasaporte válido con vigencia para toda la estadía','Carta de aceptación oficial de la DLI','Prueba de solvencia económica (colegiatura + mín. $10,000 CAD manutención)','Extractos bancarios (últimos 3-6 meses)','Carta de motivación (por qué Canadá)','Prueba de vínculos con tu país de origen','Historial académico / transcripciones','Fotos tipo pasaporte recientes','Carta de beca atlética (si aplica)','Confirmación de VAC appointment (biométricos)'],
+    fees:[['Study Permit','$150 CAD',LNK('https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html','Portal IRCC')],['Temporary Resident Visa (TRV)','$100 CAD',LNK('https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit/apply.html','Portal IRCC (si aplica)')],['Biometrics Fee','$85 CAD',LNK('https://www.vfsglobal.ca/canada/','VFS Global — VAC')],['TOTAL estimado','~$335 CAD (~$250 USD)','+ gastos de traslado']],
+    notes:[
+      {type:'warning',title:'Solvencia económica obligatoria',body:'Debes demostrar que puedes cubrir la colegiatura del primer año + mínimo $10,000 CAD de manutención. Sin esto, el Study Permit será rechazado. Estados de cuenta claros y actualizados son clave.'},
+      {type:'info',title:'Tiempo de procesamiento variable',body:'Verifica siempre los tiempos estimados actuales en IRCC antes de aplicar. Planifica con al menos 3-4 meses de anticipación a tu fecha de inicio.'},
+      {type:'tip',title:'Work On Campus incluido',body:'Con el Study Permit puedes trabajar hasta 20 horas/semana dentro del campus durante el semestre y tiempo completo en vacaciones oficiales, sin permiso adicional.'},
+    ],
+    countries:[
+      {name:'Panamá',flag:'🇵🇦',url:'https://www.vfsglobal.ca/canada/Panama/'},
+      {name:'Colombia',flag:'🇨🇴',url:'https://www.vfsglobal.ca/canada/Colombia/'},
+      {name:'Venezuela',flag:'🇻🇪',url:'https://www.vfsglobal.ca/canada/Venezuela/'},
+      {name:'Brasil',flag:'🇧🇷',url:'https://www.vfsglobal.ca/canada/Brazil/'},
+      {name:'Argentina',flag:'🇦🇷',url:'https://www.vfsglobal.ca/canada/Argentina/'},
+      {name:'Perú',flag:'🇵🇪',url:'https://www.vfsglobal.ca/canada/Peru/'},
+      {name:'Chile',flag:'🇨🇱',url:'https://www.vfsglobal.ca/canada/Chile/'},
+      {name:'Ecuador',flag:'🇪🇨',url:'https://www.vfsglobal.ca/canada/Ecuador/'},
+      {name:'Rep. Dominicana',flag:'🇩🇴',url:'https://www.vfsglobal.ca/canada/Dominican-Republic/'},
+      {name:'Guatemala',flag:'🇬🇹',url:'https://www.vfsglobal.ca/canada/Guatemala/'},
+      {name:'Costa Rica',flag:'🇨🇷',url:'https://www.vfsglobal.ca/canada/Costa-Rica/'},
+      {name:'Honduras',flag:'🇭🇳',url:'https://www.vfsglobal.ca/canada/Honduras/'},
+      {name:'El Salvador',flag:'🇸🇻',url:'https://www.vfsglobal.ca/canada/El-Salvador/'},
+      {name:'Bolivia',flag:'🇧🇴',url:'https://www.vfsglobal.ca/canada/Bolivia/'},
+      {name:'Paraguay',flag:'🇵🇾',url:'https://www.vfsglobal.ca/canada/Paraguay/'},
+      {name:'Uruguay',flag:'🇺🇾',url:'https://www.vfsglobal.ca/canada/Uruguay/'},
+    ],
+    countriesTitle:'VAC por país — VFS Global Canada (agendar biométricos)'
+  },
+  mexico:{
+    flag:'🇲🇽',country:'México',
+    title:'Visa de Estudiante — Residente Temporal en México',subtitle:'CONADEIP · UANL · Tec de Monterrey · Universidades Mexicanas',
+    intro:`<p>Esta guía cubre la <strong>Visa de Residente Temporal con característica de estudiante</strong> para estudiar más de 180 días en México. <strong>El proceso inicia cuando ya tienes la carta de aceptación</strong> de la institución mexicana.</p><p>El proceso tiene dos etapas: 1) obtienes la visa en el consulado mexicano de tu país antes de viajar, y 2) ya en México, canjes la visa por la Tarjeta de Residente Temporal ante el INM dentro de los 30 días de llegada.</p>`,
+    steps:[
+      {n:'1',title:'Solicitar la visa en el Consulado Mexicano de tu país',body:`Agenda tu cita en el consulado mexicano más cercano (ver listado por país más abajo). Lleva todos tus documentos el día de la cita. Tarifa consular ~$36 USD.<br>→ ${LNK('https://www.gob.mx/sre','Secretaría de Relaciones Exteriores — SRE')} · ${LNK('https://sre.gob.mx/servicios-consulares','Servicios consulares México')}`},
+      {n:'2',title:'Entrega de documentos y datos biométricos',body:'El consulado revisará tu expediente completo y tomará fotos y datos biométricos. La visa suele emitirse entre 5 y 10 días hábiles después de la cita. Ver lista completa de documentos en esta guía.'},
+      {n:'3',title:'Recibir la visa en el pasaporte y viajar a México',body:`La visa aparece como sticker en tu pasaporte. Al entrar a México recibirás un FMM (Forma Migratoria Múltiple) — consérvalo para el canje INM. <strong>Tienes 30 días naturales para hacer el canje.</strong><br>→ ${LNK('https://www.inm.gob.mx','inm.gob.mx — Instituto Nacional de Migración')}`},
+      {n:'4',title:'Canje en el INM — Tarjeta de Residente Temporal',body:`Dentro de los primeros 30 días en México, acude a la oficina INM más cercana para canjear tu visa por la Tarjeta de Residente Temporal (~$3,825 MXN).<br>→ ${LNK('https://www.gob.mx/tramites/ficha/cambio-de-condicion-de-estancia-de-visitante-a-residente-temporal/INM344','Trámite Residente Temporal — gob.mx')}`},
+      {n:'5',title:'Renovar la tarjeta anualmente',body:`Vigencia de 1 año, renovable hasta completar estudios (máx. 4 años). Inicia renovación con al menos 30 días de anticipación.<br>→ ${LNK('https://www.inm.gob.mx','inm.gob.mx — renovación de residencia')}`},
+    ],
+    docs:['Pasaporte válido (mín. 6 meses de vigencia)','Carta de aceptación de la institución educativa mexicana','Prueba de solvencia económica (estados de cuenta, carta de beca)','Formulario de solicitud de visa (del consulado)','Fotos recientes (fondo blanco, tamaño pasaporte)','Carta de motivos / objetivos de estudio','Historial académico / transcripciones','Comprobante de domicilio en país de origen','Carta de beca atlética (si aplica)','FMM al llegar (para el canje en el INM)'],
+    fees:[['Tarifa consular — visa residente temporal','~$36 USD','Consulado mexicano en tu país'],['Derechos INM — Tarjeta Residente Temporal','~$3,825 MXN (~$190 USD)',LNK('https://www.inm.gob.mx','Oficina INM en México')],['TOTAL estimado','~$225 USD','+ gastos de traslado']],
+    notes:[
+      {type:'warning',title:'Canje INM en 30 días — obligatorio',body:'Si no haces el canje dentro de los 30 días naturales de llegada, tu estatus migratorio queda irregular y puedes enfrentar multas o deportación. Agenda este trámite antes de viajar.'},
+      {type:'info',title:'Renovación anual',body:'La tarjeta vence cada año. Inicia la renovación ante el INM con al menos 30 días de anticipación al vencimiento para no quedar en situación irregular.'},
+      {type:'tip',title:'Tramita tu CURP al llegar',body:'Con tu Tarjeta de Residente Temporal puedes obtener tu CURP en gob.mx/curp. La necesitarás para inscripciones, salud, banco y prácticamente todo en México.'},
+    ],
+    countries:[
+      {name:'Panamá',flag:'🇵🇦',url:'https://embamex.sre.gob.mx/panama/'},
+      {name:'Colombia',flag:'🇨🇴',url:'https://embamex.sre.gob.mx/colombia/'},
+      {name:'Venezuela',flag:'🇻🇪',url:'https://embamex.sre.gob.mx/venezuela/'},
+      {name:'Brasil',flag:'🇧🇷',url:'https://embamex.sre.gob.mx/brasil/'},
+      {name:'Argentina',flag:'🇦🇷',url:'https://embamex.sre.gob.mx/argentina/'},
+      {name:'Perú',flag:'🇵🇪',url:'https://embamex.sre.gob.mx/peru/'},
+      {name:'Chile',flag:'🇨🇱',url:'https://embamex.sre.gob.mx/chile/'},
+      {name:'Ecuador',flag:'🇪🇨',url:'https://embamex.sre.gob.mx/ecuador/'},
+      {name:'Rep. Dominicana',flag:'🇩🇴',url:'https://embamex.sre.gob.mx/republicadominicana/'},
+      {name:'Guatemala',flag:'🇬🇹',url:'https://embamex.sre.gob.mx/guatemala/'},
+      {name:'Costa Rica',flag:'🇨🇷',url:'https://embamex.sre.gob.mx/costarica/'},
+      {name:'Honduras',flag:'🇭🇳',url:'https://embamex.sre.gob.mx/honduras/'},
+      {name:'El Salvador',flag:'🇸🇻',url:'https://embamex.sre.gob.mx/elsalvador/'},
+      {name:'Nicaragua',flag:'🇳🇮',url:'https://embamex.sre.gob.mx/nicaragua/'},
+      {name:'Bolivia',flag:'🇧🇴',url:'https://embamex.sre.gob.mx/bolivia/'},
+      {name:'Paraguay',flag:'🇵🇾',url:'https://embamex.sre.gob.mx/paraguay/'},
+      {name:'Uruguay',flag:'🇺🇾',url:'https://embamex.sre.gob.mx/uruguay/'},
+    ],
+    countriesTitle:'Consulados de México por país — Embajada oficial SRE'
+  },
+  telefono:{
+    flag:'📱',country:'EE.UU. — Telecomunicaciones',
+    title:'Número de Teléfono Americano — Primera vez en EE.UU.',subtitle:'Sin SSN · Prepago · Boarding School y College',
+    intro:`<p>Al llegar a EE.UU. por primera vez, obtener un número de teléfono americano es el <strong>primer paso esencial</strong>. Coaches, staff universitario, compañeros de equipo y toda la infraestructura del athletic department se comunican exclusivamente por número de EE.UU. (SMS/iMessage/llamadas).</p><p>La buena noticia: los planes <strong>prepago no requieren SSN</strong>. Solo necesitas tu pasaporte. Puedes tener número el mismo día que aterrizas.</p>`,
+    steps:[
+      {n:'1',title:'T-Mobile Prepaid — La opción más rápida',body:`Disponible en cualquier T-Mobile Store, Target, Walmart o Best Buy. Solo el pasaporte. Plan "Simply Prepaid" (ilimitado): $40/mes. Mejor cobertura nacional.<br>→ <a href="https://prepaid.t-mobile.com" style="color:#4f46e5;">prepaid.t-mobile.com</a>`},
+      {n:'2',title:'Visible (Verizon) — $25/mes todo online',body:`100% digital (sin visitar tienda). Funciona con pasaporte extranjero y tarjeta de débito. Plan único: $25/mes. Red Verizon — excelente cobertura en áreas rurales donde están muchas universidades.<br>→ <a href="https://www.visible.com" style="color:#4f46e5;">visible.com</a>`},
+      {n:'3',title:'Google Fi — Ideal para quien viaja entre países',body:`Sin SSN, 100% con pasaporte. Ventaja clave: el número americano sigue funcionando en Panamá y otros países sin cargos adicionales. Plan Flexible desde $20/mes + $10/GB.<br>→ <a href="https://fi.google.com" style="color:#4f46e5;">fi.google.com</a>`},
+      {n:'4',title:'AT&T Prepaid — Disponible en aeropuerto',body:`Quioscos en los principales aeropuertos (JFK, MIA, LAX, ORD). Sales del avión con SIM en mano. Planes desde $30/mes. No requiere SSN con pasaporte vigente.<br>→ <a href="https://www.att.com/prepaid/" style="color:#4f46e5;">att.com/prepaid</a>`},
+      {n:'5',title:'Pasos concretos al llegar',body:'1) Al aterrizar: busca tienda AT&T/T-Mobile en zona de llegadas, o Walmart a 10-15 min del aeropuerto. 2) Documentos: solo el pasaporte; usa la dirección del dormitorio o boarding school. 3) Verifica que tu teléfono esté desbloqueado y soporte bandas LTE de EE.UU. (B4, B12, B66). 4) Menores de 18 años: los planes prepago no requieren adulto presente, los contratos postpago sí.'},
+    ],
+    docs:['Pasaporte vigente (único documento requerido para prepago)','Teléfono desbloqueado (unlocked) compatible con bandas LTE USA','Tarjeta de débito/crédito para pagar el plan','Dirección local (dormitorio, boarding school o temporal)'],
+    fees:[['T-Mobile Prepaid (ilimitado)','$40/mes','T-Mobile Store · Target · Walmart'],['Visible (Verizon)','$25/mes','App o web (100% online)'],['Google Fi Flexible','Desde $20/mes + $10/GB','app.fi.google.com'],['AT&T Prepaid','Desde $30/mes','AT&T Store · Aeropuerto'],['Mint Mobile (opción económica)','Desde $15/mes','mintmobile.com']],
+    notes:[
+      {type:'info',title:'Ninguno requiere SSN',body:'Todos los planes prepago listados aceptan pasaporte extranjero sin número de seguro social. Los planes postpago (con contrato mensual) sí lo requieren — evítalos el primer año.'},
+      {type:'warning',title:'Verifica que el teléfono esté desbloqueado',body:'Si compraste el teléfono en Panamá con Claro, Movistar o Tigo, puede estar bloqueado a ese operador. Pídele a tu operador panameño que lo desbloquee antes de viajar, o compra un teléfono desbloqueado.'},
+      {type:'tip',title:'Mint Mobile — opción ultra económica',body:'Mint Mobile ($15/mes, red T-Mobile) es la opción más económica, pero se compra 100% online y la SIM llega por correo. Útil si tienes la dirección del campus antes de viajar.'},
+      {type:'tip',title:'Número americano para menores (boarding school)',body:'Los menores de 18 años pueden comprar planes prepago con su pasaporte sin necesidad de un adulto presente — esto aplica para todas las opciones de la lista.'},
+    ],
+  },
+  banco:{
+    flag:'🏦',country:'EE.UU. — Banca',
+    title:'Cuenta Bancaria en EE.UU. — Boarding School y College',subtitle:'Sin SSN al inicio · Menor de edad · 18+ · NIL y Stipend',
+    intro:`<p>Una cuenta bancaria americana es imprescindible para recibir el <strong>stipend</strong> de la beca, cobrar contratos de <strong>NIL</strong>, usar Venmo/Zelle/Apple Pay, pagar el alquiler y el día a día sin los cargos de conversión de una tarjeta panameña (3–5% por transacción).</p><p>La buena noticia: la mayoría de bancos aceptan pasaporte + I-20 + I-94 para abrir cuenta básica. <strong>El SSN no es obligatorio para empezar</strong> — se puede agregar después.</p>`,
+    steps:[
+      {n:'1',title:'[Boarding School] Capital One MONEY Teen — La más fácil remotamente',body:`El padre/guardián abre la cuenta 100% online desde Panamá si ya tiene Capital One, o abriendo una simultáneamente. El menor recibe su propia tarjeta de débito. Los padres monitorean movimientos y establecer límites desde la app. Sin cargo mensual. Se puede gestionar sin SSN del menor en muchos estados.<br>→ <a href="https://www.capitalone.com/bank/checking-accounts/teen-checking-account/" style="color:#4f46e5;">Capital One MONEY Teen</a>`},
+      {n:'2',title:'[Boarding School] Chase First Banking — Para mayores de 6 años',body:`Requiere que el padre tenga cuenta Chase. Se abre en sucursal con el menor presente. Sin cargo mensual. En algunos estados el padre puede aparecer vía videoconferencia verificada.<br>→ <a href="https://www.chase.com/personal/banking/first-banking" style="color:#4f46e5;">Chase First Banking</a>`},
+      {n:'3',title:'[Boarding School] Greenlight — Tarjeta Mastercard sin banco tradicional',body:`No es un banco — es una tarjeta de débito gestionada por padres. Funciona como Mastercard en cualquier establecimiento. Los padres cargan dinero desde cualquier país, 100% por app. Plan familiar desde $4.99/mes para hasta 5 hijos. Solución inmediata para el día 1.<br>→ <a href="https://www.greenlight.com" style="color:#4f46e5;">greenlight.com</a>`},
+      {n:'4',title:'[College 18+] Chase College Checking — La más completa',body:`Sin cargo mensual por <strong>5 años</strong> como estudiante. Acepta pasaporte + I-20 + I-94 sin SSN en la mayoría de estados. Zelle integrado. Amplia red de ATMs. Al tener SSN, se vincula directamente.<br>→ <a href="https://www.chase.com/personal/banking/college-checking" style="color:#4f46e5;">Chase College Checking</a>`},
+      {n:'5',title:'[College 18+] Bank of America Advantage SafeBalance',body:`Proceso bien establecido para estudiantes F-1. Aceptan I-20 + I-94 + pasaporte sin SSN. Sin cargo mensual si eres estudiante menor de 25 años.<br>→ <a href="https://www.bankofamerica.com/deposits/checking/advantage-safebalance-banking/" style="color:#4f46e5;">Bank of America</a>`},
+      {n:'6',title:'Wise — Para transferencias desde Panamá',body:`Wise permite enviar y recibir dinero con tasa de cambio real sin comisiones bancarias. El padre envía desde Panamá directamente a la cuenta del atleta. Gratis para abrir. Complemento ideal a la cuenta principal.<br>→ <a href="https://wise.com" style="color:#4f46e5;">wise.com</a>`},
+    ],
+    docs:['Pasaporte vigente del atleta y del padre/guardián (si es menor)','I-20 emitido por la universidad (para college)','I-94 — Arrival/Departure Record (para college)','Carta de aceptación de la institución educativa','Dirección local (dormitorio, boarding school o apartamento)','Student ID universitario (si ya lo tienes)','SSN o ITIN del padre/guardián si aplica (boarding school)','Carta de matrícula / enrollment verification (opcional, agiliza)'],
+    fees:[['Capital One MONEY Teen','$0/mes','100% online desde cualquier país'],['Chase First Banking','$0/mes','Sucursal Chase — padre con cuenta previa'],['Greenlight','$4.99–$14.98/mes','Tarjeta Mastercard inmediata'],['Chase College Checking','$0 (5 años)','Sucursal Chase — pasaporte + I-20 + I-94'],['Bank of America SafeBalance','$0 (<25 años)','Sucursal BofA — pasaporte + I-20'],['Wise','$0','100% online — transferencias internacionales']],
+    notes:[
+      {type:'warning',title:'Menores no pueden ser titulares únicos',body:'En EE.UU., los menores de 18 años necesitan un cotitular adulto (padre/guardián legal) para abrir una cuenta bancaria tradicional. La boarding school tiene convenios con bancos locales — consultar al advisor antes de llegar.'},
+      {type:'info',title:'¿Cuándo conseguir el SSN?',body:'El SSN se puede obtener si el atleta tiene autorización de trabajo (OPT, CPT, trabajo en campus, assistantship). La mayoría de atletas F-1 no lo tienen automáticamente. Hablar con el DSO de la universidad. Una vez obtenido, actualizar el banco — abre acceso a crédito y más servicios.'},
+      {type:'tip',title:'Abrir cuenta antes de llegar (online)',body:'Capital One y Wise se pueden abrir 100% online antes del viaje. Greenlight también. Esto te da acceso a dinero desde el día 1 sin depender de encontrar una sucursal.'},
+      {type:'tip',title:'Wise como puente con Panamá',body:'Aunque tengas cuenta Chase o BofA, mantén una cuenta Wise activa. Los padres pueden enviarte dinero desde Panamá con tasas de cambio reales — mucho más económico que una transferencia bancaria tradicional (ACH o SWIFT).'},
+    ],
+  }
+};
+
+function printExamenes(){
+  const today=new Date().toLocaleDateString('es-PA',{year:'numeric',month:'long',day:'numeric'});
+  const exams=[
+    {icon:'🏫',color:'#1d4ed8',bg:'rgba(59,130,246,.08)',name:'TOEFL iBT',sub:'Test of English as a Foreign Language',stats:[['💵','Costo','$215–$255 Latam / $270 EE.UU.'],['⏱','Duración','~3 horas · 4 secciones'],['📊','Escala','0 – 120 puntos'],['📅','Validez','2 años']],scores:[['D1','80–100+','Varía según universidad y deporte'],['D2','61–79','Mínimo recomendado para becas']],note:'El más aceptado en D1/D2. Obligatorio en la mayoría de universidades para atletas internacionales no nativos de inglés.'},
+    {icon:'🟩',color:'#15803d',bg:'rgba(170,255,0,.08)',name:'Duolingo English Test',sub:'Alternativa rápida y online',stats:[['💵','Costo','$70 USD (desde feb 2025)'],['⏱','Duración','~60 minutos'],['📊','Escala','10 – 160 puntos'],['📅','Validez','2 años']],scores:[['D1','105–120+','Aceptado por +4,500 univ. (no todas D1)'],['D2','90–105','Verificar antes de recomendar']],note:'100% online desde casa. Resultados en 48 horas. No todos los programas D1 lo aceptan — verificar siempre.'},
+    {icon:'📐',color:'#7c3aed',bg:'rgba(139,92,246,.08)',name:'SAT',sub:'Scholastic Assessment Test',stats:[['💵','Costo','$68 doméstico / $111 internacional'],['⏱','Duración','2 h 14 min (sin ensayo)'],['📊','Escala','400 – 1600 puntos'],['📅','Validez','Sin límite oficial']],scores:[['D1','1000–1200+','Varía por universidad y deporte'],['D2','900–1050','Requisito académico — no de inglés']],note:'Prueba académica (no de inglés). Requisito de admisión y becas académicas en muchas universidades. Aplica junto al TOEFL/Duolingo.'},
+    {icon:'📋',color:'#b45309',bg:'rgba(245,158,11,.08)',name:'ACT',sub:'American College Testing',stats:[['💵','Costo','$68 sin ensayo / $93 con ensayo'],['⏱','Duración','2 h 55 min (sin ensayo)'],['📊','Escala','1 – 36 puntos'],['📅','Validez','Sin límite oficial']],scores:[['D1','19–24+','Equivalente a SAT 1000–1200'],['D2','16–20','Aceptado igual que el SAT en todas las univ.']],note:'Alternativa directa al SAT. Aceptado igualmente en todas las universidades. Incluye sección de Ciencias que el SAT no tiene.'},
+  ];
+  const duoSteps=[
+    {n:'1',title:'Entra a la web oficial',body:'Ve a <strong>englishtest.duolingo.com</strong> desde tu computadora (no funciona en móvil). Haz clic en "Get started" o "Practice free".'},
+    {n:'2',title:'Crea tu cuenta gratis',body:'Regístrate con tu email o con tu cuenta de Google. Solo necesitas email, contraseña y tu fecha de nacimiento. No se requiere tarjeta de crédito.'},
+    {n:'3',title:'Configura tu perfil',body:'Indica tu objetivo (estudiar en EE.UU., Canadá, etc.) y cómo te enteraste del examen. Toma menos de 1 minuto.'},
+    {n:'4',title:'Ve a "Practice" en el menú',body:'Desde tu dashboard, haz clic en "Practice" en la barra superior. Verás dos opciones: prueba rápida (15 min) y práctica completa por secciones.'},
+    {n:'5',title:'Elige la prueba rápida (Quick Check)',body:'Haz clic en "Quick Check" — es la prueba gratuita de 15 minutos que simula los tipos de preguntas reales del examen. Sin límite de intentos.'},
+    {n:'6',title:'Prepara tu equipo antes de empezar',body:'Necesitas: computadora con cámara y micrófono, lugar silencioso con buena iluminación, auriculares recomendados. <strong>Desde 2025 también piden un segundo dispositivo</strong> (celular o tablet) como cámara secundaria.'},
+    {n:'7',title:'Completa la prueba',body:'Responde las preguntas de lectura, escritura, escucha y habla tal como en el examen real. La IA evalúa en tiempo real.'},
+    {n:'8',title:'Revisa tus resultados',body:'Al terminar obtienes un puntaje estimado y retroalimentación por sección. Puedes repetirla todas las veces que quieras, <strong>completamente gratis</strong>.'},
+  ];
+  const examsHtml=exams.map(e=>`
+    <div style="border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:14px;background:${e.bg};page-break-inside:avoid;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:22px;">${e.icon}</span>
+        <div><div style="font-size:14px;font-weight:800;color:${e.color};">${e.name}</div><div style="font-size:10px;color:#64748b;">${e.sub}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px;">
+        ${e.stats.map(s=>`<div style="background:#fff;border-radius:7px;padding:8px;border:1px solid #e2e8f0;text-align:center;"><div style="font-size:14px;">${s[0]}</div><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin:2px 0;">${s[1]}</div><div style="font-size:10.5px;font-weight:700;color:#0f172a;">${s[2]}</div></div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+        ${e.scores.map(s=>`<div style="background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #e2e8f0;"><div style="font-size:9px;font-weight:800;color:${e.color};letter-spacing:.5px;">${s[0]}</div><div style="font-size:13px;font-weight:800;color:#0f172a;">${s[1]}</div><div style="font-size:9.5px;color:#64748b;">${s[2]}</div></div>`).join('')}
+      </div>
+      <div style="font-size:10.5px;color:#475569;line-height:1.6;background:#fff;border-radius:7px;padding:8px 10px;border-left:3px solid ${e.color};">${e.note}</div>
+    </div>`).join('');
+  const stepsHtml=duoSteps.map(s=>`
+    <div style="display:flex;gap:12px;margin-bottom:12px;page-break-inside:avoid;">
+      <div style="width:24px;height:24px;border-radius:50%;background:#AAFF00;color:#0f172a;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${s.n}</div>
+      <div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:2px;">${s.title}</div><div style="font-size:10.5px;color:#475569;line-height:1.7;">${s.body}</div></div>
+    </div>`).join('');
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>NVS · Exámenes de Inglés</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#0f172a;font-size:12px;}@page{margin:14mm 14mm 16mm 14mm;size:A4;}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.no-print{display:none!important;}}.page{max-width:740px;margin:0 auto;padding:20px 24px;}.print-btn{position:fixed;bottom:18px;right:18px;background:#0f172a;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+  </style></head><body>
+  <div class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #AAFF00;padding-bottom:12px;margin-bottom:16px;">
+      <div><div style="font-size:28px;font-weight:900;letter-spacing:3px;">NV<span style="color:#AAFF00;">S</span></div><div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#64748b;margin-top:2px;">New Vision Sports · Agencia de Colocación Deportiva</div></div>
+      <div style="text-align:right;"><div style="font-size:16px;font-weight:800;color:#0f172a;">📝 Guía de Exámenes</div><div style="font-size:8px;color:#94a3b8;margin-top:3px;">${today}</div></div>
+    </div>
+    <div style="margin-bottom:14px;"><div style="font-size:19px;font-weight:900;color:#0f172a;">Exámenes Estandarizados para EE.UU.</div><div style="font-size:10px;color:#64748b;margin-top:2px;">TOEFL · Duolingo English Test · SAT · ACT — Costos, puntajes y requisitos 2025–2026</div></div>
+    <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 8px 8px 0;padding:10px 13px;margin-bottom:16px;font-size:10.5px;color:#1d4ed8;line-height:1.6;">ℹ️ <strong>¿Cuáles necesita tu atleta?</strong> Las universidades D1/D2 suelen exigir demostración de inglés (TOEFL o Duolingo) para atletas internacionales. El SAT/ACT es requisito académico. Siempre confirmar con cada universidad.</div>
+    ${examsHtml}
+    <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin:18px 0 12px;">🆓 Examen de Práctica GRATIS — Duolingo English Test (Paso a Paso)</div>
+    ${stepsHtml}
+    <div style="background:#f0fdf4;border-radius:8px;padding:10px 13px;margin-top:10px;font-size:10.5px;color:#15803d;">🔗 Link directo: <strong>englishtest.duolingo.com/quick</strong> — práctica por secciones: <strong>englishtest.duolingo.com/prepare</strong></div>
+    <div style="margin-top:24px;padding-top:10px;border-top:2px solid #AAFF00;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:9px;color:#94a3b8;">© ${new Date().getFullYear()} New Vision Sports · Documento interno — uso exclusivo del equipo NVS</div>
+      <div style="font-size:9px;color:#94a3b8;">playwithnewvision.com</div>
+    </div>
+  </div>
+  <button class="print-btn no-print" onclick="window.print()">⬇ Descargar PDF</button>
+  </body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();
+}
+function printGuide(type){
+  const g=PDF_CONTENT[type];if(!g)return;
+  const today=new Date().toLocaleDateString('es-PA',{year:'numeric',month:'long',day:'numeric'});
+  const noteColors={warning:'#fff7ed',alert:'#fef2f2',info:'#eff6ff',tip:'#f0fdf4'};
+  const noteBorder={warning:'#fb923c',alert:'#f87171',info:'#93c5fd',tip:'#86efac'};
+  const noteLabel={warning:'⚠️ Importante',alert:'🚫 Atención',info:'ℹ️ Ten en cuenta',tip:'💡 Consejo NVS'};
+  const stepsHtml=g.steps.map(s=>`
+    <div style="display:flex;gap:14px;margin-bottom:18px;page-break-inside:avoid;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#AAFF00;color:#0f172a;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${s.n}</div>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px;">${s.title}</div><div style="font-size:11.5px;color:#475569;line-height:1.75;">${s.body}</div></div>
+    </div>`).join('');
+  const feesHtml=`<table style="width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px;">
+    <tr style="background:#f8fafc;"><th style="text-align:left;padding:8px 10px;font-size:9px;font-weight:800;letter-spacing:1px;color:#94a3b8;border-bottom:1px solid #e2e8f0;">CONCEPTO</th><th style="text-align:left;padding:8px 10px;font-size:9px;font-weight:800;letter-spacing:1px;color:#94a3b8;border-bottom:1px solid #e2e8f0;">MONTO</th><th style="text-align:left;padding:8px 10px;font-size:9px;font-weight:800;letter-spacing:1px;color:#94a3b8;border-bottom:1px solid #e2e8f0;">PAGAR EN</th></tr>
+    ${g.fees.map((f,i)=>`<tr style="${i===g.fees.length-1?'background:#f0fdf4;font-weight:800;':''}"><td style="padding:9px 10px;border-bottom:1px solid #f1f5f9;">${f[0]}</td><td style="padding:9px 10px;border-bottom:1px solid #f1f5f9;color:#16a34a;font-weight:700;">${f[1]}</td><td style="padding:9px 10px;border-bottom:1px solid #f1f5f9;color:#475569;">${f[2]}</td></tr>`).join('')}
+  </table>`;
+  const notesHtml=g.notes.map(n=>`
+    <div style="background:${noteColors[n.type]};border-left:4px solid ${noteBorder[n.type]};border-radius:0 8px 8px 0;padding:11px 14px;margin-bottom:9px;page-break-inside:avoid;">
+      <div style="font-size:11px;font-weight:800;color:#0f172a;margin-bottom:3px;">${noteLabel[n.type]}: ${n.title}</div>
+      <div style="font-size:11px;color:#475569;line-height:1.7;">${n.body}</div>
+    </div>`).join('');
+  const countriesHtml=g.countries?`
+    <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin:22px 0 12px;">
+      ${g.countriesTitle||'Links por país'}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+      ${g.countries.map(c=>`<a href="${c.url}" target="_blank" style="display:flex;align-items:center;gap:7px;padding:8px 10px;background:#f8fafc;border-radius:7px;text-decoration:none;color:#0f172a;font-size:11px;font-weight:600;border:1px solid #e2e8f0;">
+        <span style="font-size:16px;">${c.flag}</span>
+        <span style="flex:1;">${c.name}</span>
+        <span style="color:#94a3b8;font-size:10px;">→</span>
+      </a>`).join('')}
+    </div>`:'' ;
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>NVS · ${g.title}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#0f172a;font-size:12px;}
+    a{color:#4f46e5;}
+    @page{margin:15mm 14mm 18mm 14mm;size:A4;}
+    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.no-print{display:none!important;}}
+    .page{max-width:740px;margin:0 auto;padding:20px 24px;}
+    .section-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin:20px 0 12px;}
+    .print-btn{position:fixed;bottom:18px;right:18px;background:#0f172a;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+  </style></head><body>
+  <div class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #AAFF00;padding-bottom:14px;margin-bottom:18px;">
+      <div>
+        <div style="font-size:30px;font-weight:900;letter-spacing:3px;">NV<span style="color:#AAFF00;">S</span></div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#64748b;margin-top:2px;">New Vision Sports · Agencia de Colocación Deportiva</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:20px;">${g.flag}</div>
+        <div style="font-size:11px;font-weight:700;color:#0f172a;">${g.country}</div>
+        <div style="font-size:9px;color:#94a3b8;margin-top:2px;">${today}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div style="font-size:21px;font-weight:900;color:#0f172a;letter-spacing:.3px;">${g.title}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:3px;">${g.subtitle}</div>
+    </div>
+
+    <div style="background:#f8fafc;border-radius:10px;padding:13px 15px;font-size:11.5px;color:#475569;line-height:1.75;margin-bottom:4px;">${g.intro}</div>
+
+    <div class="section-title">Pasos del proceso</div>
+    ${stepsHtml}
+
+    <div class="section-title">Documentos requeridos</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+      ${g.docs.map(d=>`<div style="display:flex;align-items:flex-start;gap:7px;padding:7px 9px;background:#f8fafc;border-radius:6px;font-size:11px;color:#0f172a;"><span style="color:#16a34a;font-weight:900;flex-shrink:0;">✓</span>${d}</div>`).join('')}
+    </div>
+
+    <div class="section-title">Resumen de costos</div>
+    ${feesHtml}
+
+    <div class="section-title">Notas importantes</div>
+    ${notesHtml}
+
+    ${countriesHtml}
+
+    <div style="margin-top:28px;padding-top:12px;border-top:2px solid #AAFF00;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#0f172a;">New Vision Sports · playwithnewvision.com</div>
+        <div style="font-size:9px;color:#94a3b8;margin-top:2px;">Documento orientativo — verificar siempre requisitos vigentes con las autoridades migratorias.</div>
+      </div>
+      <div style="text-align:right;font-size:9px;color:#94a3b8;">
+        <div>info@playwithnewvision.com</div>
+        <div>stefano@playwithnewvision.com</div>
+      </div>
+    </div>
+  </div>
+  <button class="print-btn no-print" onclick="window.print()">⬇ Guardar como PDF</button>
+  <script>setTimeout(()=>window.print(),700);<\/script>
+  </body></html>`;
+
+  const win=window.open('','_blank','width=860,height=960');
+  win.document.write(html);win.document.close();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EXÁMENES — TOEFL / SAT / ACT / DUOLINGO
+══════════════════════════════════════════════════════════════════ */
+function renderExamenesSection(){
+  return`
+  <!-- ══ INTRO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(99,102,241,.1);">📝</div>
+      <div style="flex:1;">
+        <div class="guide-card-title">Exámenes Estandarizados para Universidades de EE.UU.</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(170,255,0,.12);color:#3a6b00;">NCAA · NAIA · NJCAA</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Internacional</span>
+        </div>
+      </div>
+      <button class="guide-download-btn" onclick="printExamenes()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+    </div>
+    <div class="guide-body">
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>¿Cuáles necesita tu atleta?</strong> Depende de la universidad y la división. Las universidades D1/D2 suelen exigir demostración de inglés (TOEFL o Duolingo) para atletas internacionales. El SAT/ACT es requisito académico en muchas instituciones para becas y admisión. Siempre confirmar requisitos específicos con cada universidad.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOEFL ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(59,130,246,.1);">🏫</div>
+      <div>
+        <div class="guide-card-title">TOEFL iBT — Test of English as a Foreign Language</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(59,130,246,.1);color:#1d4ed8;">Inglés · Oficial</span>
+          <span class="guide-tag" style="background:rgba(170,255,0,.12);color:#3a6b00;">Más aceptado D1/D2</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$215–$255 USD','Latam · $270 en EE.UU.')}
+        ${examStat('⏱','Duración','~3 horas','4 secciones')}
+        ${examStat('📊','Escala','0 – 120','Puntaje total')}
+        ${examStat('📅','Validez','2 años','Desde la fecha del examen')}
+        ${examStat('💻','Modalidad','Online / Centro','TOEFL Home Edition disponible')}
+        ${examStat('🌎','Registro','ets.org/toefl','ETS — Educational Testing Service')}
+      </div>
+      <div class="steps-title">SECCIONES DEL EXAMEN</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${seccionItem('📖','Reading','30-40 min','3-4 pasajes + preguntas de comprensión','0-30 pts')}
+        ${seccionItem('🎧','Listening','41-57 min','Lecturas, conversaciones y conferencias','0-30 pts')}
+        ${seccionItem('🗣','Speaking','17 min','4 tareas de expresión oral grabadas','0-30 pts')}
+        ${seccionItem('✍️','Writing','50 min','2 tareas de escritura académica','0-30 pts')}
+      </div>
+      <div class="steps-title">PUNTAJES MÍNIMOS REQUERIDOS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${puntajeDiv('D1','79 – 100+','La mayoría exige 79+. Algunas top schools piden 100+')}
+        ${puntajeDiv('D2','61 – 80','Rango típico. Varía mucho por institución')}
+        ${puntajeDiv('D3 / NAIA','45 – 61','Muchas aceptan puntajes más bajos o eximen')}
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Consejo NVS:</strong> Registrarse con al menos 3 meses de anticipación. Se puede tomar el TOEFL Home Edition desde casa con cámara. Los resultados llegan en 4-8 días y se envían directamente a las universidades desde ets.org.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DUOLINGO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(34,197,94,.1);">🦜</div>
+      <div>
+        <div class="guide-card-title">Duolingo English Test (DET)</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(34,197,94,.1);color:#15803d;">Inglés · Online</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Más económico y rápido</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$70 USD','Fijo en todos los países')}
+        ${examStat('⏱','Duración','~1 hora','Desde casa')}
+        ${examStat('📊','Escala','10 – 160','Puntaje total')}
+        ${examStat('📅','Validez','2 años','Desde la fecha')}
+        ${examStat('💻','Modalidad','Solo online','Cámara y micrófono requeridos')}
+        ${examStat('🌎','Registro','englishtest.duolingo.com','Resultados en 2 días')}
+      </div>
+      <div class="steps-title">PUNTAJES MÍNIMOS REQUERIDOS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${puntajeDiv('D1','100 – 120+','Equivalente aproximado a TOEFL 79+')}
+        ${puntajeDiv('D2','80 – 100','Depende de la universidad')}
+        ${puntajeDiv('D3 / NAIA','55 – 80','Muchas lo aceptan. Siempre verificar')}
+      </div>
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">💡</span>
+        <div><strong>Ventaja clave:</strong> Solo $70, resultados en 48 horas y se puede tomar desde casa. Es aceptado por +4,500 universidades. Ideal como alternativa rápida al TOEFL. <strong>No todos los programas D1 lo aceptan</strong> — verificar siempre antes de recomendar.</div>
+      </div>
+
+      <!-- ── PRÁCTICA GRATIS ── -->
+      <div style="margin-top:18px;padding:18px 20px;background:rgba(34,197,94,.06);border:1.5px solid rgba(34,197,94,.25);border-radius:12px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:20px;">🆓</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#15803d;">Examen de Práctica GRATIS — Paso a Paso</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Duolingo ofrece una prueba gratuita de 15 minutos sin necesidad de pagar nada</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${detStep(1,'Entra a la web oficial','Ve a <strong>englishtest.duolingo.com</strong> desde tu computadora (no funciona en móvil). Haz clic en <strong>"Get started"</strong> o <strong>"Practice free"</strong>.','💻')}
+          ${detStep(2,'Crea tu cuenta gratis','Regístrate con tu email o con tu cuenta de Google. Solo necesitas email, contraseña y tu fecha de nacimiento. <strong>No se requiere tarjeta de crédito.</strong>','📧')}
+          ${detStep(3,'Configura tu perfil','Indica tu objetivo (estudiar en EE.UU., Canadá, etc.) y cómo te enteraste del examen. Toma menos de 1 minuto.','⚙️')}
+          ${detStep(4,'Ve a "Practice" en el menú','Desde tu dashboard, haz clic en <strong>"Practice"</strong> en la barra superior. Verás dos opciones: prueba rápida (15 min) y práctica completa por secciones.','📋')}
+          ${detStep(5,'Elige la prueba rápida (Quick Check)','Haz clic en <strong>"Quick Check"</strong> — es la prueba gratuita de 15 minutos que simula los tipos de preguntas reales del examen. Sin límite de intentos.','⚡')}
+          ${detStep(6,'Prepara tu equipo antes de empezar','Necesitas: computadora con cámara y micrófono, lugar silencioso con buena iluminación, auriculares recomendados. <strong>Desde 2025 también piden un segundo dispositivo</strong> (celular o tablet) como cámara secundaria de supervisión.','🎧')}
+          ${detStep(7,'Completa la prueba','Responde las preguntas de lectura, escritura, escucha y habla tal como en el examen real. La IA evalúa en tiempo real.','✍️')}
+          ${detStep(8,'Revisa tus resultados','Al terminar obtienes un puntaje estimado y retroalimentación por sección. Puedes repetirla todas las veces que quieras, <strong>completamente gratis.</strong>','📊')}
+        </div>
+
+        <div style="margin-top:14px;padding:10px 14px;background:rgba(15,23,42,.04);border-radius:8px;display:flex;align-items:flex-start;gap:8px;">
+          <span style="font-size:14px;flex-shrink:0;">🔗</span>
+          <div style="font-size:12px;color:var(--muted);">Link directo a la prueba rápida: <strong style="color:#15803d;">englishtest.duolingo.com/quick</strong> — también puedes practicar por secciones individuales en <strong style="color:#15803d;">englishtest.duolingo.com/prepare</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SAT ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(168,85,247,.1);">🎓</div>
+      <div>
+        <div class="guide-card-title">SAT — Scholastic Assessment Test</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(168,85,247,.1);color:#7c3aed;">Académico · College Board</span>
+          <span class="guide-tag" style="background:rgba(59,130,246,.1);color:#1d4ed8;">Admisión y becas académicas</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$68 USD','EE.UU. · $111 internacional')}
+        ${examStat('⏱','Duración','2h 14min','Digital, sin descanso')}
+        ${examStat('📊','Escala','400 – 1600','Math + Reading/Writing')}
+        ${examStat('📅','Validez','Sin vencimiento','Se acepta cualquier año')}
+        ${examStat('💻','Modalidad','Digital','En centros autorizados')}
+        ${examStat('🌎','Registro','collegeboard.org','6-8 fechas por año')}
+      </div>
+      <div class="steps-title">SECCIONES DEL SAT DIGITAL</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${seccionItem('📚','Reading & Writing','64 min','Comprensión lectora y gramática','200-800 pts')}
+        ${seccionItem('🔢','Math','70 min','Álgebra, geometría y estadística','200-800 pts')}
+      </div>
+      <div class="steps-title">PUNTAJES MÍNIMOS PARA BECAS NCAA</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${puntajeDiv('D1 Beca Completa','900 – 1000+','GPA alto puede compensar puntaje bajo')}
+        ${puntajeDiv('D2 Beca Parcial','820 – 900','Mínimo para elegibilidad académica')}
+        ${puntajeDiv('D3 / NAIA','700 – 820','Varía por institución')}
+      </div>
+      <div class="guide-alert yellow">
+        <span class="guide-alert-icon">⚠️</span>
+        <div><strong>Importante:</strong> Muchas universidades son "test-optional" post-COVID, pero un SAT alto <strong>aumenta significativamente</strong> las posibilidades de beca académica. Para atletas internacionales, el SAT puede ser exigido o recomendado además del TOEFL.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ACT ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(239,68,68,.1);">🧪</div>
+      <div>
+        <div class="guide-card-title">ACT — American College Testing</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(239,68,68,.1);color:#dc2626;">Académico · ACT Inc.</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">Alternativa al SAT</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;">
+        ${examStat('💵','Costo','$68 USD','Sin Writing · $93 con Writing')}
+        ${examStat('⏱','Duración','2h 55min','4 secciones + Writing opcional')}
+        ${examStat('📊','Escala','1 – 36','Promedio de 4 secciones')}
+        ${examStat('📅','Validez','Sin vencimiento','Mejor puntaje cuenta')}
+        ${examStat('💻','Modalidad','Papel o Digital','En centros autorizados')}
+        ${examStat('🌎','Registro','act.org','~7 fechas por año')}
+      </div>
+      <div class="steps-title">SECCIONES DEL ACT</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${seccionItem('📖','English','45 min','Gramática, puntuación y estilo','1-36')}
+        ${seccionItem('🔢','Math','60 min','Pre-álgebra a trigonometría','1-36')}
+        ${seccionItem('📚','Reading','35 min','Comprensión de textos','1-36')}
+        ${seccionItem('🔬','Science','35 min','Interpretación de datos científicos','1-36')}
+      </div>
+      <div class="steps-title">EQUIVALENCIA SAT ↔ ACT</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+        ${equivItem('36 ACT','1600 SAT')}
+        ${equivItem('30 ACT','1360 SAT')}
+        ${equivItem('24 ACT','1160 SAT')}
+        ${equivItem('18 ACT','960 SAT')}
+      </div>
+      <div class="guide-alert blue">
+        <span class="guide-alert-icon">ℹ️</span>
+        <div><strong>SAT vs ACT:</strong> Todas las universidades de EE.UU. aceptan ambos. El ACT incluye una sección de Ciencias que puede favorecer a estudiantes fuertes en esa área. Se recomienda hacer un examen de práctica de ambos y elegir el que mejor puntaje genere.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RESUMEN COMPARATIVO ══ -->
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(170,255,0,.15);">⚖️</div>
+      <div>
+        <div class="guide-card-title">Tabla Comparativa — ¿Cuál recomendar?</div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:var(--bg);">
+              <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Examen</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Costo</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Duración</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Escala</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Objetivo</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">Online</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tablaRow('TOEFL iBT','$215–$270','~3h','0-120','Inglés (oficial)','✅ Home Ed.')}
+            ${tablaRow('Duolingo DET','$70','~1h','10-160','Inglés (rápido)','✅ Siempre')}
+            ${tablaRow('SAT','$68 / $111 int.','2h 14min','400-1600','Académico','❌ Centro')}
+            ${tablaRow('ACT','$68 / $93 writing','2h 55min','1-36','Académico','✅ Parcial')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function detStep(n,title,body,icon){
+  return`<div style="display:flex;gap:12px;align-items:flex-start;">
+    <div style="width:28px;height:28px;border-radius:50%;background:#15803d;color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${n}</div>
+    <div style="flex:1;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(0,0,0,.06);">
+      <div style="font-size:12px;font-weight:700;margin-bottom:3px;">${icon} ${title}</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">${body}</div>
+    </div>
+  </div>`;
+}
+function examStat(icon,label,val,sub){
+  return`<div style="padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+    <div style="font-size:16px;margin-bottom:6px;">${icon}</div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:3px;">${label}</div>
+    <div style="font-size:14px;font-weight:700;color:var(--txt);">${val}</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:2px;">${sub}</div>
+  </div>`;
+}
+function seccionItem(icon,name,time,desc,pts){
+  return`<div style="padding:12px 14px;background:var(--bg);border-radius:8px;border-left:3px solid #AAFF00;">
+    <div style="font-size:13px;font-weight:700;margin-bottom:3px;">${icon} ${name}</div>
+    <div style="font-size:11px;color:var(--muted);">${time} · ${desc}</div>
+    <div style="font-size:11px;font-weight:700;color:#3a6b00;margin-top:4px;">${pts}</div>
+  </div>`;
+}
+function puntajeDiv(div,score,note){
+  const colors={D1:'#1d4ed8',D2:'#7c3aed'};
+  const bg={D1:'rgba(59,130,246,.08)',D2:'rgba(168,85,247,.08)'};
+  return`<div style="padding:14px;background:${bg[div]||'var(--bg)'};border-radius:8px;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:${colors[div]||'#374151'};margin-bottom:6px;">${div}</div>
+    <div style="font-size:18px;font-weight:700;font-family:'Anton',sans-serif;">${score}</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;">${note}</div>
+  </div>`;
+}
+function equivItem(act,sat){
+  return`<div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:13px;font-weight:700;">${act}</div>
+    <div style="font-size:10px;color:var(--muted);margin:3px 0;">≈</div>
+    <div style="font-size:13px;font-weight:700;color:#7c3aed;">${sat}</div>
+  </div>`;
+}
+function tablaRow(name,cost,dur,scale,obj,online){
+  return`<tr style="border-bottom:1px solid rgba(0,0,0,.04);">
+    <td style="padding:10px 12px;font-weight:700;">${name}</td>
+    <td style="padding:10px 12px;text-align:center;color:#3a6b00;font-weight:600;">${cost}</td>
+    <td style="padding:10px 12px;text-align:center;">${dur}</td>
+    <td style="padding:10px 12px;text-align:center;font-weight:600;">${scale}</td>
+    <td style="padding:10px 12px;text-align:center;">${obj}</td>
+    <td style="padding:10px 12px;text-align:center;">${online}</td>
+  </tr>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CALENDARIO ATLÉTICO — Fechas clave NCAA / NAIA / Signing Days
+══════════════════════════════════════════════════════════════════ */
+function renderCalendarioSection(){
+  const meses = [
+    { mes:'Julio – Agosto', color:'#f59e0b', bg:'rgba(245,158,11,.08)', eventos:[
+      {icon:'🏈',tag:'NCAA D1/D2',titulo:'Periodo de Contacto — Football',desc:'Los coaches pueden contactar oficialmente a prospectos de HS senior. Visitas oficiales permitidas.'},
+      {icon:'📋',tag:'NCAA',titulo:'Apertura del NCAA Eligibility Center',desc:'Prospectos de Class of 2026 deben registrarse antes del inicio del año escolar senior.'},
+      {icon:'🎾',tag:'NCAA D1',titulo:'Periodo de reclutamiento — Tennis, Golf',desc:'Coaches pueden contactar y hacer visitas. Peak de ofrecimiento de becas.'},
+    ]},
+    { mes:'Septiembre – Octubre', color:'#ef4444', bg:'rgba(239,68,68,.08)', eventos:[
+      {icon:'📅',tag:'NCAA D1/D2',titulo:'Periodo de contacto — Basketball (W)',desc:'Primer día permitido para comunicación directa de coaches con Class 2026.'},
+      {icon:'📝',tag:'TOEFL / SAT',titulo:'Fechas de exámenes recomendadas',desc:'Tomar TOEFL y SAT en Oct para tener resultados antes de las primeras aplicaciones universitarias en noviembre.'},
+      {icon:'🏊',tag:'NCAA D1',titulo:'Early evaluations — Swimming & Diving',desc:'Coaches visitan torneos y evaluaciones regionales. Momento clave para visibilidad.'},
+    ]},
+    { mes:'Noviembre', color:'#8b5cf6', bg:'rgba(139,92,246,.08)', eventos:[
+      {icon:'✍️',tag:'NCAA D1/D2 — CRÍTICO',titulo:'Early Signing Period — Football',desc:'Primera oportunidad de firmar NLI (National Letter of Intent). Solo 3 días: ~8-10 Nov.'},
+      {icon:'✍️',tag:'NCAA D1/D2 — CRÍTICO',titulo:'Early Signing Period — Basketball',desc:'Primera ventana de firma oficial para baloncesto masculino y femenino.'},
+      {icon:'✍️',tag:'NCAA D1/D2',titulo:'Early Signing Period — Mayoría de deportes',desc:'Baseball, Soccer, Tennis, Track, Swimming, Volleyball y más. Verificar fechas exactas en ncaa.org.'},
+      {icon:'🎓',tag:'Admisión',titulo:'Early Decision / Early Action — Aplicaciones',desc:'Deadline para aplicar bajo Early Decision en universidades competitivas. Resultados en diciembre.'},
+    ]},
+    { mes:'Diciembre – Enero', color:'#06b6d4', bg:'rgba(6,182,212,.08)', eventos:[
+      {icon:'📬',tag:'Admisión',titulo:'Notificaciones Early Decision',desc:'Universidades envían decisiones. Atletas con beca confirmada deben aceptar u obtener release.'},
+      {icon:'🏀',tag:'NCAA D1/D2',titulo:'Periodo de Contacto — Basketball intensivo',desc:'Coaches aseguran compromisos pendientes. Visitas oficiales pico.'},
+      {icon:'📝',tag:'NAIA',titulo:'Deadline NAIA Eligibility — Atletas internacionales',desc:'Deadline recomendado para completar proceso en PlayNAIA.org e InCred. Resultados toman 10 días hábiles.'},
+    ]},
+    { mes:'Febrero', color:'#ec4899', bg:'rgba(236,72,153,.08)', eventos:[
+      {icon:'✍️',tag:'NCAA D1/D2 — PRINCIPAL',titulo:'National Signing Day — Football',desc:'Primer miércoles de febrero. El día de firma más importante del año para football americano.'},
+      {icon:'✍️',tag:'NCAA D1/D2',titulo:'Regular Signing Period — Múltiples deportes',desc:'Segunda ventana de firma para Basketball, Soccer, Track & Field, Swimming y más.'},
+      {icon:'🔍',tag:'NVS',titulo:'Revisión de compromisos pendientes',desc:'Atletas sin universidad deben intensificar outreach. Muchas escuelas D2/D3 aún tienen becas disponibles.'},
+    ]},
+    { mes:'Marzo – Abril', color:'#10b981', bg:'rgba(16,185,129,.08)', eventos:[
+      {icon:'🏈',tag:'NCAA D1',titulo:'Spring Evaluation Period — Football',desc:'Coaches evalúan prospectos Class 2027 en sus escuelas y spring games. Primer contacto evaluativo.'},
+      {icon:'✍️',tag:'NCAA D1/D2 — PRINCIPAL',titulo:'Late Signing Period — Baseball, Softball',desc:'Ventana principal de firma para beisbol y softbol. Abril-Mayo.'},
+      {icon:'📋',tag:'NCAA',titulo:'Inicio del proceso — Class of 2027',desc:'Prospectos de HS junior deben registrar el Eligibility Center y comenzar a recolectar documentos académicos.'},
+      {icon:'🎓',tag:'Admisión',titulo:'National Decision Day — 1 de Mayo',desc:'Deadline para que estudiantes acepten oferta universitaria. Atletas ya deben tener NLI firmado o aceptación oficial.'},
+    ]},
+    { mes:'Mayo – Junio', color:'#3b82f6', bg:'rgba(59,130,246,.08)', eventos:[
+      {icon:'📊',tag:'NCAA',titulo:'Envío de transcripts finales',desc:'Seniors deben enviar transcripts del último año al Eligibility Center. Deadline típico: junio.'},
+      {icon:'🌍',tag:'Internacional',titulo:'Solicitud de visado estudiantil F-1',desc:'Con I-20 en mano, iniciar proceso de visa en embajada. Tiempo mínimo recomendado: 2-3 meses antes de arribo.'},
+      {icon:'🏃',tag:'NVS',titulo:'Evaluación Class 2027 — Torneos de verano',desc:'Temporada de showcase. Coaches D1/D2 asisten masivamente. Máxima visibilidad para prospectos junior.'},
+    ]},
+  ];
+
+  return`
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(170,255,0,.15);">📅</div>
+      <div>
+        <div class="guide-card-title">Calendario Atlético NVS — Temporada de Reclutamiento</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:rgba(170,255,0,.12);color:#3a6b00;">NCAA D1 · D2 · D3</span>
+          <span class="guide-tag" style="background:rgba(245,158,11,.1);color:#92400e;">NAIA</span>
+          <span class="guide-tag" style="background:rgba(59,130,246,.1);color:#1d4ed8;">Atletas Internacionales</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-alert green">
+        <span class="guide-alert-icon">📌</span>
+        <div><strong>Cómo usar este calendario:</strong> Las fechas marcadas como <strong>CRÍTICO</strong> son las más importantes — un atleta que pierde el Early Signing Period puede perder su beca. Las fechas exactas cambian ligeramente cada año. Siempre verificar en <strong>ncaa.org/sports/2021/2/17/ncaa-signing-periods.aspx</strong></div>
+      </div>
+    </div>
+  </div>
+
+  ${meses.map(m=>`
+  <div class="guide-card" style="border-left:4px solid ${m.color};">
+    <div style="padding:16px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:800;font-family:'Anton',sans-serif;letter-spacing:.5px;">${m.mes}</div>
+    </div>
+    <div class="guide-body" style="display:flex;flex-direction:column;gap:12px;">
+      ${m.eventos.map(e=>`
+      <div style="padding:12px 14px;background:${m.bg};border-radius:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="font-size:18px;flex-shrink:0;">${e.icon}</span>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+              <span style="font-size:11px;font-weight:700;">${e.titulo}</span>
+              <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:${e.tag.includes('CRÍTICO')?'#fee2e2':'rgba(0,0,0,.06)'};color:${e.tag.includes('CRÍTICO')?'#dc2626':'var(--muted)'};">${e.tag}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;">${e.desc}</div>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`).join('')}
+
+  <div class="guide-card" style="background:var(--txt);color:white;">
+    <div class="guide-body">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#AAFF00;margin-bottom:10px;">📌 Recursos Oficiales</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${recursoLink('NCAA Signing Periods','ncaa.org')}
+        ${recursoLink('NAIA Eligibility','playnaia.org')}
+        ${recursoLink('NCAA Eligibility Center','eligibilitycenter.org')}
+        ${recursoLink('NLI Program','nationalletter.org')}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function recursoLink(name, url){
+  return`<div style="padding:10px 14px;background:rgba(255,255,255,.08);border-radius:8px;">
+    <div style="font-size:12px;font-weight:700;color:white;">${name}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">${url}</div>
+  </div>`;
+}
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.addEventListener('DOMContentLoaded',async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(session)initApp(session.user);
+  else document.getElementById('login-overlay').style.display='flex';
+});
+</script>
+</body>
+</html>
