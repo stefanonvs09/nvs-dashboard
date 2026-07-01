@@ -426,6 +426,7 @@ const MARKETING_EMAILS=['julio@playwithnewvision.com','andy@playwithnewvision.co
 const MARKETING_HIDDEN=['finanzas','pagos'];
 const SD_MODULES=['finanzas','pagos','servicios'];
 const IH_MODULES=['finanzas'];
+const MX_ALLOWED=['stefano@playwithnewvision.com','floyd@playwithnewvision.com'];
 
 const ALL_MODULES=[
   {id:'finanzas', icon:'💰', name:'Dashboard Financiero', accent:'#AAFF00', pin:true, badgeTxt:'PIN', badgeColor:'#3a6b00'},
@@ -433,7 +434,7 @@ const ALL_MODULES=[
   {id:'leads',    icon:'🎯', name:'Leads Pipeline',       accent:'#f472b6', href:'leads.html'},
   {id:'pagos',    icon:'💸', name:'Pagos',                accent:'#0d9488', href:'pagos.html'},
   {id:'media',    icon:'🎬', name:'Media Pipeline',       accent:'#ec4899', href:'media.html'},
-  {id:'proyectos',icon:'📋', name:'Proyectos',            accent:'#f59e0b', href:'proyectos.html'},
+  {id:'proyectos-mexico',icon:'🇲🇽', name:'Proyectos México', accent:'#f59e0b', href:'proyectos.html'},
   {id:'servicios',icon:'📖', name:'Guía de Servicios',   accent:'#0ea5e9', href:'servicios.html'},
   {id:'tareas',   icon:'✅', name:'Tareas',               accent:'#06b6d4', href:'tareas.html'},
   {id:'guias',    icon:'📖', name:'Guías',                accent:'#8b5cf6', href:'guias.html'},
@@ -448,13 +449,14 @@ function buildNav(email){
   const em=email.toLowerCase();
   const isSD=em===SD_EMAIL, isIH=em===IH_EMAIL;
   const isMkt=MARKETING_EMAILS.includes(em);
-  const visible=isIH
+  const base=isIH
     ? ALL_MODULES.filter(m=>IH_MODULES.includes(m.id))
     : isSD
       ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id))
       : isMkt
         ? ALL_MODULES.filter(m=>!MARKETING_HIDDEN.includes(m.id))
         : ALL_MODULES;
+  const visible=MX_ALLOWED.includes(em)?base:base.filter(m=>m.id!=='proyectos-mexico');
 
   const hubItem=`<div class="nav-item active" id="nav-hub" onclick="selectModule('hub',null)" style="margin-bottom:6px;">
     <span class="nav-item-icon">🏠</span>
@@ -480,7 +482,7 @@ function buildNav(email){
   document.getElementById('nav-list').innerHTML=hubItem+items;
 }
 
-const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes'};
+const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline','proyectos-mexico':'Proyectos México',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes'};
 
 function selectModule(id, href){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
