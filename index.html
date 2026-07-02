@@ -346,7 +346,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
       <div id="tasks-widget" style="display:none;">
         <div class="tw-header">
           <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">✅ Esta semana</div>
-          <span class="tw-all-link" onclick="selectModule('tareas','tareas.html')">Ver todas →</span>
+          <span class="tw-all-link" onclick="selectModule('tareas','tareas.html?v=3')">Ver todas →</span>
         </div>
         <div class="stat-card" style="padding:8px 14px;">
           <div id="tw-list"><div class="tw-empty">Cargando...</div></div>
@@ -436,7 +436,7 @@ const ALL_MODULES=[
   {id:'media',    icon:'🎬', name:'Media Pipeline',       accent:'#ec4899', href:'media.html'},
   {id:'proyectos',icon:'📋', name:'Proyectos',            accent:'#f59e0b', href:'proyectos.html'},
   {id:'servicios',icon:'📖', name:'Guía de Servicios',   accent:'#0ea5e9', href:'servicios.html'},
-  {id:'tareas',   icon:'✅', name:'Tareas',               accent:'#06b6d4', href:'tareas.html'},
+  {id:'tareas',   icon:'✅', name:'Tareas',               accent:'#06b6d4', href:'tareas.html?v=3'},
   {id:'guias',    icon:'📖', name:'Guías',                accent:'#8b5cf6', href:'guias.html'},
   {id:'chat',     icon:'🤖', name:'Asistente IA',         accent:'#06b6d4', href:'chat.html'},
   {id:'reportes', icon:'📊', name:'Reportes',             accent:'#8b5cf6', disabled:true},
@@ -658,7 +658,7 @@ async function loadWeekTasks(user){
     const isHoy=t.due_date===todayStr;
     const isVencida=t.due_date&&t.due_date<todayStr;
     const dateLbl=!t.due_date?'':(isVencida?`<span class="tbadge-hoy">Vencida</span>`:isHoy?`<span class="tbadge-hoy">Hoy</span>`:`<span>${fmtWeekDate(t.due_date)}</span>`);
-    return `<div class="task-row" onclick="selectModule('tareas','tareas.html')">
+    return `<div class="task-row" onclick="selectModule('tareas','tareas.html?v=3')">
       <div class="task-check"></div>
       <div class="task-body">
         <div class="task-title">${t.title}</div>
