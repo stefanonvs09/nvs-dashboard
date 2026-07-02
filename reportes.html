@@ -25,105 +25,119 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .vtab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08);}
 
 /* ── PAGE ── */
-.page{max-width:860px;margin:0 auto;padding:32px 24px 80px;}
+.page{max-width:860px;margin:0 auto;padding:28px 24px 80px;}
 
 /* ── NAME SELECTOR ── */
-.name-section{margin-bottom:28px;}
 .name-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;}
-.name-pills{display:flex;flex-wrap:wrap;gap:8px;}
+.name-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
 .name-pill{display:flex;align-items:center;gap:7px;padding:8px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:50px;cursor:pointer;transition:all .15s;user-select:none;}
 .name-pill:hover{border-color:rgba(0,0,0,.2);box-shadow:0 1px 6px rgba(0,0,0,.06);}
-.name-pill.active{border-color:var(--green);background:var(--green-dim);box-shadow:0 0 0 3px rgba(170,255,0,.12);}
-.pill-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+.name-pill.active{border-color:var(--green);background:var(--green-dim);}
+.pill-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
 .pill-name{font-size:13px;font-weight:600;}
 .pill-dept{font-size:10px;color:var(--muted);}
 
 /* ── WEEK NAV ── */
-.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
-.week-btn{width:32px;height:32px;border:1.5px solid var(--border);background:var(--surface);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;}
-.week-btn:hover{border-color:rgba(0,0,0,.2);background:var(--bg);}
-.week-label{font-size:14px;font-weight:700;flex:1;}
-.week-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--green-dim);color:var(--green-dk);}
+.week-nav{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+.wbtn{width:32px;height:32px;border:1.5px solid var(--border);background:var(--surface);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.wbtn:hover{background:var(--bg);}
+.week-lbl{font-size:14px;font-weight:700;flex:1;}
+.week-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--green-dim);color:var(--green-dk);}
 
 /* ── REPORT CARD ── */
-.report-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.04);}
-.report-card-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.report-card-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
-.report-card-info{flex:1;}
-.report-card-name{font-size:16px;font-weight:800;}
-.report-card-meta{font-size:12px;color:var(--muted);margin-top:1px;}
-.report-card-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
-.status-done{background:rgba(170,255,0,.15);color:var(--green-dk);}
-.status-pending{background:rgba(245,158,11,.12);color:#92400e;}
+.rcard{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.04);}
+.rcard-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.rcard-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;}
+.rcard-name{font-size:16px;font-weight:800;}
+.rcard-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.status-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-left:auto;}
+.sp-done{background:rgba(170,255,0,.15);color:var(--green-dk);}
+.sp-pending{background:rgba(245,158,11,.1);color:#92400e;}
 
-/* ── FORM SECTIONS ── */
-.report-body{padding:24px;}
-.form-block{margin-bottom:22px;}
-.form-block:last-of-type{margin-bottom:0;}
-.block-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.block-icon{font-size:16px;}
-.block-title{font-size:13px;font-weight:700;}
-.block-hint{font-size:11px;color:var(--muted);margin-left:auto;}
-textarea.rf{
-  width:100%;background:var(--bg);border:1.5px solid var(--border);
-  border-radius:10px;padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;
-  color:var(--text);resize:none;line-height:1.6;outline:none;
-  transition:border-color .15s;min-height:80px;
-}
+/* ── DEPT METRICS ── */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:600px){.metrics-grid{grid-template-columns:repeat(2,1fr);}}
+.metric-box{background:var(--bg);border-radius:10px;padding:12px 10px;text-align:center;border:1.5px solid var(--border);transition:border-color .15s;}
+.metric-box:focus-within{border-color:var(--green);}
+.metric-icon{font-size:18px;margin-bottom:4px;}
+.metric-input{width:100%;border:none;background:transparent;font-family:'Anton',sans-serif;font-size:26px;text-align:center;color:var(--text);outline:none;-moz-appearance:textfield;}
+.metric-input::-webkit-outer-spin-button,.metric-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.metric-lbl{font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;margin-top:2px;}
+
+/* ── METAS ── */
+.metas-list{display:flex;flex-direction:column;gap:8px;}
+.meta-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:10px 12px;border:1.5px solid var(--border);transition:border-color .15s;}
+.meta-row:focus-within{border-color:var(--green);}
+.meta-cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:#fff;}
+.meta-cb.checked{border-color:var(--green);background:var(--green);}
+.meta-cb .ck{display:none;font-size:11px;font-weight:800;color:#0f172a;}
+.meta-cb.checked .ck{display:block;}
+.meta-input{flex:1;border:none;background:transparent;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;}
+.meta-input::placeholder{color:var(--muted);}
+.meta-input.achieved{text-decoration:line-through;color:var(--muted);}
+.meta-num{font-size:10px;font-weight:800;color:var(--muted);flex-shrink:0;}
+
+/* ── FORM BLOCKS ── */
+.rcard-body{padding:22px;}
+.fblock{margin-bottom:20px;}
+.fblock:last-child{margin-bottom:0;}
+.fblock-head{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.fblock-icon{font-size:15px;}
+.fblock-title{font-size:13px;font-weight:700;}
+.fblock-hint{font-size:11px;color:var(--muted);margin-left:auto;}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+textarea.rf{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);resize:none;line-height:1.6;outline:none;transition:border-color .15s;min-height:76px;}
 textarea.rf:focus{border-color:var(--green);background:#fff;}
 textarea.rf::placeholder{color:var(--muted);}
 
 /* ── PROGRESS ── */
-.progress-wrap{background:var(--bg);border-radius:10px;padding:14px 16px;}
-.progress-row{display:flex;align-items:center;gap:12px;}
-.progress-pct{font-family:'Anton',sans-serif;font-size:28px;min-width:56px;color:var(--text);}
-.progress-slider-wrap{flex:1;}
+.prog-wrap{background:var(--bg);border-radius:10px;padding:14px 16px;border:1.5px solid var(--border);}
+.prog-row{display:flex;align-items:center;gap:12px;}
+.prog-pct{font-family:'Anton',sans-serif;font-size:28px;min-width:54px;}
 input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none;cursor:pointer;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);cursor:grab;}
-input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;}
-.progress-track{height:6px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;position:relative;}
-.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#AAFF00,#88ff44);transition:width .3s ease;}
-.progress-labels{display:flex;justify-content:space-between;margin-top:4px;}
-.progress-lbl{font-size:9px;color:var(--muted);font-weight:600;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.prog-labels{display:flex;justify-content:space-between;margin-top:5px;}
+.prog-lbl{font-size:9px;color:var(--muted);font-weight:600;}
 
 /* ── ACTIONS ── */
-.report-actions{padding:0 24px 24px;display:flex;gap:10px;align-items:center;}
+.rcard-foot{padding:0 22px 22px;display:flex;align-items:center;gap:10px;}
 .btn-save{background:var(--green);color:var(--green-dk);border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
-.btn-save:hover{opacity:.88;transform:translateY(-1px);}
-.btn-save:disabled{opacity:.5;cursor:default;transform:none;}
-.save-msg{font-size:12px;font-weight:600;color:var(--green-dk);display:none;}
-.save-err{font-size:12px;font-weight:600;color:#dc2626;display:none;}
+.btn-save:hover{opacity:.88;}
+.btn-save:disabled{opacity:.5;cursor:default;}
+.save-ok{font-size:12px;font-weight:700;color:var(--green-dk);display:none;}
+.save-err{font-size:12px;font-weight:700;color:#dc2626;display:none;}
 
-/* ── EMPTY STATE ── */
-.empty-pick{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-pick-icon{font-size:40px;margin-bottom:12px;}
-.empty-pick-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;}
-.empty-pick-sub{font-size:13px;}
+/* ── EMPTY ── */
+.empty-pick{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.empty-sub{font-size:13px;color:var(--muted);}
 
-/* ── ALL REPORTS VIEW ── */
+/* ── ALL VIEW ── */
 .all-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
-.all-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:box-shadow .15s;}
-.all-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.07);}
-.all-card-top{padding:14px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
-.all-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
-.all-name{font-size:13px;font-weight:800;line-height:1.2;}
-.all-dept{font-size:10px;color:var(--muted);}
-.all-prog{margin-left:auto;font-family:'Anton',sans-serif;font-size:20px;}
-.all-body{padding:12px 16px;}
-.all-section{margin-bottom:10px;}
-.all-section:last-child{margin-bottom:0;}
-.all-sec-title{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;}
-.all-text{font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap;word-break:break-word;}
-.all-empty{font-size:11px;color:var(--muted);font-style:italic;}
-.no-report{background:var(--bg);border:1.5px dashed var(--border);}
-.no-report .all-card-top{background:transparent;}
-.no-report .all-body{text-align:center;padding:20px;color:var(--muted);font-size:12px;}
-
-/* ── MINI PROGRESS BAR ── */
-.mini-prog{height:4px;background:var(--bg);border-radius:2px;margin-top:6px;overflow:hidden;}
-.mini-prog-fill{height:100%;border-radius:2px;background:var(--green);}
-
-@media(max-width:600px){.page{padding:20px 16px 60px;}.name-pills{gap:6px;}.all-grid{grid-template-columns:1fr;}}
+.acard{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;}
+.acard-top{padding:14px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.aav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.aname{font-size:13px;font-weight:800;}
+.adept{font-size:10px;color:var(--muted);}
+.aprog{font-family:'Anton',sans-serif;font-size:20px;margin-left:auto;}
+.mini-bar{height:4px;background:var(--bg);border-radius:2px;margin-top:3px;overflow:hidden;}
+.mini-fill{height:100%;border-radius:2px;}
+.abody{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+.asec-title{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;}
+.asec-text{font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.ametrics{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.amet{background:var(--bg);border-radius:6px;padding:6px 4px;text-align:center;}
+.amet-val{font-family:'Anton',sans-serif;font-size:16px;}
+.amet-lbl{font-size:8px;font-weight:700;color:var(--muted);line-height:1.3;}
+.ametas{display:flex;flex-direction:column;gap:4px;}
+.ameta-row{display:flex;align-items:center;gap:6px;font-size:12px;}
+.ameta-row .dot{width:14px;height:14px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.dot-done{background:var(--green);}
+.dot-miss{background:var(--border);}
+.ameta-txt{flex:1;}.ameta-txt.done{text-decoration:line-through;color:var(--muted);}
+.no-rpt{background:var(--bg);border-style:dashed;}
+.no-rpt .abody{text-align:center;padding:20px;color:var(--muted);font-size:12px;}
 </style>
 </head>
 <body>
@@ -138,106 +152,128 @@ input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;}
 
 <div class="page">
 
-  <!-- NAME SELECTOR -->
-  <div class="name-section">
-    <div class="name-label">¿Quién eres?</div>
-    <div class="name-pills" id="name-pills"></div>
-  </div>
+  <div class="name-label">¿Quién eres?</div>
+  <div class="name-pills" id="name-pills"></div>
 
-  <!-- WEEK NAV -->
   <div class="week-nav">
-    <button class="week-btn" onclick="changeWeek(-1)">←</button>
-    <div>
-      <div class="week-label" id="week-label">—</div>
-    </div>
-    <span class="week-badge" id="week-badge">📍 Esta semana</span>
-    <button class="week-btn" onclick="changeWeek(1)">→</button>
+    <button class="wbtn" onclick="changeWeek(-1)">←</button>
+    <div><div class="week-lbl" id="week-lbl">—</div></div>
+    <span class="week-badge" id="week-badge" style="display:none">📍 Esta semana</span>
+    <button class="wbtn" onclick="changeWeek(1)">→</button>
   </div>
 
-  <!-- MI REPORTE VIEW -->
+  <!-- MI REPORTE -->
   <div id="view-mi">
     <div class="empty-pick" id="pick-prompt">
-      <div class="empty-pick-icon">👆</div>
-      <div class="empty-pick-title">Selecciona tu nombre arriba</div>
-      <div class="empty-pick-sub">Luego llena tu reporte de la semana</div>
+      <div class="empty-icon">👆</div>
+      <div class="empty-title">Selecciona tu nombre arriba</div>
+      <div class="empty-sub">Luego llena tu reporte de la semana</div>
     </div>
     <div id="report-form" style="display:none">
-      <div class="report-card">
-        <div class="report-card-header">
-          <div class="report-card-avatar" id="form-avatar"></div>
-          <div class="report-card-info">
-            <div class="report-card-name" id="form-name">—</div>
-            <div class="report-card-meta" id="form-meta">—</div>
+      <div class="rcard">
+        <div class="rcard-head">
+          <div class="rcard-av" id="f-av"></div>
+          <div>
+            <div class="rcard-name" id="f-name">—</div>
+            <div class="rcard-meta" id="f-meta">—</div>
           </div>
-          <div class="report-card-status" id="form-status"></div>
+          <div class="status-pill" id="f-status"></div>
         </div>
-        <div class="report-body">
+        <div class="rcard-body">
 
-          <div class="form-block">
-            <div class="block-header">
-              <span class="block-icon">✅</span>
-              <span class="block-title">¿Qué hice esta semana?</span>
-              <span class="block-hint">Un punto por línea</span>
+          <!-- MÉTRICAS DEPT -->
+          <div class="fblock" id="block-metrics">
+            <div class="fblock-head">
+              <span class="fblock-icon">📊</span>
+              <span class="fblock-title" id="metrics-title">Métricas de la semana</span>
             </div>
-            <textarea class="rf" id="f-logros" rows="4" placeholder="· Contacté 12 leads nuevos&#10;· Cerré el contrato de Carlos Pérez&#10;· Reunión con universidad de Florida..."></textarea>
+            <div class="metrics-grid" id="metrics-grid"></div>
           </div>
 
-          <div class="form-block">
-            <div class="block-header">
-              <span class="block-icon">⏳</span>
-              <span class="block-title">¿Qué quedó pendiente?</span>
+          <hr class="divider">
+
+          <!-- METAS -->
+          <div class="fblock">
+            <div class="fblock-head">
+              <span class="fblock-icon">🎯</span>
+              <span class="fblock-title">Metas de la semana</span>
+              <span class="fblock-hint">Márcalas al cumplirlas</span>
             </div>
-            <textarea class="rf" id="f-pendientes" rows="3" placeholder="· Seguimiento con 3 leads que no respondieron&#10;· Propuesta para Miami FC..."></textarea>
+            <div class="metas-list" id="metas-list"></div>
           </div>
 
-          <div class="form-block">
-            <div class="block-header">
-              <span class="block-icon">🔜</span>
-              <span class="block-title">Plan para la próxima semana</span>
+          <hr class="divider">
+
+          <!-- LOGROS -->
+          <div class="fblock">
+            <div class="fblock-head">
+              <span class="fblock-icon">✅</span>
+              <span class="fblock-title">¿Qué hice esta semana?</span>
+              <span class="fblock-hint">Un punto por línea</span>
             </div>
-            <textarea class="rf" id="f-proxima" rows="3" placeholder="· Cerrar los 3 leads en negociación&#10;· Enviar propuesta al coach de Georgia Tech..."></textarea>
+            <textarea class="rf" id="f-logros" rows="4" placeholder="· Contacté 12 leads nuevos&#10;· Cerré contrato de Carlos Pérez&#10;· Reunión con U. de Florida..."></textarea>
           </div>
 
-          <div class="form-block">
-            <div class="block-header">
-              <span class="block-icon">📊</span>
-              <span class="block-title">¿Cómo fue tu semana en general?</span>
+          <!-- PENDIENTES -->
+          <div class="fblock">
+            <div class="fblock-head">
+              <span class="fblock-icon">⏳</span>
+              <span class="fblock-title">¿Qué quedó pendiente?</span>
             </div>
-            <div class="progress-wrap">
-              <div class="progress-row">
-                <div class="progress-pct" id="prog-display">50%</div>
-                <div class="progress-slider-wrap">
-                  <input type="range" id="f-progreso" min="0" max="100" value="50" oninput="updateProg(this.value)">
-                  <div class="progress-labels">
-                    <span class="progress-lbl">Semana difícil</span>
-                    <span class="progress-lbl">Normal</span>
-                    <span class="progress-lbl">Excelente</span>
+            <textarea class="rf" id="f-pendientes" rows="3" placeholder="· Seguimiento con 3 leads&#10;· Propuesta para Miami FC..."></textarea>
+          </div>
+
+          <!-- PRÓXIMA SEMANA -->
+          <div class="fblock">
+            <div class="fblock-head">
+              <span class="fblock-icon">🔜</span>
+              <span class="fblock-title">Plan próxima semana</span>
+            </div>
+            <textarea class="rf" id="f-proxima" rows="3" placeholder="· Cerrar los 3 leads en negociación&#10;· Enviar propuesta a Georgia Tech..."></textarea>
+          </div>
+
+          <!-- PROGRESO -->
+          <div class="fblock">
+            <div class="fblock-head">
+              <span class="fblock-icon">📈</span>
+              <span class="fblock-title">¿Cómo fue tu semana en general?</span>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-row">
+                <div class="prog-pct" id="prog-disp">50%</div>
+                <div style="flex:1">
+                  <input type="range" id="f-prog" min="0" max="100" value="50" oninput="updProg(this.value)">
+                  <div class="prog-labels">
+                    <span class="prog-lbl">Semana difícil</span>
+                    <span class="prog-lbl">Normal</span>
+                    <span class="prog-lbl">Semana excelente 🔥</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="form-block">
-            <div class="block-header">
-              <span class="block-icon">💬</span>
-              <span class="block-title">Comentarios o bloqueos</span>
-              <span class="block-hint">Opcional</span>
+          <!-- COMENTARIOS -->
+          <div class="fblock">
+            <div class="fblock-head">
+              <span class="fblock-icon">💬</span>
+              <span class="fblock-title">Comentarios o bloqueos</span>
+              <span class="fblock-hint">Opcional</span>
             </div>
-            <textarea class="rf" id="f-comentarios" rows="2" placeholder="Algún obstáculo, necesidad de apoyo, o comentario para el equipo..."></textarea>
+            <textarea class="rf" id="f-coment" rows="2" placeholder="Algún obstáculo, necesidad de apoyo o comentario para el equipo..."></textarea>
           </div>
 
         </div>
-        <div class="report-actions">
+        <div class="rcard-foot">
           <button class="btn-save" id="btn-save" onclick="saveReport()">Guardar reporte</button>
-          <span class="save-msg" id="save-msg">✓ Guardado</span>
-          <span class="save-err" id="save-err">Error al guardar</span>
+          <span class="save-ok" id="save-ok">✓ Guardado</span>
+          <span class="save-err" id="save-err"></span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TODOS VIEW -->
+  <!-- VER TODOS -->
   <div id="view-todos" style="display:none">
     <div class="all-grid" id="all-grid"></div>
   </div>
@@ -249,6 +285,7 @@ const SUPA_URL='https://mwefvjvvitsondqghgsx.supabase.co';
 const SUPA_KEY='sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
 const db=supabase.createClient(SUPA_URL,SUPA_KEY);
 
+/* ── TEAM ── */
 const TEAM=[
   {name:'Andrea Castillo', dept:'Placement', color:'#6366f1'},
   {name:'Julio Blanco',    dept:'Placement', color:'#8b5cf6'},
@@ -260,194 +297,267 @@ const TEAM=[
   {name:'Stefano Cano',    dept:'Management',color:'#10b981'},
 ];
 
-let CURRENT_NAME=null;
-let WEEK=getMonday(new Date());
-let VIEW='mi';
-let CACHE={};
+/* ── DEPT METRICS ── */
+const DEPT_METRICS={
+  Placement:[
+    {key:'atletas_contactados', icon:'🏃', label:'Atletas contactados'},
+    {key:'propuestas_enviadas',  icon:'📄', label:'Propuestas enviadas'},
+    {key:'universidades',        icon:'🎓', label:'Universidades contactadas'},
+    {key:'contratos_firmados',   icon:'✍️', label:'Contratos firmados'},
+  ],
+  Leads:[
+    {key:'leads_nuevos',      icon:'🎯', label:'Leads nuevos'},
+    {key:'leads_contactados', icon:'📱', label:'Leads contactados'},
+    {key:'calls',             icon:'📞', label:'Calls realizadas'},
+    {key:'leads_cerrados',    icon:'✅', label:'Leads cerrados'},
+  ],
+  Marketing:[
+    {key:'posts',      icon:'📸', label:'Posts publicados'},
+    {key:'contenido',  icon:'🎬', label:'Contenido creado'},
+    {key:'campanas',   icon:'📢', label:'Campañas activas'},
+    {key:'alcance',    icon:'👁️', label:'Alcance total'},
+  ],
+  Management:[
+    {key:'reuniones',   icon:'🤝', label:'Reuniones'},
+    {key:'seguimientos',icon:'📋', label:'Seguimientos'},
+    {key:'decisiones',  icon:'⚡', label:'Decisiones'},
+    {key:'resueltos',   icon:'🔧', label:'Problemas resueltos'},
+  ],
+};
 
-// ── HELPERS ──
+/* ── STATE ── */
+let CUR=null, WEEK=getMonday(new Date()), VIEW='mi', CACHE={};
+let METAS_STATE=[{text:'',done:false},{text:'',done:false},{text:'',done:false}];
+
+/* ── HELPERS ── */
 function getMonday(d){const c=new Date(d);c.setHours(0,0,0,0);c.setDate(c.getDate()-((c.getDay()+6)%7));return c;}
-function isoDate(d){return d.toISOString().split('T')[0];}
-function weekKey(){return isoDate(WEEK);}
-function isThisWeek(){return isoDate(WEEK)===isoDate(getMonday(new Date()));}
-function fmtWeek(d){
-  const s=new Date(d);
-  const e=new Date(d);e.setDate(e.getDate()+6);
-  const opts={day:'numeric',month:'short'};
-  return s.toLocaleDateString('es',opts)+' – '+e.toLocaleDateString('es',opts);
-}
-function initials(name){return name.split(' ').map(w=>w[0]).slice(0,2).join('');}
-function progColor(p){return p>=80?'#16a34a':p>=50?'#3a6b00':'#92400e';}
+function iso(d){return d.toISOString().split('T')[0];}
+function wkey(){return iso(WEEK);}
+function isTW(){return iso(WEEK)===iso(getMonday(new Date()));}
+function fmtW(d){const e=new Date(d);e.setDate(e.getDate()+6);const o={day:'numeric',month:'short'};return new Date(d).toLocaleDateString('es',o)+' – '+e.toLocaleDateString('es',o);}
+function inits(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('');}
+function pc(p){return p>=75?'#16a34a':p>=40?'#3a6b00':'#dc2626';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ── BUILD NAME PILLS ──
+/* ── PILLS ── */
 function buildPills(){
   document.getElementById('name-pills').innerHTML=TEAM.map(m=>`
-    <div class="name-pill" data-name="${m.name}" onclick="selectName('${m.name}')">
-      <div class="pill-avatar" style="background:${m.color}">${initials(m.name)}</div>
-      <div>
-        <div class="pill-name">${m.name.split(' ')[0]}</div>
-        <div class="pill-dept">${m.dept}</div>
-      </div>
+    <div class="name-pill" data-name="${m.name}" onclick="pickName('${m.name}')">
+      <div class="pill-av" style="background:${m.color}">${inits(m.name)}</div>
+      <div><div class="pill-name">${m.name.split(' ')[0]}</div><div class="pill-dept">${m.dept}</div></div>
     </div>`).join('');
 }
 
-// ── SELECT NAME ──
-function selectName(name){
-  CURRENT_NAME=name;
+/* ── PICK NAME ── */
+function pickName(name){
+  CUR=name;
   document.querySelectorAll('.name-pill').forEach(p=>p.classList.toggle('active',p.dataset.name===name));
-  if(VIEW==='mi')loadMyReport();
+  if(VIEW==='mi')loadMy();
   if(VIEW==='todos')renderAll();
 }
 
-// ── WEEK NAV ──
-function changeWeek(dir){
-  WEEK=new Date(WEEK);WEEK.setDate(WEEK.getDate()+dir*7);
-  updateWeekUI();
-  CACHE={};
-  if(VIEW==='mi'&&CURRENT_NAME)loadMyReport();
-  if(VIEW==='todos')loadAll();
-}
-function updateWeekUI(){
-  document.getElementById('week-label').textContent=fmtWeek(WEEK);
+/* ── WEEK NAV ── */
+function changeWeek(d){WEEK=new Date(WEEK);WEEK.setDate(WEEK.getDate()+d*7);CACHE={};updWeekUI();if(VIEW==='mi'&&CUR)loadMy();if(VIEW==='todos')loadAll();}
+function updWeekUI(){
+  document.getElementById('week-lbl').textContent=fmtW(WEEK);
   const b=document.getElementById('week-badge');
-  if(isThisWeek()){b.textContent='📍 Esta semana';b.style.display='inline-flex';}
-  else{b.textContent='';b.style.display='none';}
+  b.style.display=isTW()?'inline-flex':'none';
 }
 
-// ── VIEW TOGGLE ──
+/* ── VIEW ── */
 function setView(v,el){
   VIEW=v;
-  document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
   document.getElementById('view-mi').style.display=v==='mi'?'block':'none';
   document.getElementById('view-todos').style.display=v==='todos'?'block':'none';
   if(v==='todos')loadAll();
 }
 
-// ── PROGRESS ──
-function updateProg(v){
-  document.getElementById('prog-display').textContent=v+'%';
-  document.getElementById('prog-display').style.color=progColor(+v);
+/* ── PROGRESS ── */
+function updProg(v){const el=document.getElementById('prog-disp');el.textContent=v+'%';el.style.color=pc(+v);}
+
+/* ── BUILD METRICS INPUTS ── */
+function buildMetrics(dept, vals){
+  const metrics=DEPT_METRICS[dept]||DEPT_METRICS.Management;
+  document.getElementById('metrics-title').textContent=`Métricas de ${dept} — esta semana`;
+  document.getElementById('metrics-grid').innerHTML=metrics.map(m=>`
+    <div class="metric-box">
+      <div class="metric-icon">${m.icon}</div>
+      <input class="metric-input" type="number" id="met-${m.key}" min="0" value="${vals[m.key]||0}" placeholder="0">
+      <div class="metric-lbl">${m.label}</div>
+    </div>`).join('');
 }
 
-// ── LOAD MY REPORT ──
-async function loadMyReport(){
+/* ── BUILD METAS ── */
+function buildMetas(metas){
+  METAS_STATE=metas.length===3?metas:[{text:'',done:false},{text:'',done:false},{text:'',done:false}];
+  renderMetas();
+}
+function renderMetas(){
+  document.getElementById('metas-list').innerHTML=METAS_STATE.map((m,i)=>`
+    <div class="meta-row">
+      <div class="meta-num">${i+1}</div>
+      <div class="meta-cb${m.done?' checked':''}" onclick="toggleMeta(${i})" title="${m.done?'Desmarcar':'Marcar como cumplida'}">
+        <span class="ck">✓</span>
+      </div>
+      <input class="meta-input${m.done?' achieved':''}" id="meta-${i}" type="text" value="${esc(m.text)}" placeholder="Meta #${i+1}…" oninput="METAS_STATE[${i}].text=this.value">
+    </div>`).join('');
+}
+function toggleMeta(i){
+  METAS_STATE[i].done=!METAS_STATE[i].done;
+  renderMetas();
+  // refocus
+  setTimeout(()=>{const el=document.getElementById('meta-'+i);if(el)el.focus();},50);
+}
+
+/* ── LOAD MY REPORT ── */
+async function loadMy(){
   document.getElementById('pick-prompt').style.display='none';
   document.getElementById('report-form').style.display='block';
-  const member=TEAM.find(m=>m.name===CURRENT_NAME);
-  document.getElementById('form-avatar').textContent=initials(CURRENT_NAME);
-  document.getElementById('form-avatar').style.background=member?.color||'#64748b';
-  document.getElementById('form-name').textContent=CURRENT_NAME;
-  document.getElementById('form-meta').textContent=`${member?.dept||''} · ${fmtWeek(WEEK)}`;
+  const m=TEAM.find(x=>x.name===CUR);
+  document.getElementById('f-av').textContent=inits(CUR);
+  document.getElementById('f-av').style.background=m?.color||'#64748b';
+  document.getElementById('f-name').textContent=CUR;
+  document.getElementById('f-meta').textContent=`${m?.dept||''} · ${fmtW(WEEK)}`;
 
-  const {data,error}=await db.from('nvs_weekly_reports').select('*')
-    .eq('nombre',CURRENT_NAME).eq('week_start',weekKey()).maybeSingle();
+  buildMetrics(m?.dept||'Management',{});
+  buildMetas([{text:'',done:false},{text:'',done:false},{text:'',done:false}]);
 
+  const{data}=await db.from('nvs_weekly_reports').select('*').eq('nombre',CUR).eq('week_start',wkey()).maybeSingle();
   if(data){
     document.getElementById('f-logros').value=data.logros||'';
     document.getElementById('f-pendientes').value=data.pendientes||'';
     document.getElementById('f-proxima').value=data.proxima_semana||'';
-    document.getElementById('f-comentarios').value=data.comentarios||'';
-    document.getElementById('f-progreso').value=data.progreso||50;
-    updateProg(data.progreso||50);
-    document.getElementById('form-status').textContent='✓ Reportado';
-    document.getElementById('form-status').className='report-card-status status-done';
+    document.getElementById('f-coment').value=data.comentarios||'';
+    document.getElementById('f-prog').value=data.progreso||50;
+    updProg(data.progreso||50);
+    buildMetrics(m?.dept||'Management', data.metricas||{});
+    buildMetas(data.metas&&data.metas.length===3?data.metas:[{text:'',done:false},{text:'',done:false},{text:'',done:false}]);
+    document.getElementById('f-status').textContent='✓ Reportado';
+    document.getElementById('f-status').className='status-pill sp-done';
   } else {
     document.getElementById('f-logros').value='';
     document.getElementById('f-pendientes').value='';
     document.getElementById('f-proxima').value='';
-    document.getElementById('f-comentarios').value='';
-    document.getElementById('f-progreso').value=50;
-    updateProg(50);
-    document.getElementById('form-status').textContent='Pendiente';
-    document.getElementById('form-status').className='report-card-status status-pending';
+    document.getElementById('f-coment').value='';
+    document.getElementById('f-prog').value=50;
+    updProg(50);
+    document.getElementById('f-status').textContent='Pendiente';
+    document.getElementById('f-status').className='status-pill sp-pending';
   }
 }
 
-// ── SAVE ──
+/* ── SAVE ── */
 async function saveReport(){
-  if(!CURRENT_NAME)return;
+  if(!CUR)return;
   const btn=document.getElementById('btn-save');
-  const msg=document.getElementById('save-msg');
+  const ok=document.getElementById('save-ok');
   const err=document.getElementById('save-err');
-  btn.disabled=true; btn.textContent='Guardando…';
-  msg.style.display='none'; err.style.display='none';
+  btn.disabled=true;btn.textContent='Guardando…';
+  ok.style.display='none';err.style.display='none';
 
-  const member=TEAM.find(m=>m.name===CURRENT_NAME);
+  const m=TEAM.find(x=>x.name===CUR);
+  const metrics=DEPT_METRICS[m?.dept||'Management']||[];
+  const metricVals={};
+  metrics.forEach(mt=>{const el=document.getElementById('met-'+mt.key);if(el)metricVals[mt.key]=+el.value||0;});
+  const metas=METAS_STATE.map(mt=>({text:document.getElementById('meta-'+METAS_STATE.indexOf(mt))?.value||mt.text,done:mt.done}));
+
   const payload={
-    nombre:CURRENT_NAME,
-    departamento:member?.dept||'',
-    week_start:weekKey(),
+    nombre:CUR, departamento:m?.dept||'',
+    week_start:wkey(),
     logros:document.getElementById('f-logros').value.trim(),
     pendientes:document.getElementById('f-pendientes').value.trim(),
     proxima_semana:document.getElementById('f-proxima').value.trim(),
-    comentarios:document.getElementById('f-comentarios').value.trim(),
-    progreso:+document.getElementById('f-progreso').value,
+    comentarios:document.getElementById('f-coment').value.trim(),
+    progreso:+document.getElementById('f-prog').value,
+    metricas:metricVals,
+    metas,
     updated_at:new Date().toISOString(),
   };
 
-  const {error}=await db.from('nvs_weekly_reports')
-    .upsert(payload,{onConflict:'nombre,week_start'});
-
-  btn.disabled=false; btn.textContent='Guardar reporte';
-  if(error){err.style.display='inline';err.textContent='Error: '+error.message;}
+  const{error}=await db.from('nvs_weekly_reports').upsert(payload,{onConflict:'nombre,week_start'});
+  btn.disabled=false;btn.textContent='Guardar reporte';
+  if(error){err.textContent='Error: '+error.message;err.style.display='inline';}
   else{
-    msg.style.display='inline';
-    document.getElementById('form-status').textContent='✓ Reportado';
-    document.getElementById('form-status').className='report-card-status status-done';
+    ok.style.display='inline';
+    document.getElementById('f-status').textContent='✓ Reportado';
+    document.getElementById('f-status').className='status-pill sp-done';
     CACHE={};
-    setTimeout(()=>msg.style.display='none',3000);
+    setTimeout(()=>ok.style.display='none',3000);
   }
 }
 
-// ── ALL REPORTS ──
+/* ── ALL REPORTS ── */
 async function loadAll(){
-  const {data}=await db.from('nvs_weekly_reports').select('*').eq('week_start',weekKey());
+  const{data}=await db.from('nvs_weekly_reports').select('*').eq('week_start',wkey());
   CACHE.all=data||[];
   renderAll();
 }
-
 function renderAll(){
-  const reports=CACHE.all||[];
-  const grid=document.getElementById('all-grid');
-  grid.innerHTML=TEAM.map(m=>{
-    const r=reports.find(x=>x.nombre===m.name);
-    if(!r)return`
-      <div class="all-card no-report">
-        <div class="all-card-top">
-          <div class="all-avatar" style="background:${m.color}">${initials(m.name)}</div>
-          <div><div class="all-name">${m.name}</div><div class="all-dept">${m.dept}</div></div>
-        </div>
-        <div class="all-body">Sin reporte esta semana</div>
-      </div>`;
+  const rpts=CACHE.all||[];
+  document.getElementById('all-grid').innerHTML=TEAM.map(m=>{
+    const r=rpts.find(x=>x.nombre===m.name);
+    if(!r)return`<div class="acard no-rpt">
+      <div class="acard-top">
+        <div class="aav" style="background:${m.color}">${inits(m.name)}</div>
+        <div><div class="aname">${m.name}</div><div class="adept">${m.dept}</div></div>
+      </div>
+      <div class="abody"><div style="color:var(--muted);font-size:12px">Sin reporte esta semana</div></div>
+    </div>`;
 
     const pct=r.progreso||0;
-    return`
-      <div class="all-card">
-        <div class="all-card-top">
-          <div class="all-avatar" style="background:${m.color}">${initials(m.name)}</div>
-          <div style="flex:1;min-width:0">
-            <div class="all-name">${m.name}</div>
-            <div class="all-dept">${m.dept}</div>
-            <div class="mini-prog"><div class="mini-prog-fill" style="width:${pct}%;background:${m.color}"></div></div>
-          </div>
-          <div class="all-prog" style="color:${progColor(pct)}">${pct}%</div>
+    const metrics=DEPT_METRICS[m.dept]||[];
+    const mv=r.metricas||{};
+    const mts=(r.metas||[]);
+
+    const metricsHTML=metrics.length?`<div>
+      <div class="asec-title">📊 Métricas</div>
+      <div class="ametrics">${metrics.map(mt=>`
+        <div class="amet">
+          <div class="amet-val">${mv[mt.key]||0}</div>
+          <div class="amet-lbl">${mt.label.split(' ')[0]}</div>
+        </div>`).join('')}
+      </div>
+    </div>`:'';
+
+    const metasHTML=mts.some(mt=>mt.text)?`<div>
+      <div class="asec-title">🎯 Metas</div>
+      <div class="ametas">${mts.map(mt=>mt.text?`
+        <div class="ameta-row">
+          <div class="dot ${mt.done?'dot-done':'dot-miss'}">${mt.done?'✓':''}</div>
+          <div class="ameta-txt${mt.done?' done':''}"> ${esc(mt.text)}</div>
+        </div>`:''
+      ).join('')}
+      </div>
+    </div>`:'';
+
+    const logrosHTML=r.logros?`<div><div class="asec-title">✅ Esta semana</div><div class="asec-text">${esc(r.logros)}</div></div>`:'';
+    const proximaHTML=r.proxima_semana?`<div><div class="asec-title">🔜 Próxima semana</div><div class="asec-text">${esc(r.proxima_semana)}</div></div>`:'';
+
+    return`<div class="acard">
+      <div class="acard-top">
+        <div class="aav" style="background:${m.color}">${inits(m.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="aname">${m.name}</div>
+          <div class="adept">${m.dept}</div>
+          <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${m.color}"></div></div>
         </div>
-        <div class="all-body">
-          ${r.logros?`<div class="all-section"><div class="all-sec-title">✅ Esta semana</div><div class="all-text">${esc(r.logros)}</div></div>`:''}
-          ${r.pendientes?`<div class="all-section"><div class="all-sec-title">⏳ Pendiente</div><div class="all-text">${esc(r.pendientes)}</div></div>`:''}
-          ${r.proxima_semana?`<div class="all-section"><div class="all-sec-title">🔜 Próxima semana</div><div class="all-text">${esc(r.proxima_semana)}</div></div>`:''}
-          ${r.comentarios?`<div class="all-section"><div class="all-sec-title">💬 Comentarios</div><div class="all-text">${esc(r.comentarios)}</div></div>`:''}
-        </div>
-      </div>`;
+        <div class="aprog" style="color:${pc(pct)}">${pct}%</div>
+      </div>
+      <div class="abody">
+        ${metricsHTML}
+        ${metasHTML}
+        ${logrosHTML}
+        ${proximaHTML}
+        ${r.comentarios?`<div><div class="asec-title">💬 Comentarios</div><div class="asec-text">${esc(r.comentarios)}</div></div>`:''}
+      </div>
+    </div>`;
   }).join('');
 }
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-// ── INIT ──
+/* ── INIT ── */
 buildPills();
-updateWeekUI();
+updWeekUI();
 </script>
 </body>
 </html>
