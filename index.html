@@ -187,6 +187,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .pin-cancel{background:none;border:none;color:#94a3b8;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;padding:8px 16px;font-weight:600;}
 .pin-cancel:hover{color:var(--muted);}
 
+/* ── REPORTES WIDGET ── */
+.rw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:720px){.rw-grid{grid-template-columns:repeat(2,1fr);}}
+.rw-pill{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);transition:all .15s;cursor:pointer;position:relative;}
+.rw-pill:hover{border-color:rgba(0,0,0,.15);background:#f1f5f9;}
+.rw-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;}
+.rw-info{flex:1;min-width:0;}
+.rw-name{font-size:11px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rw-dept{font-size:9px;color:var(--muted);}
+.rw-status{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.rw-dot{width:8px;height:8px;border-radius:50%;}
+.rw-dot.done{background:#AAFF00;}
+.rw-dot.miss{background:#e2e8f0;}
+.rw-pct{font-size:9px;font-weight:800;color:var(--muted);}
+.rw-pct.done{color:#3a6b00;}
+.rw-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.rw-summary{font-size:10px;font-weight:700;color:var(--muted);}
+.rw-summary b{color:var(--txt);}
+
 /* ── MOBILE TOPBAR ── */
 #mob-topbar{
   display:none;
@@ -340,6 +359,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
         <div class="fin-balance-row"><span class="fin-balance-lbl">Balance Neto</span><span class="fin-balance-val" id="fin-balance">—</span></div>
         <div class="fin-margen-pill" id="fin-margen">— %</div>
         <div class="stat-live" style="margin-top:10px;"><div class="live-dot"></div>En vivo · Todas las transacciones</div>
+      </div>
+
+      <!-- REPORTES WIDGET (Stefano only) -->
+      <div id="reportes-widget" style="display:none;margin-bottom:20px;">
+        <div class="tw-header">
+          <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">📋 Reportes del equipo</div>
+          <span class="tw-all-link" onclick="selectModule('reportes','reportes.html')">Ver completo →</span>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;">
+          <div class="rw-header-row">
+            <div class="rw-summary" id="rw-summary">Cargando…</div>
+            <div style="font-size:9px;color:var(--muted);font-weight:600;" id="rw-week-lbl"></div>
+          </div>
+          <div class="rw-grid" id="rw-grid"></div>
+        </div>
       </div>
 
       <!-- TASKS WIDGET -->
@@ -561,6 +595,7 @@ async function showPlatform(user){
     loadFinanceStats();
   }
   if(!isSD&&!isIH)loadWeekTasks(user);
+  if(em==='stefano@playwithnewvision.com')loadReportesWidget();
 }
 
 /* ── CLOCK ── */
@@ -666,6 +701,50 @@ async function loadWeekTasks(user){
       </div>
     </div>`;
   }).join('')+(extra>0?`<div style="text-align:center;padding:6px 0;font-size:10px;color:var(--muted);font-weight:700;">+${extra} más →</div>`:'');
+}
+
+/* ── REPORTES WIDGET ── */
+const RW_TEAM=[
+  {name:'Andrea Castillo', dept:'Placement', color:'#6366f1'},
+  {name:'Julio Blanco',    dept:'Placement', color:'#8b5cf6'},
+  {name:'Diego Julio',     dept:'Leads',     color:'#f472b6'},
+  {name:'Ariel Ching',     dept:'Leads',     color:'#ec4899'},
+  {name:'Floyd Ramson',    dept:'Leads',     color:'#db2777'},
+  {name:'José Montilla',   dept:'Marketing', color:'#f59e0b'},
+  {name:'Ximena Botello',  dept:'Marketing', color:'#d97706'},
+  {name:'Stefano Cano',    dept:'Management',color:'#10b981'},
+];
+function rwMonday(d){const c=new Date(d);c.setHours(0,0,0,0);c.setDate(c.getDate()-((c.getDay()+6)%7));return c;}
+function rwIso(d){return d.toISOString().split('T')[0];}
+function rwInits(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('');}
+function rwFmtW(d){const e=new Date(d);e.setDate(e.getDate()+6);const o={day:'numeric',month:'short'};return new Date(d).toLocaleDateString('es',o)+' – '+e.toLocaleDateString('es',o);}
+
+async function loadReportesWidget(){
+  const widget=document.getElementById('reportes-widget');
+  if(!widget)return;
+  widget.style.display='block';
+  const monday=rwMonday(new Date());
+  const wk=rwIso(monday);
+  document.getElementById('rw-week-lbl').textContent=rwFmtW(monday);
+  const {data}=await db.from('nvs_weekly_reports').select('nombre,progreso').eq('week_start',wk);
+  const rpts=data||[];
+  const done=rpts.length;
+  const total=RW_TEAM.length;
+  document.getElementById('rw-summary').innerHTML=`<b>${done}/${total}</b> reportaron esta semana`;
+  document.getElementById('rw-grid').innerHTML=RW_TEAM.map(m=>{
+    const r=rpts.find(x=>x.nombre===m.name);
+    return`<div class="rw-pill" onclick="selectModule('reportes','reportes.html')">
+      <div class="rw-av" style="background:${m.color}">${rwInits(m.name)}</div>
+      <div class="rw-info">
+        <div class="rw-name">${m.name.split(' ')[0]}</div>
+        <div class="rw-dept">${m.dept}</div>
+      </div>
+      <div class="rw-status">
+        <div class="rw-dot ${r?'done':'miss'}"></div>
+        ${r?`<div class="rw-pct done">${r.progreso||0}%</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ── INIT ── */
