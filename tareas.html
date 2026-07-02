@@ -127,6 +127,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .task-item{display:flex;align-items:center;gap:10px;padding:11px 13px;background:#fff;border:1px solid var(--border);border-radius:10px;transition:all .13s;animation:slideUp .18s both;}
 .task-item:hover{border-color:rgba(0,0,0,.12);box-shadow:0 2px 6px rgba(0,0,0,.04);}
 .task-item.done{opacity:.45;}
+.task-item.dragging{opacity:.35;box-shadow:0 8px 24px rgba(0,0,0,.12);transform:scale(1.01);}
+.task-item.drag-over{border-color:#AAFF00;background:rgba(170,255,0,0.05);transform:translateY(-2px);}
+.drag-handle{cursor:grab;color:#cbd5e1;padding:0 2px;flex-shrink:0;display:flex;align-items:center;transition:color .13s;touch-action:none;}
+.drag-handle:hover{color:#94a3b8;}
+.drag-handle:active{cursor:grabbing;}
+.task-item.done .drag-handle{display:none;}
 .task-cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .task-cb:hover{border-color:#AAFF00;}
 .task-cb.checked{border-color:#AAFF00;background:#AAFF00;}
@@ -463,6 +469,7 @@ function renderPersonal(){
 
   document.getElementById('my-scroll').innerHTML=html;
   if(P_FORM){const inp=document.getElementById('pf-title');if(inp)inp.focus();}
+  attachPersonalDrag();
 }
 
 function pTaskRow(t,i){
@@ -485,7 +492,10 @@ function pTaskRow(t,i){
       </div>
     </div>`;
   }
-  return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s">
+  return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s" draggable="${!t.completed}" data-drag-id="${t.id}">
+    <div class="drag-handle" title="Arrastra para reordenar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="6" r="1.2" fill="currentColor"/><circle cx="15" cy="6" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="18" r="1.2" fill="currentColor"/><circle cx="15" cy="18" r="1.2" fill="currentColor"/></svg>
+    </div>
     <div class="task-cb${t.completed?' checked':''}" onclick="togglePersonal('${t.id}',${t.completed})">
       <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
@@ -691,6 +701,7 @@ function renderSemanal(){
   }
   document.getElementById('sem-scroll').innerHTML=html;
   if(S_FORM){const inp=document.getElementById('sf-title');if(inp)inp.focus();}
+  attachSemanalDrag();
 }
 function showSForm(){S_FORM=true;S_EDIT=null;renderSemanal();}
 function cancelSForm(){S_FORM=false;renderSemanal();}
@@ -730,7 +741,10 @@ function sTaskRow(t,i){
       </div>
     </div>`;
   }
-  return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s">
+  return`<div class="task-item${t.completed?' done':''}" style="animation-delay:${i*.03}s" draggable="${!t.completed}" data-drag-id="${t.id}">
+    <div class="drag-handle" title="Arrastra para reordenar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="6" r="1.2" fill="currentColor"/><circle cx="15" cy="6" r="1.2" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="18" r="1.2" fill="currentColor"/><circle cx="15" cy="18" r="1.2" fill="currentColor"/></svg>
+    </div>
     <div class="task-cb${t.completed?' checked':''}" onclick="toggleSemanal('${t.id}',${t.completed})">
       <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
@@ -761,6 +775,70 @@ function sTaskRow(t,i){
       </button>
     </div>
   </div>`;
+}
+
+/* ── DRAG & DROP ── */
+let _dragId=null,_dragType=null;
+
+function _dragAttach(container,onDrop){
+  const items=container.querySelectorAll('[data-drag-id]');
+  items.forEach(el=>{
+    el.addEventListener('dragstart',e=>{
+      _dragId=el.dataset.dragId;
+      _dragType=container.id;
+      setTimeout(()=>el.classList.add('dragging'),0);
+      e.dataTransfer.effectAllowed='move';
+    });
+    el.addEventListener('dragend',()=>{
+      el.classList.remove('dragging');
+      container.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();
+      if(_dragType!==container.id)return;
+      el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave',e=>{
+      if(!el.contains(e.relatedTarget))el.classList.remove('drag-over');
+    });
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const toId=el.dataset.dragId;
+      if(!_dragId||_dragId===toId||_dragType!==container.id)return;
+      onDrop(_dragId,toId);
+      _dragId=null;
+    });
+  });
+}
+
+function attachPersonalDrag(){
+  const c=document.getElementById('my-scroll');
+  if(!c)return;
+  _dragAttach(c,(fromId,toId)=>{
+    const pending=MY_TASKS.filter(t=>!t.completed);
+    if(!pending.find(t=>t.id===fromId)||!pending.find(t=>t.id===toId))return;
+    const fi=MY_TASKS.findIndex(t=>t.id===fromId);
+    const [moved]=MY_TASKS.splice(fi,1);
+    const ti=MY_TASKS.findIndex(t=>t.id===toId);
+    MY_TASKS.splice(ti,0,moved);
+    renderPersonal();
+  });
+}
+
+function attachSemanalDrag(){
+  const c=document.getElementById('sem-scroll');
+  if(!c)return;
+  _dragAttach(c,(fromId,toId)=>{
+    const tasks=SEM_TASKS[DEPT];
+    const pending=tasks.filter(t=>!t.completed);
+    if(!pending.find(t=>t.id===fromId)||!pending.find(t=>t.id===toId))return;
+    const fi=tasks.findIndex(t=>t.id===fromId);
+    const [moved]=tasks.splice(fi,1);
+    const ti=tasks.findIndex(t=>t.id===toId);
+    tasks.splice(ti,0,moved);
+    renderSemanal();
+  });
 }
 
 /* ── HELPERS ── */
