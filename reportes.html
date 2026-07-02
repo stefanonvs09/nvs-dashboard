@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>NVS · Reportes</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#AAFF00;--green-dim:rgba(170,255,0,0.10);--green-dk:#3a6b00;
+  --bg:#f8fafc;--surface:#ffffff;--border:rgba(0,0,0,0.08);
+  --text:#0f172a;--muted:#64748b;--r:12px;
+  --blue:#6366f1;--pink:#f472b6;--orange:#f59e0b;--red:#ef4444;--teal:#0d9488;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-logo{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:1px;}
+.topbar-logo span{color:var(--green);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.range-tabs{display:flex;background:var(--bg);border-radius:8px;padding:3px;gap:2px;}
+.rtab{padding:5px 14px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
+.rtab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.btn-pdf{background:var(--green);color:var(--green-dk);border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity .15s;}
+.btn-pdf:hover{opacity:.88;}
+.loading-bar{height:3px;background:linear-gradient(90deg,var(--green),#88ff00,var(--green));background-size:200% 100%;animation:load 1.2s linear infinite;position:fixed;top:0;left:0;right:0;z-index:999;display:none;}
+@keyframes load{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* ── LAYOUT ── */
+.page{max-width:1100px;margin:0 auto;padding:28px 24px 60px;}
+.section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px;margin-top:32px;}
+.section-title:first-child{margin-top:0;}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:560px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--green));}
+.kpi-icon{font-size:20px;margin-bottom:8px;}
+.kpi-val{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:.5px;line-height:1;margin-bottom:3px;}
+.kpi-lbl{font-size:11px;color:var(--muted);font-weight:600;}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+.kpi-trend{font-size:10px;font-weight:700;margin-top:6px;}
+.trend-up{color:#16a34a;}
+.trend-down{color:var(--red);}
+
+/* ── TWO-COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:700px){.three-col{grid-template-columns:1fr;}}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.card-title{font-size:13px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:7px;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent,var(--green));flex-shrink:0;}
+
+/* ── FUNNEL BARS ── */
+.funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.funnel-lbl{font-size:11px;font-weight:600;color:var(--muted);width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.funnel-track{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative;}
+.funnel-fill{height:100%;border-radius:4px;transition:width .6s ease;display:flex;align-items:center;padding-left:8px;}
+.funnel-n{font-size:11px;font-weight:800;color:rgba(0,0,0,.6);}
+.funnel-pct{font-size:10px;color:var(--muted);width:38px;text-align:right;flex-shrink:0;}
+
+/* ── DONUT ── */
+.donut-wrap{display:flex;align-items:center;gap:20px;}
+.donut-svg{flex-shrink:0;}
+.donut-legend{display:flex;flex-direction:column;gap:7px;flex:1;}
+.leg-row{display:flex;align-items:center;gap:7px;font-size:11px;}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.leg-lbl{color:var(--muted);flex:1;}
+.leg-val{font-weight:700;font-size:12px;}
+
+/* ── TEAM GRID ── */
+.dept-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
+.dept-name{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:12px;}
+.member-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.member-row:last-child{border-bottom:none;}
+.member-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.member-info{flex:1;min-width:0;}
+.member-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.member-sub{font-size:10px;color:var(--muted);}
+.member-pct{font-size:13px;font-weight:800;color:var(--green-dk);}
+.mini-bar{height:4px;background:var(--bg);border-radius:2px;margin-top:3px;overflow:hidden;}
+.mini-fill{height:100%;border-radius:2px;background:var(--green);transition:width .5s ease;}
+
+/* ── WEEKLY REPORT ── */
+.report-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;}
+.report-header-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.report-logo{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;}
+.report-logo span{color:var(--green);}
+.report-date{font-size:11px;color:var(--muted);text-align:right;}
+.report-section{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.report-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.report-sec-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.report-stat-row{display:flex;gap:12px;flex-wrap:wrap;}
+.rstat{background:var(--bg);border-radius:8px;padding:10px 14px;min-width:90px;}
+.rstat-val{font-family:'Anton',sans-serif;font-size:22px;}
+.rstat-lbl{font-size:10px;color:var(--muted);font-weight:600;}
+.report-list{display:flex;flex-direction:column;gap:4px;}
+.report-li{font-size:12px;color:var(--text);display:flex;align-items:center;gap:6px;}
+.report-li::before{content:'•';color:var(--green-dk);font-weight:800;}
+.btn-gen{background:var(--text);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:7px;transition:opacity .15s;margin-top:16px;}
+.btn-gen:hover{opacity:.82;}
+
+/* ── EMPTY / LOADING ── */
+.skel{background:linear-gradient(90deg,var(--bg) 25%,rgba(0,0,0,.04) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.data-error{font-size:12px;color:var(--muted);text-align:center;padding:20px;}
+
+/* ── PRINT ── */
+@media print{
+  .topbar,.btn-gen,.btn-pdf,.range-tabs{display:none!important;}
+  .page{padding:0;}
+  body{background:#fff;}
+  .card,.kpi-card,.report-preview,.dept-col{box-shadow:none;border-color:#ddd;}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-bar" id="lbar"></div>
+
+<div class="topbar">
+  <div class="topbar-logo"><span>NVS</span> · Reportes</div>
+  <div class="topbar-right">
+    <div class="range-tabs">
+      <div class="rtab active" onclick="setRange('semana',this)">Esta semana</div>
+      <div class="rtab" onclick="setRange('mes',this)">Este mes</div>
+      <div class="rtab" onclick="setRange('todo',this)">Todo</div>
+    </div>
+    <button class="btn-pdf" onclick="printReport()">📄 Exportar PDF</button>
+  </div>
+</div>
+
+<div class="page" id="page-content">
+
+  <!-- KPIs -->
+  <div class="section-title">📊 Indicadores Clave</div>
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card skel" style="height:100px"></div>
+    <div class="kpi-card skel" style="height:100px"></div>
+    <div class="kpi-card skel" style="height:100px"></div>
+    <div class="kpi-card skel" style="height:100px"></div>
+    <div class="kpi-card skel" style="height:100px"></div>
+  </div>
+
+  <!-- Leads + Placements -->
+  <div class="section-title">🎯 Pipeline de Leads</div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><div class="dot" style="--accent:#f472b6"></div>Leads por Etapa</div>
+      <div id="funnel-wrap"><div class="skel" style="height:160px"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="dot" style="--accent:#6366f1"></div>Atletas por Deporte</div>
+      <div id="donut-wrap"><div class="skel" style="height:160px"></div></div>
+    </div>
+  </div>
+
+  <!-- Finanzas -->
+  <div class="section-title">💰 Resumen Financiero</div>
+  <div class="three-col" id="fin-cols">
+    <div class="card skel" style="height:90px"></div>
+    <div class="card skel" style="height:90px"></div>
+    <div class="card skel" style="height:90px"></div>
+  </div>
+
+  <!-- Equipo -->
+  <div class="section-title">👥 Performance del Equipo — Tareas Semanales</div>
+  <div class="three-col" id="team-grid">
+    <div class="dept-col skel" style="height:150px"></div>
+    <div class="dept-col skel" style="height:150px"></div>
+    <div class="dept-col skel" style="height:150px"></div>
+  </div>
+
+  <!-- Reporte Semanal -->
+  <div class="section-title">📋 Reporte Semanal</div>
+  <div class="report-preview" id="report-wrap">
+    <div class="skel" style="height:260px"></div>
+  </div>
+
+</div>
+
+<script>
+const SUPA_URL='https://mwefvjvvitsondqghgsx.supabase.co';
+const SUPA_KEY='sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
+const db=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+// ── TEAM CONFIG ──
+const TEAM_CONFIG=[
+  {name:'Andrea Castillo', dept:'Placement', color:'#6366f1'},
+  {name:'Julio Blanco',    dept:'Placement', color:'#818cf8'},
+  {name:'Diego Julio',     dept:'Leads',     color:'#f472b6'},
+  {name:'Ariel Ching',     dept:'Leads',     color:'#fb7185'},
+  {name:'Floyd Ramson',    dept:'Leads',     color:'#f43f5e'},
+  {name:'José Montilla',   dept:'Marketing', color:'#f59e0b'},
+  {name:'Ximena Botello',  dept:'Marketing', color:'#fbbf24'},
+  {name:'Stefano Cano',    dept:'Management',color:'#10b981'},
+];
+const DEPTS=['Placement','Leads','Marketing','Management'];
+const DEPT_COLORS={Placement:'#6366f1',Leads:'#f472b6',Marketing:'#f59e0b',Management:'#10b981'};
+const SPORT_COLORS=['#AAFF00','#6366f1','#f472b6','#f59e0b','#0d9488','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16'];
+
+let RANGE='semana';
+let DATA={leads:[],placements:[],trans:[],tasks:[]};
+
+// ── RANGE ──
+function setRange(r,el){
+  RANGE=r;
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function getWeekStart(){
+  const d=new Date();d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-((d.getDay()+6)%7));
+  return d;
+}
+function isoDate(d){return d.toISOString().split('T')[0];}
+function inRange(dateStr){
+  if(RANGE==='todo')return true;
+  const d=new Date(dateStr);
+  if(RANGE==='semana'){const ws=getWeekStart();const we=new Date(ws);we.setDate(we.getDate()+6);return d>=ws&&d<=we;}
+  if(RANGE==='mes'){const now=new Date();return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();}
+  return true;
+}
+
+// ── LOAD ──
+async function loadAll(){
+  document.getElementById('lbar').style.display='block';
+  const [leadsR,placR,transR,tasksR]=await Promise.all([
+    db.from('leads').select('*'),
+    db.from('placements').select('deporte,commit_status,nombre'),
+    db.from('transacciones').select('fecha,ingreso,gasto,concepto').order('fecha',{ascending:false}),
+    db.from('nvs_weekly_tasks').select('*').gte('week_start',isoDate(new Date(new Date().setDate(new Date().getDate()-28)))),
+  ]);
+  DATA.leads=leadsR.data||[];
+  DATA.placements=placR.data||[];
+  DATA.trans=transR.data||[];
+  DATA.tasks=tasksR.data||[];
+  document.getElementById('lbar').style.display='none';
+  render();
+}
+
+// ── RENDER ──
+function render(){
+  renderKPIs();
+  renderFunnel();
+  renderDonut();
+  renderFin();
+  renderTeam();
+  renderReport();
+}
+
+// ── KPIs ──
+function renderKPIs(){
+  const leads=DATA.leads;
+  const total=leads.length;
+  const firmados=leads.filter(l=>l.estado==='Firmado').length;
+  const perdidos=leads.filter(l=>l.estado==='Perdido').length;
+  const conv=total-perdidos>0?Math.round(firmados/(total-perdidos)*100):0;
+  const plac=DATA.placements;
+  const committed=plac.filter(p=>(p.commit_status||'').toLowerCase().includes('commit')).length;
+  const now=new Date();const ms=now.getFullYear()+'-'+(String(now.getMonth()+1).padStart(2,'0'));
+  const transMonth=DATA.trans.filter(t=>t.fecha&&t.fecha.startsWith(ms));
+  const ingresoMes=transMonth.reduce((s,t)=>s+(t.ingreso||0),0);
+  const gastoMes=transMonth.reduce((s,t)=>s+(t.gasto||0),0);
+
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi-card" style="--accent:#f472b6">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-val">${total}</div>
+      <div class="kpi-lbl">Leads Totales</div>
+      <div class="kpi-sub">${firmados} firmados · ${perdidos} perdidos</div>
+    </div>
+    <div class="kpi-card" style="--accent:#AAFF00">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-val">${conv}%</div>
+      <div class="kpi-lbl">Tasa de Conversión</div>
+      <div class="kpi-sub">Firmados vs activos</div>
+    </div>
+    <div class="kpi-card" style="--accent:#6366f1">
+      <div class="kpi-icon">🎓</div>
+      <div class="kpi-val">${plac.length}</div>
+      <div class="kpi-lbl">Atletas en Pipeline</div>
+      <div class="kpi-sub">${committed} comprometidos</div>
+    </div>
+    <div class="kpi-card" style="--accent:#10b981">
+      <div class="kpi-icon">💵</div>
+      <div class="kpi-val">$${(ingresoMes/1000).toFixed(1)}k</div>
+      <div class="kpi-lbl">Ingresos del Mes</div>
+      <div class="kpi-sub">${now.toLocaleString('es',{month:'long'})}</div>
+    </div>
+    <div class="kpi-card" style="--accent:#ef4444">
+      <div class="kpi-icon">💸</div>
+      <div class="kpi-val">$${(gastoMes/1000).toFixed(1)}k</div>
+      <div class="kpi-lbl">Gastos del Mes</div>
+      <div class="kpi-sub">Balance: $${((ingresoMes-gastoMes)/1000).toFixed(1)}k</div>
+    </div>`;
+}
+
+// ── FUNNEL ──
+function renderFunnel(){
+  const STAGES=['Nuevo','Contactado','Interesado','En Negociacion','Contract Sent','Firmado','Delayed Sign Up','Perdido'];
+  const COLORS={'Nuevo':'#94a3b8','Contactado':'#60a5fa','Interesado':'#818cf8','En Negociacion':'#f59e0b','Contract Sent':'#f472b6','Firmado':'#AAFF00','Delayed Sign Up':'#fb923c','Perdido':'#ef4444'};
+  const counts={};
+  STAGES.forEach(s=>counts[s]=0);
+  DATA.leads.forEach(l=>{if(counts[l.estado]!==undefined)counts[l.estado]++;});
+  const max=Math.max(...Object.values(counts),1);
+  const html=STAGES.map(s=>`
+    <div class="funnel-row">
+      <div class="funnel-lbl">${s}</div>
+      <div class="funnel-track">
+        <div class="funnel-fill" style="width:${Math.round(counts[s]/max*100)}%;background:${COLORS[s]}20;border-left:3px solid ${COLORS[s]}">
+          <span class="funnel-n" style="color:${COLORS[s]}">${counts[s]}</span>
+        </div>
+      </div>
+      <div class="funnel-pct">${DATA.leads.length?Math.round(counts[s]/DATA.leads.length*100):0}%</div>
+    </div>`).join('');
+  document.getElementById('funnel-wrap').innerHTML=html;
+}
+
+// ── DONUT ──
+function renderDonut(){
+  const sportCount={};
+  DATA.placements.forEach(p=>{const s=p.deporte||'Otro';sportCount[s]=(sportCount[s]||0)+1;});
+  const entries=Object.entries(sportCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const total=entries.reduce((s,e)=>s+e[1],0)||1;
+  const SIZE=120,CX=60,CY=60,R=48,INNER=30;
+  let angle=-Math.PI/2;
+  let paths='';
+  entries.forEach(([sport,n],i)=>{
+    const sweep=n/total*Math.PI*2;
+    const x1=CX+R*Math.cos(angle),y1=CY+R*Math.sin(angle);
+    angle+=sweep;
+    const x2=CX+R*Math.cos(angle),y2=CY+R*Math.sin(angle);
+    const ix1=CX+INNER*Math.cos(angle-sweep),iy1=CY+INNER*Math.sin(angle-sweep);
+    const ix2=CX+INNER*Math.cos(angle),iy2=CY+INNER*Math.sin(angle);
+    const big=sweep>Math.PI?1:0;
+    paths+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${R},${R} 0 ${big} 1 ${x2.toFixed(1)},${y2.toFixed(1)} L${ix2.toFixed(1)},${iy2.toFixed(1)} A${INNER},${INNER} 0 ${big} 0 ${ix1.toFixed(1)},${iy1.toFixed(1)} Z" fill="${SPORT_COLORS[i%SPORT_COLORS.length]}" opacity=".9"/>`;
+  });
+  if(!total||entries.length===0){document.getElementById('donut-wrap').innerHTML='<div class="data-error">Sin datos de placements</div>';return;}
+  const legend=entries.map(([s,n],i)=>`<div class="leg-row"><div class="leg-dot" style="background:${SPORT_COLORS[i%SPORT_COLORS.length]}"></div><span class="leg-lbl">${s}</span><span class="leg-val">${n}</span></div>`).join('');
+  document.getElementById('donut-wrap').innerHTML=`
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">${paths}
+        <text x="${CX}" y="${CY+4}" text-anchor="middle" font-size="14" font-weight="800" fill="#0f172a">${DATA.placements.length}</text>
+        <text x="${CX}" y="${CY+16}" text-anchor="middle" font-size="8" fill="#64748b">atletas</text>
+      </svg>
+      <div class="donut-legend">${legend}</div>
+    </div>`;
+}
+
+// ── FINANZAS ──
+function renderFin(){
+  const now=new Date();
+  const ms=now.getFullYear()+'-'+(String(now.getMonth()+1).padStart(2,'0'));
+  const transMonth=DATA.trans.filter(t=>t.fecha&&t.fecha.startsWith(ms));
+  const ingresoMes=transMonth.reduce((s,t)=>s+(t.ingreso||0),0);
+  const gastoMes=transMonth.reduce((s,t)=>s+(t.gasto||0),0);
+  const balance=ingresoMes-gastoMes;
+  const totalIngreso=DATA.trans.reduce((s,t)=>s+(t.ingreso||0),0);
+  const totalGasto=DATA.trans.reduce((s,t)=>s+(t.gasto||0),0);
+
+  // Last 6 months bar chart
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),lbl:d.toLocaleString('es',{month:'short'})});}
+  const barData=months.map(m=>({...m,ing:DATA.trans.filter(t=>t.fecha&&t.fecha.startsWith(m.key)).reduce((s,t)=>s+(t.ingreso||0),0)}));
+  const maxIng=Math.max(...barData.map(b=>b.ing),1);
+  const bars=barData.map(b=>`
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+      <div style="font-size:9px;font-weight:700;color:var(--muted)">${b.ing>=1000?'$'+(b.ing/1000).toFixed(1)+'k':'$'+b.ing}</div>
+      <div style="width:100%;background:var(--bg);border-radius:4px;height:60px;display:flex;align-items:flex-end">
+        <div style="width:100%;background:var(--green);border-radius:4px 4px 0 0;height:${Math.max(4,Math.round(b.ing/maxIng*60))}px;opacity:.85"></div>
+      </div>
+      <div style="font-size:9px;color:var(--muted)">${b.lbl}</div>
+    </div>`).join('');
+
+  document.getElementById('fin-cols').innerHTML=`
+    <div class="card">
+      <div class="card-title"><div class="dot" style="--accent:#10b981"></div>Ingresos Totales</div>
+      <div style="font-family:'Anton',sans-serif;font-size:28px;color:#10b981">$${totalIngreso.toLocaleString()}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px">Mes actual: <strong>$${ingresoMes.toLocaleString()}</strong></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="dot" style="--accent:#ef4444"></div>Gastos Totales</div>
+      <div style="font-family:'Anton',sans-serif;font-size:28px;color:#ef4444">$${totalGasto.toLocaleString()}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px">Mes actual: <strong>$${gastoMes.toLocaleString()}</strong></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="dot" style="--accent:#AAFF00"></div>Ingresos últimos 6 meses</div>
+      <div style="display:flex;align-items:flex-end;gap:4px;height:90px">${bars}</div>
+    </div>`;
+}
+
+// ── TEAM ──
+function renderTeam(){
+  const ws=isoDate(getWeekStart());
+  const weekTasks=DATA.tasks.filter(t=>t.week_start===ws);
+  const deptMap={};
+  DEPTS.forEach(d=>deptMap[d]=[]);
+  TEAM_CONFIG.forEach(m=>{ if(deptMap[m.dept])deptMap[m.dept].push(m); });
+
+  const cols=DEPTS.filter(d=>deptMap[d].length>0).map(dept=>{
+    const members=deptMap[dept];
+    const rows=members.map(m=>{
+      const mTasks=weekTasks.filter(t=>(t.assignee||'').toLowerCase().includes(m.name.split(' ')[0].toLowerCase()));
+      const done=mTasks.filter(t=>t.completed).length;
+      const total=mTasks.length;
+      const pct=total?Math.round(done/total*100):0;
+      const initials=m.name.split(' ').map(w=>w[0]).slice(0,2).join('');
+      return`<div class="member-row">
+        <div class="member-avatar" style="background:${m.color}">${initials}</div>
+        <div class="member-info">
+          <div class="member-name">${m.name.split(' ')[0]}</div>
+          <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${m.color}"></div></div>
+          <div class="member-sub">${done}/${total} tareas</div>
+        </div>
+        <div class="member-pct" style="color:${m.color}">${pct}%</div>
+      </div>`;
+    }).join('');
+    return`<div class="dept-col">
+      <div class="dept-name" style="color:${DEPT_COLORS[dept]}">${dept}</div>
+      ${rows}
+    </div>`;
+  }).join('');
+
+  document.getElementById('team-grid').innerHTML=cols||'<div class="data-error">Sin datos de equipo esta semana</div>';
+}
+
+// ── WEEKLY REPORT ──
+function renderReport(){
+  const now=new Date();
+  const ws=getWeekStart();
+  const we=new Date(ws);we.setDate(we.getDate()+6);
+  const weekTasks=DATA.tasks.filter(t=>t.week_start===isoDate(ws));
+  const totalTasks=weekTasks.length;
+  const doneTasks=weekTasks.filter(t=>t.completed).length;
+
+  const STAGES=['Nuevo','Contactado','Interesado','En Negociacion','Contract Sent','Firmado','Delayed Sign Up','Perdido'];
+  const stageCounts={};STAGES.forEach(s=>stageCounts[s]=0);
+  DATA.leads.forEach(l=>{if(stageCounts[l.estado]!==undefined)stageCounts[l.estado]++;});
+  const firmados=stageCounts['Firmado']||0;
+  const conv=DATA.leads.length?Math.round(firmados/DATA.leads.length*100):0;
+
+  const fmtD=d=>d.toLocaleDateString('es',{day:'numeric',month:'long'});
+  const ms=now.getFullYear()+'-'+(String(now.getMonth()+1).padStart(2,'0'));
+  const transMonth=DATA.trans.filter(t=>t.fecha&&t.fecha.startsWith(ms));
+  const ingresoMes=transMonth.reduce((s,t)=>s+(t.ingreso||0),0);
+
+  const topSports=Object.entries(DATA.placements.reduce((a,p)=>{const s=p.deporte||'Otro';a[s]=(a[s]||0)+1;return a;},{})).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([s,n])=>`${s} (${n})`).join(', ');
+
+  const deptSummary=DEPTS.map(dept=>{
+    const members=TEAM_CONFIG.filter(m=>m.dept===dept);
+    const dTasks=weekTasks.filter(t=>members.some(m=>(t.assignee||'').toLowerCase().includes(m.name.split(' ')[0].toLowerCase())));
+    const done=dTasks.filter(t=>t.completed).length;
+    return done>0?`${dept}: ${done} tarea${done!==1?'s':''} completada${done!==1?'s':''}`:null;
+  }).filter(Boolean);
+
+  document.getElementById('report-wrap').innerHTML=`
+    <div class="report-header-row">
+      <div>
+        <div class="report-logo"><span>NVS</span> — New Vision Sports</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">Reporte Semanal · ${fmtD(ws)} – ${fmtD(we)}</div>
+      </div>
+      <div class="report-date">
+        <div style="font-size:11px;font-weight:700">Generado el</div>
+        <div style="font-size:11px;color:var(--muted)">${now.toLocaleDateString('es',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-sec-title">📊 Resumen General</div>
+      <div class="report-stat-row">
+        <div class="rstat"><div class="rstat-val">${DATA.leads.length}</div><div class="rstat-lbl">Leads totales</div></div>
+        <div class="rstat"><div class="rstat-val">${firmados}</div><div class="rstat-lbl">Firmados</div></div>
+        <div class="rstat"><div class="rstat-val">${conv}%</div><div class="rstat-lbl">Conversión</div></div>
+        <div class="rstat"><div class="rstat-val">${DATA.placements.length}</div><div class="rstat-lbl">Atletas</div></div>
+        <div class="rstat" style="background:rgba(170,255,0,.12)"><div class="rstat-val" style="color:var(--green-dk)">$${(ingresoMes/1000).toFixed(1)}k</div><div class="rstat-lbl">Ingresos mes</div></div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-sec-title">🎯 Pipeline de Leads</div>
+      <div class="report-list">
+        ${['Nuevo','Contactado','Interesado','En Negociacion','Contract Sent','Firmado'].map(s=>`<div class="report-li"><strong>${s}:</strong> ${stageCounts[s]} lead${stageCounts[s]!==1?'s':''}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-sec-title">🎓 Placements</div>
+      <div class="report-list">
+        <div class="report-li">Total atletas en pipeline: <strong>${DATA.placements.length}</strong></div>
+        ${topSports?`<div class="report-li">Deportes principales: <strong>${topSports}</strong></div>`:''}
+      </div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-sec-title">✅ Tareas del Equipo</div>
+      <div class="report-list">
+        <div class="report-li">Total esta semana: <strong>${doneTasks}/${totalTasks}</strong> completadas</div>
+        ${deptSummary.map(s=>`<div class="report-li">${s}</div>`).join('')}
+      </div>
+    </div>
+
+    <button class="btn-gen" onclick="printReport()">📄 Imprimir / Descargar PDF</button>`;
+}
+
+// ── PRINT ──
+function printReport(){window.print();}
+
+// ── INIT ──
+loadAll();
+</script>
+</body>
+</html>
