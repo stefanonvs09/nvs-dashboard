@@ -428,11 +428,13 @@ async function loadMy(){
     document.getElementById('f-logros').value=data.logros||'';
     document.getElementById('f-pendientes').value=data.pendientes||'';
     document.getElementById('f-proxima').value=data.proxima_semana||'';
-    document.getElementById('f-coment').value=data.comentarios||'';
     document.getElementById('f-prog').value=data.progreso||50;
     updProg(data.progreso||50);
-    buildMetrics(m?.dept||'Management', data.metricas||{});
-    buildMetas(data.metas&&data.metas.length===3?data.metas:[{text:'',done:false},{text:'',done:false},{text:'',done:false}]);
+    let _c=data.comentarios||'',_k={},_m=[{text:'',done:false},{text:'',done:false},{text:'',done:false}];
+    try{const p=JSON.parse(_c);if(p.__nvs){_c=p.c||'';_k=p.k||{};_m=p.m||_m;}}catch(e){}
+    document.getElementById('f-coment').value=_c;
+    buildMetrics(m?.dept||'Management',_k);
+    buildMetas(_m.length===3?_m:[{text:'',done:false},{text:'',done:false},{text:'',done:false}]);
     document.getElementById('f-status').textContent='✓ Reportado';
     document.getElementById('f-status').className='status-pill sp-done';
   } else {
@@ -468,10 +470,8 @@ async function saveReport(){
     logros:document.getElementById('f-logros').value.trim(),
     pendientes:document.getElementById('f-pendientes').value.trim(),
     proxima_semana:document.getElementById('f-proxima').value.trim(),
-    comentarios:document.getElementById('f-coment').value.trim(),
+    comentarios:JSON.stringify({__nvs:1,c:document.getElementById('f-coment').value.trim(),m:metas,k:metricVals}),
     progreso:+document.getElementById('f-prog').value,
-    metricas:metricVals,
-    metas,
     updated_at:new Date().toISOString(),
   };
 
@@ -507,8 +507,10 @@ function renderAll(){
 
     const pct=r.progreso||0;
     const metrics=DEPT_METRICS[m.dept]||[];
-    const mv=r.metricas||{};
-    const mts=(r.metas||[]);
+    let _rc=r.comentarios||'',_mv={},_mts=[];
+    try{const p=JSON.parse(_rc);if(p.__nvs){_rc=p.c||'';_mv=p.k||{};_mts=p.m||[];}}catch(e){}
+    const mv=_mv;
+    const mts=_mts;
 
     const metricsHTML=metrics.length?`<div>
       <div class="asec-title">📊 Métricas</div>
@@ -549,7 +551,7 @@ function renderAll(){
         ${metasHTML}
         ${logrosHTML}
         ${proximaHTML}
-        ${r.comentarios?`<div><div class="asec-title">💬 Comentarios</div><div class="asec-text">${esc(r.comentarios)}</div></div>`:''}
+        ${_rc?`<div><div class="asec-title">💬 Comentarios</div><div class="asec-text">${esc(_rc)}</div></div>`:''}
       </div>
     </div>`;
   }).join('');
