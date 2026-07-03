@@ -247,6 +247,43 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
   .lbox{width:94vw;padding:34px 22px;}
 }
 
+/* ── UPLOADS VIEW ── */
+.upl-tabs{display:flex;gap:2px;padding:12px 16px 0;border-bottom:1px solid var(--b);flex-shrink:0;background:var(--card);}
+.utab{padding:8px 18px;border-radius:8px 8px 0 0;font-size:12px;font-weight:700;color:var(--m);cursor:pointer;border:1px solid transparent;border-bottom:none;transition:all .15s;user-select:none;}
+.utab.active{background:var(--bg);color:var(--txt);border-color:var(--b);margin-bottom:-1px;}
+.utab:hover:not(.active){color:var(--txt);}
+.upl-wrap{flex:1;overflow-y:auto;padding:20px 24px;}
+.upl-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.upl-h-info{}
+.upl-title{font-size:15px;font-weight:800;}
+.upl-sub{font-size:11px;color:var(--m);margin-top:2px;}
+.upl-btn-add{background:var(--green);color:#0f172a;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:800;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.upl-btn-add:hover{background:var(--green-dk);}
+.utbl{width:100%;border-collapse:collapse;}
+.utbl th{text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--m);padding:10px 12px;background:rgba(0,0,0,.02);border-bottom:1px solid var(--b);position:sticky;top:0;}
+.utbl th:first-child{width:36px;border-radius:10px 0 0 0;}
+.utbl th:last-child{border-radius:0 10px 0 0;}
+.utbl td{padding:10px 12px;border-bottom:1px solid var(--b);font-size:12px;vertical-align:middle;}
+.utbl tbody tr:last-child td{border-bottom:none;}
+.utbl tbody tr:hover td{background:rgba(0,0,0,.015);}
+.utbl tbody tr.row-done td{opacity:.45;}
+.utbl tbody tr.row-done .upl-atleta{text-decoration:line-through;}
+.utbl{background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden;}
+.upl-cb{width:18px;height:18px;border-radius:5px;border:2px solid var(--b2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:#fff;flex-shrink:0;}
+.upl-cb.done{background:var(--green);border-color:var(--green);}
+.upl-cb.done::after{content:'✓';font-size:10px;font-weight:800;color:#0f172a;}
+.upl-cb:hover{border-color:var(--green);}
+.upl-atleta{font-weight:700;color:var(--txt);}
+.row-actions{display:flex;gap:3px;}
+.ra-btn{background:none;border:none;cursor:pointer;color:var(--m);padding:3px 6px;border-radius:5px;font-size:11px;transition:all .15s;}
+.ra-btn:hover{background:rgba(0,0,0,.06);color:var(--txt);}
+.ra-btn.del:hover{color:#dc2626;}
+.upl-notas-cell{font-size:11px;color:var(--m);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.upl-empty{text-align:center;padding:56px 20px;color:var(--m);}
+.upl-empty-ico{font-size:32px;margin-bottom:10px;}
+.upl-empty-txt{font-size:13px;font-weight:600;margin-bottom:6px;}
+.upl-empty-link{font-size:12px;color:var(--green-dk);font-weight:700;cursor:pointer;}
+
 /* LIGHT THEME */
 body{background:#f8fafc;color:#0f172a;}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);}
@@ -435,6 +472,7 @@ body{background:#f8fafc;color:#0f172a;}
         <button class="vbtn" id="vbtn-c" onclick="setView('cal')">📅 Calendario</button>
         <button class="vbtn" id="vbtn-t" onclick="setView('todo')">✅ To-Do</button>
         <button class="vbtn" id="vbtn-a" onclick="setView('atletas')">🎯 Atletas</button>
+        <button class="vbtn" id="vbtn-u" onclick="setView('uploads')">📤 Subidas</button>
       </div>
       <button class="btn-add" onclick="openModal(null)">+ Contenido</button>
     </div>
@@ -469,6 +507,16 @@ body{background:#f8fafc;color:#0f172a;}
     <!-- ATLETAS -->
     <div id="view-atletas" style="display:none;flex:1;overflow:hidden;padding:16px;gap:14px;display:none;">
       <div id="atletas-board" style="display:flex;gap:14px;height:100%;"></div>
+    </div>
+
+    <!-- UPLOADS -->
+    <div id="view-uploads" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+      <div class="upl-tabs">
+        <div class="utab active" id="utab-sign"      onclick="setUplTab('sign')">✍️ Signs</div>
+        <div class="utab"        id="utab-commit"    onclick="setUplTab('commit')">🎓 Commits</div>
+        <div class="utab"        id="utab-highlight" onclick="setUplTab('highlight')">⚡ Highlights</div>
+      </div>
+      <div class="upl-wrap" id="upl-content"></div>
     </div>
   </div>
 </div>
@@ -532,6 +580,21 @@ body{background:#f8fafc;color:#0f172a;}
   </div>
 </div>
 
+<!-- MODAL UPLOADS -->
+<div class="m-ov" id="m2-ov" onclick="if(event.target===this)closeUplModal()"></div>
+<div class="modal" id="modal2">
+  <div class="m-hd">
+    <span class="m-ttl" id="m2-ttl">Agregar</span>
+    <button class="m-x" onclick="closeUplModal()">×</button>
+  </div>
+  <input type="hidden" id="m2-tipo">
+  <div class="m-body" id="m2-body"></div>
+  <div class="m-ft">
+    <button class="btn-cancel" onclick="closeUplModal()">Cancelar</button>
+    <button class="btn-save"   onclick="saveUpload()">Guardar</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -580,6 +643,7 @@ async function loadData(){
   buildFilterOptions();
   applyFilters();
   await loadAtletas();
+  await loadUploads();
   if(openId){const a=ALL.find(x=>x.id===openId);if(a)renderDP(a);}
 }
 
@@ -630,9 +694,11 @@ function setView(v){
   q('#view-cal').style.display=v==='cal'?'flex':'none';
   q('#view-todo').style.display=v==='todo'?'':'none';
   q('#view-atletas').style.display=v==='atletas'?'flex':'none';
-  ['k','c','t','a'].forEach(x=>q('#vbtn-'+x)?.classList.remove('active'));
-  q('#vbtn-'+{kanban:'k',cal:'c',todo:'t',atletas:'a'}[v])?.classList.add('active');
+  q('#view-uploads').style.display=v==='uploads'?'flex':'none';
+  ['k','c','t','a','u'].forEach(x=>q('#vbtn-'+x)?.classList.remove('active'));
+  q('#vbtn-'+{kanban:'k',cal:'c',todo:'t',atletas:'a',uploads:'u'}[v])?.classList.add('active');
   if(v==='atletas') renderAtletas();
+  else if(v==='uploads') renderUploads();
   else render();
 }
 function render(){
@@ -733,6 +799,197 @@ async function deleteAtleta(id){
   renderAtletas();
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ── UPLOADS (Signs · Commits · Highlights) ── */
+let UPLOADS=[], UPL_TAB='sign', UPL_EDIT=null;
+
+const UPL_CFG={
+  sign:      {label:'Signs para subir',     icon:'✍️', cols:['atleta','deporte','fecha_subir','estado','notas']},
+  commit:    {label:'Commits para subir',   icon:'🎓', cols:['atleta','deporte','modalidad','universidad','fecha_subir','estado','notas']},
+  highlight: {label:'Highlights para subir',icon:'⚡', cols:['atleta','deporte','fecha_subir','estado','notas']},
+};
+const COL_LBL={atleta:'Atleta',deporte:'Deporte',modalidad:'Modalidad',universidad:'Universidad / Escuela',fecha_subir:'Fecha',estado:'Estado',notas:'Notas'};
+const DEPORTES=['Fútbol','Béisbol','Voleibol','Flag Football','Baloncesto','Dance','Gimnasia','Atletismo'];
+const DEP_CLR={
+  'Fútbol':{'bg':'rgba(34,197,94,.12)','c':'#16a34a','b':'rgba(34,197,94,.3)'},
+  'Béisbol':{'bg':'rgba(251,146,60,.12)','c':'#ea580c','b':'rgba(251,146,60,.3)'},
+  'Voleibol':{'bg':'rgba(167,139,250,.12)','c':'#7c3aed','b':'rgba(167,139,250,.3)'},
+  'Flag Football':{'bg':'rgba(245,158,11,.12)','c':'#b45309','b':'rgba(245,158,11,.3)'},
+  'Baloncesto':{'bg':'rgba(96,165,250,.12)','c':'#2563eb','b':'rgba(96,165,250,.3)'},
+  'Dance':{'bg':'rgba(244,114,182,.12)','c':'#db2777','b':'rgba(244,114,182,.3)'},
+  'Gimnasia':{'bg':'rgba(52,211,153,.12)','c':'#059669','b':'rgba(52,211,153,.3)'},
+  'Atletismo':{'bg':'rgba(251,191,36,.12)','c':'#b45309','b':'rgba(251,191,36,.3)'},
+};
+function depTag(d){
+  if(!d)return'';
+  const c=DEP_CLR[d]||{bg:'rgba(0,0,0,.05)',c:'#64748b',b:'rgba(0,0,0,.1)'};
+  return`<span style="background:${c.bg};color:${c.c};border:1px solid ${c.b};border-radius:5px;padding:2px 8px;font-size:9px;font-weight:700;white-space:nowrap">${esc(d)}</span>`;
+}
+function estadoBadge(e){
+  if(!e)return'—';
+  const s={'In Process':'background:rgba(59,130,246,.1);color:#2563eb;','Listo':'background:rgba(170,255,0,.15);color:#3a6b00;','Pendiente':'background:rgba(245,158,11,.12);color:#b45309;'};
+  return`<span style="${s[e]||'background:rgba(0,0,0,.05);color:#64748b;'}border-radius:5px;padding:2px 8px;font-size:9px;font-weight:700;">${esc(e)}</span>`;
+}
+
+async function loadUploads(){
+  const{data}=await db.from('nvs_media_uploads').select('*').order('subido',{ascending:true}).order('created_at',{ascending:true});
+  UPLOADS=data||[];
+  if(curView==='uploads')renderUploads();
+}
+
+function setUplTab(tipo){
+  UPL_TAB=tipo;
+  document.querySelectorAll('.utab').forEach(t=>t.classList.remove('active'));
+  q('#utab-'+tipo)?.classList.add('active');
+  renderUploads();
+}
+
+function renderUploads(){
+  const cfg=UPL_CFG[UPL_TAB];
+  const items=UPLOADS.filter(u=>u.tipo===UPL_TAB);
+  const pending=items.filter(u=>!u.subido);
+  const done=items.filter(u=>u.subido);
+  const all=[...pending,...done];
+
+  if(!items.length){
+    q('#upl-content').innerHTML=`
+      <div class="upl-head">
+        <div class="upl-h-info"><div class="upl-title">${cfg.icon} ${cfg.label}</div></div>
+        <button class="upl-btn-add" onclick="openUplModal('${UPL_TAB}',null)">+ Agregar</button>
+      </div>
+      <div class="upl-empty">
+        <div class="upl-empty-ico">${cfg.icon}</div>
+        <div class="upl-empty-txt">Sin registros en ${cfg.label}</div>
+        <div class="upl-empty-link" onclick="openUplModal('${UPL_TAB}',null)">Agregar el primero →</div>
+      </div>`;
+    return;
+  }
+
+  const thCols=cfg.cols.map(c=>`<th>${COL_LBL[c]}</th>`).join('');
+  const mkRow=u=>{
+    const isDone=!!u.subido;
+    const tdCols=cfg.cols.map(c=>{
+      if(c==='atleta')  return`<td class="upl-atleta">${esc(u.atleta||'—')}</td>`;
+      if(c==='deporte') return`<td>${depTag(u.deporte)}</td>`;
+      if(c==='estado')  return`<td>${estadoBadge(u.estado)}</td>`;
+      if(c==='fecha_subir') return`<td style="font-size:11px;color:var(--m)">${u.fecha_subir?fmtDate(u.fecha_subir):'—'}</td>`;
+      if(c==='notas')   return`<td class="upl-notas-cell" title="${esc(u.notas)}">${esc(u.notas)||''}</td>`;
+      return`<td style="font-size:11px;color:var(--m)">${esc(u[c]||'—')}</td>`;
+    }).join('');
+    return`<tr class="${isDone?'row-done':''}" data-id="${u.id}">
+      <td><div class="upl-cb${isDone?' done':''}" onclick="toggleSubido('${u.id}',${isDone})" title="${isDone?'Marcar pendiente':'Marcar como subido'}"></div></td>
+      ${tdCols}
+      <td><div class="row-actions">
+        <button class="ra-btn" onclick="openUplModal('${UPL_TAB}','${u.id}')" title="Editar">✏</button>
+        <button class="ra-btn del" onclick="deleteUpload('${u.id}')" title="Eliminar">✕</button>
+      </div></td>
+    </tr>`;
+  };
+
+  q('#upl-content').innerHTML=`
+    <div class="upl-head">
+      <div class="upl-h-info">
+        <div class="upl-title">${cfg.icon} ${cfg.label}</div>
+        <div class="upl-sub">${pending.length} pendiente${pending.length!==1?'s':''} · ${done.length} subido${done.length!==1?'s':''}</div>
+      </div>
+      <button class="upl-btn-add" onclick="openUplModal('${UPL_TAB}',null)">+ Agregar</button>
+    </div>
+    <table class="utbl">
+      <thead><tr><th></th>${thCols}<th>Acciones</th></tr></thead>
+      <tbody>${all.map(mkRow).join('')}</tbody>
+    </table>`;
+}
+
+function openUplModal(tipo, id){
+  UPL_EDIT=id||null;
+  const u=id?UPLOADS.find(x=>x.id===id):null;
+  const isCommit=tipo==='commit';
+  const lbl={sign:'Sign',commit:'Commit',highlight:'Highlight'};
+  q('#m2-ttl').textContent=(u?'Editar ':'Agregar ')+lbl[tipo]+' para subir';
+  q('#m2-tipo').value=tipo;
+  const extraCols=isCommit?`
+    <div class="mf-2">
+      <div class="mf"><label>Modalidad</label>
+        <select class="fi" id="u-modalidad">
+          <option value="">—</option>
+          <option${u?.modalidad==='Presencial'?' selected':''}>Presencial</option>
+          <option${u?.modalidad==='Online'?' selected':''}>Online</option>
+        </select>
+      </div>
+      <div class="mf"><label>Universidad / Escuela</label>
+        <input class="fi" id="u-uni" placeholder="Ej: Asbury University (NCAA D3)" value="${esc(u?.universidad||'')}">
+      </div>
+    </div>`:'';
+  q('#m2-body').innerHTML=`
+    <div class="m-sec-lbl">Atleta</div>
+    <div class="mf-2">
+      <div class="mf"><label>Nombre del atleta *</label>
+        <input class="fi" id="u-atleta" placeholder="Ej: Fabricio Turner" value="${esc(u?.atleta||'')}">
+      </div>
+      <div class="mf"><label>Deporte</label>
+        <select class="fi" id="u-deporte">
+          <option value="">—</option>
+          ${DEPORTES.map(d=>`<option${u?.deporte===d?' selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${extraCols}
+    <div class="m-sec-lbl">Estado</div>
+    <div class="mf-2">
+      <div class="mf"><label>Fecha para subir</label>
+        <input class="fi" id="u-fecha" type="date" value="${u?.fecha_subir||''}">
+      </div>
+      <div class="mf"><label>Estado</label>
+        <select class="fi" id="u-estado">
+          <option value="In Process"${!u||u.estado==='In Process'?' selected':''}>In Process</option>
+          <option value="Pendiente"${u?.estado==='Pendiente'?' selected':''}>Pendiente</option>
+          <option value="Listo"${u?.estado==='Listo'?' selected':''}>Listo</option>
+        </select>
+      </div>
+    </div>
+    <div class="m-sec-lbl">Notas</div>
+    <div class="mf"><textarea class="fi" id="u-notas" rows="2" placeholder="Observaciones...">${esc(u?.notas||'')}</textarea></div>`;
+  q('#m2-ov').classList.add('open');q('#modal2').classList.add('open');
+  setTimeout(()=>q('#u-atleta')?.focus(),80);
+}
+function closeUplModal(){q('#m2-ov').classList.remove('open');q('#modal2').classList.remove('open');UPL_EDIT=null;}
+
+async function saveUpload(){
+  const tipo=q('#m2-tipo').value;
+  const atleta=(q('#u-atleta')?.value||'').trim();
+  if(!atleta){toast('Ingresa el nombre del atleta','err');return;}
+  const payload={
+    tipo,atleta,
+    deporte:    q('#u-deporte')?.value||'',
+    modalidad:  q('#u-modalidad')?.value||'',
+    universidad:q('#u-uni')?.value?.trim()||'',
+    fecha_subir:q('#u-fecha')?.value||null,
+    estado:     q('#u-estado')?.value||'In Process',
+    notas:      q('#u-notas')?.value?.trim()||'',
+  };
+  let error;
+  if(UPL_EDIT){({error}=await db.from('nvs_media_uploads').update(payload).eq('id',UPL_EDIT));}
+  else{({error}=await db.from('nvs_media_uploads').insert(payload));}
+  if(error){toast('Error: '+error.message,'err');return;}
+  closeUplModal();await loadUploads();
+  toast((UPL_EDIT?'Actualizado':'Agregado')+' ✓','ok');
+}
+
+async function toggleSubido(id, wasDone){
+  const{error}=await db.from('nvs_media_uploads').update({subido:!wasDone}).eq('id',id);
+  if(error){toast('Error','err');return;}
+  const u=UPLOADS.find(x=>x.id===id);if(u)u.subido=!wasDone;
+  renderUploads();
+  toast(wasDone?'Marcado como pendiente':'¡Subido! ✓','ok');
+}
+
+async function deleteUpload(id){
+  if(!confirm('¿Eliminar este registro?'))return;
+  const{error}=await db.from('nvs_media_uploads').delete().eq('id',id);
+  if(error){toast('Error: '+error.message,'err');return;}
+  UPLOADS=UPLOADS.filter(u=>u.id!==id);
+  renderUploads();toast('Eliminado','ok');
+}
 
 /* KANBAN */
 function renderKanban(){
