@@ -189,31 +189,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .btn-save{background:var(--green);color:#000;border:none;border-radius:9px;padding:9px 24px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s;box-shadow:0 0 20px var(--green-glow);}
 .btn-save:hover{background:var(--green-dk);}
 
-/* ATLETAS PANEL */
-.at-col{flex:1;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--b);border-radius:14px;overflow:hidden;max-height:100%;}
-.at-col-hd{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b);flex-shrink:0;}
-.at-col-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.at-col-title{font-size:13px;font-weight:800;flex:1;}
-.at-col-desc{font-size:10px;color:var(--m);line-height:1.5;padding:8px 16px;border-bottom:1px solid var(--b);background:rgba(0,0,0,.02);flex-shrink:0;}
-.at-col-cnt{font-size:11px;font-weight:700;color:var(--m);background:rgba(0,0,0,.06);border-radius:99px;padding:2px 8px;}
-.at-body{flex:1;overflow-y:auto;padding:12px;}
-.at-card{background:var(--bg);border:1px solid var(--b);border-radius:10px;padding:12px 13px;margin-bottom:8px;position:relative;}
-.at-card-name{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px;}
-.at-card-desc{font-size:11px;color:var(--m);line-height:1.5;white-space:pre-wrap;word-break:break-word;}
-.at-card-actions{display:flex;gap:4px;position:absolute;top:10px;right:10px;}
-.at-btn{background:none;border:none;cursor:pointer;color:var(--m);padding:3px;border-radius:5px;line-height:1;transition:color .15s,background .15s;}
-.at-btn:hover{background:rgba(0,0,0,.06);color:var(--txt);}
-.at-add-btn{display:flex;align-items:center;gap:6px;width:100%;background:none;border:1.5px dashed var(--b);border-radius:9px;padding:9px 13px;font-size:12px;font-weight:600;color:var(--m);cursor:pointer;margin-top:4px;transition:border-color .15s,color .15s;}
-.at-add-btn:hover{border-color:var(--green);color:var(--txt);}
-.at-form{background:var(--bg);border:1.5px solid var(--green);border-radius:10px;padding:12px;margin-bottom:8px;}
-.at-tf{width:100%;background:#fff;border:1px solid var(--b);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:12px;color:var(--txt);outline:none;margin-bottom:6px;transition:border-color .15s;}
-.at-tf:focus{border-color:var(--green);}
-.at-ta{width:100%;background:#fff;border:1px solid var(--b);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:12px;color:var(--txt);outline:none;resize:none;line-height:1.5;transition:border-color .15s;}
-.at-ta:focus{border-color:var(--green);}
-.at-form-btns{display:flex;gap:6px;margin-top:8px;}
-.at-save{background:var(--green);color:#0f172a;border:none;border-radius:7px;padding:7px 14px;font-size:11px;font-weight:800;cursor:pointer;}
-.at-cancel{background:none;border:1px solid var(--b);border-radius:7px;padding:7px 12px;font-size:11px;font-weight:600;color:var(--m);cursor:pointer;}
-
 /* TOAST */
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(18,18,18,0.96);backdrop-filter:blur(14px);border:1px solid var(--b2);border-radius:11px;padding:9px 20px;font-size:12px;font-weight:700;z-index:999;transition:transform .28s cubic-bezier(.34,1.5,.64,1);white-space:nowrap;box-shadow:0 14px 36px rgba(0,0,0,.55);}
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -471,7 +446,6 @@ body{background:#f8fafc;color:#0f172a;}
         <button class="vbtn active" id="vbtn-k" onclick="setView('kanban')">⬛ Kanban</button>
         <button class="vbtn" id="vbtn-c" onclick="setView('cal')">📅 Calendario</button>
         <button class="vbtn" id="vbtn-t" onclick="setView('todo')">✅ To-Do</button>
-        <button class="vbtn" id="vbtn-a" onclick="setView('atletas')">🎯 Atletas</button>
         <button class="vbtn" id="vbtn-u" onclick="setView('uploads')">📤 Subidas</button>
       </div>
       <button class="btn-add" onclick="openModal(null)">+ Contenido</button>
@@ -503,11 +477,6 @@ body{background:#f8fafc;color:#0f172a;}
 
     <!-- TODO -->
     <div class="todo-wrap" id="view-todo" style="display:none" id="todo-body"></div>
-
-    <!-- ATLETAS -->
-    <div id="view-atletas" style="display:none;flex:1;overflow:hidden;padding:16px;gap:14px;display:none;">
-      <div id="atletas-board" style="display:flex;gap:14px;height:100%;"></div>
-    </div>
 
     <!-- UPLOADS -->
     <div id="view-uploads" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
@@ -619,7 +588,6 @@ const MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','
 const DIA = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
 let ALL=[], FLT=[], SF='', curView='kanban', calYear, calMonth, openId=null, editId=null;
-let ATLETAS={highlights:[],commit:[]}, AT_FORM=null, AT_EDIT=null; // AT_FORM: 'highlights'|'commit', AT_EDIT: id
 
 /* AUTH */
 async function init(){
@@ -642,7 +610,6 @@ async function loadData(){
   ALL=data||[];
   buildFilterOptions();
   applyFilters();
-  await loadAtletas();
   await loadUploads();
   if(openId){const a=ALL.find(x=>x.id===openId);if(a)renderDP(a);}
 }
@@ -693,12 +660,10 @@ function setView(v){
   q('#view-kanban').style.display=v==='kanban'?'':'none';
   q('#view-cal').style.display=v==='cal'?'flex':'none';
   q('#view-todo').style.display=v==='todo'?'':'none';
-  q('#view-atletas').style.display=v==='atletas'?'flex':'none';
   q('#view-uploads').style.display=v==='uploads'?'flex':'none';
-  ['k','c','t','a','u'].forEach(x=>q('#vbtn-'+x)?.classList.remove('active'));
-  q('#vbtn-'+{kanban:'k',cal:'c',todo:'t',atletas:'a',uploads:'u'}[v])?.classList.add('active');
-  if(v==='atletas') renderAtletas();
-  else if(v==='uploads') renderUploads();
+  ['k','c','t','u'].forEach(x=>q('#vbtn-'+x)?.classList.remove('active'));
+  q('#vbtn-'+{kanban:'k',cal:'c',todo:'t',uploads:'u'}[v])?.classList.add('active');
+  if(v==='uploads') renderUploads();
   else render();
 }
 function render(){
@@ -707,97 +672,6 @@ function render(){
   else renderTodo();
 }
 
-/* ── ATLETAS ── */
-async function loadAtletas(){
-  const {data,error}=await db.from('nvs_media_atletas').select('*').order('created_at');
-  if(error){console.error(error);return;}
-  ATLETAS={highlights:[],commit:[]};
-  (data||[]).forEach(a=>{if(ATLETAS[a.tipo])ATLETAS[a.tipo].push(a);});
-}
-function renderAtletas(){
-  const cols=[
-    {tipo:'highlights',color:'#a78bfa',label:'Highlights',desc:'Atletas que necesitan video de highlights para enviar a universidades o redes sociales.'},
-    {tipo:'commit',color:'#AAFF00',label:'Commit / Sign',desc:'Atletas para los que tenemos que producir el video de commit o firma con universidad.'},
-  ];
-  q('#atletas-board').innerHTML=cols.map(col=>{
-    const list=ATLETAS[col.tipo]||[];
-    const cardsHtml=list.map(a=>{
-      if(AT_EDIT===a.id){
-        return`<div class="at-form">
-          <input class="at-tf" id="ae-name-${a.id}" value="${esc(a.nombre)}" placeholder="Nombre del atleta">
-          <textarea class="at-ta" id="ae-desc-${a.id}" rows="3" placeholder="Descripción…">${esc(a.descripcion||'')}</textarea>
-          <div class="at-form-btns">
-            <button class="at-save" onclick="saveEditAtleta('${a.id}')">Guardar</button>
-            <button class="at-cancel" onclick="AT_EDIT=null;renderAtletas()">Cancelar</button>
-          </div>
-        </div>`;
-      }
-      return`<div class="at-card">
-        <div class="at-card-actions">
-          <button class="at-btn" onclick="AT_EDIT='${a.id}';renderAtletas()" title="Editar">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="at-btn" onclick="deleteAtleta('${a.id}')" title="Eliminar" style="color:#dc2626;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-          </button>
-        </div>
-        <div class="at-card-name">${esc(a.nombre)}</div>
-        ${a.descripcion?`<div class="at-card-desc">${esc(a.descripcion)}</div>`:''}
-      </div>`;
-    }).join('');
-    const formHtml=AT_FORM===col.tipo?`<div class="at-form">
-      <input class="at-tf" id="af-name-${col.tipo}" placeholder="Nombre del atleta" autocomplete="off">
-      <textarea class="at-ta" id="af-desc-${col.tipo}" rows="3" placeholder="Descripción (opcional)…"></textarea>
-      <div class="at-form-btns">
-        <button class="at-save" onclick="saveAtleta('${col.tipo}')">Guardar</button>
-        <button class="at-cancel" onclick="AT_FORM=null;renderAtletas()">Cancelar</button>
-      </div>
-    </div>`:'';
-    return`<div class="at-col">
-      <div class="at-col-hd">
-        <div class="at-col-dot" style="background:${col.color};box-shadow:0 0 7px ${col.color}77;"></div>
-        <div class="at-col-title">${col.label}</div>
-        <div class="at-col-cnt">${list.length}</div>
-      </div>
-      <div class="at-col-desc">${col.desc}</div>
-      <div class="at-body">
-        ${cardsHtml}
-        ${formHtml}
-        <button class="at-add-btn" onclick="AT_FORM='${col.tipo}';AT_EDIT=null;renderAtletas();setTimeout(()=>document.getElementById('af-name-${col.tipo}')?.focus(),50)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Agregar atleta
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-}
-async function saveAtleta(tipo){
-  const nombre=(document.getElementById('af-name-'+tipo)?.value||'').trim();
-  if(!nombre)return;
-  const descripcion=(document.getElementById('af-desc-'+tipo)?.value||'').trim();
-  const {data,error}=await db.from('nvs_media_atletas').insert({nombre,tipo,descripcion}).select().single();
-  if(error){toast('Error: '+error.message,'err');return;}
-  ATLETAS[tipo].push(data);
-  AT_FORM=null;renderAtletas();
-}
-async function saveEditAtleta(id){
-  const nombre=(document.getElementById('ae-name-'+id)?.value||'').trim();
-  if(!nombre)return;
-  const descripcion=(document.getElementById('ae-desc-'+id)?.value||'').trim();
-  const {data,error}=await db.from('nvs_media_atletas').update({nombre,descripcion}).eq('id',id).select().single();
-  if(error){toast('Error: '+error.message,'err');return;}
-  const tipo=data.tipo;
-  const idx=ATLETAS[tipo].findIndex(a=>a.id===id);
-  if(idx>-1)ATLETAS[tipo][idx]=data;
-  AT_EDIT=null;renderAtletas();
-}
-async function deleteAtleta(id){
-  if(!confirm('¿Eliminar este atleta?'))return;
-  const {error}=await db.from('nvs_media_atletas').delete().eq('id',id);
-  if(error){toast('Error: '+error.message,'err');return;}
-  for(const t of['highlights','commit'])ATLETAS[t]=ATLETAS[t].filter(a=>a.id!==id);
-  renderAtletas();
-}
 /* ── UPLOADS (Signs · Commits · Highlights) ── */
 let UPLOADS=[], UPL_TAB='sign', UPL_EDIT=null;
 
