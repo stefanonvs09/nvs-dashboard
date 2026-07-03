@@ -798,8 +798,6 @@ async function deleteAtleta(id){
   for(const t of['highlights','commit'])ATLETAS[t]=ATLETAS[t].filter(a=>a.id!==id);
   renderAtletas();
 }
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
 /* ── UPLOADS (Signs · Commits · Highlights) ── */
 let UPLOADS=[], UPL_TAB='sign', UPL_EDIT=null;
 
@@ -1223,7 +1221,7 @@ async function savePost(){
 
 /* UTIL */
 const q   = s=>document.querySelector(s);
-const esc = s=>(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esc = s=>(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const setV= (sel,v)=>{const e=q(sel);if(e)e.value=v;};
 function fmtDate(d){
   if(!d)return'';
