@@ -66,7 +66,7 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 #role-screen{
   position:fixed;inset:0;display:flex;flex-direction:column;
   z-index:999;overflow:hidden;
-  background:url("/nvs-dashboard/assets/bg-role.jpg") center 30%/cover no-repeat;
+  background:url("/nvs-dashboard/assets/bg-role.jpg?v=2") center 30%/cover no-repeat;
 }
 #role-screen::before{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
@@ -530,7 +530,7 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 <!-- ROLE SELECTOR -->
 <div id="role-screen" style="display:none">
   <div class="rs-topbar">
-    <img src="/nvs-dashboard/assets/logo-n.jpg" alt="NVS" class="rs-logo-img">
+    <img src="/nvs-dashboard/assets/logo-n.jpg?v=2" alt="NVS" class="rs-logo-img">
     <button class="rs-staff-mini" onclick="showPinModal()">Staff</button>
   </div>
   <div class="rs-center">
