@@ -270,6 +270,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
   <div class="login-bg"><div class="login-grid"></div></div>
   <div class="login-box">
     <div class="login-logo-wrap">
+      <img src="/nvs-dashboard/assets/logo-n.jpg" alt="NVS" style="width:72px;height:72px;border-radius:14px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 20px rgba(0,0,0,0.12);">
       <div class="login-logo">NV<span>S</span></div>
       <div class="login-tagline">New Vision Sports · Platform</div>
     </div>
@@ -294,15 +295,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
     <button id="mob-hamburger" onclick="toggleDrawer()">
       <span></span><span></span><span></span>
     </button>
+    <img src="/nvs-dashboard/assets/logo-n.jpg" alt="NVS" style="width:28px;height:28px;border-radius:6px;object-fit:cover;">
     <div id="mob-title">NV<span>S</span></div>
     <span id="mob-mod-name" style="font-size:11px;font-weight:700;color:var(--muted);"></span>
   </div>
 
   <!-- LEFT NAV SIDEBAR (desktop) / DRAWER (mobile) -->
   <nav id="nav-sidebar">
-    <div class="nav-brand">
-      <div class="nav-logo">NV<span>S</span></div>
-      <div class="nav-tagline">Platform</div>
+    <div class="nav-brand" style="display:flex;align-items:center;gap:10px;">
+      <img src="/nvs-dashboard/assets/logo-n.jpg" alt="NVS" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;">
+      <div>
+        <div class="nav-logo">NV<span>S</span></div>
+        <div class="nav-tagline">Platform</div>
+      </div>
     </div>
 
     <div class="nav-scroll">
@@ -325,8 +330,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
     <!-- HUB HOME (default) -->
     <div id="hub-home">
       <div class="hub-header">
-        <div class="hub-greeting" id="hero-greeting">Bienvenido</div>
-        <div class="hub-title">New Vision<br><span>Sports</span> Platform</div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+          <img src="/nvs-dashboard/assets/logo-n.jpg" alt="NVS" style="width:52px;height:52px;border-radius:12px;object-fit:cover;box-shadow:0 2px 12px rgba(0,0,0,0.10);">
+          <div>
+            <div class="hub-greeting" id="hero-greeting">Bienvenido</div>
+            <div class="hub-title">New Vision<br><span>Sports</span> Platform</div>
+          </div>
+        </div>
         <div class="hub-date">
           <span id="hero-date">—</span>
           <div class="hub-live"><div class="live-dot"></div>Live</div>
