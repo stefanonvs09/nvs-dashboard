@@ -127,10 +127,19 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 }
 .rs-other-camps:hover{color:rgba(255,255,255,0.62);}
 .rs-bottom-bar{
-  position:relative;z-index:1;text-align:center;padding:14px;
-  font-size:8px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
-  color:rgba(255,255,255,0.16);
+  position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;
+  padding:12px 24px 20px;
 }
+.rs-soc{
+  display:flex;align-items:center;gap:5px;
+  color:rgba(255,255,255,0.28);text-decoration:none;
+  font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  transition:color .2s;padding:5px 9px;border-radius:8px;
+}
+.rs-soc:hover{color:rgba(255,255,255,0.65);}
+.rs-soc svg{width:14px;height:14px;flex-shrink:0;}
+.rs-soc-sep{width:1px;height:11px;background:rgba(255,255,255,0.10);margin:0 2px;}
 
 /* ── SIDEBAR OVERLAY ── */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:49;backdrop-filter:blur(2px);}
@@ -538,7 +547,22 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
     </button>
     <button class="rs-other-camps" onclick="goToCampSelector()">Ver todos los camps →</button>
   </div>
-  <div class="rs-bottom-bar">playwithnewvision.com</div>
+  <div class="rs-bottom-bar">
+    <a href="https://playwithnewvision.com/" target="_blank" rel="noopener" class="rs-soc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span>playwithnewvision.com</span>
+    </a>
+    <div class="rs-soc-sep"></div>
+    <a href="https://www.instagram.com/newvisionsport/" target="_blank" rel="noopener" class="rs-soc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      <span>@newvisionsport</span>
+    </a>
+    <div class="rs-soc-sep"></div>
+    <a href="https://www.linkedin.com/company/newvisionsports" target="_blank" rel="noopener" class="rs-soc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      <span>New Vision Sports</span>
+    </a>
+  </div>
 </div>
 
 <!-- PIN MODAL -->
