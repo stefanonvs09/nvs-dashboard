@@ -111,6 +111,21 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 }
 .rs-main-btn:hover,.rs-main-btn:active{transform:scale(1.036);box-shadow:0 0 76px rgba(170,255,0,0.62),0 8px 36px rgba(0,0,0,0.56);}
 .rs-main-btn svg{flex-shrink:0;}
+.rs-camp-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(170,255,0,0.10);border:1px solid rgba(170,255,0,0.28);
+  border-radius:99px;padding:7px 18px;
+  font-size:11px;font-weight:700;color:var(--green);letter-spacing:.3px;
+  margin-bottom:20px;
+}
+.rs-camp-badge svg{opacity:.75;flex-shrink:0;}
+.rs-other-camps{
+  margin-top:14px;background:none;border:none;
+  font-size:11px;font-weight:600;color:rgba(255,255,255,0.32);
+  cursor:pointer;letter-spacing:.3px;transition:color .2s;
+  text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.13);
+}
+.rs-other-camps:hover{color:rgba(255,255,255,0.62);}
 .rs-bottom-bar{
   position:relative;z-index:1;text-align:center;padding:14px;
   font-size:8px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
@@ -513,10 +528,15 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
     <div class="rs-eyebrow">New Vision Sports · Panamá 2026</div>
     <div class="rs-title">College Flag Football<br>ID Camp</div>
     <div class="rs-tagline">Evaluación de talento femenino para oportunidades universitarias en EE.UU.</div>
+    <div class="rs-camp-badge" id="rs-camp-name">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      <span>ID Camp Panama 2026</span>
+    </div>
     <button class="rs-main-btn" onclick="enterAs('athlete')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Soy Atleta — Ver mis resultados
     </button>
+    <button class="rs-other-camps" onclick="goToCampSelector()">Ver todos los camps →</button>
   </div>
   <div class="rs-bottom-bar">playwithnewvision.com</div>
 </div>
@@ -810,6 +830,9 @@ async function selectCamp(id){
   document.getElementById('sb-event-lbl')?.remove();
   /* Load data for this camp */
   await initData();
+  /* Update camp badge on role screen */
+  const bn=document.querySelector('#rs-camp-name span');
+  if(bn) bn.textContent=camp.nombre;
   /* Show role selector with animation */
   document.getElementById('camp-screen').style.display='none';
   const rs=document.getElementById('role-screen');
