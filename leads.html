@@ -253,6 +253,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .web-rem-age.urgent{background:rgba(220,38,38,0.10);color:var(--red);}
 .web-rem-wa{font-size:14px;text-decoration:none;flex-shrink:0;padding:3px 5px;border-radius:6px;transition:background .15s;}
 .web-rem-wa:hover{background:rgba(29,185,84,0.15);}
+.web-rem-del{background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.25);font-size:13px;padding:3px 5px;border-radius:6px;flex-shrink:0;line-height:1;transition:all .15s;}
+.web-rem-del:hover{background:rgba(220,38,38,0.10);color:var(--red);}
 .rec-avs{display:flex;align-items:center;gap:7px;margin-top:2px;}
 .rec-avs-lbl{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
 .rec-av{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:10px;font-weight:800;transition:transform .18s,box-shadow .18s;flex-shrink:0;line-height:1;}
@@ -1162,6 +1164,7 @@ function renderWeb(){
         </div>
         <div class="web-rem-age ${isOverdue?'urgent':'warn'}">${isOverdue?'Atrasado':'Hoy'}</div>
         ${wa?`<a class="web-rem-wa" href="https://wa.me/${wa}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp">💬</a>`:''}
+        <button class="web-rem-del" onclick="event.stopPropagation();clearSeg(${a.id})" title="Borrar seguimiento">✕</button>
       </div>`;
     }).join('')}</div>`);
   }
@@ -1291,6 +1294,12 @@ async function saveSeg(id){
   const {error}=await sb.from('leads').update({seguimiento_fecha:fecha||null,seguimiento_nota:nota,updated_at:new Date().toISOString()}).eq('id',id);
   if(!error){const a=ALL.find(x=>x.id===id);if(a){a.seguimiento_fecha=fecha;a.seguimiento_nota=nota;}applyFilters();toast('Seguimiento guardado ✓','ok');}
   else toast('Error: agrega las columnas en Supabase primero','err');
+}
+async function clearSeg(id){
+  await sb.from('leads').update({seguimiento_fecha:null,seguimiento_nota:'',updated_at:new Date().toISOString()}).eq('id',id);
+  const a=ALL.find(x=>x.id===id);
+  if(a){a.seguimiento_fecha=null;a.seguimiento_nota='';}
+  applyFilters();
 }
 function segBadge(a){
   if(!a.seguimiento_fecha)return '';
