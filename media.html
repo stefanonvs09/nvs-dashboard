@@ -270,22 +270,8 @@ select.fi{cursor:pointer;}
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-ov">
-  <div class="lbox">
-    <div class="lbox-logo">NV<span>S</span></div>
-    <div class="lbox-sub">Media Pipeline</div>
-    <div class="l-err" id="l-err"></div>
-    <div class="lf">
-      <label>Contraseña</label>
-      <input class="fi" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="btn-g" onclick="doLogin()">Entrar</button>
-  </div>
-</div>
-
 <!-- APP -->
-<div class="app" id="app" style="display:none">
+<div class="app" id="app">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -488,17 +474,8 @@ function load(){
   try{ const d=localStorage.getItem('nvs_media_v3'); if(d) D=JSON.parse(d); }catch(e){}
 }
 
-/* ── LOGIN ── */
-function doLogin(){
-  if(document.getElementById('l-pass').value===PASS){
-    document.getElementById('login-ov').style.display='none';
-    document.getElementById('app').style.display='flex';
-    load(); renderSection('calendario');
-  } else {
-    document.getElementById('l-err').textContent='Contraseña incorrecta';
-    document.getElementById('l-pass').value='';
-  }
-}
+/* ── INIT ── */
+load(); renderSection('calendario');
 
 /* ── NAV ── */
 function nav(id){
