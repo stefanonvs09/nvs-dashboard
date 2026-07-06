@@ -464,6 +464,8 @@ const SD_EMAIL='sd@cervicalservices.com';
 const IH_EMAIL='ih@decolatam.com';
 const MARKETING_EMAILS=['julio@playwithnewvision.com','andy@playwithnewvision.com','floyd@playwithnewvision.com','diegoajulio@gmail.com'];
 const MARKETING_HIDDEN=['finanzas','pagos'];
+const MARKETING_ACCOUNT='marketing@playwithnewvision.com';
+const MARKETING_ACCOUNT_HIDDEN=['finanzas','pagos','crm','leads'];
 const SD_MODULES=['finanzas','pagos','servicios'];
 const IH_MODULES=['finanzas'];
 const MX_ALLOWED=['stefano@playwithnewvision.com','floyd@playwithnewvision.com'];
@@ -489,13 +491,16 @@ function buildNav(email){
   const em=email.toLowerCase();
   const isSD=em===SD_EMAIL, isIH=em===IH_EMAIL;
   const isMkt=MARKETING_EMAILS.includes(em);
+  const isMktAccount=em===MARKETING_ACCOUNT;
   const visible=isIH
     ? ALL_MODULES.filter(m=>IH_MODULES.includes(m.id))
     : isSD
       ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id))
-      : isMkt
-        ? ALL_MODULES.filter(m=>!MARKETING_HIDDEN.includes(m.id))
-        : ALL_MODULES;
+      : isMktAccount
+        ? ALL_MODULES.filter(m=>!MARKETING_ACCOUNT_HIDDEN.includes(m.id))
+        : isMkt
+          ? ALL_MODULES.filter(m=>!MARKETING_HIDDEN.includes(m.id))
+          : ALL_MODULES;
 
   const hubItem=`<div class="nav-item active" id="nav-hub" onclick="selectModule('hub',null)" style="margin-bottom:6px;">
     <span class="nav-item-icon">🏠</span>
