@@ -314,6 +314,30 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 .empty-sub{font-size:12px;}
 select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes fadeIn{
+  from{opacity:0;}to{opacity:1;}
+}
+@keyframes scaleIn{
+  from{opacity:0;transform:scale(.94);}
+  to{opacity:1;transform:scale(1);}
+}
+@keyframes slideRight{
+  from{opacity:0;transform:translateX(-12px);}
+  to{opacity:1;transform:translateX(0);}
+}
+.anim-fade-up{opacity:0;animation:fadeUp .42s cubic-bezier(.22,1,.36,1) both;}
+.anim-fade-in{opacity:0;animation:fadeIn .35s ease both;}
+.anim-scale-in{opacity:0;animation:scaleIn .38s cubic-bezier(.22,1,.36,1) both;}
+.anim-slide-right{opacity:0;animation:slideRight .32s cubic-bezier(.22,1,.36,1) both;}
+/* content view transition */
+#content{transition:opacity .18s ease;}
+#content.fading{opacity:0;pointer-events:none;}
+
 /* ── CAMP SELECTOR ── */
 #camp-screen{
   position:fixed;inset:0;display:none;flex-direction:column;align-items:center;
@@ -712,7 +736,10 @@ function closeNewCampModal(){
 
 async function renderCampSelector(){
   const screen=document.getElementById('camp-screen');
-  screen.style.display='flex';
+  screen.style.display='flex';screen.style.opacity='0';
+  requestAnimationFrame(()=>{screen.style.transition='opacity .3s ease';screen.style.opacity='1';});
+  const header=screen.querySelector('.cs-header');
+  if(header){header.classList.add('anim-fade-up');header.style.animationDelay='0.05s';}
   const grid=document.getElementById('camp-grid');
   grid.innerHTML=`<div class="cs-loading"><div class="spin-ring"></div><span>Cargando eventos...</span></div>`;
 
@@ -740,6 +767,12 @@ async function renderCampSelector(){
 
   /* Show "create camp" button — visible to all but PIN protected */
   document.getElementById('camp-new-btn').style.display='flex';
+  /* Animate camp cards */
+  requestAnimationFrame(()=>{
+    stagger('#camp-grid .camp-card','anim-scale-in',0.08,0.08);
+    const btn=document.getElementById('camp-new-btn');
+    btn.classList.add('anim-fade-up');btn.style.animationDelay=(0.1+CAMPS_LIST.length*0.08)+'s';
+  });
 }
 
 async function selectCamp(id){
@@ -752,9 +785,14 @@ async function selectCamp(id){
   document.getElementById('sb-event-lbl')?.remove();
   /* Load data for this camp */
   await initData();
-  /* Show role selector */
+  /* Show role selector with animation */
   document.getElementById('camp-screen').style.display='none';
-  document.getElementById('role-screen').style.display='flex';
+  const rs=document.getElementById('role-screen');
+  rs.style.display='flex';rs.style.opacity='0';
+  requestAnimationFrame(()=>{
+    rs.style.transition='opacity .35s ease';rs.style.opacity='1';
+    stagger('#role-screen .rs-card','anim-scale-in',0.15,0.1);
+  });
 }
 
 /* ─── DEMO DATA ─── */
@@ -943,12 +981,18 @@ function setView(v){
   const btn=document.getElementById('tb-action');
   search.style.display=v==='athletes'?'block':'none';
   btn.style.display=v==='athletes'&&ROLE==='staff'?'block':'none';
-  if(v==='dashboard')   renderDashboard();
-  else if(v==='athletes') renderAthletes();
-  else if(v==='combine')  renderCombine();
-  else if(v==='rankings') renderRankings();
-  else if(v==='agenda')   renderAgenda();
-  else if(v==='my-profile') renderMyProfile();
+  const ct=document.getElementById('content');
+  ct.classList.add('fading');
+  setTimeout(()=>{
+    ct.classList.remove('fading');
+    if(v==='dashboard')   renderDashboard();
+    else if(v==='athletes') renderAthletes();
+    else if(v==='combine')  renderCombine();
+    else if(v==='rankings') renderRankings();
+    else if(v==='agenda')   renderAgenda();
+    else if(v==='my-profile') renderMyProfile();
+    requestAnimationFrame(animSection);
+  },160);
 }
 function onSearch(){SEARCH=document.getElementById('tb-search').value.toLowerCase();renderAthletes();}
 function tbAction(){openMod(null);}
@@ -972,6 +1016,43 @@ function rankAthlete(key){
   return DATA.athletes.map(a=>({a,v:metricVal(a.id,key)})).filter(x=>x.v!==null).sort((a,b)=>mt.dir==='low'?a.v-b.v:b.v-a.v);
 }
 function getMyRank(athId,key){const ranked=rankAthlete(key);const idx=ranked.findIndex(x=>x.a.id===athId);return idx>=0?idx+1:null;}
+/* ─── ANIMATION HELPERS ─── */
+function stagger(selector,cls='anim-fade-up',baseDelay=0,step=0.055){
+  document.querySelectorAll(selector).forEach((el,i)=>{
+    el.classList.add(cls);
+    el.style.animationDelay=(baseDelay+i*step)+'s';
+  });
+}
+function animSection(){
+  /* runs after any view renders */
+  stagger('#content .stat-card','anim-fade-up',0.04,0.06);
+  stagger('#content .camp-card','anim-scale-in',0.05,0.07);
+  stagger('#content .rank-card','anim-fade-up',0.04,0.08);
+  stagger('#content .rank-row','anim-fade-up',0.06,0.035);
+  stagger('#content .prog-row','anim-slide-right',0.08,0.04);
+  stagger('#content .ath-stat-card','anim-scale-in',0.05,0.045);
+  stagger('#content .ag-item','anim-fade-up',0.04,0.045);
+  stagger('#content .class-card','anim-scale-in',0.06,0.04);
+  stagger('#content .page-hero','anim-fade-in',0,0);
+  /* count up numbers in stat cards */
+  document.querySelectorAll('#content .stat-n').forEach(el=>{
+    const raw=el.textContent.trim();
+    const num=parseFloat(raw.replace('%',''));
+    const isPct=raw.includes('%');
+    if(isNaN(num)||num===0)return;
+    let start=0;const dur=900;const t0=performance.now();
+    const tick=now=>{
+      const p=Math.min((now-t0)/dur,1);
+      const ease=1-Math.pow(1-p,3);
+      const cur=Math.round(start+(num-start)*ease);
+      el.textContent=isPct?cur+'%':String(cur);
+      if(p<1)requestAnimationFrame(tick);
+      else el.textContent=raw;
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
 let _tt=null;
 function toast(msg,type='ok'){
   const el=q('#toast');el.textContent=msg;el.className='toast '+type+' show';
