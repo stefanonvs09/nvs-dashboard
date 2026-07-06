@@ -64,37 +64,58 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 
 /* ── ROLE SELECTOR ── */
 #role-screen{
-  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  z-index:999;flex-direction:column;gap:0;overflow:hidden;
-  background:url("WhatsApp Image 2026-07-03 at 4.03.52 PM.jpeg") center/cover no-repeat;
+  position:fixed;inset:0;display:flex;flex-direction:column;
+  z-index:999;overflow:hidden;
+  background:url("/nvs-dashboard/assets/bg-role.jpg") center 30%/cover no-repeat;
 }
 #role-screen::before{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:rgba(5,9,22,0.82);
+  background:linear-gradient(to bottom,rgba(5,9,22,0.62) 0%,rgba(5,9,22,0.50) 40%,rgba(5,9,22,0.82) 100%);
 }
-#role-screen::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:
-    radial-gradient(ellipse 70% 60% at 50% 50%,rgba(170,255,0,0.05) 0%,transparent 65%),
-    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.018) 39px,rgba(255,255,255,0.018) 40px),
-    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.018) 39px,rgba(255,255,255,0.018) 40px);
+.rs-topbar{
+  position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px 16px;
 }
-.rs-logo{font-family:'Anton',sans-serif;font-size:clamp(56px,9vw,96px);letter-spacing:3px;text-align:center;position:relative;z-index:1;}
-.rs-logo span{color:var(--green);text-shadow:0 0 40px rgba(170,255,0,0.5),0 0 80px rgba(170,255,0,0.2);}
-.rs-sub{font-size:8px;font-weight:800;letter-spacing:4px;color:var(--green);text-transform:uppercase;margin-top:8px;margin-bottom:4px;text-align:center;position:relative;z-index:1;opacity:.85;}
-.rs-divider{width:40px;height:1px;background:var(--b2);margin:12px auto;position:relative;z-index:1;}
-.rs-event{font-size:11px;font-weight:500;color:var(--m2);text-align:center;margin-bottom:40px;max-width:380px;line-height:1.8;position:relative;z-index:1;letter-spacing:.2px;padding:0 20px;}
-.rs-cards{display:flex;gap:var(--sp4);position:relative;z-index:1;flex-wrap:wrap;justify-content:center;padding:0 16px;}
-.rs-card{
-  width:210px;background:var(--card);border:1px solid var(--b);border-radius:20px;padding:32px 24px;
-  cursor:pointer;text-align:center;transition:transform var(--t),border-color var(--t),box-shadow var(--t);
-  box-shadow:var(--sh-card);
+.rs-logo-img{
+  width:48px;height:48px;border-radius:11px;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.14),0 4px 16px rgba(0,0,0,0.45);
+  object-fit:cover;
 }
-.rs-card:hover,.rs-card:active{border-color:var(--green);transform:translateY(-6px);box-shadow:0 0 40px rgba(170,255,0,0.16),0 20px 60px rgba(0,0,0,0.4);}
-.rs-card-ico-wrap{width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;transition:background var(--t);}
-.rs-card:hover .rs-card-ico-wrap{background:rgba(170,255,0,0.08);border-color:rgba(170,255,0,0.25);}
-.rs-card-ttl{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--txt);}
-.rs-card-desc{font-size:11px;color:var(--m);margin-top:8px;line-height:1.6;}
+.rs-staff-mini{
+  background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.14);border-radius:99px;
+  padding:6px 16px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.38);cursor:pointer;transition:all .2s;
+}
+.rs-staff-mini:hover{color:rgba(255,255,255,0.68);border-color:rgba(255,255,255,0.28);background:rgba(0,0,0,0.48);}
+.rs-center{
+  position:relative;z-index:1;flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:0 24px 52px;text-align:center;
+}
+.rs-eyebrow{font-size:9px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--green);margin-bottom:10px;}
+.rs-title{
+  font-family:'Anton',sans-serif;font-size:clamp(30px,6.5vw,56px);
+  line-height:1.05;letter-spacing:1px;color:#fff;
+  text-shadow:0 2px 20px rgba(0,0,0,0.65);margin-bottom:12px;
+}
+.rs-tagline{font-size:11px;font-weight:500;color:rgba(255,255,255,0.50);max-width:300px;line-height:1.75;margin-bottom:40px;}
+.rs-main-btn{
+  display:flex;align-items:center;gap:11px;justify-content:center;
+  background:var(--green);color:#060b18;
+  border:none;border-radius:18px;padding:20px 36px;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:800;
+  cursor:pointer;width:100%;max-width:400px;
+  box-shadow:0 0 52px rgba(170,255,0,0.45),0 6px 28px rgba(0,0,0,0.50);
+  transition:transform .18s,box-shadow .18s;letter-spacing:-.1px;
+}
+.rs-main-btn:hover,.rs-main-btn:active{transform:scale(1.036);box-shadow:0 0 76px rgba(170,255,0,0.62),0 8px 36px rgba(0,0,0,0.56);}
+.rs-main-btn svg{flex-shrink:0;}
+.rs-bottom-bar{
+  position:relative;z-index:1;text-align:center;padding:14px;
+  font-size:8px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.16);
+}
 
 /* ── SIDEBAR OVERLAY ── */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:49;backdrop-filter:blur(2px);}
@@ -403,9 +424,9 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
   .content{padding:var(--sp4);}
   .page-hero{margin-bottom:var(--sp5);padding-bottom:var(--sp4);}
   .page-hero-sub{display:none;}
-  .rs-cards{flex-direction:column;align-items:center;}
-  .rs-card{width:82vw;max-width:300px;padding:24px 20px;}
-  .rs-event{font-size:10px;margin-bottom:28px;}
+  .rs-center{padding:0 20px 44px;}
+  .rs-title{font-size:clamp(26px,8vw,40px);}
+  .rs-main-btn{font-size:15px;padding:17px 28px;border-radius:16px;}
   .stat-grid{grid-template-columns:1fr 1fr;gap:var(--sp3);}
   .class-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
   .rank-grid{grid-template-columns:1fr;}
@@ -484,27 +505,20 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 
 <!-- ROLE SELECTOR -->
 <div id="role-screen" style="display:none">
-  <div class="rs-logo">NV<span>S</span></div>
-  <div class="rs-sub">New Vision Sports · Panama 2026</div>
-  <div class="rs-divider"></div>
-  <div style="font-family:'Anton',sans-serif;font-size:clamp(12px,2vw,17px);letter-spacing:2px;text-transform:uppercase;color:var(--txt);text-align:center;margin-bottom:8px;position:relative;z-index:1">College Flag Football ID Camp</div>
-  <div class="rs-event">Evaluación y desarrollo de talento femenino para oportunidades universitarias en Estados Unidos</div>
-  <div class="rs-cards">
-    <div class="rs-card" onclick="showPinModal()">
-      <div class="rs-card-ico-wrap">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </div>
-      <div class="rs-card-ttl">Staff</div>
-      <div class="rs-card-desc">Registrar atletas, ingresar datos del combine y gestionar el evento</div>
-    </div>
-    <div class="rs-card" onclick="enterAs('athlete')">
-      <div class="rs-card-ico-wrap">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
-      <div class="rs-card-ttl">Atleta</div>
-      <div class="rs-card-desc">Ver tus resultados del combine y el ranking general del camp</div>
-    </div>
+  <div class="rs-topbar">
+    <img src="/nvs-dashboard/assets/logo-n.jpg" alt="NVS" class="rs-logo-img">
+    <button class="rs-staff-mini" onclick="showPinModal()">Staff</button>
   </div>
+  <div class="rs-center">
+    <div class="rs-eyebrow">New Vision Sports · Panamá 2026</div>
+    <div class="rs-title">College Flag Football<br>ID Camp</div>
+    <div class="rs-tagline">Evaluación de talento femenino para oportunidades universitarias en EE.UU.</div>
+    <button class="rs-main-btn" onclick="enterAs('athlete')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Soy Atleta — Ver mis resultados
+    </button>
+  </div>
+  <div class="rs-bottom-bar">playwithnewvision.com</div>
 </div>
 
 <!-- PIN MODAL -->
@@ -802,7 +816,7 @@ async function selectCamp(id){
   rs.style.display='flex';rs.style.opacity='0';
   requestAnimationFrame(()=>{
     rs.style.transition='opacity .35s ease';rs.style.opacity='1';
-    stagger('#role-screen .rs-card','anim-scale-in',0.15,0.1);
+    stagger('#role-screen .rs-main-btn','anim-scale-in',0.22,0);
   });
 }
 
