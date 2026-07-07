@@ -474,7 +474,6 @@ const ALL_MODULES=[
   {id:'finanzas', icon:'💰', name:'Dashboard Financiero', accent:'#AAFF00', pin:true, badgeTxt:'PIN', badgeColor:'#3a6b00'},
   {id:'crm',      icon:'🎓', name:'APL · Placements',    accent:'#6366f1', href:'crm.html',      statId:'mod-crm-stat'},
   {id:'leads',    icon:'🎯', name:'Leads Pipeline',       accent:'#f472b6', href:'leads.html'},
-  {id:'camps',    icon:'🏕️', name:'Camps',                accent:'#f97316', href:'camps.html'},
   {id:'pagos',    icon:'💸', name:'Pagos',                accent:'#0d9488', href:'pagos.html'},
   {id:'media',    icon:'🎬', name:'Media Pipeline',       accent:'#ec4899', href:'media.html'},
   {id:'proyectos',icon:'📋', name:'Proyectos',            accent:'#f59e0b', href:'proyectos.html'},
@@ -527,7 +526,7 @@ function buildNav(email){
   document.getElementById('nav-list').innerHTML=hubItem+items;
 }
 
-const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',camps:'Camps',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes'};
+const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes'};
 
 function selectModule(id, href){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
