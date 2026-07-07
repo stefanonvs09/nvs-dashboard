@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVS · Camps</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0; --text:#0f172a;
+    --muted:#64748b; --accent:#AAFF00; --accent-ink:#3a6b00; --danger:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+
+  /* Login */
+  #login-ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(ellipse at 50% -10%,rgba(170,255,0,0.08) 0%,var(--bg) 55%);}
+  .login-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:32px 28px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.07);width:min(380px,92vw);}
+  .login-card h1{font-size:20px;margin-bottom:4px;}
+  .login-card p{color:var(--muted);font-size:13px;margin-bottom:20px;}
+  .fi{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px;font-size:14px;margin-bottom:12px;}
+  .fi:focus{outline:none;border-color:var(--accent-ink);}
+  .btn{background:var(--accent);color:var(--accent-ink);border:none;border-radius:10px;padding:11px 16px;
+    font-weight:700;font-size:14px;cursor:pointer;width:100%;}
+  .btn:hover{filter:brightness(0.96);}
+  .err{color:var(--danger);font-size:12px;min-height:16px;margin-top:6px;}
+
+  /* App */
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+  .head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;}
+  .head h1{font-size:24px;display:flex;align-items:center;gap:10px;}
+  .btn-sm{width:auto;padding:9px 16px;}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+  .camp{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 18px 14px;
+    position:relative;transition:.15s;animation:fadeUp .35s both;}
+  .camp:hover{box-shadow:0 6px 22px rgba(0,0,0,0.07);transform:translateY(-2px);}
+  .camp::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;
+    background:linear-gradient(90deg,var(--accent),transparent);}
+  .camp .sport{display:inline-block;font-size:11px;font-weight:700;color:var(--accent-ink);
+    background:rgba(170,255,0,0.18);padding:3px 9px;border-radius:20px;margin-bottom:8px;}
+  .camp h3{font-size:16px;margin-bottom:6px;}
+  .camp .meta{font-size:13px;color:var(--muted);margin-bottom:3px;}
+  .camp .desc{font-size:12.5px;color:var(--muted);margin:8px 0 12px;line-height:1.4;}
+  .camp .foot{display:flex;align-items:center;justify-content:space-between;
+    border-top:1px solid var(--border);padding-top:10px;}
+  .count{font-size:12px;color:var(--text);font-weight:600;}
+  .count span{color:var(--accent-ink);}
+  .acts{display:flex;gap:8px;}
+  .ico{cursor:pointer;font-size:14px;opacity:.6;}
+  .ico:hover{opacity:1;}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;}
+
+  /* Modal */
+  #modal{position:fixed;inset:0;background:rgba(15,23,42,0.45);z-index:9998;display:none;
+    align-items:center;justify-content:center;padding:16px;}
+  .modal-card{background:#fff;border-radius:16px;padding:26px 24px;width:min(460px,94vw);max-height:90vh;overflow:auto;}
+  .modal-card h2{font-size:18px;margin-bottom:18px;}
+  .lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;display:block;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .modal-actions{display:flex;gap:10px;margin-top:8px;}
+  textarea.fi{resize:vertical;min-height:70px;font-family:inherit;}
+
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;
+    padding:11px 20px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:10000;}
+  #toast.show{opacity:1;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-ov">
+  <div class="login-card">
+    <h1>🏕️ Camps</h1>
+    <p>Entra con tu cuenta de New Vision</p>
+    <input class="fi" id="l-em" type="email" placeholder="Correo" autocomplete="username">
+    <input class="fi" id="l-pw" type="password" placeholder="Contraseña" autocomplete="current-password">
+    <button class="btn" onclick="doLogin()">Entrar</button>
+    <div class="err" id="l-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <div class="wrap">
+    <div class="head">
+      <h1>🏕️ Camps</h1>
+      <button class="btn btn-sm" onclick="openForm()">+ Nuevo camp</button>
+    </div>
+    <div id="camps" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">Aún no hay camps. Crea el primero con “+ Nuevo camp”.</div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal">
+  <div class="modal-card">
+    <h2 id="m-title">Nuevo camp</h2>
+    <input type="hidden" id="m-id">
+    <label class="lbl">Nombre del camp</label>
+    <input class="fi" id="m-nombre" placeholder="Ej: ID Camp Panamá 2026">
+    <div class="row2">
+      <div>
+        <label class="lbl">Deporte</label>
+        <input class="fi" id="m-deporte" placeholder="Flag Football">
+      </div>
+      <div>
+        <label class="lbl">Fecha</label>
+        <input class="fi" id="m-fecha" type="date">
+      </div>
+    </div>
+    <label class="lbl">Ubicación</label>
+    <input class="fi" id="m-ubicacion" placeholder="Panama City, Panamá">
+    <label class="lbl">Descripción</label>
+    <textarea class="fi" id="m-descripcion" placeholder="Breve descripción del camp…"></textarea>
+    <div class="err" id="m-err"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-sm" style="flex:1" onclick="saveCamp()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL = 'https://mwefvjvvitsondqghgsx.supabase.co';
+const SB_KEY = 'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const q = s => document.querySelector(s);
+
+/* ── Auth ── */
+async function init(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(session) showApp(); else q('#login-ov').style.display='flex';
+}
+async function doLogin(){
+  q('#l-err').textContent='';
+  const {error} = await sb.auth.signInWithPassword({
+    email:q('#l-em').value.trim(), password:q('#l-pw').value
+  });
+  if(error){ q('#l-err').textContent=error.message; } else showApp();
+}
+function showApp(){
+  q('#login-ov').style.display='none';
+  q('#app').style.display='block';
+  loadCamps();
+}
+
+/* ── Datos ── */
+let CAMPS=[];
+async function loadCamps(){
+  const {data,error} = await sb.from('nvs_camps').select('*').order('fecha',{ascending:true});
+  if(error){ toast('Error cargando camps: '+error.message); CAMPS=[]; }
+  else CAMPS = data||[];
+  render();
+  countAthletes();
+}
+function render(){
+  const el=q('#camps');
+  q('#empty').style.display = CAMPS.length? 'none':'block';
+  el.innerHTML = CAMPS.map(c=>`
+    <div class="camp">
+      <span class="sport">${esc(c.deporte||'—')}</span>
+      <h3>${esc(c.nombre||'Sin nombre')}</h3>
+      <div class="meta">📅 ${fmtDate(c.fecha)}</div>
+      <div class="meta">📍 ${esc(c.ubicacion||'—')}</div>
+      ${c.descripcion?`<div class="desc">${esc(c.descripcion)}</div>`:''}
+      <div class="foot">
+        <span class="count" id="cnt-${cssId(c.id)}">👥 <span>—</span> atletas</span>
+        <span class="acts">
+          <span class="ico" title="Editar" onclick='openForm(${JSON.stringify(c)})'>✏️</span>
+          <span class="ico" title="Borrar" onclick="delCamp('${jsStr(c.id)}')">🗑️</span>
+        </span>
+      </div>
+    </div>`).join('');
+}
+async function countAthletes(){
+  for(const c of CAMPS){
+    try{
+      const {count,error}=await sb.from('nvs_camp_atletas')
+        .select('id',{count:'exact',head:true}).eq('camp_id',c.id);
+      const el=q('#cnt-'+cssId(c.id));
+      if(el) el.innerHTML='👥 <span>'+(error?'—':(count??0))+'</span> atletas';
+    }catch(e){/* tabla puede no existir todavía */}
+  }
+}
+
+/* ── Crear / Editar ── */
+function openForm(camp){
+  q('#m-err').textContent='';
+  const editing = camp && camp.id;
+  q('#m-title').textContent = editing? 'Editar camp':'Nuevo camp';
+  q('#m-id').value        = editing? camp.id : '';
+  q('#m-nombre').value    = editing? (camp.nombre||'') : '';
+  q('#m-deporte').value   = editing? (camp.deporte||'') : '';
+  q('#m-fecha').value     = editing? (camp.fecha||'') : '';
+  q('#m-ubicacion').value = editing? (camp.ubicacion||'') : '';
+  q('#m-descripcion').value = editing? (camp.descripcion||'') : '';
+  q('#modal').style.display='flex';
+}
+function closeForm(){ q('#modal').style.display='none'; }
+
+function slug(s){
+  return (s||'camp').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
+}
+async function saveCamp(){
+  q('#m-err').textContent='';
+  const nombre=q('#m-nombre').value.trim();
+  if(!nombre){ q('#m-err').textContent='El nombre es obligatorio.'; return; }
+  const payload={
+    nombre,
+    deporte:q('#m-deporte').value.trim(),
+    fecha:q('#m-fecha').value||null,
+    ubicacion:q('#m-ubicacion').value.trim(),
+    descripcion:q('#m-descripcion').value.trim(),
+  };
+  const id=q('#m-id').value;
+  let error;
+  if(id){
+    ({error}=await sb.from('nvs_camps').update(payload).eq('id',id));
+  }else{
+    payload.id = slug(nombre)+'-'+Math.floor(1000+Math.random()*9000);
+    ({error}=await sb.from('nvs_camps').insert(payload));
+  }
+  if(error){ q('#m-err').textContent=error.message; return; }
+  closeForm(); toast(id?'Camp actualizado':'Camp creado'); loadCamps();
+}
+async function delCamp(id){
+  if(!confirm('¿Borrar este camp? Esta acción no se puede deshacer.')) return;
+  const {error}=await sb.from('nvs_camps').delete().eq('id',id);
+  if(error){ toast('Error: '+error.message); return; }
+  toast('Camp borrado'); loadCamps();
+}
+
+/* ── Utils ── */
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function jsStr(s){return String(s??'').replace(/'/g,"\\'");}
+function cssId(s){return String(s??'').replace(/[^a-zA-Z0-9_-]/g,'_');}
+function fmtDate(d){ if(!d)return '—'; try{return new Date(d+'T00:00:00').toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'});}catch(e){return d;} }
+let _tt;
+function toast(m){const t=q('#toast');t.textContent=m;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2600);}
+
+init();
+</script>
+</body>
+</html>
