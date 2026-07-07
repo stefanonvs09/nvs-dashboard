@@ -22,21 +22,21 @@
 html{scroll-behavior:smooth;}
 :root{
   --green:#AAFF00;--green-dk:#88cc00;--green-glow:rgba(170,255,0,0.20);
-  --bg:#060b18;--bg2:#0b1224;--card:#0e1829;--card2:#121f35;--sb:#07101f;
-  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--b3:rgba(255,255,255,0.04);
-  --txt:#f1f5f9;--m:#64748b;--m2:#475569;
+  --bg:#f8fafc;--bg2:#f1f5f9;--card:#ffffff;--card2:#f8fafc;--sb:#ffffff;
+  --b:rgba(0,0,0,0.08);--b2:rgba(0,0,0,0.14);--b3:rgba(0,0,0,0.04);
+  --txt:#0f172a;--m:#64748b;--m2:#94a3b8;
   --blue:#3b82f6;--amber:#d97706;--red:#ef4444;
-  --sh-card:0 4px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);
-  --sh-card-hover:0 8px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08);
-  --sh-modal:0 32px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.07);
-  --sh-green:0 0 28px rgba(170,255,0,0.28),0 4px 16px rgba(0,0,0,0.3);
+  --sh-card:0 2px 10px rgba(0,0,0,0.07),0 1px 3px rgba(0,0,0,0.05);
+  --sh-card-hover:0 6px 24px rgba(0,0,0,0.10),0 2px 8px rgba(0,0,0,0.06);
+  --sh-modal:0 24px 60px rgba(0,0,0,0.15),0 4px 16px rgba(0,0,0,0.08);
+  --sh-green:0 0 20px rgba(170,255,0,0.20),0 4px 12px rgba(0,0,0,0.10);
   --t:0.22s ease;--t-fast:0.14s ease;
   --sp1:4px;--sp2:8px;--sp3:12px;--sp4:16px;--sp5:20px;--sp6:24px;--sp8:32px;
 }
 html,body{height:100%;font-family:'Inter',sans-serif;}
 body{background:var(--bg);color:var(--txt);overflow:hidden;}
 ::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:99px;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:99px;}
 ::-webkit-scrollbar-track{background:transparent;}
 
 /* ── LOADING ── */
@@ -157,7 +157,7 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 }
 .sb-top{padding:22px 18px 16px;border-bottom:1px solid var(--b);}
 .sb-logo{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:1px;color:var(--txt);}
-.sb-logo span{color:var(--green);text-shadow:0 0 20px rgba(170,255,0,0.45);}
+.sb-logo span{color:#3a6b00;}
 .sb-event{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--m2);text-transform:uppercase;margin-top:6px;padding-top:6px;border-top:1px solid var(--b);line-height:1.5;}
 .sb-body{flex:1;overflow-y:auto;padding:var(--sp3) 10px;}
 .sb-lbl{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--m2);text-transform:uppercase;padding:0 8px;margin:var(--sp4) 0 var(--sp2);}
@@ -167,25 +167,25 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
   cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.3px;color:var(--m);
   transition:background var(--t-fast),color var(--t-fast);margin-bottom:1px;text-transform:uppercase;
 }
-.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--txt);}
-.nav-item.active{background:rgba(170,255,0,0.09);color:var(--green);font-weight:800;border-left:2px solid var(--green);padding-left:11px;}
+.nav-item:hover{background:rgba(0,0,0,0.04);color:var(--txt);}
+.nav-item.active{background:rgba(170,255,0,0.14);color:#3a6b00;font-weight:800;border-left:2px solid var(--green);padding-left:11px;}
 .sb-foot{padding:var(--sp4);border-top:1px solid var(--b);}
-.sb-role-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(170,255,0,0.08);border:1px solid rgba(170,255,0,0.25);border-radius:99px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--green);}
+.sb-role-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(170,255,0,0.14);border:1px solid rgba(170,255,0,0.35);border-radius:99px;padding:5px 12px;font-size:10px;font-weight:700;color:#3a6b00;}
 .sb-switch{display:block;margin-top:var(--sp3);font-size:10px;color:var(--m2);cursor:pointer;font-weight:600;transition:color var(--t-fast);}
 .sb-switch:hover{color:var(--txt);}
 
 /* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden;}
-.topbar{display:flex;align-items:center;gap:10px;padding:10px var(--sp5);border-bottom:1px solid var(--b);flex-shrink:0;background:var(--sb);box-shadow:0 2px 16px rgba(0,0,0,0.25);}
+.topbar{display:flex;align-items:center;gap:10px;padding:10px var(--sp5);border-bottom:1px solid var(--b);flex-shrink:0;background:var(--sb);box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 .topbar-info{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;}
 .topbar-ttl{font-family:'Anton',sans-serif;font-size:clamp(14px,2vw,18px);letter-spacing:.5px;color:var(--txt);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .topbar-crumb{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--m2);}
 .ham-btn{display:none;background:none;border:none;cursor:pointer;color:var(--m);padding:6px;border-radius:8px;line-height:1;font-size:22px;flex-shrink:0;transition:color var(--t-fast),background var(--t-fast);}
-.ham-btn:hover{color:var(--txt);background:rgba(255,255,255,0.06);}
-.tb-search{background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:10px;padding:8px 14px;font-size:12px;font-family:'Inter',sans-serif;color:var(--txt);outline:none;width:220px;transition:border-color var(--t),box-shadow var(--t);}
+.ham-btn:hover{color:var(--txt);background:rgba(0,0,0,0.05);}
+.tb-search{background:var(--bg);border:1px solid var(--b);border-radius:10px;padding:8px 14px;font-size:12px;font-family:'Inter',sans-serif;color:var(--txt);outline:none;width:220px;transition:border-color var(--t),box-shadow var(--t);}
 .tb-search::placeholder{color:var(--m2);}
-.tb-search:focus{border-color:rgba(170,255,0,0.4);box-shadow:0 0 0 3px rgba(170,255,0,0.08);}
-.btn-primary{background:var(--green);color:#060b18;border:none;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:background var(--t),transform var(--t),box-shadow var(--t);box-shadow:0 0 20px rgba(170,255,0,0.25);}
+.tb-search:focus{border-color:rgba(170,255,0,0.5);box-shadow:0 0 0 3px rgba(170,255,0,0.10);}
+.btn-primary{background:var(--green);color:#000;border:none;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:background var(--t),transform var(--t),box-shadow var(--t);box-shadow:0 0 20px rgba(170,255,0,0.25);}
 .btn-primary:hover{background:var(--green-dk);transform:scale(1.03);box-shadow:var(--sh-green);}
 .content{flex:1;overflow-y:auto;padding:var(--sp6);}
 
@@ -215,7 +215,7 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 
 /* ── SECTION TITLES ── */
 .section-ttl{display:flex;align-items:center;gap:10px;font-family:'Anton',sans-serif;font-size:clamp(13px,1.8vw,15px);letter-spacing:.5px;margin-bottom:var(--sp4);color:var(--txt);text-transform:uppercase;}
-.section-ttl::before{content:'';display:inline-block;width:3px;height:16px;background:var(--green);border-radius:2px;flex-shrink:0;box-shadow:0 0 8px rgba(170,255,0,0.4);}
+.section-ttl::before{content:'';display:inline-block;width:3px;height:16px;background:var(--green);border-radius:2px;flex-shrink:0;}
 .class-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:var(--sp6);}
 .class-card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:var(--sp4);text-align:center;box-shadow:var(--sh-card);transition:transform var(--t);}
 .class-card:hover{transform:translateY(-2px);}
@@ -224,7 +224,7 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 .class-card-sub{font-size:10px;color:var(--m2);margin-top:3px;}
 .prog-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--b);border-radius:12px;padding:var(--sp3) var(--sp4);margin-bottom:var(--sp2);box-shadow:var(--sh-card);}
 .prog-name{font-size:12px;font-weight:700;flex:1;color:var(--txt);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.prog-bar-wrap{flex:2;height:5px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;min-width:60px;}
+.prog-bar-wrap{flex:2;height:5px;background:rgba(0,0,0,0.07);border-radius:99px;overflow:hidden;min-width:60px;}
 .prog-bar{height:100%;border-radius:99px;background:var(--green);transition:width .5s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(170,255,0,0.4);}
 .prog-pct{font-size:11px;font-weight:700;color:var(--green);width:32px;text-align:right;}
 
@@ -232,11 +232,11 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 .tbl-wrap{background:var(--card);border:1px solid var(--b);border-radius:16px;overflow:hidden;box-shadow:var(--sh-card);}
 .tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .tbl{width:100%;border-collapse:collapse;min-width:520px;}
-.tbl th{text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--m2);padding:12px var(--sp4);background:rgba(255,255,255,0.025);border-bottom:1px solid var(--b);}
+.tbl th{text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--m2);padding:12px var(--sp4);background:var(--bg);border-bottom:1px solid var(--b);}
 .tbl td{padding:11px var(--sp4);border-bottom:1px solid var(--b);font-size:12px;vertical-align:middle;}
 .tbl tbody tr:last-child td{border-bottom:none;}
 .tbl tbody tr{transition:background var(--t-fast);}
-.tbl tbody tr:hover td{background:rgba(255,255,255,0.025);cursor:pointer;}
+.tbl tbody tr:hover td{background:rgba(0,0,0,0.025);cursor:pointer;}
 .ath-num{font-family:'Anton',sans-serif;font-size:16px;color:var(--m2);}
 .ath-name{font-weight:700;color:var(--txt);}
 .ath-av-sm{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:11px;color:#fff;vertical-align:middle;margin-right:8px;flex-shrink:0;}
@@ -878,6 +878,9 @@ const DEMO_ATHLETES=[
   {id:'ath-007',camp_id:CAMP_ID,nombre:'Andrea Guillén',                 ano:2010,pos:'QB',colegio:'Instituto Episcopal San Cristóbal', ciudad:'Panamá',tel:'60759196',photo_url:''},
   {id:'ath-008',camp_id:CAMP_ID,nombre:'Lucía Victoria Rodríguez Osorio',ano:2009,pos:'QB',colegio:'Balboa Academy',                   ciudad:'Panamá',tel:'68978908',photo_url:''},
   {id:'ath-009',camp_id:CAMP_ID,nombre:'Catalina Isabel Pazmiño Calvo', ano:2010,pos:'DB',colegio:'El Colegio de Panamá',              ciudad:'Panamá',tel:'67964956',photo_url:''},
+  {id:'ath-010',camp_id:CAMP_ID,nombre:'Alejandra Sofia Duncan Lu',      ano:2011,pos:'DB',colegio:'La Salle de Margarita',             ciudad:'Colón', tel:'64800042',photo_url:''},
+  {id:'ath-011',camp_id:CAMP_ID,nombre:'Marjorie Nicole Ledezma Ortiz',  ano:2010,pos:'DB',colegio:'Colegio Abel Bravo',               ciudad:'Colón', tel:'62474060',photo_url:''},
+  {id:'ath-012',camp_id:CAMP_ID,nombre:'Lia Victoria Romero',            ano:2011,pos:'WR',colegio:'Academia Bilingüe San Lorenzo',    ciudad:'Panamá',tel:'62444497',photo_url:''},
 ];
 
 /* ─── DATA LAYER ─── */
