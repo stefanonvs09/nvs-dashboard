@@ -328,6 +328,18 @@ select.fi{cursor:pointer;}
 .file-name{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .file-name a{color:var(--txt);text-decoration:none;}
 .file-name a:hover{color:var(--green-txt);}
+
+/* ── Atletas (Media × Placements) ── */
+.chip.ma-chip{padding:6px 13px;border-radius:99px;border:1px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--m);cursor:pointer;}
+.chip.ma-chip.active{background:var(--green);color:#000;border-color:var(--green);}
+.ma-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--card);border:1px solid var(--b);border-radius:12px;padding:12px 16px;margin-bottom:8px;}
+.ma-row.done{opacity:.6;}
+.ma-name{flex:1;min-width:150px;font-size:14px;font-weight:700;color:var(--txt);}
+.ma-sport{font-size:11px;font-weight:600;color:var(--m2);margin-left:8px;}
+.ma-deliv{display:flex;align-items:center;gap:8px;min-width:230px;}
+.ma-lbl{font-size:12px;font-weight:700;color:var(--m);white-space:nowrap;}
+.ma-lbl.done{color:var(--green-txt);}
+.ma-link{flex:1;min-width:90px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:6px 9px;font-size:11px;color:var(--txt);outline:none;font-family:'Inter',sans-serif;}
 </style>
 </head>
 <body>
@@ -364,6 +376,7 @@ select.fi{cursor:pointer;}
       <button class="nav-item" onclick="nav('ideas')" id="nav-ideas"><span class="nav-ico">💡</span>Ideas</button>
       <button class="nav-item" onclick="nav('brief')" id="nav-brief"><span class="nav-ico">📝</span>Brief</button>
       <button class="nav-item" onclick="nav('reportes')" id="nav-reportes"><span class="nav-ico">📈</span>Reportes</button>
+      <button class="nav-item" onclick="nav('atletas')" id="nav-atletas"><span class="nav-ico">🎥</span>Atletas</button>
     </nav>
     <div class="sb-foot"><a href="index.html">← Hub NVS</a></div>
   </aside>
@@ -507,6 +520,23 @@ select.fi{cursor:pointer;}
       <div class="sec-body"><div id="rep-body"></div></div>
     </section>
 
+    <!-- ⑩ ATLETAS (Media × APL Placements) -->
+    <section class="section" id="sec-atletas">
+      <div class="sec-head">
+        <span class="sec-title">🎥 Atletas — Highlight & Sign</span>
+        <span class="sec-title" id="ma-summary" style="font-size:12px;color:var(--m);font-weight:600"></span>
+      </div>
+      <div class="sec-body">
+        <div class="toolbar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <span class="chip ma-chip" id="ma-chip-pend" onclick="maSetFilter('pend')">Pendientes</span>
+          <span class="chip ma-chip" id="ma-chip-hechos" onclick="maSetFilter('hechos')">Completados</span>
+          <span class="chip ma-chip" id="ma-chip-todos" onclick="maSetFilter('todos')">Todos</span>
+          <input class="fi" id="ma-search" placeholder="Buscar atleta..." oninput="renderMediaAtletas()" style="flex:1;min-width:160px">
+        </div>
+        <div id="ma-body"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -572,10 +602,11 @@ const ANALYTICS_PLATS = [
 ];
 
 /* ── STATE ── */
-let D = { cal:[], prod:[], camp:[], tareas:[], analytics:{}, bib:{brand:[],logos:[],guias:[],templates:[],musica:[],assets:[]}, ideas:[], briefs:[], reportes:[], perfiles:['Ximena Botello','José Montilla'] };
+let D = { cal:[], prod:[], camp:[], tareas:[], analytics:{}, bib:{brand:[],logos:[],guias:[],templates:[],musica:[],assets:[]}, ideas:[], briefs:[], reportes:[], perfiles:['Ximena Botello','José Montilla'], mediaAtletas:{} };
 let modalMode = null, editId = null;
 let calOff = 0, curSec = 'calendario', curAtab = 'meta', curBib = 'brand';
 let calView = 'lista', curPerfil = null, curBrief = null, curReporte = null, tmpPublicos = [];
+let MA_PLACEMENTS = null, maFilter = 'pend';
 
 /* ── SUPABASE: estado compartido en tiempo real ── */
 const SB_URL='https://mwefvjvvitsondqghgsx.supabase.co';
@@ -590,6 +621,7 @@ function normalizeD(){
   D.bib=D.bib||{brand:[],logos:[],guias:[],templates:[],musica:[],assets:[]};
   D.ideas=D.ideas||[]; D.briefs=D.briefs||[]; D.reportes=D.reportes||[];
   D.perfiles=(D.perfiles&&D.perfiles.length)?D.perfiles:['Ximena Botello','José Montilla'];
+  D.mediaAtletas=D.mediaAtletas||{};
 }
 function save(){
   try{ localStorage.setItem('nvs_media_v3', JSON.stringify(D)); }catch(e){}
@@ -660,6 +692,7 @@ function renderSection(id){
   else if(id==='ideas')     renderIdeas();
   else if(id==='brief')     renderBrief();
   else if(id==='reportes')  renderReporte();
+  else if(id==='atletas')   renderMediaAtletas();
 }
 
 /* ══════════════════════════════
@@ -1391,6 +1424,49 @@ function openAddReporte(){
     <div class="mf"><label>Título *</label><input class="fi" id="f-titulo" placeholder="Ej: Reporte Julio"></div>
     <div class="mf"><label>Fecha / Período *</label><input class="fi" id="f-fecha" placeholder="Ej: Julio 2026 / primera quincena de julio"></div>`);
 }
+
+/* ══════════════════════════════
+   ⑩ ATLETAS (Media × APL Placements)
+══════════════════════════════ */
+async function renderMediaAtletas(){
+  const cont=document.getElementById('ma-body'); if(!cont) return;
+  ['pend','hechos','todos'].forEach(f=>document.getElementById('ma-chip-'+f)?.classList.toggle('active',maFilter===f));
+  if(MA_PLACEMENTS===null){
+    cont.innerHTML='<div style="padding:40px;text-align:center;color:var(--m);font-size:13px">Cargando atletas de APL Placements…</div>';
+    try{
+      const {data,error}=await sb.from('placements').select('id,nombre,deporte').order('nombre');
+      MA_PLACEMENTS = error?[]:(data||[]);
+    }catch(e){ MA_PLACEMENTS=[]; }
+  }
+  D.mediaAtletas=D.mediaAtletas||{};
+  const isDone=p=>{const s=D.mediaAtletas[p.id]||{};return s.hl&&s.sign;};
+  const total=MA_PLACEMENTS.length, done=MA_PLACEMENTS.filter(isDone).length;
+  const sum=document.getElementById('ma-summary'); if(sum) sum.textContent=`${done}/${total} completos (highlight + sign)`;
+  const term=(document.getElementById('ma-search')?.value||'').toLowerCase();
+  let list=MA_PLACEMENTS.filter(p=>!term||(p.nombre||'').toLowerCase().includes(term)||(p.deporte||'').toLowerCase().includes(term));
+  if(maFilter==='pend') list=list.filter(p=>!isDone(p));
+  else if(maFilter==='hechos') list=list.filter(p=>isDone(p));
+  if(!list.length){ cont.innerHTML='<div style="padding:40px;text-align:center;color:var(--m);font-size:13px">'+(maFilter==='pend'?'¡Nada pendiente! 🎉':'Sin resultados.')+'</div>'; return; }
+  cont.innerHTML=list.map(p=>{
+    const s=D.mediaAtletas[p.id]||{};
+    return `<div class="ma-row${(s.hl&&s.sign)?' done':''}">
+      <div class="ma-name">${esc(p.nombre)}<span class="ma-sport">${esc(p.deporte||'')}</span></div>
+      <div class="ma-deliv">
+        <label class="sw"><input type="checkbox" ${s.hl?'checked':''} onchange="maToggle(${p.id},'hl',this.checked)"><span class="sw-track"></span></label>
+        <span class="ma-lbl${s.hl?' done':''}">🎬 Highlight</span>
+        <input class="ma-link" value="${esc(s.hlUrl||'')}" placeholder="link…" oninput="maSetUrl(${p.id},'hlUrl',this.value)">
+      </div>
+      <div class="ma-deliv">
+        <label class="sw"><input type="checkbox" ${s.sign?'checked':''} onchange="maToggle(${p.id},'sign',this.checked)"><span class="sw-track"></span></label>
+        <span class="ma-lbl${s.sign?' done':''}">📸 Sign (IG)</span>
+        <input class="ma-link" value="${esc(s.signUrl||'')}" placeholder="link…" oninput="maSetUrl(${p.id},'signUrl',this.value)">
+      </div>
+    </div>`;
+  }).join('');
+}
+function maSetFilter(f){ maFilter=f; renderMediaAtletas(); }
+function maToggle(id,field,val){ D.mediaAtletas[id]=D.mediaAtletas[id]||{}; D.mediaAtletas[id][field]=val; save(); renderMediaAtletas(); }
+function maSetUrl(id,field,val){ D.mediaAtletas[id]=D.mediaAtletas[id]||{}; D.mediaAtletas[id][field]=val; save(); }
 
 function doDelete(){
   if(modalMode==='edit-prod'){D.prod=D.prod.filter(x=>x.id!==editId);save();closeMod();renderProd();}
