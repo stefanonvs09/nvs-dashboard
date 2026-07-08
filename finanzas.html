@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -81,7 +81,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(
 .tab-content.active { display: block; }
 
 /* KPI GRID */
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
 .kpi-card { background: var(--card); border-radius: 14px; padding: 18px 20px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: border-color .2s, transform .2s; animation: kpiPop .4s both; }
 .kpi-card:hover { transform: translateY(-2px); }
 .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
@@ -669,6 +669,11 @@ label.fl{color:#64748b;}
           <div class="kpi-label">Atletas Activos</div>
           <div class="kpi-value" id="kpi-atletas">—</div>
           <div class="kpi-sub"><span id="kpi-completados">—</span> completados · <span id="kpi-deudores">—</span> deudores</div>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-label">Por Cobrar</div>
+          <div class="kpi-value" id="kpi-cobrar">—</div>
+          <div class="kpi-sub">Saldo pendiente de contratos</div>
         </div>
       </div>
 
@@ -1536,6 +1541,16 @@ function renderDashboard() {
   const completados = atletasData.filter(a=>a.estado==='Completado').length;
   const deudores = atletasData.filter(a=>a.estado==='Deudor').length;
 
+  // Cuentas por cobrar: saldo pendiente de cada contrato según cuotas hechas
+  const porCobrar = atletasData.reduce((s,a)=>{
+    const m = String(a.pagosHechos||'').match(/(\d+(?:\.\d+)?)\s*out of\s*(\d+(?:\.\d+)?)/i);
+    if(!m) return s;                        // sin plan reconocible (Cerrado, etc.)
+    const done=+m[1], of=+m[2];
+    if(!of || done>=of) return s;           // ya pagado por completo
+    return s + (a.total||0) * (1 - done/of);
+  }, 0);
+
+  document.getElementById('kpi-cobrar').textContent = fmt(porCobrar);
   document.getElementById('kpi-balance').textContent = fmt(balance);
   document.getElementById('kpi-ingresos').textContent = fmt(totalI);
   document.getElementById('kpi-gastos').textContent = fmt(totalG);
