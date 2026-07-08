@@ -498,6 +498,12 @@ body{background:#f8fafc;color:#0f172a;}
 .an-n{font-size:11px;font-weight:700;color:#334155;width:26px;text-align:right;flex-shrink:0;}
 .an-pct{font-size:10px;color:#94a3b8;width:34px;text-align:right;flex-shrink:0;}
 @media(max-width:900px){.an-kpis{grid-template-columns:1fr 1fr;}.an-charts{grid-template-columns:1fr;}}
+/* ── NUEVO: chips de recruiter ── */
+.rec-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.rec-chip{padding:6px 11px;border-radius:20px;border:1px solid var(--b2);background:transparent;color:var(--m2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:.12s;}
+.rec-chip:hover{border-color:var(--green);color:var(--txt);}
+.rec-chip.active{background:var(--green);color:#000;border-color:var(--green);}
+.rec-chip.clear{color:var(--red);border-color:var(--b2);padding:6px 10px;}
 </style>
 </head>
 <body>
@@ -726,7 +732,10 @@ body{background:#f8fafc;color:#0f172a;}
         </select>
       </div>
     </div>
-    <div class="mf"><label>Recruiter / Responsable</label><input class="fi" id="m-recruiter" placeholder="Nombre del recruiter o 'Yo'"></div>
+    <div class="mf"><label>Recruiter / Responsable</label>
+      <div class="rec-chips" id="m-rec-chips"></div>
+      <input type="hidden" id="m-recruiter">
+    </div>
     <div class="mf"><label>Notas</label><textarea class="fi" id="m-notas" rows="3" placeholder="Observaciones, intereses, seguimiento..."></textarea></div>
   </div>
   <div class="m-ft">
@@ -1103,7 +1112,7 @@ function openDP(id){
         <div class="dp-sec-lbl">Detalle</div>
         <div class="dp-row"><span class="dp-rl">Posición</span><span class="dp-rv">${esc(a.posicion)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Presupuesto</span><span class="dp-rv" style="color:var(--green)">${esc(a.presupuesto)||'—'}</span></div>
-        <div class="dp-row"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="color:var(--purple)">${esc(a.recruiter)||'—'}</span></div>
+        <div class="dp-row" style="align-items:flex-start"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="flex:1"><div class="rec-chips">${recChipButtons((a.recruiter||'').trim(),'dp',id)}</div></span></div>
         <div class="dp-row"><span class="dp-rl">Fuente</span><span class="dp-rv">${esc(a.fuente)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Agregado</span><span class="dp-rv" style="color:var(--m2)">${(a.created_at||'').substring(0,10)}</span></div>
       </div>
@@ -1252,6 +1261,33 @@ async function doAssign(recruiter){
     toast(`✓ Asignado a ${recruiter} — ya está en el pipeline`,'ok');
   } else toast('Error: '+error.message,'err');
 }
+/* ── Asignación de recruiter con botones (modal + detalle) ── */
+function jsq(s){ return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function recChipButtons(cur, mode, id){
+  cur=(cur||'').trim();
+  const known=RECRUITERS.includes(cur);
+  const call = name => mode==='dp' ? `assignRec(${id},'${jsq(name)}')` : `selectRec('${jsq(name)}')`;
+  let h = RECRUITERS.map(r=>`<button type="button" class="rec-chip${cur===r?' active':''}" onclick="${call(r)}">${esc(r)}</button>`).join('');
+  h += `<button type="button" class="rec-chip${(cur&&!known)?' active':''}" onclick="${mode==='dp'?`assignRecOtro(${id})`:'selectRecOtro()'}">${(cur&&!known)?esc(cur):'Otro…'}</button>`;
+  if(cur) h += `<button type="button" class="rec-chip clear" onclick="${mode==='dp'?`assignRec(${id},'')`:"selectRec('')"}" title="Quitar">×</button>`;
+  return h;
+}
+function renderRecChips(){ const box=q('#m-rec-chips'); if(box) box.innerHTML=recChipButtons((q('#m-recruiter').value||'').trim(),'modal'); }
+function selectRec(name){ q('#m-recruiter').value=name; renderRecChips(); }
+function selectRecOtro(){ const raw=prompt('Nombre del recruiter:', q('#m-recruiter').value||''); if(raw===null)return; q('#m-recruiter').value=raw.trim(); renderRecChips(); }
+async function assignRec(id, name){
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  const upd={recruiter:name};
+  if(name && !a.recruiter && (a.estado==='Nuevo'||!a.estado)) upd.estado='Contactado'; // primera asignación → al pipeline
+  const {error}=await sb.from('leads').update(upd).eq('id',id);
+  if(error){ toast('Error: '+error.message,'err'); return; }
+  Object.assign(a,upd);
+  applyFilters(); renderWeb();
+  if(q('#dp').classList.contains('open')) openDP(id);
+  toast(name?`✓ Asignado a ${name} — en el pipeline de recruiters`:'Recruiter quitado','ok');
+}
+function assignRecOtro(id){ const raw=prompt('Nombre del recruiter:'); if(raw===null)return; assignRec(id, raw.trim()); }
+
 function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').classList.toggle('open');}
 function toggleSortStatus(){
   SORT_STATUS=!SORT_STATUS;
@@ -1316,6 +1352,7 @@ function openAdd(){
   ['nombre','deporte','wa','email','pais','ciudad','posicion','presupuesto','recruiter'].forEach(f=>q('#m-'+f).value='');
   q('#m-edad').value='';q('#m-notas').value='';
   setFi('#m-estado','Nuevo');setFi('#m-fuente','Manual');
+  renderRecChips();
   q('#m-ov').classList.add('open');q('#modal').classList.add('open');
 }
 function openEdit(id){
@@ -1328,6 +1365,7 @@ function openEdit(id){
   q('#m-presupuesto').value=a.presupuesto||'';q('#m-recruiter').value=a.recruiter||'';
   q('#m-notas').value=a.notas||'';
   setFi('#m-estado',a.estado||'Nuevo');setFi('#m-fuente',a.fuente||'Manual');
+  renderRecChips();
   q('#m-ov').classList.add('open');q('#modal').classList.add('open');
 }
 function closeMod(){q('#m-ov').classList.remove('open');q('#modal').classList.remove('open');}
