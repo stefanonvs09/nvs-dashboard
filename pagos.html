@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -75,6 +75,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .btn-sm{padding:6px 13px;font-size:12px;}
 .btn-del{background:none;border:none;color:var(--m2);cursor:pointer;padding:5px 7px;border-radius:7px;font-size:13px;transition:all .15s;}
 .btn-del:hover{background:var(--red-bg);color:var(--red);}
+.btn-edit{background:none;border:none;color:var(--m2);cursor:pointer;padding:5px 7px;border-radius:7px;font-size:13px;transition:all .15s;}
+.btn-edit:hover{background:var(--teal-bg,rgba(13,148,136,.12));color:var(--teal,#0d9488);}
 
 /* KPI GRID */
 .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
@@ -330,6 +332,7 @@ const fmt=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maxim
 
 let ALL=[];
 let curTab='payroll';
+let editId=null;
 
 const SEED=[
   {categoria:'PAYROLL',nombre:'Stefano Cano',monto:500,frecuencia:'Quincenal'},
@@ -348,12 +351,9 @@ const SEED=[
 /* AUTH */
 async function doLogin(){
   q('#l-err').textContent='';
-  const {data,error}=await sb.auth.signInWithPassword({email:q('#l-em').value.trim(),password:q('#l-pw').value});
-  if(error){q('#l-err').textContent='Credenciales incorrectas.';return;}
-  if((data.user?.app_metadata?.blocked||[]).includes('pagos')){
-    await sb.auth.signOut();q('#l-err').textContent='No tienes acceso a este módulo.';return;
-  }
-  q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();
+  const {error}=await sb.auth.signInWithPassword({email:q('#l-em').value.trim(),password:q('#l-pw').value});
+  if(error){q('#l-err').textContent='Credenciales incorrectas.';}
+  else{q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();}
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&q('#login-ov').style.display!=='none')doLogin();});
 
@@ -412,7 +412,7 @@ function render(){
       <td class="td-amt">${fmt(a.monto)}</td>
       <td><span class="td-freq ${a.frecuencia==='Quincenal'?'quincenal':'mensual'}">${a.frecuencia}</span></td>
       <td class="td-total">${fmt(mensualEquiv(Number(a.monto),a.frecuencia))}/mes</td>
-      <td><button class="btn-del" onclick="deleteEntry(${a.id})" title="Eliminar">✕</button></td>
+      <td><button class="btn-edit" onclick="openEdit(${a.id})" title="Editar">✎</button><button class="btn-del" onclick="deleteEntry(${a.id})" title="Eliminar">✕</button></td>
     </tr>`).join('')
     :'<tr><td colspan="5" style="text-align:center;color:var(--m2);padding:24px">Sin entradas</td></tr>';
 
@@ -421,7 +421,7 @@ function render(){
       <td class="td-name">${esc(a.nombre)}</td>
       <td class="td-amt">${fmt(a.monto)}</td>
       <td><span class="td-freq mensual">${a.frecuencia}</span></td>
-      <td><button class="btn-del" onclick="deleteEntry(${a.id})" title="Eliminar">✕</button></td>
+      <td><button class="btn-edit" onclick="openEdit(${a.id})" title="Editar">✎</button><button class="btn-del" onclick="deleteEntry(${a.id})" title="Eliminar">✕</button></td>
     </tr>`).join('')
     :'<tr><td colspan="4" style="text-align:center;color:var(--m2);padding:24px">Sin entradas</td></tr>';
 
@@ -430,7 +430,7 @@ function render(){
       <td class="td-name">${esc(a.nombre)}</td>
       <td class="td-amt">${fmt(a.monto)}</td>
       <td><span class="td-freq mensual">${a.frecuencia}</span></td>
-      <td><button class="btn-del" onclick="deleteEntry(${a.id})" title="Eliminar">✕</button></td>
+      <td><button class="btn-edit" onclick="openEdit(${a.id})" title="Editar">✎</button><button class="btn-del" onclick="deleteEntry(${a.id})" title="Eliminar">✕</button></td>
     </tr>`).join('')
     :'<tr><td colspan="4" style="text-align:center;color:var(--m2);padding:24px">Sin entradas</td></tr>';
 }
@@ -449,9 +449,21 @@ function showTab(t){
 
 /* MODAL */
 function openAdd(){
+  editId=null;
   q('#m-cat').value=curTab==='payroll'?'PAYROLL':'SOFTWARE';
   q('#m-nombre').value='';q('#m-monto').value='';q('#m-freq').value=curTab==='payroll'?'Quincenal':'Mensual';
   q('#modal-title').textContent=curTab==='payroll'?'Agregar al Payroll':'Agregar Proveedor';
+  q('#modal-ov').classList.add('open');
+  setTimeout(()=>q('#m-nombre').focus(),100);
+}
+function openEdit(id){
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  editId=id;
+  q('#m-cat').value=a.categoria;
+  q('#m-nombre').value=a.nombre;
+  q('#m-monto').value=a.monto;
+  q('#m-freq').value=a.frecuencia;
+  q('#modal-title').textContent='Editar entrada';
   q('#modal-ov').classList.add('open');
   setTimeout(()=>q('#m-nombre').focus(),100);
 }
@@ -463,6 +475,18 @@ async function saveEntry(){
   const categoria=q('#m-cat').value;
   const frecuencia=q('#m-freq').value;
   if(!nombre||isNaN(monto)||monto<=0){toast('Completa todos los campos','err');return;}
+
+  // Modo edición: actualizar la entrada existente
+  if(editId){
+    const {error}=await sb.from('pagos_recurrentes').update({categoria,nombre,monto,frecuencia}).eq('id',editId);
+    const a=ALL.find(x=>x.id===editId);
+    if(a){a.categoria=categoria;a.nombre=nombre;a.monto=monto;a.frecuencia=frecuencia;}
+    render();closeModal();
+    toast(error?`✓ ${nombre} actualizado (local)`:`✓ ${nombre} actualizado`,'ok');
+    editId=null;
+    return;
+  }
+
   const {data,error}=await sb.from('pagos_recurrentes').insert([{categoria,nombre,monto,frecuencia}]).select().single();
   if(!error&&data){ALL.push(data);render();closeModal();toast(`✓ ${nombre} agregado`,'ok');}
   else{
@@ -487,15 +511,8 @@ function toast(msg,type='ok'){
 }
 
 /* INIT */
-sb.auth.getSession().then(async ({data:{session}})=>{
-  if(session){
-    if((session.user?.app_metadata?.blocked||[]).includes('pagos')){
-      await sb.auth.signOut();
-      q('#login-ov').style.display='flex';
-      q('#l-err').textContent='No tienes acceso a este módulo.';return;
-    }
-    q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();
-  }
+sb.auth.getSession().then(({data:{session}})=>{
+  if(session){q('#login-ov').style.display='none';q('#app').style.display='flex';loadData();}
 });
 </script>
 </body>
