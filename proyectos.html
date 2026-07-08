@@ -81,6 +81,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .pi-badge.activo{background:rgba(170,255,0,.15);color:#3a6b00;}
 .pi-badge.pausa{background:rgba(234,179,8,.15);color:#92400e;}
 .pi-badge.completado{background:rgba(99,102,241,.15);color:#3730a3;}
+.pi-badge.sinempezar{background:rgba(148,163,184,.18);color:#475569;}
 .sb-empty{padding:30px 14px;text-align:center;color:#94a3b8;font-size:12px;line-height:1.6;}
 
 /* ── DOC PANEL ── */
@@ -242,13 +243,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .view-btn.active{background:#fff;color:var(--txt);box-shadow:0 1px 4px rgba(0,0,0,.08);}
 
 /* ── KANBAN BOARD ── */
-#board-view{flex:1;overflow-x:auto;overflow-y:hidden;padding:20px 24px;display:none;gap:16px;align-items:flex-start;}
+#board-view{flex:1;overflow-x:auto;overflow-y:hidden;padding:20px 24px;display:none;gap:16px;align-items:stretch;}
 #board-view.show{display:flex;}
-.kanban-col{width:300px;min-width:300px;display:flex;flex-direction:column;}
+.kanban-col{width:300px;min-width:300px;display:flex;flex-direction:column;max-height:100%;}
 .kanban-col-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 10px;margin-bottom:6px;}
 .kanban-col-label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--txt);}
 .kanban-col-count{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--muted);}
-.kanban-cards{flex:1;min-height:100px;padding:4px;border-radius:12px;transition:background .15s,outline .15s;}
+.kanban-cards{flex:1;min-height:100px;padding:4px;border-radius:12px;transition:background .15s,outline .15s;overflow-y:auto;}
 .kanban-cards.drag-over{background:rgba(170,255,0,.07);outline:2px dashed rgba(170,255,0,.4);outline-offset:-2px;}
 .kanban-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;cursor:grab;transition:box-shadow .18s,transform .18s;animation:fadeUp .2s both;}
 .kanban-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.09);transform:translateY(-1px);}
@@ -350,6 +351,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
             <input class="proj-name-input" id="proj-name" type="text" placeholder="Nombre del proyecto..." maxlength="120" oninput="markDirty()">
             <div class="proj-header-actions">
               <select class="status-sel" id="proj-status" onchange="markDirty()">
+                <option value="Sin empezar">⚪ Sin empezar</option>
                 <option value="Activo">🟢 Activo</option>
                 <option value="En pausa">🟡 En pausa</option>
                 <option value="Completado">✅ Completado</option>
@@ -459,8 +461,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
     <input class="m-inp" id="m-nombre" type="text" placeholder="Ej: Campaña Instagram Q3" maxlength="120">
     <div class="m-lbl">Estado</div>
     <select class="m-inp" id="m-estado">
+      <option value="Sin empezar">⚪ Sin empezar</option>
       <option value="Activo">🟢 Activo</option>
       <option value="En pausa">🟡 En pausa</option>
+      <option value="Completado">✅ Completado</option>
     </select>
     <div class="m-lbl">Color</div>
     <div class="m-colors" id="m-colors"></div>
@@ -1015,7 +1019,7 @@ function shortUrl(url) {
   catch { return url.substring(0, 55); }
 }
 function isValidUrl(s) { try { new URL(s); return true; } catch { return false; } }
-function badgeClass(s) { return s === 'Completado' ? 'completado' : s === 'En pausa' ? 'pausa' : 'activo'; }
+function badgeClass(s) { return s === 'Completado' ? 'completado' : s === 'En pausa' ? 'pausa' : s === 'Sin empezar' ? 'sinempezar' : 'activo'; }
 function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('es-PA', { day: '2-digit', month: 'short', year: 'numeric' }); }
 function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toast(msg, type = '') {
@@ -1044,9 +1048,10 @@ let currentView = 'list';
 let dragId = null;
 
 const KANBAN_COLS = [
-  { status: 'Activo',     icon: '🟢', key: 'activo'     },
-  { status: 'En pausa',   icon: '🟡', key: 'pausa'      },
-  { status: 'Completado', icon: '✅', key: 'completado'  },
+  { status: 'Sin empezar', icon: '⚪', key: 'sinempezar' },
+  { status: 'Activo',      icon: '🟢', key: 'activo'     },
+  { status: 'En pausa',    icon: '🟡', key: 'pausa'      },
+  { status: 'Completado',  icon: '✅', key: 'completado'  },
 ];
 
 async function switchView(v) {
