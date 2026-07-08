@@ -155,9 +155,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 <div class="topbar">
   <div class="topbar-logo"><span>NVS</span> · Reportes Semanales</div>
-  <div class="view-toggle">
-    <div class="vtab active" onclick="setView('mi',this)">👤 Mi Reporte</div>
-    <div class="vtab" onclick="setView('todos',this)">👥 Ver Todos</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="view-toggle">
+      <div class="vtab active" onclick="setView('mi',this)">👤 Mi Reporte</div>
+      <div class="vtab" onclick="setView('todos',this)">👥 Ver Todos</div>
+    </div>
+    <button onclick="exportAllCSV()" title="Descargar todos los reportes en CSV" style="background:var(--green);color:var(--green-dk);border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap">⬇ CSV</button>
   </div>
 </div>
 
@@ -578,6 +581,28 @@ function renderAll(){
       </div>
     </div>`;
   }).join('');
+}
+
+/* ── EXPORTAR TODOS A CSV ── */
+async function exportAllCSV(){
+  const {data,error}=await db.from('nvs_weekly_reports').select('*').order('week_start',{ascending:false}).order('nombre');
+  if(error){ alert('Error al leer los reportes: '+error.message); return; }
+  if(!data || !data.length){ alert('No hay reportes para exportar todavía.'); return; }
+  const cols=['Semana','Nombre','Departamento','Progreso %','Logros','Pendientes','Próxima semana','Comentarios','Actualizado'];
+  const rows=data.map(r=>{
+    let coment=r.comentarios||'';
+    try{ const j=JSON.parse(coment); if(j && j.__nvs) coment=j.c||''; }catch(e){}
+    return [ r.week_start||'', r.nombre||'', r.departamento||'', (r.progreso??''),
+             r.logros||'', r.pendientes||'', r.proxima_semana||'', coment,
+             (r.updated_at||'').substring(0,16).replace('T',' ') ];
+  });
+  const cell=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const csv=[cols.map(cell).join(','), ...rows.map(r=>r.map(cell).join(','))].join('\r\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='reportes-semanales-nvs.csv';
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 /* ── INIT ── */
