@@ -90,8 +90,7 @@
     <label class="lbl">Título</label>
     <input class="fi" id="m-titulo" placeholder="Ej: Cierre de venta — familia atleta">
     <label class="lbl">Categoría</label>
-    <input class="fi" id="m-categoria" list="cats" placeholder="Ej: Sales, Marketing, Operaciones…">
-    <datalist id="cats"></datalist>
+    <select class="fi" id="m-categoria" onchange="onCatChange()"></select>
     <label class="lbl">Prompt</label>
     <textarea class="fi" id="m-contenido" placeholder="Escribe aquí el prompt reutilizable…"></textarea>
     <div class="err" id="m-err"></div>
@@ -130,12 +129,26 @@ async function load(){
 
 function categorias(){ return [...new Set(DATA.map(p=>p.categoria||'General'))].sort(); }
 
+const CATEGORIES=['Sales','Marketing','Operaciones','Reclutamiento','Contenido','General'];
+function catOptions(sel){
+  const cats=[...new Set([...CATEGORIES, ...categorias(), sel].filter(Boolean))];
+  return cats.map(c=>`<option${c===sel?' selected':''}>${esc(c)}</option>`).join('')
+    + `<option value="__otro__">+ Otra categoría…</option>`;
+}
+function onCatChange(){
+  const s=q('#m-categoria');
+  if(s.value!=='__otro__') return;
+  const n=(prompt('Nueva categoría:')||'').trim();
+  if(n){
+    if(![...s.options].some(o=>o.value===n)){ const o=document.createElement('option'); o.textContent=n; s.insertBefore(o, s.lastElementChild); }
+    s.value=n;
+  } else { s.selectedIndex=0; }
+}
+
 function render(){
   // chips
   const cats=['Todos',...categorias()];
   q('#chips').innerHTML=cats.map(c=>`<span class="chip ${c===filterCat?'active':''}" onclick="setCat('${jsStr(c)}')">${esc(c)}</span>`).join('');
-  // datalist
-  q('#cats').innerHTML=categorias().map(c=>`<option value="${esc(c)}">`).join('');
   // filtro + búsqueda
   const term=(q('#search').value||'').toLowerCase();
   const items=DATA.filter(p=>(filterCat==='Todos'||(p.categoria||'General')===filterCat)
@@ -174,9 +187,10 @@ function openForm(p){
   q('#m-title').textContent=ed?'Editar prompt':'Nuevo prompt';
   q('#m-id').value=ed?p.id:'';
   q('#m-titulo').value=ed?(p.titulo||''):'';
-  q('#m-categoria').value=ed?(p.categoria||''):(filterCat!=='Todos'?filterCat:'');
+  const catSel = ed ? (p.categoria||'General') : (filterCat!=='Todos'?filterCat:'Sales');
+  q('#m-categoria').innerHTML = catOptions(catSel);
+  q('#m-categoria').value = catSel;
   q('#m-contenido').value=ed?(p.contenido||''):'';
-  q('#cats').innerHTML=categorias().map(c=>`<option value="${esc(c)}">`).join('');
   q('#modal').style.display='flex';
 }
 function closeForm(){ q('#modal').style.display='none'; }
@@ -185,7 +199,8 @@ async function save(){
   q('#m-err').textContent='';
   const titulo=q('#m-titulo').value.trim();
   const contenido=q('#m-contenido').value.trim();
-  const categoria=q('#m-categoria').value.trim()||'General';
+  let categoria=q('#m-categoria').value.trim()||'General';
+  if(categoria==='__otro__') categoria='General';
   if(!titulo){ q('#m-err').textContent='El título es obligatorio.'; return; }
   if(!contenido){ q('#m-err').textContent='El prompt no puede estar vacío.'; return; }
   const id=q('#m-id').value;
