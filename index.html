@@ -261,6 +261,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
   .hub-title{font-size:26px;}
   .hub-header{margin-bottom:20px;}
 }
+/* ── Widgets del home (proyectos / mis leads / placement) ── */
+.wg-item{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);cursor:pointer;}
+.wg-item:last-child{border-bottom:none;}
+.wg-item:hover{background:var(--bg);border-radius:8px;}
+.wg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.wg-name{font-size:12.5px;font-weight:600;color:var(--txt);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wg-tag{font-size:9px;font-weight:700;color:var(--muted);background:var(--bg);padding:2px 7px;border-radius:20px;white-space:nowrap;}
+.wg-more{font-size:10px;color:var(--muted);text-align:center;padding-top:8px;font-weight:600;}
+.wg-stats{display:flex;gap:10px;flex-wrap:wrap;}
+.wg-stat{flex:1;min-width:80px;background:var(--bg);border-radius:10px;padding:10px 12px;}
+.wg-stat-n{font-size:22px;font-weight:800;font-family:'Anton',sans-serif;color:var(--txt);}
+.wg-stat-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:2px;}
 </style>
 </head>
 <body>
@@ -357,6 +369,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 
       </div>
 
+      <!-- PROYECTOS ACTIVOS WIDGET -->
+      <div id="projects-widget" style="display:none;margin-bottom:20px;">
+        <div class="tw-header">
+          <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">🚀 Proyectos activos</div>
+          <span class="tw-all-link" onclick="selectModule('proyectos','proyectos.html')">Ver todos →</span>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;">
+          <div id="pw-list"><div class="tw-empty">Cargando…</div></div>
+        </div>
+      </div>
+
       <!-- FIN STATS (admin only) -->
       <div id="fin-stats-card" class="stat-card" style="--sc-top:linear-gradient(90deg,var(--green),transparent);display:none;margin-bottom:24px;animation-delay:.25s">
         <div class="stat-label">💰 Margen de Ganancia</div>
@@ -379,6 +402,28 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
             <div style="font-size:9px;color:var(--muted);font-weight:600;" id="rw-week-lbl"></div>
           </div>
           <div class="rw-grid" id="rw-grid"></div>
+        </div>
+      </div>
+
+      <!-- MIS LEADS WIDGET (recruiters) -->
+      <div id="myleads-widget" style="display:none;margin-bottom:20px;">
+        <div class="tw-header">
+          <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">🎯 Mis leads</div>
+          <span class="tw-all-link" onclick="selectModule('leads','leads.html')">Ver todos →</span>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;">
+          <div id="mlw-list"><div class="tw-empty">Cargando…</div></div>
+        </div>
+      </div>
+
+      <!-- PLACEMENT METRICS WIDGET -->
+      <div id="placement-widget" style="display:none;margin-bottom:20px;">
+        <div class="tw-header">
+          <div style="font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">🎓 APL · Placements</div>
+          <span class="tw-all-link" onclick="selectModule('crm','crm.html')">Ver completo →</span>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;">
+          <div id="plw-list"><div class="tw-empty">Cargando…</div></div>
         </div>
       </div>
 
@@ -469,6 +514,27 @@ const MARKETING_ACCOUNT_HIDDEN=['finanzas','pagos','crm','leads'];
 const SD_MODULES=['finanzas','pagos','servicios'];
 const IH_MODULES=['finanzas'];
 const MX_ALLOWED=['stefano@playwithnewvision.com','floyd@playwithnewvision.com'];
+
+/* ── WIDGETS DEL HOME POR ROL (editable) ──
+   Correo del recruiter -> su nombre tal como aparece en Leads (para mostrar SUS leads). */
+const REC_BY_EMAIL={
+  'julio@playwithnewvision.com':'Julio',
+  'andy@playwithnewvision.com':'Andy',
+  'floyd@playwithnewvision.com':'Floyd',
+  'diegoajulio@gmail.com':'Diego Julio',
+  'ariel@playwithnewvision.com':'Ariel',
+};
+const PLACEMENT_EMAILS=['andrea@playwithnewvision.com','julioblanco@playwithnewvision.com'];
+const ADMIN_EMAIL='stefano@playwithnewvision.com';
+/* Widgets que ve cada login. Disponibles: finance, projects, athletes, tasks, myleads, placement, reportes */
+function widgetsFor(em){
+  if(em===SD_EMAIL||em===IH_EMAIL) return ['finance'];                         // externos: solo financiero
+  if(em===ADMIN_EMAIL) return ['finance','projects','athletes','tasks','reportes'];
+  if(em===MARKETING_ACCOUNT) return ['projects','athletes','tasks'];
+  if(REC_BY_EMAIL[em]) return ['myleads','tasks'];                             // recruiters: sus leads
+  if(PLACEMENT_EMAILS.includes(em)) return ['placement','athletes','tasks'];   // placement: métricas APL
+  return ['athletes','tasks'];                                                 // resto del equipo
+}
 
 const ALL_MODULES=[
   {id:'finanzas', icon:'💰', name:'Dashboard Financiero', accent:'#AAFF00', pin:true, badgeTxt:'PIN', badgeColor:'#3a6b00'},
@@ -595,19 +661,22 @@ async function showPlatform(user){
   buildNav(user.email);
 
   const em=user.email.toLowerCase();
-  const isSD=em===SD_EMAIL, isIH=em===IH_EMAIL;
-  const isMkt=MARKETING_EMAILS.includes(em);
+  const W=widgetsFor(em);
 
-  if(!isSD&&!isMkt&&!isIH){loadStats();subscribeStats();}
-  if(isSD||isIH){const s=document.getElementById('hub-stats');if(s)s.style.display='none';}
+  // Atletas activos (tarjeta hub-stats)
+  if(W.includes('athletes')){ loadStats(); subscribeStats(); }
+  else { const s=document.getElementById('hub-stats'); if(s)s.style.display='none'; }
 
-  const FIN_ALLOWED=['stefano@playwithnewvision.com','ih@decolatam.com','sd@cervicalservices.com'];
-  if(FIN_ALLOWED.includes(em)){
-    const fc=document.getElementById('fin-stats-card');if(fc)fc.style.display='block';
-    loadFinanceStats();
+  // Financiero
+  if(W.includes('finance')){
+    const fc=document.getElementById('fin-stats-card'); if(fc)fc.style.display='block';
+    loadFinanceStats(); subscribeFinance();
   }
-  if(!isSD&&!isIH)loadWeekTasks(user);
-  if(em==='stefano@playwithnewvision.com')loadReportesWidget();
+  if(W.includes('projects'))  loadProjectsWidget();
+  if(W.includes('tasks'))     loadWeekTasks(user);
+  if(W.includes('myleads'))   loadMyLeadsWidget(REC_BY_EMAIL[em]);
+  if(W.includes('placement')) loadPlacementWidget();
+  if(W.includes('reportes'))  loadReportesWidget();
 }
 
 /* ── CLOCK ── */
@@ -650,7 +719,50 @@ async function loadStats(){
 }
 function subscribeStats(){
   sb.channel('placements-live').on('postgres_changes',{event:'*',schema:'public',table:'placements'},()=>loadStats()).subscribe();
+}
+function subscribeFinance(){
   sb.channel('trans-live').on('postgres_changes',{event:'*',schema:'public',table:'transacciones'},()=>loadFinanceStats()).subscribe();
+}
+/* ── WIDGETS NUEVOS ── */
+function wgEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+async function loadProjectsWidget(){
+  const box=document.getElementById('projects-widget'), el=document.getElementById('pw-list');
+  if(!box||!el)return; box.style.display='block';
+  const {data,error}=await sb.from('proyectos').select('nombre,color,updated_at').eq('estado','Activo').order('updated_at',{ascending:false});
+  if(error){ el.innerHTML='<div class="tw-empty">No se pudo cargar</div>'; return; }
+  if(!data||!data.length){ el.innerHTML='<div class="tw-empty">Sin proyectos activos</div>'; return; }
+  el.innerHTML = data.slice(0,6).map(p=>`
+    <div class="wg-item" onclick="selectModule('proyectos','proyectos.html')">
+      <span class="wg-dot" style="background:${p.color||'#AAFF00'}"></span>
+      <span class="wg-name">${wgEsc(p.nombre)}</span>
+    </div>`).join('') + (data.length>6?`<div class="wg-more">+${data.length-6} más · ${data.length} activos en total</div>`:`<div class="wg-more">${data.length} activo${data.length!==1?'s':''}</div>`);
+}
+async function loadMyLeadsWidget(recName){
+  const box=document.getElementById('myleads-widget'), el=document.getElementById('mlw-list');
+  if(!box||!el)return; box.style.display='block';
+  const {data,error}=await sb.from('leads').select('nombre,estado,deporte').eq('recruiter',recName).order('updated_at',{ascending:false});
+  if(error){ el.innerHTML='<div class="tw-empty">No se pudo cargar</div>'; return; }
+  if(!data||!data.length){ el.innerHTML=`<div class="tw-empty">Aún no tienes leads asignados (${wgEsc(recName)})</div>`; return; }
+  el.innerHTML = data.slice(0,6).map(l=>`
+    <div class="wg-item" onclick="selectModule('leads','leads.html')">
+      <span class="wg-dot" style="background:#f472b6"></span>
+      <span class="wg-name">${wgEsc(l.nombre)}</span>
+      <span class="wg-tag">${wgEsc(l.estado||'—')}</span>
+    </div>`).join('') + `<div class="wg-more">${data.length} lead${data.length!==1?'s':''} tuyos</div>`;
+}
+async function loadPlacementWidget(){
+  const box=document.getElementById('placement-widget'), el=document.getElementById('plw-list');
+  if(!box||!el)return; box.style.display='block';
+  const {data,error}=await sb.from('placements').select('commit_status,committed_university');
+  if(error){ el.innerHTML='<div class="tw-empty">No se pudo cargar</div>'; return; }
+  const rows=data||[]; const total=rows.length;
+  const firmados=rows.filter(r=>(r.committed_university&&String(r.committed_university).trim())||/commit|sign|firm|done|s[ií]|yes/i.test(r.commit_status||'')).length;
+  const proceso=total-firmados;
+  el.innerHTML=`<div class="wg-stats">
+    <div class="wg-stat"><div class="wg-stat-n">${total}</div><div class="wg-stat-l">Atletas APL</div></div>
+    <div class="wg-stat"><div class="wg-stat-n">${firmados}</div><div class="wg-stat-l">Firmados</div></div>
+    <div class="wg-stat"><div class="wg-stat-n">${proceso}</div><div class="wg-stat-l">En proceso</div></div>
+  </div>`;
 }
 async function loadFinanceStats(){
   const card=document.getElementById('fin-stats-card');if(!card)return;
