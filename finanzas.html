@@ -2095,28 +2095,28 @@ function calcularNumPagoSiguiente(a) {
 }
 
 function incrementarContadorPago(pagosHechos) {
-  // "X out of Y"
-  const m1 = pagosHechos.match(/(\d+)\s+(out\s+of)\s+(\d+)/i);
-  if(m1) {
-    const next = parseInt(m1[1]) + 1;
-    return pagosHechos.replace(m1[0], `${next} out of ${m1[3]}`);
-  }
-  // "MONTHLY (X)" or "MONTHLY(X)"
-  const m2 = pagosHechos.match(/(MONTHLY\s*\()(\d+)(\))/i);
-  if(m2) return pagosHechos.replace(m2[0], `${m2[1]}${parseInt(m2[2])+1}${m2[3]}`);
-  // "ABONO x/y + MONTHLY(Z)"
-  const m3 = pagosHechos.match(/(MONTHLY\()(\d+)(\))/i);
-  if(m3) return pagosHechos.replace(m3[0], `${m3[1]}${parseInt(m3[2])+1}${m3[3]}`);
-  return pagosHechos + ' (+1)';
+  const s = pagosHechos || '';
+  // "MONTHLY PAYMENT (N)"  → sube la mensualidad (formato real de los datos)
+  const mm = s.match(/(MONTHLY\s*PAYMENT\s*\(\s*)(\d+)(\s*\))/i);
+  if(mm) return s.replace(mm[0], `${mm[1]}${parseInt(mm[2])+1}${mm[3]}`);
+  // "X out of Y"  → cuotas fijas
+  const m1 = s.match(/(\d+)\s+out\s+of\s+(\d+)/i);
+  if(m1) { const next = parseInt(m1[1]) + 1; return s.replace(m1[0], `${next} out of ${m1[2]}`); }
+  // formatos viejos "MONTHLY (X)" / "MONTHLY(X)"
+  const m2 = s.match(/(MONTHLY\s*\()(\d+)(\))/i);
+  if(m2) return s.replace(m2[0], `${m2[1]}${parseInt(m2[2])+1}${m2[3]}`);
+  return s + ' (+1)';
 }
 
 function incrementarAbono(pagosHechos) {
-  const m = pagosHechos.match(/ABONO\s*(\d+)\/(\d+)/i);
-  if(m) {
-    const next = parseInt(m[1]) + 1;
-    return pagosHechos.replace(m[0], `ABONO ${next}/${m[2]}`);
-  }
-  return pagosHechos + ' +ABONO';
+  const s = pagosHechos || '';
+  // "ABONO (X OUT OF Y)"  → sube el abono (formato real de los datos)
+  const m = s.match(/(ABONO\s*\(\s*)(\d+)(\s*out of\s*\d+\s*\))/i);
+  if(m) return s.replace(m[0], `${m[1]}${parseInt(m[2])+1}${m[3]}`);
+  // formato viejo "ABONO X/Y"
+  const m2 = s.match(/ABONO\s*(\d+)\/(\d+)/i);
+  if(m2) { const next = parseInt(m2[1]) + 1; return s.replace(m2[0], `ABONO ${next}/${m2[2]}`); }
+  return s + ' +ABONO';
 }
 
 function esUltimoPago(a, nuevoPagosHechos) {
