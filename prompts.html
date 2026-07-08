@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVS · Prompts</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{ --bg:#f8fafc; --card:#fff; --border:#e2e8f0; --text:#0f172a; --muted:#64748b;
+    --accent:#AAFF00; --accent-ink:#3a6b00; --danger:#ef4444; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);}
+
+  #login-ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(ellipse at 50% -10%,rgba(170,255,0,0.08) 0%,var(--bg) 55%);}
+  .login-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:32px 28px;box-shadow:0 4px 24px rgba(0,0,0,.07);width:min(380px,92vw);}
+  .login-card h1{font-size:20px;margin-bottom:4px;} .login-card p{color:var(--muted);font-size:13px;margin-bottom:20px;}
+  .fi{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px;font-size:14px;margin-bottom:12px;font-family:inherit;}
+  .fi:focus{outline:none;border-color:var(--accent-ink);}
+  .btn{background:var(--accent);color:var(--accent-ink);border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;}
+  .btn:hover{filter:brightness(.96);} .btn-sm{padding:9px 15px;} .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .err{color:var(--danger);font-size:12px;min-height:16px;margin-top:6px;}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 20px 60px;}
+  .head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;}
+  .head h1{font-size:24px;display:flex;align-items:center;gap:10px;}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+  .search{flex:1;min-width:200px;padding:10px 13px;border:1px solid var(--border);border-radius:10px;font-size:14px;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .chip{padding:6px 13px;border-radius:99px;border:1px solid var(--border);background:#fff;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.12s;}
+  .chip.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+  .p-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 16px 12px;display:flex;flex-direction:column;animation:fadeUp .3s both;}
+  .p-card:hover{box-shadow:0 6px 22px rgba(0,0,0,.07);}
+  .p-cat{align-self:flex-start;font-size:10.5px;font-weight:700;color:var(--accent-ink);background:rgba(170,255,0,.18);padding:3px 9px;border-radius:20px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+  .p-card h3{font-size:15px;margin-bottom:7px;}
+  .p-text{font-size:12.5px;color:var(--muted);line-height:1.5;white-space:pre-wrap;max-height:120px;overflow:hidden;position:relative;flex:1;}
+  .p-text.expanded{max-height:none;}
+  .p-more{font-size:11px;color:var(--accent-ink);cursor:pointer;font-weight:600;margin-top:4px;}
+  .p-foot{display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border);margin-top:10px;padding-top:10px;}
+  .ico{cursor:pointer;font-size:13px;opacity:.65;padding:4px 7px;border-radius:7px;}
+  .ico:hover{opacity:1;background:var(--bg);}
+  .ico.copy{margin-right:auto;color:var(--accent-ink);opacity:.9;font-weight:600;font-size:12px;}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;}
+
+  #modal{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:9998;display:none;align-items:center;justify-content:center;padding:16px;}
+  .modal-card{background:#fff;border-radius:16px;padding:24px;width:min(560px,94vw);max-height:92vh;overflow:auto;}
+  .modal-card h2{font-size:18px;margin-bottom:16px;}
+  .lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;display:block;}
+  textarea.fi{resize:vertical;min-height:160px;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.5;}
+  .modal-actions{display:flex;gap:10px;margin-top:6px;}
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;z-index:10000;}
+  #toast.show{opacity:1;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<div id="login-ov">
+  <div class="login-card">
+    <h1>💬 Prompts</h1>
+    <p>Entra con tu cuenta de New Vision</p>
+    <input class="fi" id="l-em" type="email" placeholder="Correo" autocomplete="username">
+    <input class="fi" id="l-pw" type="password" placeholder="Contraseña" autocomplete="current-password">
+    <button class="btn" style="width:100%" onclick="doLogin()">Entrar</button>
+    <div class="err" id="l-err"></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="wrap">
+    <div class="head">
+      <h1>💬 Prompts</h1>
+      <button class="btn btn-sm" onclick="openForm()">+ Nuevo prompt</button>
+    </div>
+    <div class="toolbar">
+      <input class="search" id="search" placeholder="Buscar por título o contenido…" oninput="render()">
+    </div>
+    <div class="chips" id="chips"></div>
+    <div id="list" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">Aún no hay prompts. Crea el primero con “+ Nuevo prompt”.</div>
+  </div>
+</div>
+
+<div id="modal">
+  <div class="modal-card">
+    <h2 id="m-title">Nuevo prompt</h2>
+    <input type="hidden" id="m-id">
+    <label class="lbl">Título</label>
+    <input class="fi" id="m-titulo" placeholder="Ej: Cierre de venta — familia atleta">
+    <label class="lbl">Categoría</label>
+    <input class="fi" id="m-categoria" list="cats" placeholder="Ej: Sales, Marketing, Operaciones…">
+    <datalist id="cats"></datalist>
+    <label class="lbl">Prompt</label>
+    <textarea class="fi" id="m-contenido" placeholder="Escribe aquí el prompt reutilizable…"></textarea>
+    <div class="err" id="m-err"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-sm" style="flex:1" onclick="save()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL='https://mwefvjvvitsondqghgsx.supabase.co';
+const SB_KEY='sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const q=s=>document.querySelector(s);
+let DATA=[], filterCat='Todos';
+
+async function init(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session) showApp(); else q('#login-ov').style.display='flex';
+}
+async function doLogin(){
+  q('#l-err').textContent='';
+  const {error}=await sb.auth.signInWithPassword({email:q('#l-em').value.trim(),password:q('#l-pw').value});
+  if(error) q('#l-err').textContent=error.message; else showApp();
+}
+function showApp(){ q('#login-ov').style.display='none'; q('#app').style.display='block'; load(); }
+
+async function load(){
+  const {data,error}=await sb.from('nvs_prompts').select('*').order('categoria').order('titulo');
+  if(error){ toast('Error: '+error.message); DATA=[]; } else DATA=data||[];
+  render();
+}
+
+function categorias(){ return [...new Set(DATA.map(p=>p.categoria||'General'))].sort(); }
+
+function render(){
+  // chips
+  const cats=['Todos',...categorias()];
+  q('#chips').innerHTML=cats.map(c=>`<span class="chip ${c===filterCat?'active':''}" onclick="setCat('${jsStr(c)}')">${esc(c)}</span>`).join('');
+  // datalist
+  q('#cats').innerHTML=categorias().map(c=>`<option value="${esc(c)}">`).join('');
+  // filtro + búsqueda
+  const term=(q('#search').value||'').toLowerCase();
+  const items=DATA.filter(p=>(filterCat==='Todos'||(p.categoria||'General')===filterCat)
+    && (!term || (p.titulo||'').toLowerCase().includes(term) || (p.contenido||'').toLowerCase().includes(term)));
+  q('#empty').style.display=items.length?'none':(DATA.length?'block':'block');
+  q('#empty').textContent=DATA.length?'Sin resultados para tu búsqueda.':'Aún no hay prompts. Crea el primero con “+ Nuevo prompt”.';
+  q('#list').innerHTML=items.map(p=>`
+    <div class="p-card">
+      <span class="p-cat">${esc(p.categoria||'General')}</span>
+      <h3>${esc(p.titulo)}</h3>
+      <div class="p-text" id="txt-${p.id}">${esc(p.contenido||'')}</div>
+      <div class="p-more" onclick="toggle(${p.id})" id="more-${p.id}">Ver más ▾</div>
+      <div class="p-foot">
+        <span class="ico copy" onclick='copyP(${p.id})'>⧉ Copiar</span>
+        <span class="ico" title="Editar" onclick='openForm(${JSON.stringify(p)})'>✎</span>
+        <span class="ico" title="Borrar" onclick="del(${p.id})">🗑</span>
+      </div>
+    </div>`).join('');
+  // ocultar "ver más" si el texto es corto
+  items.forEach(p=>{ const el=q('#txt-'+p.id); const more=q('#more-'+p.id);
+    if(el && more && el.scrollHeight<=el.clientHeight+2) more.style.display='none'; });
+}
+function setCat(c){ filterCat=c; render(); }
+function toggle(id){ const el=q('#txt-'+id), m=q('#more-'+id);
+  el.classList.toggle('expanded'); m.textContent=el.classList.contains('expanded')?'Ver menos ▴':'Ver más ▾'; }
+
+async function copyP(id){
+  const p=DATA.find(x=>x.id===id); if(!p) return;
+  try{ await navigator.clipboard.writeText(p.contenido||''); toast('✓ Prompt copiado'); }
+  catch(e){ toast('No se pudo copiar'); }
+}
+
+function openForm(p){
+  q('#m-err').textContent='';
+  const ed=p&&p.id;
+  q('#m-title').textContent=ed?'Editar prompt':'Nuevo prompt';
+  q('#m-id').value=ed?p.id:'';
+  q('#m-titulo').value=ed?(p.titulo||''):'';
+  q('#m-categoria').value=ed?(p.categoria||''):(filterCat!=='Todos'?filterCat:'');
+  q('#m-contenido').value=ed?(p.contenido||''):'';
+  q('#cats').innerHTML=categorias().map(c=>`<option value="${esc(c)}">`).join('');
+  q('#modal').style.display='flex';
+}
+function closeForm(){ q('#modal').style.display='none'; }
+
+async function save(){
+  q('#m-err').textContent='';
+  const titulo=q('#m-titulo').value.trim();
+  const contenido=q('#m-contenido').value.trim();
+  const categoria=q('#m-categoria').value.trim()||'General';
+  if(!titulo){ q('#m-err').textContent='El título es obligatorio.'; return; }
+  if(!contenido){ q('#m-err').textContent='El prompt no puede estar vacío.'; return; }
+  const id=q('#m-id').value;
+  let error;
+  if(id){ ({error}=await sb.from('nvs_prompts').update({titulo,categoria,contenido,updated_at:new Date().toISOString()}).eq('id',id)); }
+  else { ({error}=await sb.from('nvs_prompts').insert({titulo,categoria,contenido})); }
+  if(error){ q('#m-err').textContent=error.message; return; }
+  closeForm(); toast(id?'Prompt actualizado':'Prompt creado'); load();
+}
+async function del(id){
+  if(!confirm('¿Borrar este prompt?')) return;
+  const {error}=await sb.from('nvs_prompts').delete().eq('id',id);
+  if(error){ toast('Error: '+error.message); return; }
+  toast('Prompt borrado'); load();
+}
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function jsStr(s){return String(s??'').replace(/'/g,"\\'");}
+let _tt; function toast(m){const t=q('#toast');t.textContent=m;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2400);}
+
+init();
+</script>
+</body>
+</html>
