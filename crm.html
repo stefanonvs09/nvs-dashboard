@@ -384,6 +384,8 @@ body.in-iframe .sb-foot{display:none!important;}
         <option value="">❤ Relación familiar</option>
         <option>Excellent</option><option>Good</option><option>Mid</option><option>Bad</option>
       </select>
+      <div class="sb-lbl" style="margin-top:18px">Backup</div>
+      <button onclick="exportCSV()" title="Descargar todos los atletas en CSV" style="width:100%;text-align:left;background:#AAFF00;color:#000;border:none;border-radius:9px;padding:10px 12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">⬇ Descargar CSV</button>
     </div>
     <div class="sb-foot"><a href="index.html">← Volver al Hub</a></div>
   </nav>
@@ -778,6 +780,28 @@ function renderDP(a){
 }
 function closeDP(){q('#dp').classList.remove('open');q('#dp-ov').classList.remove('open');openId=null;}
 function toggleSidebar(){q('.sidebar').classList.toggle('mob-open');q('#sb-ov').classList.toggle('open');}
+
+async function exportCSV(){
+  const {data,error}=await sb.from('placements').select('*').order('nombre');
+  if(error){ alert('Error al leer los atletas: '+error.message); return; }
+  const rows=data||[];
+  if(!rows.length){ alert('No hay atletas para exportar.'); return; }
+  const cols=[
+    ['nombre','Nombre'],['deporte','Deporte'],['posicion','Posición'],['nacionalidad','Nacionalidad'],
+    ['fecha_nacimiento','Fecha nacimiento'],['nvs_program','Programa'],['tipo','Tipo'],
+    ['commit_status','Estado commit'],['committed_university','Universidad comprometida'],
+    ['current_team','Equipo actual'],['universities_interested','Universidades interesadas'],
+    ['desired_major','Carrera deseada'],['gpa','GPA'],['budget','Presupuesto'],
+    ['family_status','Relación familiar'],['working_with','Recruiter'],
+    ['start_year','Año inicio'],['target_end_year','Año fin'],
+    ['digital_profile','Perfil digital'],['notion_url','Notion'],['notas','Notas'],['created_at','Creado']
+  ];
+  const cell=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const csv=[cols.map(c=>cell(c[1])).join(','), ...rows.map(r=>cols.map(c=>cell(r[c[0]])).join(','))].join('\r\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='apl-placements-backup.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
 
 /* ── DRAG & DROP ── */
 let _dragId=null;
