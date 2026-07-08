@@ -290,12 +290,8 @@ const sb = supabase.createClient(
   'https://mwefvjvvitsondqghgsx.supabase.co',
   'sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk'
 );
-// Admin client — DB operations, bypasses RLS (no session stored)
-const db = supabase.createClient(
-  'https://mwefvjvvitsondqghgsx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZWZ2anZ2aXRzb25kcWdoZ3N4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTc5ODM3MSwiZXhwIjoyMDk3Mzc0MzcxfQ.kaI4cGXyYzWn9YLvrvOQLDyQ56qCG2EtzB_7rQ9xL2k',
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+// Operaciones de BD con la sesión autenticada (respeta RLS) — sin llave admin en el código público
+const db = sb;
 
 /* ── STATE ── */
 let CURRENT_USER = null;
