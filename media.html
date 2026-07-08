@@ -266,6 +266,67 @@ select.fi{cursor:pointer;}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:9px 20px;border-radius:10px;font-size:12px;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{background:var(--red);}
+
+/* ── NUEVO: toggle de vista, leyenda y puntos de plataforma ── */
+.view-toggle{display:inline-flex;border:1px solid var(--b);border-radius:9px;overflow:hidden;margin-right:8px;}
+.view-toggle button{background:#fff;border:none;padding:7px 13px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:var(--m);cursor:pointer;}
+.view-toggle button.active{background:var(--green);color:#000;}
+.plat-legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;padding:8px 12px;background:var(--card);border:1px solid var(--b);border-radius:10px;}
+.plat-legend span{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--m);}
+.pdot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.cal-dots{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle;}
+
+/* ── NUEVO: calendario mensual ── */
+.calm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.calm-dow{text-align:center;font-size:10px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
+.calm-cell{min-height:88px;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:5px 6px;display:flex;flex-direction:column;gap:3px;overflow:hidden;}
+.calm-cell.out{background:#f1f5f9;opacity:.5;}
+.calm-cell.today{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+.calm-daynum{font-size:11px;font-weight:700;color:var(--txt);}
+.calm-item{font-size:10px;background:var(--green-bg);border-radius:5px;padding:2px 5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px;}
+.calm-add{font-size:10px;color:var(--m2);cursor:pointer;margin-top:auto;}
+
+/* ── NUEVO: switch on/off (piezas) ── */
+.sw{position:relative;display:inline-block;width:38px;height:21px;flex-shrink:0;cursor:pointer;}
+.sw input{display:none;}
+.sw-track{position:absolute;inset:0;background:#cbd5e1;border-radius:99px;transition:.2s;}
+.sw-track::after{content:'';position:absolute;width:16px;height:16px;left:2.5px;top:2.5px;background:#fff;border-radius:50%;transition:.2s;}
+.sw input:checked + .sw-track{background:var(--green);}
+.sw input:checked + .sw-track::after{transform:translateX(17px);}
+.piece-done{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--m);}
+.prod-piece-name.done{text-decoration:line-through;color:var(--m2);}
+
+/* ── NUEVO: editor de públicos (campañas) ── */
+.pub-box{border:1px solid var(--b);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg);}
+.pub-head{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.pub-head input{flex:1;}
+.pub-link-row{display:flex;gap:6px;margin-bottom:6px;}
+.pub-link-row input{flex:1;}
+.mini-x{background:none;border:1px solid var(--b);border-radius:7px;width:30px;cursor:pointer;color:var(--red);font-weight:700;flex-shrink:0;}
+.mini-add{background:var(--green-bg);border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--green-txt);cursor:pointer;}
+
+/* ── NUEVO: perfiles (tareas) ── */
+.perfiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.perfil-card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:20px 18px;cursor:pointer;text-align:center;transition:.15s;}
+.perfil-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px);}
+.perfil-av{width:52px;height:52px;border-radius:50%;background:var(--green-bg);color:var(--green-txt);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;margin:0 auto 10px;}
+.perfil-name{font-size:14px;font-weight:700;}
+.perfil-count{font-size:11px;color:var(--m);margin-top:3px;}
+.perfil-add{border:2px dashed var(--b2);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--m);font-weight:700;font-size:13px;}
+
+/* ── NUEVO: brief / reportes ── */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.doc-card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:18px;cursor:pointer;transition:.15s;position:relative;}
+.doc-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px);}
+.doc-card h3{font-size:15px;margin-bottom:4px;}
+.doc-card .sub{font-size:12px;color:var(--m);}
+.doc-card .card-x{position:absolute;top:10px;right:12px;color:var(--m2);cursor:pointer;font-size:15px;}
+.file-list{display:flex;flex-direction:column;gap:8px;}
+.file-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--b);border-radius:10px;padding:10px 12px;}
+.file-ico{font-size:18px;}
+.file-name{flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-name a{color:var(--txt);text-decoration:none;}
+.file-name a:hover{color:var(--green-txt);}
 </style>
 </head>
 <body>
@@ -287,6 +348,8 @@ select.fi{cursor:pointer;}
       <button class="nav-item" onclick="nav('analytics')" id="nav-analytics"><span class="nav-ico">📊</span>Analytics</button>
       <button class="nav-item" onclick="nav('biblioteca')" id="nav-biblioteca"><span class="nav-ico">📂</span>Biblioteca</button>
       <button class="nav-item" onclick="nav('ideas')" id="nav-ideas"><span class="nav-ico">💡</span>Ideas</button>
+      <button class="nav-item" onclick="nav('brief')" id="nav-brief"><span class="nav-ico">📝</span>Brief</button>
+      <button class="nav-item" onclick="nav('reportes')" id="nav-reportes"><span class="nav-ico">📈</span>Reportes</button>
     </nav>
     <div class="sb-foot"><a href="index.html">← Hub NVS</a></div>
   </aside>
@@ -301,17 +364,22 @@ select.fi{cursor:pointer;}
           <span class="sec-title">📅 Calendario de Contenido</span>
         </div>
         <div class="sec-head-right">
+          <div class="view-toggle">
+            <button id="vt-lista" class="active" onclick="setCalView('lista')">Lista</button>
+            <button id="vt-mes" onclick="setCalView('mes')">Mes</button>
+          </div>
           <button class="cal-today-btn" onclick="calToday()">Hoy</button>
           <button class="btn-add" onclick="openAddCal()">+ Agregar</button>
         </div>
       </div>
       <div class="sec-body">
+        <div class="plat-legend" id="plat-legend"></div>
         <div class="cal-week-nav">
-          <button class="cal-nav-btn" onclick="calNav(-7)">‹</button>
+          <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
           <span class="cal-week-lbl" id="cal-week-lbl"></span>
-          <button class="cal-nav-btn" onclick="calNav(7)">›</button>
+          <button class="cal-nav-btn" onclick="calNav(1)">›</button>
         </div>
-        <div class="cal-grid" id="cal-grid"></div>
+        <div id="cal-grid"></div>
       </div>
     </section>
 
@@ -401,6 +469,30 @@ select.fi{cursor:pointer;}
       </div>
     </section>
 
+    <!-- ⑧ BRIEF -->
+    <section class="section" id="sec-brief">
+      <div class="sec-head">
+        <span class="sec-title" id="brief-title">📝 Brief</span>
+        <div class="sec-head-right">
+          <button class="btn-2" id="brief-back" style="display:none" onclick="closeBrief()">← Volver</button>
+          <button class="btn-add" id="brief-add-btn" onclick="openAddBrief()">+ Agregar brief</button>
+        </div>
+      </div>
+      <div class="sec-body"><div id="brief-body"></div></div>
+    </section>
+
+    <!-- ⑨ REPORTES -->
+    <section class="section" id="sec-reportes">
+      <div class="sec-head">
+        <span class="sec-title" id="rep-title">📈 Reportes</span>
+        <div class="sec-head-right">
+          <button class="btn-2" id="rep-back" style="display:none" onclick="closeReporte()">← Volver</button>
+          <button class="btn-add" id="rep-add-btn" onclick="openAddReporte()">+ Agregar reporte</button>
+        </div>
+      </div>
+      <div class="sec-body"><div id="rep-body"></div></div>
+    </section>
+
   </main>
 </div>
 
@@ -427,6 +519,8 @@ const PLATS = ['Instagram','TikTok','YouTube','LinkedIn','Facebook','X / Twitter
 const PLAT_CLS = {Instagram:'ig',TikTok:'tt',YouTube:'yt',LinkedIn:'li',Facebook:'fb','X / Twitter':'tw'};
 const PILARES = ['Educativo','Marca','Testimonio','Captación','Entretenimiento','Detrás de cámaras','Producto','Otro'];
 const TEAM = ['Ariel','Stefano','Diego','Floyd','Andrea','Marketing','Otro'];
+const RESPONSABLES = ['José Montilla','Ximena Botello','Otro'];
+const PLAT_DOT = {Instagram:'#9333EA',TikTok:'#EC4899','X / Twitter':'#000000',LinkedIn:'#2563EB',YouTube:'#DC2626',Facebook:'#F97316'};
 const BIB_CATS = {brand:'Brand Kit',logos:'Logos',guias:'Guías de Edición',templates:'Templates',musica:'Música',assets:'Assets'};
 const COL_ORDER = ['pendiente','progreso','hecho'];
 const COL_LABELS = {pendiente:'Pendiente',progreso:'En progreso',hecho:'Hecho'};
@@ -464,14 +558,17 @@ const ANALYTICS_PLATS = [
 ];
 
 /* ── STATE ── */
-let D = { cal:[], prod:[], camp:[], tareas:[], analytics:{}, bib:{brand:[],logos:[],guias:[],templates:[],musica:[],assets:[]}, ideas:[] };
+let D = { cal:[], prod:[], camp:[], tareas:[], analytics:{}, bib:{brand:[],logos:[],guias:[],templates:[],musica:[],assets:[]}, ideas:[], briefs:[], reportes:[], perfiles:['Ximena Botello','José Montilla'] };
 let modalMode = null, editId = null;
 let calOff = 0, curSec = 'calendario', curAtab = 'meta', curBib = 'brand';
+let calView = 'lista', curPerfil = null, curBrief = null, curReporte = null, tmpPublicos = [];
 
 /* ── STORAGE ── */
 function save(){ localStorage.setItem('nvs_media_v3', JSON.stringify(D)); }
 function load(){
   try{ const d=localStorage.getItem('nvs_media_v3'); if(d) D=JSON.parse(d); }catch(e){}
+  D.briefs = D.briefs||[]; D.reportes = D.reportes||[];
+  D.perfiles = (D.perfiles && D.perfiles.length) ? D.perfiles : ['Ximena Botello','José Montilla'];
 }
 
 /* ── INIT ── */
@@ -493,6 +590,8 @@ function renderSection(id){
   else if(id==='analytics') renderAnalytics();
   else if(id==='biblioteca') renderBib();
   else if(id==='ideas')     renderIdeas();
+  else if(id==='brief')     renderBrief();
+  else if(id==='reportes')  renderReporte();
 }
 
 /* ══════════════════════════════
@@ -501,27 +600,38 @@ function renderSection(id){
 function calNav(d){ calOff+=d; renderCal(); }
 function calToday(){ calOff=0; renderCal(); }
 function isoDate(d){ return d.toISOString().slice(0,10); }
+function setCalView(v){
+  calView=v; calOff=0;
+  document.getElementById('vt-lista').classList.toggle('active',v==='lista');
+  document.getElementById('vt-mes').classList.toggle('active',v==='mes');
+  renderCal();
+}
+function dotsHtml(plats){ return `<span class="cal-dots">${(plats||[]).map(p=>`<i class="pdot" style="background:${PLAT_DOT[p]||'#999'}"></i>`).join('')}</span>`; }
 
 function renderCal(){
+  document.getElementById('plat-legend').innerHTML =
+    PLATS.map(p=>`<span><i class="pdot" style="background:${PLAT_DOT[p]}"></i>${p.replace(' / Twitter','')}</span>`).join('');
+  if(calView==='mes') renderCalMonth(); else renderCalList();
+}
+
+function renderCalList(){
   const today=new Date(); today.setHours(0,0,0,0);
-  const dow=today.getDay(); // 0=Sun
+  const dow=today.getDay();
   const monday=new Date(today);
-  monday.setDate(today.getDate()-(dow===0?6:dow-1)+calOff);
+  monday.setDate(today.getDate()-(dow===0?6:dow-1)+calOff*7);
 
   const days=[];
   for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);days.push(d);}
-
   const end=days[6];
   document.getElementById('cal-week-lbl').textContent=
     `${days[0].toLocaleDateString('es-PA',{day:'numeric',month:'short'})} – ${end.toLocaleDateString('es-PA',{day:'numeric',month:'short',year:'numeric'})}`;
 
-  const grid=document.getElementById('cal-grid'); grid.innerHTML='';
+  const grid=document.getElementById('cal-grid'); grid.className='cal-grid'; grid.innerHTML='';
   days.forEach(d=>{
     const iso=isoDate(d);
     const isToday=iso===isoDate(today);
     const items=(D.cal||[]).filter(i=>i.fecha===iso).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
     const label=d.toLocaleDateString('es-PA',{weekday:'short',day:'numeric',month:'short'});
-
     const el=document.createElement('div'); el.className='cal-day';
     el.innerHTML=`
       <div class="cal-day-head">
@@ -535,13 +645,38 @@ function renderCal(){
             <div class="cal-check${it.pub?' done':''}" onclick="togglePub('${it.id}',event)">${it.pub?'✓':''}</div>
             <span class="cal-hora">${it.hora||'—'}</span>
             <span class="cal-nombre${it.pub?' done':''}">${esc(it.nombre)}</span>
-            <div class="cal-plats">${(it.plats||[]).map(p=>`<span class="plat-badge ${PLAT_CLS[p]||''}">${p.replace(' / Twitter','')}</span>`).join('')}</div>
+            ${dotsHtml(it.plats)}
+            ${it.link?`<a class="cal-link" href="${esc(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir link">🔗</a>`:''}
             ${it.pilar?`<span class="cal-pilar">${esc(it.pilar)}</span>`:''}
             ${it.resp?`<span class="cal-resp">${esc(it.resp)}</span>`:''}
             <button class="cal-del" onclick="delItem('cal','${it.id}',event)">×</button>
           </div>`).join('')}</div>`}`;
     grid.appendChild(el);
   });
+}
+
+function renderCalMonth(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const base=new Date(today.getFullYear(), today.getMonth()+calOff, 1);
+  const y=base.getFullYear(), m=base.getMonth();
+  document.getElementById('cal-week-lbl').textContent=
+    base.toLocaleDateString('es-PA',{month:'long',year:'numeric'});
+  const firstDow=(base.getDay()+6)%7;
+  const start=new Date(y,m,1-firstDow);
+  const dows=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const grid=document.getElementById('cal-grid'); grid.className='calm-grid';
+  let html=dows.map(d=>`<div class="calm-dow">${d}</div>`).join('');
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const iso=isoDate(d), out=d.getMonth()!==m, isToday=iso===isoDate(today);
+    const items=(D.cal||[]).filter(x=>x.fecha===iso).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+    html+=`<div class="calm-cell${out?' out':''}${isToday?' today':''}">
+      <div class="calm-daynum">${d.getDate()}</div>
+      ${items.map(it=>`<div class="calm-item" onclick="togglePub('${it.id}',event)" title="${esc(it.nombre)}">${dotsHtml(it.plats)}${esc(it.nombre)}</div>`).join('')}
+      <div class="calm-add" onclick="openAddCal('${iso}')">+ agregar</div>
+    </div>`;
+  }
+  grid.innerHTML=html;
 }
 
 function togglePub(id,e){
@@ -574,15 +709,22 @@ function renderProd(){
             <div class="prod-piece">
               <span class="prod-piece-num">#${i+1}</span>
               <div class="prod-piece-info">
-                <div class="prod-piece-name">${esc(pz.nombre)}</div>
+                <div class="prod-piece-name${pz.done?' done':''}">${esc(pz.nombre)}</div>
                 ${pz.desc?`<div class="prod-piece-desc">${esc(pz.desc)}</div>`:''}
                 ${pz.ref?`<div class="prod-piece-ref">🔗 ${esc(pz.ref)}</div>`:''}
+              </div>
+              <div class="piece-done">
+                <span>${pz.done?'Completado':'Pendiente'}</span>
+                <label class="sw"><input type="checkbox" ${pz.done?'checked':''} onclick="togglePieza('${p.id}','${pz.id}',event)"><span class="sw-track"></span></label>
               </div>
               <button class="prod-piece-del" onclick="delPieza('${p.id}','${pz.id}')">×</button>
             </div>`).join('')}
         </div>
-        <button class="prod-add-piece" onclick="openAddPieza('${p.id}')">+ Agregar pieza grabada</button>
-        ${p.notas?`<div class="prod-notas-lbl">Notas</div><div class="prod-notas-txt">${esc(p.notas)}</div>`:''}
+        <button class="prod-add-piece" onclick="openAddPieza('${p.id}')">+ Piezas</button>
+        ${p.hora?`<div class="prod-notas-lbl">Hora</div><div class="prod-notas-txt">${esc(p.hora)}</div>`:''}
+        ${p.logistica?`<div class="prod-notas-lbl">Logística</div><div class="prod-notas-txt">${esc(p.logistica)}</div>`:''}
+        ${p.participantes?`<div class="prod-notas-lbl">Participantes</div><div class="prod-notas-txt">${esc(p.participantes)}</div>`:''}
+        ${p.elementos?`<div class="prod-notas-lbl">Elementos / Materiales</div><div class="prod-notas-txt">${esc(p.elementos)}</div>`:''}
       </div>
     </div>`).join('');
 }
@@ -611,16 +753,40 @@ function renderCamp(){
           <div class="camp-metric"><div class="camp-metric-n">${c.cpl||'—'}</div><div class="camp-metric-l">CPL</div></div>
         </div>
         ${(c.inicio||c.fin)?`<div class="camp-dates">${c.inicio?fmtShort(c.inicio):'?'} → ${c.fin?fmtShort(c.fin):'?'}</div>`:''}
+        ${(c.publicos&&c.publicos.length)?`<div class="camp-dates">👥 ${c.publicos.length} público${c.publicos.length!==1?'s':''}</div>`:''}
       </div>`; }).join('');
 }
 
 /* ══════════════════════════════
    ④ TAREAS
 ══════════════════════════════ */
+function inits(n){ return (n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function openPerfil(name){ curPerfil=name; renderTareas(); }
+function closePerfil(){ curPerfil=null; renderTareas(); }
+function addPerfil(){
+  const name=(prompt('Nombre del nuevo perfil:')||'').trim();
+  if(!name) return;
+  if(!D.perfiles.includes(name)) D.perfiles.push(name);
+  save(); renderTareas();
+}
 function renderTareas(){
   const board=document.getElementById('tareas-board');
-  board.innerHTML=COL_ORDER.map(col=>{
-    const tasks=(D.tareas||[]).filter(t=>t.estado===col);
+  board.style.display='block';
+  if(!curPerfil){
+    board.innerHTML=`<div class="perfiles-grid">
+      ${D.perfiles.map(name=>{
+        const n=(D.tareas||[]).filter(t=>t.persona===name).length;
+        return `<div class="perfil-card" onclick='openPerfil(${JSON.stringify(name)})'>
+          <div class="perfil-av">${inits(name)}</div>
+          <div class="perfil-name">${esc(name)}</div>
+          <div class="perfil-count">${n} tarea${n!==1?'s':''}</div>
+        </div>`; }).join('')}
+      <div class="perfil-card perfil-add" onclick="addPerfil()">+ Agregar perfil</div>
+    </div>`;
+    return;
+  }
+  const cols=COL_ORDER.map(col=>{
+    const tasks=(D.tareas||[]).filter(t=>t.estado===col && t.persona===curPerfil);
     return `
       <div class="col-wrap">
         <div class="col-head">
@@ -633,10 +799,10 @@ function renderTareas(){
             return `
               <div class="task-card">
                 <div class="task-title">${esc(t.titulo)}</div>
+                ${t.desc?`<div style="font-size:11px;color:var(--m);margin:4px 0 2px">${esc(t.desc)}</div>`:''}
                 <div class="task-footer">
                   <span class="prio ${t.prio||'Baja'}">${t.prio||'Baja'}</span>
                   ${t.due?`<span class="task-due">📅 ${fmtShort(t.due)}</span>`:''}
-                  ${t.asig?`<span class="task-asig">👤 ${esc(t.asig)}</span>`:''}
                 </div>
                 <div class="task-actions">
                   ${idx>0?`<button class="task-move" onclick="moveTask('${t.id}',-1)">← Atrás</button>`:''}
@@ -647,6 +813,13 @@ function renderTareas(){
               </div>`;}).join('')}
         </div>
       </div>`; }).join('');
+  board.innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <button class="btn-2" onclick="closePerfil()">← Perfiles</button>
+      <span class="perfil-av" style="width:34px;height:34px;font-size:13px;margin:0">${inits(curPerfil)}</span>
+      <span style="font-weight:800;font-size:16px">${esc(curPerfil)}</span>
+    </div>
+    <div style="display:flex;gap:14px;align-items:flex-start;overflow-x:auto;padding-bottom:8px">${cols}</div>`;
 }
 function moveTask(id,dir){
   const t=D.tareas.find(x=>x.id===id); if(!t)return;
@@ -769,8 +942,10 @@ function openAddCal(fecha=''){
     <div class="mf"><label>Plataformas</label>${platChecks()}</div>
     <div class="mf-2">
       <div class="mf"><label>Pilar de contenido</label><select class="fi" id="f-pilar"><option value="">—</option>${PILARES.map(p=>`<option>${p}</option>`).join('')}</select></div>
-      <div class="mf"><label>Responsable</label><select class="fi" id="f-resp"><option value="">—</option>${TEAM.map(t=>`<option>${t}</option>`).join('')}</select></div>
-    </div>`);
+      <div class="mf"><label>Responsable</label><select class="fi" id="f-resp"><option value="">—</option>${RESPONSABLES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    </div>
+    <div class="mf"><label>Link de la pieza</label><input class="fi" id="f-link" placeholder="https://..."></div>
+    <div class="mf"><label>Copy / Caption</label><textarea class="fi" id="f-copy" rows="4" placeholder="Texto que acompaña la publicación..."></textarea></div>`);
 }
 
 /* PRODUCCIONES */
@@ -778,11 +953,14 @@ function openAddProd(){
   modalMode='add-prod';
   openMod('Nueva sesión de producción',`
     <div class="mf"><label>Título de la sesión *</label><input class="fi" id="f-titulo" placeholder="Ej: Sesión Julio — Campus NVS"></div>
-    <div class="mf-2">
+    <div class="mf-3">
       <div class="mf"><label>Fecha *</label><input class="fi" id="f-fecha" type="date" value="${isoDate(new Date())}"></div>
       <div class="mf"><label>Lugar</label><input class="fi" id="f-lugar" placeholder="Ej: Balboa Academy..."></div>
+      <div class="mf"><label>Hora</label><input class="fi" id="f-hora" type="time"></div>
     </div>
-    <div class="mf"><label>Notas generales</label><textarea class="fi" id="f-notas" rows="3" placeholder="Ideas, logística, referencias..."></textarea></div>`);
+    <div class="mf"><label>Logística</label><textarea class="fi" id="f-log" rows="2" placeholder="Transporte, permisos, horarios..."></textarea></div>
+    <div class="mf"><label>Participantes</label><textarea class="fi" id="f-part" rows="2" placeholder="Quiénes participan en la producción..."></textarea></div>
+    <div class="mf"><label>Elementos / Materiales</label><textarea class="fi" id="f-elem" rows="2" placeholder="Todo lo que se va a usar: pelota, micrófono, cámara, luces..."></textarea></div>`);
 }
 function openEditProd(id,e){
   e.stopPropagation();
@@ -790,11 +968,14 @@ function openEditProd(id,e){
   modalMode='edit-prod'; editId=id;
   openMod('Editar sesión',`
     <div class="mf"><label>Título *</label><input class="fi" id="f-titulo" value="${esc(p.titulo)}"></div>
-    <div class="mf-2">
+    <div class="mf-3">
       <div class="mf"><label>Fecha</label><input class="fi" id="f-fecha" type="date" value="${p.fecha||''}"></div>
       <div class="mf"><label>Lugar</label><input class="fi" id="f-lugar" value="${esc(p.lugar||'')}"></div>
+      <div class="mf"><label>Hora</label><input class="fi" id="f-hora" type="time" value="${p.hora||''}"></div>
     </div>
-    <div class="mf"><label>Notas</label><textarea class="fi" id="f-notas" rows="3">${esc(p.notas||'')}</textarea></div>`,true);
+    <div class="mf"><label>Logística</label><textarea class="fi" id="f-log" rows="2">${esc(p.logistica||'')}</textarea></div>
+    <div class="mf"><label>Participantes</label><textarea class="fi" id="f-part" rows="2">${esc(p.participantes||'')}</textarea></div>
+    <div class="mf"><label>Elementos / Materiales</label><textarea class="fi" id="f-elem" rows="2">${esc(p.elementos||'')}</textarea></div>`,true);
 }
 function openAddPieza(prodId){
   modalMode='add-pieza'; editId=prodId;
@@ -806,6 +987,13 @@ function openAddPieza(prodId){
 function delPieza(prodId,pzId){
   const p=D.prod.find(x=>x.id===prodId); if(!p)return;
   p.piezas=(p.piezas||[]).filter(z=>z.id!==pzId); save(); renderProd();
+}
+function togglePieza(prodId,pzId,e){
+  if(e) e.stopPropagation();
+  const p=D.prod.find(x=>x.id===prodId); if(!p)return;
+  const pz=(p.piezas||[]).find(z=>z.id===pzId); if(!pz)return;
+  pz.done=!pz.done; save(); renderProd();
+  document.getElementById('pc-'+prodId)?.classList.add('expanded');
 }
 
 /* CAMPAÑAS */
@@ -828,7 +1016,36 @@ function openAddCamp(){
       <div class="mf"><label>CPL ($)</label><input class="fi" id="f-cpl" placeholder="—"></div>
       <div class="mf"><label>Conversiones</label><input class="fi" id="f-conv" type="number" placeholder="0"></div>
     </div>
-    <div class="mf"><label>Creativos utilizados</label><input class="fi" id="f-cre" placeholder="Links o descripción..."></div>`);
+    <div class="mf"><label>Públicos</label>
+      <div id="pub-editor"></div>
+      <button type="button" class="mini-add" onclick="addPublico()">+ Agregar público</button>
+    </div>`);
+  tmpPublicos=[]; renderPublicosEditor();
+}
+/* ── Editor de públicos (campañas) ── */
+function renderPublicosEditor(){
+  const box=document.getElementById('pub-editor'); if(!box)return;
+  box.innerHTML=tmpPublicos.map((pu,i)=>`
+    <div class="pub-box">
+      <div class="pub-head">
+        <input class="fi" placeholder="Nombre del público (ej. Público retargeting)" value="${esc(pu.nombre||'')}" oninput="tmpPublicos[${i}].nombre=this.value">
+        <button type="button" class="mini-x" title="Eliminar público" onclick="delPublico(${i})">×</button>
+      </div>
+      ${(pu.links||[]).map((lk,j)=>`
+        <div class="pub-link-row">
+          <input class="fi" placeholder="Link de material" value="${esc(lk)}" oninput="tmpPublicos[${i}].links[${j}]=this.value">
+          <button type="button" class="mini-x" title="Quitar link" onclick="delLink(${i},${j})">×</button>
+        </div>`).join('')}
+      <button type="button" class="mini-add" onclick="addLink(${i})">+ Agregar link</button>
+    </div>`).join('') || '<div style="font-size:12px;color:var(--m2);margin-bottom:8px">Sin públicos todavía.</div>';
+}
+function addPublico(){ tmpPublicos.push({nombre:'Público '+(tmpPublicos.length+1),links:['']}); renderPublicosEditor(); }
+function delPublico(i){ tmpPublicos.splice(i,1); renderPublicosEditor(); }
+function addLink(i){ tmpPublicos[i].links=tmpPublicos[i].links||[]; tmpPublicos[i].links.push(''); renderPublicosEditor(); }
+function delLink(i,j){ tmpPublicos[i].links.splice(j,1); renderPublicosEditor(); }
+function collectPublicos(){
+  return tmpPublicos.map(pu=>({nombre:(pu.nombre||'').trim()||'Público',links:(pu.links||[]).map(l=>(l||'').trim()).filter(Boolean)}))
+    .filter(pu=>pu.links.length || pu.nombre!=='Público');
 }
 function openEditCamp(id){
   const c=D.camp.find(x=>x.id===id); if(!c)return;
@@ -850,38 +1067,38 @@ function openEditCamp(id){
       <div class="mf"><label>CPL ($)</label><input class="fi" id="f-cpl" value="${c.cpl||''}"></div>
       <div class="mf"><label>Conversiones</label><input class="fi" id="f-conv" value="${c.conversiones||''}"></div>
     </div>
-    <div class="mf"><label>Creativos</label><input class="fi" id="f-cre" value="${esc(c.creativos||'')}"></div>`,true);
+    <div class="mf"><label>Públicos</label>
+      <div id="pub-editor"></div>
+      <button type="button" class="mini-add" onclick="addPublico()">+ Agregar público</button>
+    </div>`,true);
+  tmpPublicos = JSON.parse(JSON.stringify(c.publicos||[]));
+  renderPublicosEditor();
 }
 
 /* TAREAS */
 function openAddTarea(){
+  if(!curPerfil){ toast('Entra a un perfil primero','err'); return; }
   modalMode='add-tarea';
-  openMod('Nueva tarea',`
+  openMod('Nueva tarea — '+curPerfil,`
     <div class="mf"><label>Título *</label><input class="fi" id="f-titulo" placeholder="Ej: Editar reel de la sesión..."></div>
-    <div class="mf-3">
+    <div class="mf-2">
       <div class="mf"><label>Prioridad</label><select class="fi" id="f-prio"><option>Baja</option><option>Media</option><option selected>Alta</option></select></div>
       <div class="mf"><label>Estado</label><select class="fi" id="f-est"><option value="pendiente">Pendiente</option><option value="progreso">En progreso</option><option value="hecho">Hecho</option></select></div>
-      <div class="mf"><label>Asignado</label><select class="fi" id="f-asig"><option value="">—</option>${TEAM.map(t=>`<option>${t}</option>`).join('')}</select></div>
     </div>
-    <div class="mf-2">
-      <div class="mf"><label>Fecha límite</label><input class="fi" id="f-due" type="date"></div>
-      <div class="mf"><label>Relación (opcional)</label><input class="fi" id="f-rel" placeholder="Campaña o producción..."></div>
-    </div>`);
+    <div class="mf"><label>Fecha límite</label><input class="fi" id="f-due" type="date"></div>
+    <div class="mf"><label>Descripción</label><textarea class="fi" id="f-desc" rows="3" placeholder="Descripción, observaciones o anotaciones..."></textarea></div>`);
 }
 function openEditTarea(id){
   const t=D.tareas.find(x=>x.id===id); if(!t)return;
   modalMode='edit-tarea'; editId=id;
   openMod('Editar tarea',`
     <div class="mf"><label>Título *</label><input class="fi" id="f-titulo" value="${esc(t.titulo)}"></div>
-    <div class="mf-3">
+    <div class="mf-2">
       <div class="mf"><label>Prioridad</label><select class="fi" id="f-prio"><option${t.prio==='Baja'?' selected':''}>Baja</option><option${t.prio==='Media'?' selected':''}>Media</option><option${t.prio==='Alta'?' selected':''}>Alta</option></select></div>
       <div class="mf"><label>Estado</label><select class="fi" id="f-est"><option value="pendiente"${t.estado==='pendiente'?' selected':''}>Pendiente</option><option value="progreso"${t.estado==='progreso'?' selected':''}>En progreso</option><option value="hecho"${t.estado==='hecho'?' selected':''}>Hecho</option></select></div>
-      <div class="mf"><label>Asignado</label><select class="fi" id="f-asig"><option value="">—</option>${TEAM.map(tm=>`<option${t.asig===tm?' selected':''}>${tm}</option>`).join('')}</select></div>
     </div>
-    <div class="mf-2">
-      <div class="mf"><label>Fecha límite</label><input class="fi" id="f-due" type="date" value="${t.due||''}"></div>
-      <div class="mf"><label>Relación</label><input class="fi" id="f-rel" value="${esc(t.relacion||'')}"></div>
-    </div>`,true);
+    <div class="mf"><label>Fecha límite</label><input class="fi" id="f-due" type="date" value="${t.due||''}"></div>
+    <div class="mf"><label>Descripción</label><textarea class="fi" id="f-desc" rows="3">${esc(t.desc||'')}</textarea></div>`,true);
 }
 
 /* BIBLIOTECA */
@@ -912,18 +1129,18 @@ function doSave(){
   if(modalMode==='add-cal'){
     const nombre=gv('f-nom'); if(!nombre){toast('El nombre es requerido','err');return;}
     if(!D.cal)D.cal=[];
-    D.cal.push({id:uid(),nombre,fecha:gv('f-fecha'),hora:gv('f-hora'),plats:getPlats(),pilar:gv('f-pilar'),resp:gv('f-resp'),pub:false});
+    D.cal.push({id:uid(),nombre,fecha:gv('f-fecha'),hora:gv('f-hora'),plats:getPlats(),pilar:gv('f-pilar'),resp:gv('f-resp'),link:gv('f-link'),copy:gv('f-copy'),pub:false});
     save();closeMod();renderCal();
   }
   else if(modalMode==='add-prod'){
     const titulo=gv('f-titulo'); if(!titulo){toast('El título es requerido','err');return;}
     if(!D.prod)D.prod=[];
-    D.prod.push({id:uid(),titulo,fecha:gv('f-fecha'),lugar:gv('f-lugar'),notas:gv('f-notas'),piezas:[]});
+    D.prod.push({id:uid(),titulo,fecha:gv('f-fecha'),lugar:gv('f-lugar'),hora:gv('f-hora'),logistica:gv('f-log'),participantes:gv('f-part'),elementos:gv('f-elem'),piezas:[]});
     save();closeMod();renderProd();
   }
   else if(modalMode==='edit-prod'){
     const p=D.prod.find(x=>x.id===editId);
-    if(p)Object.assign(p,{titulo:gv('f-titulo'),fecha:gv('f-fecha'),lugar:gv('f-lugar'),notas:gv('f-notas')});
+    if(p)Object.assign(p,{titulo:gv('f-titulo'),fecha:gv('f-fecha'),lugar:gv('f-lugar'),hora:gv('f-hora'),logistica:gv('f-log'),participantes:gv('f-part'),elementos:gv('f-elem')});
     save();closeMod();renderProd();
   }
   else if(modalMode==='add-pieza'){
@@ -935,23 +1152,23 @@ function doSave(){
   else if(modalMode==='add-camp'){
     const nombre=gv('f-nom'); if(!nombre){toast('El nombre es requerido','err');return;}
     if(!D.camp)D.camp=[];
-    D.camp.push({id:uid(),nombre,objetivo:gv('f-obj'),plats:getPlats(),presupuesto:gv('f-pres'),estado:gv('f-est'),inicio:gv('f-ini'),fin:gv('f-fin'),leads:gv('f-leads'),cpl:gv('f-cpl'),conversiones:gv('f-conv'),creativos:gv('f-cre')});
+    D.camp.push({id:uid(),nombre,objetivo:gv('f-obj'),plats:getPlats(),presupuesto:gv('f-pres'),estado:gv('f-est'),inicio:gv('f-ini'),fin:gv('f-fin'),leads:gv('f-leads'),cpl:gv('f-cpl'),conversiones:gv('f-conv'),publicos:collectPublicos()});
     save();closeMod();renderCamp();
   }
   else if(modalMode==='edit-camp'){
     const c=D.camp.find(x=>x.id===editId);
-    if(c)Object.assign(c,{nombre:gv('f-nom'),objetivo:gv('f-obj'),plats:getPlats(),presupuesto:gv('f-pres'),estado:gv('f-est'),inicio:gv('f-ini'),fin:gv('f-fin'),leads:gv('f-leads'),cpl:gv('f-cpl'),conversiones:gv('f-conv'),creativos:gv('f-cre')});
+    if(c)Object.assign(c,{nombre:gv('f-nom'),objetivo:gv('f-obj'),plats:getPlats(),presupuesto:gv('f-pres'),estado:gv('f-est'),inicio:gv('f-ini'),fin:gv('f-fin'),leads:gv('f-leads'),cpl:gv('f-cpl'),conversiones:gv('f-conv'),publicos:collectPublicos()});
     save();closeMod();renderCamp();
   }
   else if(modalMode==='add-tarea'){
     const titulo=gv('f-titulo'); if(!titulo){toast('El título es requerido','err');return;}
     if(!D.tareas)D.tareas=[];
-    D.tareas.push({id:uid(),titulo,prio:gv('f-prio'),estado:gv('f-est')||'pendiente',due:gv('f-due'),asig:gv('f-asig'),relacion:gv('f-rel')});
+    D.tareas.push({id:uid(),titulo,prio:gv('f-prio'),estado:gv('f-est')||'pendiente',due:gv('f-due'),desc:gv('f-desc'),persona:curPerfil});
     save();closeMod();renderTareas();
   }
   else if(modalMode==='edit-tarea'){
     const t=D.tareas.find(x=>x.id===editId);
-    if(t)Object.assign(t,{titulo:gv('f-titulo'),prio:gv('f-prio'),estado:gv('f-est'),due:gv('f-due'),asig:gv('f-asig'),relacion:gv('f-rel')});
+    if(t)Object.assign(t,{titulo:gv('f-titulo'),prio:gv('f-prio'),estado:gv('f-est'),due:gv('f-due'),desc:gv('f-desc')});
     save();closeMod();renderTareas();
   }
   else if(modalMode==='add-bib'){
@@ -974,6 +1191,137 @@ function doSave(){
     }
     save();closeMod();setBibCat(newCat);
   }
+  else if(modalMode==='add-brief'){
+    const t=gv('f-titulo'); if(!t){toast('El título es requerido','err');return;}
+    D.briefs.push({id:uid(),titulo:t,subtitulo:gv('f-sub'),docs:[]});
+    save();closeMod();renderBrief();
+  }
+  else if(modalMode==='add-reporte'){
+    const t=gv('f-titulo'); if(!t){toast('El título es requerido','err');return;}
+    D.reportes.push({id:uid(),titulo:t,fecha:gv('f-fecha'),docs:[]});
+    save();closeMod();renderReporte();
+  }
+  else if(modalMode==='add-doc-brief'){ saveDoc('brief'); }
+  else if(modalMode==='add-doc-reportes'){ saveDoc('reportes'); }
+}
+
+/* ══════════════════════════════
+   ⑧ BRIEF  &  ⑨ REPORTES
+══════════════════════════════ */
+function docIco(d){
+  if(d.tipo==='link') return '🔗';
+  const m=(d.mime||'')+' '+(d.nombre||'');
+  if(/pdf/i.test(m))return '📕';
+  if(/image|png|jpe?g|gif|webp|heic/i.test(m))return '🖼️';
+  if(/word|\.docx?/i.test(m))return '📘';
+  if(/powerpoint|presentation|\.pptx?/i.test(m))return '📙';
+  if(/excel|sheet|\.xlsx?|\.csv/i.test(m))return '📗';
+  return '📄';
+}
+function fileListHtml(docs,kind,pid){
+  if(!docs || !docs.length) return `<div style="text-align:center;padding:34px;color:var(--m);font-size:13px">Sin documentos. Usa "+ Agregar documento" para subir archivos o pegar links.</div>`;
+  return `<div class="file-list">${docs.map(d=>`
+    <div class="file-row">
+      <span class="file-ico">${docIco(d)}</span>
+      <span class="file-name"><a href="${esc(d.url)}" ${d.tipo==='file'?`download="${esc(d.nombre)}"`:'target="_blank" rel="noopener"'}>${esc(d.nombre)}</a></span>
+      <button class="mini-x" title="Quitar" onclick="delDoc('${kind}','${pid}','${d.id}')">×</button>
+    </div>`).join('')}</div>`;
+}
+function openAddDoc(kind){
+  modalMode='add-doc-'+kind;
+  openMod('Agregar documento',`
+    <div class="mf"><label>Archivo (PDF, Word, PowerPoint, imagen…)</label><input class="fi" id="f-file" type="file"></div>
+    <div style="text-align:center;color:var(--m2);font-size:11px;margin:-4px 0 10px">— o —</div>
+    <div class="mf"><label>Link</label><input class="fi" id="f-link" placeholder="https://drive.google.com/..."></div>
+    <div class="mf"><label>Nombre (opcional)</label><input class="fi" id="f-nom" placeholder="Nombre a mostrar"></div>`);
+}
+function saveDoc(kind){
+  const fileInput=document.getElementById('f-file');
+  const link=gv('f-link'), nom=gv('f-nom');
+  const parent = kind==='brief' ? D.briefs.find(x=>x.id===curBrief) : D.reportes.find(x=>x.id===curReporte);
+  if(!parent) return;
+  parent.docs=parent.docs||[];
+  const rerender=()=>{ closeMod(); kind==='brief'?renderBrief():renderReporte(); };
+  const persist=()=>{ try{ save(); return true; }catch(e){ parent.docs.pop(); toast('Sin espacio local para el archivo. Usa un link.','err'); return false; } };
+  if(fileInput && fileInput.files && fileInput.files[0]){
+    const f=fileInput.files[0];
+    if(f.size > 4*1024*1024){ toast('Archivo muy grande (máx 4MB). Mejor pega un link.','err'); return; }
+    const r=new FileReader();
+    r.onload=()=>{ parent.docs.push({id:uid(),tipo:'file',nombre:nom||f.name,mime:f.type,url:r.result}); if(persist()) rerender(); };
+    r.readAsDataURL(f);
+  } else if(link){
+    parent.docs.push({id:uid(),tipo:'link',nombre:nom||link,url:link}); if(persist()) rerender();
+  } else { toast('Agrega un archivo o un link','err'); }
+}
+function delDoc(kind,pid,docId){
+  const parent = kind==='brief' ? D.briefs.find(x=>x.id===pid) : D.reportes.find(x=>x.id===pid);
+  if(!parent) return;
+  parent.docs=(parent.docs||[]).filter(d=>d.id!==docId); save();
+  kind==='brief'?renderBrief():renderReporte();
+}
+
+/* BRIEF */
+function renderBrief(){
+  const back=document.getElementById('brief-back'), addBtn=document.getElementById('brief-add-btn');
+  const title=document.getElementById('brief-title'), body=document.getElementById('brief-body');
+  if(!curBrief){
+    back.style.display='none'; title.textContent='📝 Brief';
+    addBtn.textContent='+ Agregar brief'; addBtn.onclick=openAddBrief;
+    body.innerHTML = D.briefs.length ? `<div class="doc-grid">${D.briefs.map(b=>`
+      <div class="doc-card" onclick="openBrief('${b.id}')">
+        <span class="card-x" title="Borrar" onclick="delBrief('${b.id}',event)">×</span>
+        <h3>${esc(b.titulo)}</h3>
+        <div class="sub">${esc(b.subtitulo||'')}</div>
+        <div class="sub" style="margin-top:8px">${(b.docs||[]).length} documento${(b.docs||[]).length!==1?'s':''}</div>
+      </div>`).join('')}</div>`
+      : `<div style="text-align:center;padding:44px;color:var(--m);font-size:13px">Sin briefs. Crea el primero con "+ Agregar brief".</div>`;
+    return;
+  }
+  const b=D.briefs.find(x=>x.id===curBrief); if(!b){ curBrief=null; return renderBrief(); }
+  back.style.display=''; title.textContent='📝 '+b.titulo;
+  addBtn.textContent='+ Agregar documento'; addBtn.onclick=()=>openAddDoc('brief');
+  body.innerHTML = `${b.subtitulo?`<div style="color:var(--m);font-size:13px;margin-bottom:14px">${esc(b.subtitulo)}</div>`:''}${fileListHtml(b.docs||[],'brief',b.id)}`;
+}
+function openBrief(id){ curBrief=id; renderBrief(); }
+function closeBrief(){ curBrief=null; renderBrief(); }
+function delBrief(id,e){ e.stopPropagation(); if(!confirm('¿Borrar este brief y sus documentos?'))return; D.briefs=D.briefs.filter(x=>x.id!==id); save(); renderBrief(); }
+function openAddBrief(){
+  modalMode='add-brief';
+  openMod('Agregar brief',`
+    <div class="mf"><label>Título *</label><input class="fi" id="f-titulo" placeholder="Ej: Brief de Julio"></div>
+    <div class="mf"><label>Subtítulo</label><input class="fi" id="f-sub" placeholder="Breve descripción..."></div>`);
+}
+
+/* REPORTES */
+function renderReporte(){
+  const back=document.getElementById('rep-back'), addBtn=document.getElementById('rep-add-btn');
+  const title=document.getElementById('rep-title'), body=document.getElementById('rep-body');
+  if(!curReporte){
+    back.style.display='none'; title.textContent='📈 Reportes';
+    addBtn.textContent='+ Agregar reporte'; addBtn.onclick=openAddReporte;
+    body.innerHTML = D.reportes.length ? `<div class="doc-grid">${D.reportes.map(r=>`
+      <div class="doc-card" onclick="openReporte('${r.id}')">
+        <span class="card-x" title="Borrar" onclick="delReporte('${r.id}',event)">×</span>
+        <h3>${esc(r.titulo)}</h3>
+        <div class="sub">🗓 ${esc(r.fecha||'')}</div>
+        <div class="sub" style="margin-top:8px">${(r.docs||[]).length} archivo${(r.docs||[]).length!==1?'s':''}</div>
+      </div>`).join('')}</div>`
+      : `<div style="text-align:center;padding:44px;color:var(--m);font-size:13px">Sin reportes. Crea el primero con "+ Agregar reporte".</div>`;
+    return;
+  }
+  const r=D.reportes.find(x=>x.id===curReporte); if(!r){ curReporte=null; return renderReporte(); }
+  back.style.display=''; title.textContent='📈 '+r.titulo;
+  addBtn.textContent='+ Agregar archivo'; addBtn.onclick=()=>openAddDoc('reportes');
+  body.innerHTML = `<div style="color:var(--m);font-size:13px;margin-bottom:14px">🗓 ${esc(r.fecha||'')}</div>${fileListHtml(r.docs||[],'reportes',r.id)}`;
+}
+function openReporte(id){ curReporte=id; renderReporte(); }
+function closeReporte(){ curReporte=null; renderReporte(); }
+function delReporte(id,e){ e.stopPropagation(); if(!confirm('¿Borrar este reporte y sus archivos?'))return; D.reportes=D.reportes.filter(x=>x.id!==id); save(); renderReporte(); }
+function openAddReporte(){
+  modalMode='add-reporte';
+  openMod('Agregar reporte',`
+    <div class="mf"><label>Título *</label><input class="fi" id="f-titulo" placeholder="Ej: Reporte Julio"></div>
+    <div class="mf"><label>Fecha / Período *</label><input class="fi" id="f-fecha" placeholder="Ej: Julio 2026 / primera quincena de julio"></div>`);
 }
 
 function doDelete(){
