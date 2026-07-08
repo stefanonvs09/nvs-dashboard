@@ -482,6 +482,7 @@ const ALL_MODULES=[
   {id:'guias',    icon:'📖', name:'Guías',                accent:'#8b5cf6', href:'guias.html'},
   {id:'chat',     icon:'🤖', name:'Asistente IA',         accent:'#06b6d4', href:'chat.html'},
   {id:'reportes', icon:'📊', name:'Reportes',             accent:'#8b5cf6', href:'reportes.html'},
+  {id:'prompts',  icon:'💬', name:'Prompts',              accent:'#14b8a6', href:'prompts.html'},
 ];
 
 /* ── NAV ── */
@@ -526,7 +527,7 @@ function buildNav(email){
   document.getElementById('nav-list').innerHTML=hubItem+items;
 }
 
-const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes'};
+const _modTitles={finanzas:'Dashboard Financiero',crm:'APL · Placements',leads:'Leads Pipeline',pagos:'Pagos',media:'Media Pipeline',proyectos:'Proyectos',servicios:'Servicios',tareas:'Tareas',guias:'Guías',chat:'Asistente IA',reportes:'Reportes',prompts:'Prompts'};
 
 function selectModule(id, href){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
