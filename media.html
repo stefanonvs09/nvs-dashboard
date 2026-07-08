@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NVS · Media Pipeline</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -331,8 +332,21 @@ select.fi{cursor:pointer;}
 </head>
 <body>
 
+<!-- LOGIN -->
+<div id="login-ov" style="position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:var(--bg);font-family:'Inter',sans-serif;">
+  <div style="background:#fff;border:1px solid var(--b);border-radius:16px;padding:30px 26px;width:min(360px,92vw);box-shadow:0 4px 24px rgba(0,0,0,.08);">
+    <h2 style="margin:0 0 4px;font-size:19px;">🎬 Media Pipeline</h2>
+    <p style="margin:0 0 18px;color:var(--m);font-size:13px;">Entra con tu cuenta de New Vision</p>
+    <input id="lg-em" type="email" placeholder="Correo" class="fi" style="margin-bottom:10px" autocomplete="username">
+    <input id="lg-pw" type="password" placeholder="Contraseña" class="fi" style="margin-bottom:14px" autocomplete="current-password">
+    <button class="btn-add" style="width:100%;padding:11px" onclick="mediaLogin()">Entrar</button>
+    <div id="lg-err" style="color:var(--red);font-size:12px;min-height:15px;margin-top:8px;"></div>
+  </div>
+</div>
+
 <!-- APP -->
-<div class="app" id="app">
+<div class="app" id="app" style="display:none">
+
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -563,16 +577,70 @@ let modalMode = null, editId = null;
 let calOff = 0, curSec = 'calendario', curAtab = 'meta', curBib = 'brand';
 let calView = 'lista', curPerfil = null, curBrief = null, curReporte = null, tmpPublicos = [];
 
-/* ── STORAGE ── */
-function save(){ localStorage.setItem('nvs_media_v3', JSON.stringify(D)); }
-function load(){
+/* ── SUPABASE: estado compartido en tiempo real ── */
+const SB_URL='https://mwefvjvvitsondqghgsx.supabase.co';
+const SB_KEY='sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const STATE_ID='default';
+let _saveTimer=null;
+
+function normalizeD(){
+  D.cal=D.cal||[]; D.prod=D.prod||[]; D.camp=D.camp||[]; D.tareas=D.tareas||[];
+  D.analytics=D.analytics||{};
+  D.bib=D.bib||{brand:[],logos:[],guias:[],templates:[],musica:[],assets:[]};
+  D.ideas=D.ideas||[]; D.briefs=D.briefs||[]; D.reportes=D.reportes||[];
+  D.perfiles=(D.perfiles&&D.perfiles.length)?D.perfiles:['Ximena Botello','José Montilla'];
+}
+function save(){
+  try{ localStorage.setItem('nvs_media_v3', JSON.stringify(D)); }catch(e){}
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    sb.from('nvs_media_state').upsert({id:STATE_ID,data:D,updated_at:new Date().toISOString()}).then(()=>{});
+  }, 600);
+}
+async function load(){
   try{ const d=localStorage.getItem('nvs_media_v3'); if(d) D=JSON.parse(d); }catch(e){}
-  D.briefs = D.briefs||[]; D.reportes = D.reportes||[];
-  D.perfiles = (D.perfiles && D.perfiles.length) ? D.perfiles : ['Ximena Botello','José Montilla'];
+  normalizeD();
+  try{
+    const {data,error}=await sb.from('nvs_media_state').select('data').eq('id',STATE_ID).maybeSingle();
+    if(!error){
+      const remote = data && data.data;
+      const has = o => o && (((o.cal||[]).length)||((o.prod||[]).length)||((o.camp||[]).length)||((o.tareas||[]).length)||((o.briefs||[]).length)||((o.reportes||[]).length)||((o.ideas||[]).length));
+      if(has(remote)){ D=remote; normalizeD(); }              // hay datos compartidos → usarlos
+      else if(has(D)){ await sb.from('nvs_media_state').upsert({id:STATE_ID,data:D}); } // remoto vacío pero tengo datos locales → migrarlos
+      else if(remote){ D=remote; normalizeD(); }              // ambos vacíos → tomar remoto
+      else { await sb.from('nvs_media_state').upsert({id:STATE_ID,data:D}); } // crear fila inicial
+    }
+  }catch(e){}
+}
+function subscribeRealtime(){
+  sb.channel('media-state')
+    .on('postgres_changes',{event:'*',schema:'public',table:'nvs_media_state'},payload=>{
+      const nd = payload.new && payload.new.data;
+      if(nd){ D=nd; normalizeD(); try{localStorage.setItem('nvs_media_v3',JSON.stringify(D));}catch(e){} renderSection(curSec); }
+    }).subscribe();
 }
 
-/* ── INIT ── */
-load(); renderSection('calendario');
+/* ── AUTH + INIT ── */
+async function mediaLogin(){
+  document.getElementById('lg-err').textContent='';
+  const {error}=await sb.auth.signInWithPassword({
+    email:(document.getElementById('lg-em').value||'').trim(),
+    password:document.getElementById('lg-pw').value
+  });
+  if(error){ document.getElementById('lg-err').textContent=error.message; } else startApp();
+}
+async function startApp(){
+  document.getElementById('login-ov').style.display='none';
+  document.getElementById('app').style.display='';
+  await load();
+  renderSection(curSec||'calendario');
+  subscribeRealtime();
+}
+(async()=>{
+  const {data:{session}} = await sb.auth.getSession();
+  if(session) startApp(); else document.getElementById('login-ov').style.display='flex';
+})();
 
 /* ── NAV ── */
 function nav(id){
