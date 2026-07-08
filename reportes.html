@@ -142,6 +142,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 </head>
 <body>
 
+<div id="nvs-login" style="position:fixed;inset:0;z-index:99999;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;">
+  <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:30px 26px;width:min(360px,92vw);box-shadow:0 4px 24px rgba(0,0,0,.08);">
+    <h2 style="margin:0 0 4px;font-size:19px;">NVS · Reportes</h2>
+    <p style="margin:0 0 18px;color:#64748b;font-size:13px;">Inicia sesión para continuar</p>
+    <input id="nvs-em" type="email" placeholder="Correo" style="width:100%;box-sizing:border-box;padding:11px;border:1px solid #e2e8f0;border-radius:9px;margin-bottom:10px;font-size:14px;">
+    <input id="nvs-pw" type="password" placeholder="Contraseña" style="width:100%;box-sizing:border-box;padding:11px;border:1px solid #e2e8f0;border-radius:9px;margin-bottom:14px;font-size:14px;">
+    <button onclick="nvsLogin()" style="width:100%;padding:11px;border:none;border-radius:9px;background:#AAFF00;color:#3a6b00;font-weight:700;font-size:14px;cursor:pointer;">Entrar</button>
+    <div id="nvs-err" style="color:#ef4444;font-size:12px;min-height:15px;margin-top:8px;"></div>
+  </div>
+</div>
+
 <div class="topbar">
   <div class="topbar-logo"><span>NVS</span> · Reportes Semanales</div>
   <div class="view-toggle">
@@ -284,6 +295,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 const SUPA_URL='https://mwefvjvvitsondqghgsx.supabase.co';
 const SUPA_KEY='sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk';
 const db=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+/* ── LOGIN (requerido tras activar la seguridad RLS) ── */
+async function nvsLogin(){
+  const em=document.getElementById('nvs-em').value.trim();
+  const pw=document.getElementById('nvs-pw').value;
+  const {error}=await db.auth.signInWithPassword({email:em,password:pw});
+  if(error){document.getElementById('nvs-err').textContent=error.message;}
+  else location.reload();
+}
+db.auth.getSession().then(({data:{session}})=>{
+  if(session){const o=document.getElementById('nvs-login'); if(o)o.style.display='none';}
+});
 
 /* ── TEAM ── */
 const TEAM=[
