@@ -477,7 +477,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 
 <script>
 const sb=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','sb_publishable_GuFFI-viJquULQCSY_Bd6Q_WoLf0cZk');
-const db=supabase.createClient('https://mwefvjvvitsondqghgsx.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZWZ2anZ2aXRzb25kcWdoZ3N4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTc5ODM3MSwiZXhwIjoyMDk3Mzc0MzcxfQ.kaI4cGXyYzWn9YLvrvOQLDyQ56qCG2EtzB_7rQ9xL2k',{auth:{autoRefreshToken:false,persistSession:false}});
+const db=sb; // usa la sesión autenticada (respeta RLS) — sin llave admin en el código público
 
 /* ── AUTH ── */
 async function doLogin(){
