@@ -1541,13 +1541,24 @@ function renderDashboard() {
   const completados = atletasData.filter(a=>a.estado==='Completado').length;
   const deudores = atletasData.filter(a=>a.estado==='Deudor').length;
 
-  // Cuentas por cobrar: saldo pendiente de cada contrato según cuotas hechas
+  // Cuentas por cobrar: saldo pendiente de cada contrato, según el tipo de plan.
   const porCobrar = atletasData.reduce((s,a)=>{
-    const m = String(a.pagosHechos||'').match(/(\d+(?:\.\d+)?)\s*out of\s*(\d+(?:\.\d+)?)/i);
-    if(!m) return s;                        // sin plan reconocible (Cerrado, etc.)
-    const done=+m[1], of=+m[2];
-    if(!of || done>=of) return s;           // ya pagado por completo
-    return s + (a.total||0) * (1 - done/of);
+    const total=+a.total||0, made=String(a.pagosHechos||''), tp=String(a.tipoPago||'').toUpperCase(), pago=+a.pago||0;
+    if(/payment done/i.test(made)) return s;                 // pagado completo
+    let collected=0;
+    const abM=/ABONO\s*\(\s*(\d+)\s*out of\s*(\d+)/i.exec(made);
+    const moM=/MONTHLY PAYMENT\s*\(\s*(\d+)\s*\)/i.exec(made);
+    if(tp.includes('ABONO')||tp.includes('MENSUALIDAD')){
+      collected = pago*(abM?+abM[1]:1) + 100*(moM?+moM[1]:0);   // abono + $100/mes
+    } else if(tp.includes('MONTHLY')){
+      collected = pago*(moM?+moM[1]:0);                          // renta mensual × meses pagados
+    } else {
+      const m=/(\d+)\s*out\s*(?:of\s*)?(\d+)/i.exec(made);       // planes de cuotas fijas
+      if(!m) return s;
+      const d=+m[1], of=+m[2];
+      collected = of? total*Math.min(d,of)/of : 0;
+    }
+    return s + Math.max(0, total - Math.min(total,collected));
   }, 0);
 
   document.getElementById('kpi-cobrar').textContent = fmt(porCobrar);
