@@ -573,14 +573,14 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
     </div>
     <div style="font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--m2);margin-bottom:8px">STAFF ACCESS</div>
     <div style="font-family:'Anton',sans-serif;font-size:clamp(18px,3vw,24px);margin-bottom:6px;color:var(--txt)">Acceso Staff</div>
-    <div style="font-size:12px;color:var(--m);margin-bottom:20px">Ingresa el código de acceso</div>
+    <div style="font-size:12px;color:var(--m);margin-bottom:20px">Entra con tu cuenta de New Vision</div>
     <div id="pin-err" style="font-size:11px;color:#f87171;min-height:16px;margin-bottom:6px"></div>
-    <input id="pin-input" type="password" placeholder="••••••••"
-      style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--b2);border-radius:12px;padding:13px 16px;font-size:16px;font-family:'Inter',sans-serif;text-align:center;letter-spacing:6px;outline:none;margin-bottom:12px;color:var(--txt);transition:border-color .2s,box-shadow .2s"
-      onfocus="this.style.borderColor='rgba(170,255,0,0.5)';this.style.boxShadow='0 0 0 3px rgba(170,255,0,0.10)'"
-      onblur="this.style.borderColor='var(--b2)';this.style.boxShadow='none'"
-      onkeydown="if(event.key==='Enter')checkPin()">
-    <button onclick="checkPin()" style="width:100%;background:var(--green);color:#060b18;border:none;border-radius:12px;padding:13px;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-bottom:10px;transition:background .2s,transform .2s">Entrar →</button>
+    <input id="staff-email" type="email" placeholder="Correo" autocomplete="username"
+      style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--b2);border-radius:12px;padding:13px 16px;font-size:15px;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px;color:var(--txt)">
+    <input id="pin-input" type="password" placeholder="Contraseña" autocomplete="current-password"
+      style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--b2);border-radius:12px;padding:13px 16px;font-size:15px;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;color:var(--txt)"
+      onkeydown="if(event.key==='Enter')staffLogin()">
+    <button onclick="staffLogin()" style="width:100%;background:var(--green);color:#060b18;border:none;border-radius:12px;padding:13px;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-bottom:10px;transition:background .2s,transform .2s">Entrar →</button>
     <button onclick="hidePinModal()" style="background:none;border:none;font-size:12px;color:var(--m2);cursor:pointer;font-family:'Inter',sans-serif;font-weight:600">Cancelar</button>
   </div>
 </div>
@@ -985,10 +985,11 @@ const STAFF_PIN='NVS2025';
 function showPinModal(){
   const ov=document.getElementById('pin-ov');
   ov.style.display='flex';
+  const em=document.getElementById('staff-email'); if(em) em.value='';
   const inp=document.getElementById('pin-input');
   inp.value='';
   document.getElementById('pin-err').textContent='';
-  setTimeout(()=>inp.focus(),80);
+  setTimeout(()=>{(em||inp).focus();},80);
 }
 function hidePinModal(){document.getElementById('pin-ov').style.display='none';}
 function checkPin(){
@@ -1006,6 +1007,19 @@ function checkPin(){
     inp.style.borderColor='#ef4444';
     setTimeout(()=>{inp.style.borderColor='var(--b2)';err.textContent='';},2000);
   }
+}
+async function staffLogin(){
+  const email=(document.getElementById('staff-email').value||'').trim();
+  const pass=document.getElementById('pin-input').value;
+  const err=document.getElementById('pin-err');
+  err.textContent='';
+  if(!email||!pass){ err.textContent='Ingresa correo y contraseña'; return; }
+  if(!sb){ err.textContent='Sin conexión a la base'; return; }
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){ err.textContent='Correo o contraseña incorrectos'; return; }
+  hidePinModal();
+  if(_pendingAfterPin){_pendingAfterPin();_pendingAfterPin=null;}
+  else{ enterAs('staff'); }
 }
 
 /* ─── ENTER ─── */
