@@ -939,9 +939,12 @@ function saveLocal(){
 }
 
 async function dbUpsertAthlete(a){
-  if(!sb||OFFLINE){saveLocal();return;}
+  if(!sb){ toast('Sin conexión a la base','err'); return false; }
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ toast('⚠ Entra como Staff (correo y contraseña) para guardar en la nube','err'); return false; }
   const {error}=await sb.from('nvs_camp_atletas').upsert(a,{onConflict:'id'});
-  if(error){OFFLINE=true;saveLocal();}
+  if(error){ toast('Error al guardar: '+error.message,'err'); return false; }
+  return true;
 }
 
 async function dbDeleteAthlete(id){
@@ -951,9 +954,12 @@ async function dbDeleteAthlete(id){
 }
 
 async function dbUpsertCombine(athId,datos){
-  if(!sb||OFFLINE){saveLocal();return;}
+  if(!sb) return false;
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ toast('⚠ Entra como Staff para guardar','err'); return false; }
   const {error}=await sb.from('nvs_camp_combine').upsert({atleta_id:athId,datos,updated_at:new Date().toISOString()},{onConflict:'atleta_id'});
-  if(error){saveLocal();}
+  if(error){ toast('Error al guardar: '+error.message,'err'); return false; }
+  return true;
 }
 
 /* ─── STATE ─── */
@@ -1647,16 +1653,18 @@ async function saveAthlete(){
     colegio:q('#m-colegio').value.trim(),ciudad:q('#m-ciudad').value.trim(),
     tel:q('#m-tel').value.trim(),photo_url
   };
+  let target, isNew=false;
   if(EDIT_ID){
     const idx=DATA.athletes.findIndex(a=>a.id===EDIT_ID);
-    if(idx>-1){DATA.athletes[idx]={...DATA.athletes[idx],...athData};}
-    await dbUpsertAthlete(DATA.athletes.find(a=>a.id===EDIT_ID));
+    target={...(idx>-1?DATA.athletes[idx]:{}),...athData,id:EDIT_ID};
   }else{
-    const newAth={id:'a'+Date.now(),...athData};
-    DATA.athletes.push(newAth);
-    await dbUpsertAthlete(newAth);
+    target={id:'a'+Date.now(),...athData}; isNew=true;
   }
+  const ok=await dbUpsertAthlete(target);
   savingBtn.textContent='Guardar';savingBtn.disabled=false;
+  if(!ok) return; // el error ya se mostró; dejamos el modal abierto para reintentar
+  if(isNew){ DATA.athletes.push(target); }
+  else{ const idx=DATA.athletes.findIndex(a=>a.id===EDIT_ID); if(idx>-1) DATA.athletes[idx]=target; }
   closeMod();
   toast(EDIT_ID?'Atleta actualizada ✓':'Atleta registrada ✓','ok');
   renderAthletes();
