@@ -1468,115 +1468,194 @@ async function downloadCard(athId){
   if(!ath){toast('Atleta no encontrada','err');return;}
   const c=DATA.combine[ath.id]||{};
   await document.fonts.ready;
-  const W=620,H=980;
+  const GREEN='#8AD500';
+  const W=1080,H=1920;
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const ctx=cv.getContext('2d');
-  const PAD=28;
-  const bgG=ctx.createLinearGradient(0,0,0,H);bgG.addColorStop(0,'#05091a');bgG.addColorStop(1,'#0a1228');
-  ctx.fillStyle=bgG;ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(255,255,255,0.022)';ctx.lineWidth=1;
-  for(let x=0;x<W;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  const sg=ctx.createLinearGradient(0,0,W,0);sg.addColorStop(0,'#AAFF00');sg.addColorStop(1,'#66cc00');
-  ctx.fillStyle=sg;ctx.fillRect(0,0,W,5);
+  ctx.clearRect(0,0,W,H); // fondo transparente para Instagram Stories
+
+  /* ── tarjeta flotante ── */
+  const cardX=96,cardY=150,cardW=W-192,cardH=H-300,cardR=64;
+  const cardB=cardY+cardH, cCx=cardX+cardW/2;
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=70;ctx.shadowOffsetY=30;
+  const cg=ctx.createLinearGradient(0,cardY,0,cardB);cg.addColorStop(0,'#181818');cg.addColorStop(1,'#0e0e0e');
+  rrect(ctx,cardX,cardY,cardW,cardH,cardR,cg);
+  ctx.restore();
+  rrect(ctx,cardX,cardY,cardW,cardH,cardR,null,'rgba(255,255,255,0.05)',1.5);
+
+  const PADX=76, IX=cardX+PADX, IR=cardX+cardW-PADX, IW=IR-IX;
   ctx.textBaseline='alphabetic';
-  ctx.font='bold 44px Anton, sans-serif';ctx.fillStyle='#ffffff';ctx.textAlign='left';
-  ctx.fillText('NV',PAD,68);
-  const nw=ctx.measureText('NV').width;
-  ctx.fillStyle='#AAFF00';ctx.fillText('S',PAD+nw,68);
-  ctx.font='700 7.5px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fillText('NEW VISION SPORTS',PAD,80);
-  ctx.font='700 8px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.textAlign='right';
-  ctx.fillText('COLLEGE FLAG FOOTBALL ID CAMP',W-PAD,54);
-  ctx.fillText('PANAMÁ · 2026',W-PAD,68);
-  const photoY=92,photoH=260;
-  if(ath.photo_url){
-    const img=await loadImg(ath.photo_url);
-    if(img){
-      ctx.save();ctx.beginPath();ctx.rect(0,photoY,W,photoH);ctx.clip();
-      const scale=Math.max(W/img.width,photoH/img.height);
-      const dw=img.width*scale,dh=img.height*scale;
-      ctx.drawImage(img,(W-dw)/2,photoY+(photoH-dh)/2,dw,dh);
-      const ov=ctx.createLinearGradient(0,photoY,0,photoY+photoH);
-      ov.addColorStop(0,'rgba(5,9,26,0.1)');ov.addColorStop(0.6,'rgba(5,9,26,0.05)');ov.addColorStop(1,'rgba(5,9,26,0.92)');
-      ctx.fillStyle=ov;ctx.fillRect(0,photoY,W,photoH);ctx.restore();
-    }else{drawAvatarBlock(ctx,W,photoY,photoH,ath);}
-  }else{drawAvatarBlock(ctx,W,photoY,photoH,ath);}
-  const nameY=photoY+photoH;
-  const cl=CLASS_MAP[ath.ano]||'';
-  const clColor={'2027S':'#f97316','2027':'#60a5fa','2028':'#a78bfa','2029':'#34d399','2030':'#fb7185'}[cl]||'#94a3b8';
-  const fullName=ath.nombre.toUpperCase();
-  let fs=36;ctx.font=`bold ${fs}px Anton, sans-serif`;
-  while(ctx.measureText(fullName).width>W-PAD*2-10&&fs>22){fs--;ctx.font=`bold ${fs}px Anton, sans-serif`;}
-  ctx.fillStyle='#ffffff';ctx.textAlign='left';ctx.fillText(fullName,PAD,nameY+44);
-  ctx.font='600 10px Inter, sans-serif';ctx.fillStyle=clColor;
-  ctx.fillText((CLASS_LABEL[cl]||cl).toUpperCase(),PAD,nameY+62);
-  const clW=ctx.measureText((CLASS_LABEL[cl]||cl).toUpperCase()).width;
-  ctx.fillStyle='rgba(255,255,255,0.25)';
-  ctx.fillText(`  ·  ${(ath.pos||'—').toUpperCase()}  ·  ${(ath.colegio||'—').toUpperCase()}`,PAD+clW,nameY+62);
-  const sepY=nameY+76;ctx.fillStyle='rgba(255,255,255,0.07)';ctx.fillRect(PAD,sepY,W-PAD*2,1);
-  const combY=sepY+16;ctx.font='800 9px Inter, sans-serif';ctx.fillStyle='#AAFF00';ctx.textAlign='left';
-  ctx.fillText('COMBINE RESULTS',PAD,combY);ctx.fillRect(PAD,combY+4,22,2);
-  const mY=combY+18,cols=2,mW=(W-PAD*2-12)/cols,mH=74,mGap=6;
-  METRICS.forEach((mt,i)=>{
-    const col=i%cols,row=Math.floor(i/cols);
-    const mx=PAD+col*(mW+12),my=mY+row*(mH+mGap);
-    const v=c[mt.key];
-    const rank=v!==undefined?getMyRank(athId,mt.key):null;
-    const total=rankAthlete(mt.key).length;
-    const isG=rank===1,isS=rank===2,isB=rank===3;
-    rrect(ctx,mx,my,mW,mH,8,'rgba(255,255,255,0.038)');
-    const ac=isG?'#AAFF00':isS?'#c8a84b':isB?'#b87333':'rgba(255,255,255,0.08)';
-    if(isG||isS||isB)rrect(ctx,mx,my,mW,mH,8,null,ac,1.5);
-    ctx.fillStyle=ac;ctx.fillRect(mx+8,my,mW-16,2);
-    ctx.font='600 7.5px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.textAlign='left';
-    ctx.fillText(mt.label.toUpperCase(),mx+10,my+16);
-    const vc=isG?'#AAFF00':isS?'#d4b44a':isB?'#c8834a':'#f1f5f9';
-    ctx.font='bold 28px Anton, sans-serif';ctx.fillStyle=v!==undefined?vc:'rgba(255,255,255,0.15)';
-    ctx.fillText(v!==undefined?String(v):'—',mx+10,my+52);
-    if(v!==undefined){ctx.font='700 7.5px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fillText(mt.unit,mx+10,my+64);}
-    if(rank&&total>0){
-      const pillTxt=`#${rank}/${total}`;ctx.font='800 8px Inter, sans-serif';
-      const pw=ctx.measureText(pillTxt).width+12,px=mx+mW-6-pw,py=my+10;
-      rrect(ctx,px,py,pw,16,4,(isG||isS||isB)?ac:'rgba(255,255,255,0.1)');
-      ctx.fillStyle=(isG||isS||isB)?'#05091a':'rgba(255,255,255,0.5)';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(pillTxt,px+pw/2,py+8);ctx.textBaseline='alphabetic';
-    }
-  });
-  const rsY=mY+Math.ceil(METRICS.length/cols)*(mH+mGap)+8;
-  ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fillRect(PAD,rsY,W-PAD*2,1);
-  const topRanks=METRICS.map(mt=>({mt,rank:getMyRank(athId,mt.key),total:rankAthlete(mt.key).length,v:c[mt.key]})).filter(x=>x.rank&&x.rank<=3&&x.v!==undefined).sort((a,b)=>a.rank-b.rank).slice(0,4);
-  if(topRanks.length){
-    ctx.font='800 8px Inter, sans-serif';ctx.fillStyle='rgba(170,255,0,0.8)';ctx.textAlign='left';ctx.fillText('TOP RANKINGS',PAD,rsY+16);
-    const pillW=(W-PAD*2-(topRanks.length-1)*8)/topRanks.length;
-    topRanks.forEach(({mt,rank,v:tv},i)=>{
-      const px=PAD+i*(pillW+8),py=rsY+22;
-      const rk=rank===1?'rgba(170,255,0,0.15)':rank===2?'rgba(192,168,96,0.12)':'rgba(184,115,51,0.12)';
-      const rb=rank===1?'rgba(170,255,0,0.4)':rank===2?'rgba(192,168,96,0.35)':'rgba(184,115,51,0.35)';
-      rrect(ctx,px,py,pillW,34,6,rk,rb,1);
-      const med=`#${rank}`;const rcolor=rank===1?'#AAFF00':rank===2?'#d4b44a':'#c8834a';
-      ctx.font='800 11px Anton, sans-serif';ctx.fillStyle=rcolor;ctx.textAlign='left';ctx.textBaseline='middle';
-      ctx.fillText(med,px+8,py+17);
-      ctx.font='600 7px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(mt.label.split(' ')[0].toUpperCase(),px+26,py+12);
-      ctx.font='700 9px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillText(`${tv} ${mt.unit}`,px+26,py+24);
-      ctx.textBaseline='alphabetic';
-    });
-  }
-  const vY=H-78;ctx.fillStyle='rgba(255,255,255,0.04)';ctx.fillRect(PAD,vY,W-PAD*2,1);
-  rrect(ctx,PAD,vY+10,W-PAD*2,48,10,'rgba(170,255,0,0.06)','rgba(170,255,0,0.18)',1);
-  ctx.beginPath();ctx.arc(PAD+22,vY+34,10,0,Math.PI*2);ctx.fillStyle='rgba(170,255,0,0.15)';ctx.fill();
-  ctx.strokeStyle='rgba(170,255,0,0.7)';ctx.lineWidth=1.5;ctx.stroke();
-  ctx.beginPath();ctx.moveTo(PAD+16,vY+34);ctx.lineTo(PAD+21,vY+39);ctx.lineTo(PAD+28,vY+29);
-  ctx.strokeStyle='#AAFF00';ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
-  ctx.font='700 8px Inter, sans-serif';ctx.fillStyle='rgba(170,255,0,0.9)';ctx.textAlign='left';
-  ctx.fillText('EVALUADO Y VERIFICADO POR',PAD+38,vY+29);
-  ctx.font='800 11px Inter, sans-serif';ctx.fillStyle='#AAFF00';ctx.fillText('PLAYWITHNEWVISION.COM',PAD+38,vY+44);
-  ctx.font='600 8px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.25)';ctx.textAlign='right';
-  ctx.fillText('College Flag Football ID Camp · Panamá 2026',W-PAD,vY+29);
-  ctx.fillText('Datos registrados por NVS Staff',W-PAD,vY+44);
-  ctx.fillStyle='#AAFF00';ctx.fillRect(0,H-4,W,4);
-  const link=document.createElement('a');link.download=`${ath.nombre.replace(/\s+/g,'-')}-NVS-ID-Card.png`;link.href=cv.toDataURL('image/png');link.click();
-  toast('Tarjeta descargada','ok');
+  const slant=(t,x,y,sk)=>{ctx.save();ctx.translate(x,y);ctx.transform(1,0,-(sk||0.16),1,0,0);ctx.fillText(t,0,0);ctx.restore();};
+
+  /* ── HEADER: logo (izquierda) ── */
+  const hY=cardY+108;
+  ctx.textAlign='left';
+  ctx.font='700 72px Anton, sans-serif';ctx.fillStyle='#ffffff';ctx.fillText('NV',IX,hY);
+  const nvW=ctx.measureText('NV').width;
+  ctx.fillStyle=GREEN;ctx.fillText('S',IX+nvW,hY);
+  ctx.font='700 15px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
+  ctx.letterSpacing='3px';ctx.fillText('NEW VISION SPORTS',IX+2,hY+28);ctx.letterSpacing='0px';
+
+  /* ── HEADER: verificado (derecha) ── */
+  ctx.textAlign='right';
+  ctx.font='800 20px Inter, sans-serif';ctx.fillStyle='#ffffff';
+  ctx.letterSpacing='2px';ctx.fillText('VERIFIED METRICS',IR,hY-30);
+  const vmW=ctx.measureText('VERIFIED METRICS').width;ctx.letterSpacing='0px';
+  drawShield(ctx,IR-vmW-24,hY-37,15,GREEN);
+  ctx.font='600 15px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';
+  ctx.letterSpacing='1.5px';ctx.fillText('COLLEGE FLAG FOOTBALL ID CAMP 2026',IR,hY);ctx.letterSpacing='0px';
+
+  /* ── NOMBRE (dinámico) ── */
+  ctx.textAlign='left';
+  const name=(ath.nombre||'').toUpperCase();
+  const wrap=(size)=>{ctx.font=`700 ${size}px Anton, sans-serif`;const words=name.split(/\s+/);const ls=[];let cur='';
+    for(const w of words){const t=cur?cur+' '+w:w;if(ctx.measureText(t).width>IW&&cur){ls.push(cur);cur=w;}else cur=t;}
+    if(cur)ls.push(cur);return ls;};
+  let fs=104,lines=wrap(fs);
+  while(lines.length>2&&fs>62){fs-=6;lines=wrap(fs);}
+  while(fs>48&&lines.some(l=>{ctx.font=`700 ${fs}px Anton, sans-serif`;return ctx.measureText(l).width>IW;})){fs-=4;lines=wrap(fs);}
+  ctx.font=`700 ${fs}px Anton, sans-serif`;ctx.fillStyle='#ffffff';
+  const ny=cardY+300,lineH=fs*0.92;
+  lines.forEach((l,i)=>slant(l,IX,ny+i*lineH,0.17));
+  const afterName=ny+(lines.length-1)*lineH;
+  ctx.fillStyle=GREEN;ctx.fillRect(IX,afterName+30,58,9);
+  ctx.font='700 46px Anton, sans-serif';ctx.fillStyle=GREEN;
+  slant((ath.pos||'—').toUpperCase(),IX,afterName+96,0.17);
+  const posB=afterName+96;
+
+  /* ── DIVISOR ── */
+  const divY=posB+42;
+  ctx.fillStyle='rgba(255,255,255,0.09)';ctx.fillRect(IX,divY,IW,1.5);
+
+  /* ── MÉTRICAS (dinámicas desde el Combine) ── */
+  const M=Object.fromEntries(METRICS.map(m=>[m.key,m]));
+  const SUNIT={y40:'s',cone3:'s',shuttle:'s',bench:'reps',squat:'reps',vertical:'"',broad:'"'};
+  const leftKeys=['y40','shuttle','squat','broad'];
+  const rightKeys=['cone3','bench','vertical'];
+  const gridTop=divY+40,gridBot=cardB-176,rowH=(gridBot-gridTop)/4,colDivX=cCx;
+  ctx.fillStyle='rgba(255,255,255,0.08)';ctx.fillRect(colDivX,gridTop+6,1.5,rowH*4-12);
+
+  const drawMetric=(key,colX,cy)=>{
+    const mt=M[key];if(!mt)return;
+    const v=c[key];const has=(v!==undefined&&v!==''&&v!==null);
+    const textX=colX+94;
+    drawMetricIcon(ctx,key,colX+36,cy+2,34);
+    ctx.textAlign='left';
+    ctx.font='700 62px Anton, sans-serif';ctx.fillStyle=has?'#ffffff':'rgba(255,255,255,0.18)';
+    const vtxt=has?String(v):'—';
+    slant(vtxt,textX,cy+2,0.15);
+    const vw=ctx.measureText(vtxt).width;
+    if(has){ctx.font='700 30px Anton, sans-serif';ctx.fillStyle=GREEN;slant(SUNIT[key]||mt.unit||'',textX+vw+14,cy+2,0.15);}
+    ctx.font='600 21px Inter, sans-serif';ctx.fillStyle='rgba(255,255,255,0.42)';
+    ctx.letterSpacing='1.5px';ctx.fillText(mt.label.toUpperCase(),textX,cy+40);ctx.letterSpacing='0px';
+  };
+  leftKeys.forEach((k,i)=>drawMetric(k,IX,gridTop+rowH*(i+0.5)));
+  rightKeys.forEach((k,i)=>drawMetric(k,colDivX+44,gridTop+rowH*(i+0.5)));
+
+  /* ── FOOTER ── */
+  const fLineY=cardB-150;
+  ctx.fillStyle='rgba(255,255,255,0.08)';ctx.fillRect(IX,fLineY,IW,1.5);
+  drawShield(ctx,IX+18,cardB-96,17,GREEN);
+  ctx.textAlign='left';
+  ctx.font='700 15px Inter, sans-serif';ctx.fillStyle=GREEN;
+  ctx.letterSpacing='2px';ctx.fillText('VERIFIED BY',IX+52,cardB-102);ctx.letterSpacing='0px';
+  ctx.font='800 24px Anton, sans-serif';ctx.fillStyle='#ffffff';
+  ctx.letterSpacing='1px';ctx.fillText('PLAYWITHNEWVISION.COM',IX+52,cardB-70);ctx.letterSpacing='0px';
+  ctx.textAlign='right';
+  ctx.font='700 26px Inter, sans-serif';ctx.fillStyle='#ffffff';
+  const ig='@newvisionsport';const igW=ctx.measureText(ig).width;
+  ctx.fillText(ig,IR,cardB-80);
+  drawInstagram(ctx,IR-igW-38,cardB-98,28,'#ffffff');
+
+  const link=document.createElement('a');
+  link.download=`${(ath.nombre||'atleta').replace(/\s+/g,'-')}-NVS-Metrics.png`;
+  link.href=cv.toDataURL('image/png');link.click();
+  toast('Story descargada','ok');
 }
+
+function drawShield(ctx,cx,cy,s,color){
+  ctx.save();ctx.translate(cx,cy);ctx.scale(s/16,s/16);
+  ctx.lineWidth=2.4/(s/16);ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(0,-15);ctx.lineTo(13,-9);ctx.lineTo(13,1);
+  ctx.quadraticCurveTo(13,11,0,16);
+  ctx.quadraticCurveTo(-13,11,-13,1);
+  ctx.lineTo(-13,-9);ctx.closePath();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-6,0);ctx.lineTo(-1,6);ctx.lineTo(7,-6);ctx.stroke();
+  ctx.restore();
+}
+
+function drawInstagram(ctx,cx,cy,s,color){
+  ctx.save();ctx.translate(cx,cy);
+  const r=s/2;ctx.lineWidth=2.6;ctx.lineCap='round';ctx.strokeStyle=color;ctx.fillStyle=color;
+  const rr=(x,y,w,h,rad)=>{ctx.beginPath();ctx.moveTo(x+rad,y);ctx.arcTo(x+w,y,x+w,y+h,rad);ctx.arcTo(x+w,y+h,x,y+h,rad);ctx.arcTo(x,y+h,x,y,rad);ctx.arcTo(x,y,x+w,y,rad);ctx.closePath();ctx.stroke();};
+  rr(-r,-r,s,s,s*0.28);
+  ctx.beginPath();ctx.arc(0,0,s*0.28,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(r*0.55,-r*0.55,1.6,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+function drawMetricIcon(ctx,key,cx,cy,s){
+  ctx.save();ctx.translate(cx,cy);ctx.scale(s/16,s/16);
+  ctx.lineWidth=2.0;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeStyle='#ffffff';ctx.fillStyle='#ffffff';
+  const P=(pts,close)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));if(close)ctx.closePath();ctx.stroke();};
+  const dot=(x,y,r)=>{ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();};
+  if(key==='y40'){
+    dot(6,-11,3.2);
+    P([[5,-8],[0,1]]);
+    P([[0,1],[7,6]]);P([[0,1],[-6,7]]);
+    P([[2,-4],[9,-2]]);P([[2,-4],[-5,-6]]);
+    P([[-13,-4],[-8,-4]]);P([[-14,1],[-8,1]]);P([[-13,6],[-9,6]]);
+  }else if(key==='cone3'){
+    P([[0,-13],[-9,10],[9,10]],true);
+    ctx.strokeStyle=GREEN_ICON;P([[-5,-1],[5,-1]]);ctx.strokeStyle='#ffffff';
+    P([[-7,4.5],[7,4.5]]);
+    P([[-13,12.5],[13,12.5]]);
+  }else if(key==='shuttle'){
+    P([[-11,-7],[-11,12]]);P([[-14,-7],[-8,-7]]);P([[-14,12],[-8,12]]);
+    P([[11,-7],[11,12]]);P([[14,-7],[8,-7]]);P([[14,12],[8,12]]);
+    P([[-6,2.5],[6,2.5]]);
+    P([[-3,-0.5],[-6,2.5],[-3,5.5]]);P([[3,-0.5],[6,2.5],[3,5.5]]);
+  }else if(key==='bench'){
+    P([[-14,-6],[14,-6]]);
+    P([[-12,-10],[-12,-2]]);P([[-9.5,-9],[-9.5,-3]]);
+    P([[12,-10],[12,-2]]);P([[9.5,-9],[9.5,-3]]);
+    P([[-10,8],[10,8]]);
+    P([[-8,8],[-8,13]]);P([[8,8],[8,13]]);
+    P([[0,8],[0,-6]]);
+  }else if(key==='squat'){
+    dot(2,-11,3);
+    P([[1,-8],[-3,-1]]);
+    P([[-3,-1],[6,-1]]);
+    P([[6,-1],[6,9]]);P([[3,9],[9,9]]);
+    P([[-3,-1],[-3,9]]);P([[-6,9],[0,9]]);
+    P([[0,-5],[9,-4]]);
+    P([[-13,-4],[-8,-4]]);P([[-13,1],[-9,1]]);
+  }else if(key==='vertical'){
+    dot(-4,-8,3);
+    P([[-4,-5],[-4,4]]);
+    P([[-4,-3],[2,-11]]);
+    P([[-4,4],[-8,10]]);P([[-4,4],[0,10]]);
+    ctx.strokeStyle=GREEN_ICON;
+    P([[10,10],[10,-12]]);P([[6.5,-8],[10,-12],[13.5,-8]]);
+    ctx.strokeStyle='#ffffff';
+    ctx.setLineDash([2,3]);P([[-13,13],[13,13]]);ctx.setLineDash([]);
+  }else if(key==='broad'){
+    dot(7,-9,3);
+    P([[6,-6],[-2,2]]);
+    P([[-2,2],[7,4]]);P([[-2,2],[-8,-1]]);
+    P([[3,-3],[11,-5]]);P([[3,-3],[-5,-4]]);
+    ctx.setLineDash([2,3]);
+    ctx.beginPath();ctx.moveTo(-12,11);ctx.quadraticCurveTo(0,3,12,11);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle=GREEN_ICON;P([[-13,-3],[-9,-3]]);ctx.strokeStyle='#ffffff';
+  }
+  ctx.restore();
+}
+const GREEN_ICON='#8AD500';
+
 function drawAvatarBlock(ctx,W,photoY,photoH,ath){
   const cc=classColor(ath.ano);
   const grd=ctx.createLinearGradient(0,photoY,0,photoY+photoH);
