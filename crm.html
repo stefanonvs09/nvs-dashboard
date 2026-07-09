@@ -343,6 +343,12 @@ body{background:#f8fafc;color:#0f172a;}
 /* When loaded inside hub iframe — hide redundant branding & back link */
 body.in-iframe .sb-top{display:none!important;}
 body.in-iframe .sb-foot{display:none!important;}
+/* ── NUEVO: barra de scroll del Kanban más gruesa y fácil de agarrar ── */
+.kboard-wrap{scrollbar-width:auto;scrollbar-color:#AAFF00 rgba(0,0,0,0.18);padding-bottom:6px;}
+.kboard-wrap::-webkit-scrollbar{height:16px;width:14px;}
+.kboard-wrap::-webkit-scrollbar-track{background:rgba(0,0,0,0.12);border-radius:10px;}
+.kboard-wrap::-webkit-scrollbar-thumb{background:#AAFF00;border-radius:10px;border:3px solid transparent;background-clip:content-box;min-width:60px;}
+.kboard-wrap::-webkit-scrollbar-thumb:hover{background:#88CC00;background-clip:content-box;}
 </style>
 </head>
 <body>
