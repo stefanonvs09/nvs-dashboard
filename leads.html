@@ -1119,10 +1119,8 @@ function openDP(id){
       </div>
       <div class="dp-sec">
         <div class="dp-sec-lbl">📅 Seguimiento</div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input type="date" class="dp-inp" id="dp-seg-fecha" value="${a.seguimiento_fecha||''}" onchange="saveSeg(${id})" style="flex:1;min-width:130px">
-          <input type="text" class="dp-inp" id="dp-seg-nota" value="${esc(a.seguimiento_nota||'')}" placeholder="Nota del seguimiento..." onblur="saveSeg(${id})" style="flex:2;min-width:160px">
-        </div>
+        <input type="date" class="dp-inp" id="dp-seg-fecha" value="${a.seguimiento_fecha||''}" onchange="saveSeg(${id})" style="width:100%;margin-bottom:8px">
+        <textarea class="dp-notas" id="dp-seg-nota" placeholder="Nota del seguimiento..." onblur="saveSeg(${id})" style="font-size:13.5px;line-height:1.45;min-height:58px;margin-top:0">${esc(a.seguimiento_nota||'')}</textarea>
       </div>
       <div class="dp-sec">
         <div class="dp-sec-lbl">Notas</div>
