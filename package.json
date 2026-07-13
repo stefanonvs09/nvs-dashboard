@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@vercel/edge": "^1.2.1"
+  },
+  "devDependencies": {
+    "pg": "^8.22.0"
+  }
+}
