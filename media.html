@@ -745,12 +745,13 @@ function renderCalList(){
           <div class="cal-item">
             <div class="cal-check${it.pub?' done':''}" onclick="togglePub('${it.id}',event)">${it.pub?'✓':''}</div>
             <span class="cal-hora">${it.hora||'—'}</span>
-            <span class="cal-nombre${it.pub?' done':''}">${esc(it.nombre)}</span>
+            <span class="cal-nombre${it.pub?' done':''}" onclick="openEditCal('${it.id}')" style="cursor:pointer" title="Editar contenido">${esc(it.nombre)}</span>
             ${dotsHtml(it.plats)}
             ${it.link?`<a class="cal-link" href="${esc(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir link">🔗</a>`:''}
             ${it.pilar?`<span class="cal-pilar">${esc(it.pilar)}</span>`:''}
             ${it.resp?`<span class="cal-resp">${esc(it.resp)}</span>`:''}
-            <button class="cal-del" onclick="delItem('cal','${it.id}',event)">×</button>
+            <button class="cal-del" onclick="openEditCal('${it.id}')" title="Editar" style="font-size:13px">✎</button>
+            <button class="cal-del" onclick="delItem('cal','${it.id}',event)" title="Borrar">×</button>
           </div>`).join('')}</div>`}`;
     grid.appendChild(el);
   });
@@ -773,7 +774,7 @@ function renderCalMonth(){
     const items=(D.cal||[]).filter(x=>x.fecha===iso).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
     html+=`<div class="calm-cell${out?' out':''}${isToday?' today':''}">
       <div class="calm-daynum">${d.getDate()}</div>
-      ${items.map(it=>`<div class="calm-item" onclick="togglePub('${it.id}',event)" title="${esc(it.nombre)}">${dotsHtml(it.plats)}${esc(it.nombre)}</div>`).join('')}
+      ${items.map(it=>`<div class="calm-item${it.pub?' done':''}" onclick="openEditCal('${it.id}')" title="Editar: ${esc(it.nombre)}" style="cursor:pointer">${dotsHtml(it.plats)}${esc(it.nombre)}</div>`).join('')}
       <div class="calm-add" onclick="openAddCal('${iso}')">+ agregar</div>
     </div>`;
   }
@@ -1048,6 +1049,23 @@ function openAddCal(fecha=''){
     <div class="mf"><label>Link de la pieza</label><input class="fi" id="f-link" placeholder="https://..."></div>
     <div class="mf"><label>Copy / Caption</label><textarea class="fi" id="f-copy" rows="4" placeholder="Texto que acompaña la publicación..."></textarea></div>`);
 }
+function openEditCal(id){
+  const it=(D.cal||[]).find(x=>x.id===id); if(!it)return;
+  modalMode='edit-cal'; editId=id;
+  openMod('Editar contenido',`
+    <div class="mf"><label>Nombre del contenido *</label><input class="fi" id="f-nom" value="${esc(it.nombre||'')}"></div>
+    <div class="mf-2">
+      <div class="mf"><label>Fecha *</label><input class="fi" id="f-fecha" type="date" value="${it.fecha||''}"></div>
+      <div class="mf"><label>Hora</label><input class="fi" id="f-hora" type="time" value="${it.hora||''}"></div>
+    </div>
+    <div class="mf"><label>Plataformas</label>${platChecks(it.plats||[])}</div>
+    <div class="mf-2">
+      <div class="mf"><label>Pilar de contenido</label><select class="fi" id="f-pilar"><option value="">—</option>${PILARES.map(p=>`<option${it.pilar===p?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="mf"><label>Responsable</label><select class="fi" id="f-resp"><option value="">—</option>${RESPONSABLES.map(t=>`<option${it.resp===t?' selected':''}>${t}</option>`).join('')}</select></div>
+    </div>
+    <div class="mf"><label>Link de la pieza</label><input class="fi" id="f-link" value="${esc(it.link||'')}"></div>
+    <div class="mf"><label>Copy / Caption</label><textarea class="fi" id="f-copy" rows="4" placeholder="Texto que acompaña la publicación...">${esc(it.copy||'')}</textarea></div>`,true);
+}
 
 /* PRODUCCIONES */
 function openAddProd(){
@@ -1231,6 +1249,12 @@ function doSave(){
     const nombre=gv('f-nom'); if(!nombre){toast('El nombre es requerido','err');return;}
     if(!D.cal)D.cal=[];
     D.cal.push({id:uid(),nombre,fecha:gv('f-fecha'),hora:gv('f-hora'),plats:getPlats(),pilar:gv('f-pilar'),resp:gv('f-resp'),link:gv('f-link'),copy:gv('f-copy'),pub:false});
+    save();closeMod();renderCal();
+  }
+  else if(modalMode==='edit-cal'){
+    const nombre=gv('f-nom'); if(!nombre){toast('El nombre es requerido','err');return;}
+    const it=(D.cal||[]).find(x=>x.id===editId);
+    if(it)Object.assign(it,{nombre,fecha:gv('f-fecha'),hora:gv('f-hora'),plats:getPlats(),pilar:gv('f-pilar'),resp:gv('f-resp'),link:gv('f-link'),copy:gv('f-copy')});
     save();closeMod();renderCal();
   }
   else if(modalMode==='add-prod'){
@@ -1469,7 +1493,8 @@ function maToggle(id,field,val){ D.mediaAtletas[id]=D.mediaAtletas[id]||{}; D.me
 function maSetUrl(id,field,val){ D.mediaAtletas[id]=D.mediaAtletas[id]||{}; D.mediaAtletas[id][field]=val; save(); }
 
 function doDelete(){
-  if(modalMode==='edit-prod'){D.prod=D.prod.filter(x=>x.id!==editId);save();closeMod();renderProd();}
+  if(modalMode==='edit-cal'){D.cal=D.cal.filter(x=>x.id!==editId);save();closeMod();renderCal();}
+  else if(modalMode==='edit-prod'){D.prod=D.prod.filter(x=>x.id!==editId);save();closeMod();renderProd();}
   else if(modalMode==='edit-camp'){D.camp=D.camp.filter(x=>x.id!==editId);save();closeMod();renderCamp();}
   else if(modalMode==='edit-tarea'){D.tareas=D.tareas.filter(x=>x.id!==editId);save();closeMod();renderTareas();}
   else if(modalMode==='edit-bib'){
