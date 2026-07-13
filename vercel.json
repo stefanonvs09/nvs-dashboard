@@ -1,5 +1,10 @@
 {
-  "rewrites": [
-    { "source": "/", "has": [{ "type": "host", "value": "camp.playwithnewvision.com" }], "destination": "/camp.html" }
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "camp.playwithnewvision.com" }],
+      "destination": "/camp.html?camp=panama-flag-2026",
+      "permanent": false
+    }
   ]
 }
