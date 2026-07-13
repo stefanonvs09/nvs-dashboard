@@ -811,6 +811,22 @@ function _dragAttach(container,onDrop){
   });
 }
 
+// Guarda el orden manual en la base. Reescribe created_at (que NO se muestra en ningún
+// lado; solo se usa para ordenar), de modo que el orden persiste tras recargar, cambiar
+// de semana/vista y para todos los usuarios. Espaciado de 1 min y anclado al pasado para
+// que las tareas nuevas (created_at = ahora) siempre queden al final.
+async function persistTaskOrder(table, arr){
+  if(!arr||!arr.length)return;
+  const base=Date.now()-arr.length*60000;
+  const jobs=arr.map((t,i)=>{
+    const ca=new Date(base+i*60000).toISOString();
+    t.created_at=ca;
+    return db.from(table).update({created_at:ca}).eq('id',t.id);
+  });
+  try{ await Promise.all(jobs); }
+  catch(e){ console.error('No se pudo guardar el orden:',e); if(typeof toast==='function')toast('No se pudo guardar el orden','err'); }
+}
+
 function attachPersonalDrag(){
   const c=document.getElementById('my-scroll');
   if(!c)return;
@@ -822,6 +838,7 @@ function attachPersonalDrag(){
     const ti=MY_TASKS.findIndex(t=>t.id===toId);
     MY_TASKS.splice(ti,0,moved);
     renderPersonal();
+    persistTaskOrder('nvs_team_tasks',MY_TASKS);
   });
 }
 
@@ -837,6 +854,7 @@ function attachSemanalDrag(){
     const ti=tasks.findIndex(t=>t.id===toId);
     tasks.splice(ti,0,moved);
     renderSemanal();
+    persistTaskOrder('nvs_weekly_tasks',tasks);
   });
 }
 
