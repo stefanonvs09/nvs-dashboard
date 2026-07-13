@@ -1064,7 +1064,8 @@ function openEditCal(id){
       <div class="mf"><label>Responsable</label><select class="fi" id="f-resp"><option value="">—</option>${RESPONSABLES.map(t=>`<option${it.resp===t?' selected':''}>${t}</option>`).join('')}</select></div>
     </div>
     <div class="mf"><label>Link de la pieza</label><input class="fi" id="f-link" value="${esc(it.link||'')}"></div>
-    <div class="mf"><label>Copy / Caption</label><textarea class="fi" id="f-copy" rows="4" placeholder="Texto que acompaña la publicación...">${esc(it.copy||'')}</textarea></div>`,true);
+    <div class="mf"><label>Copy / Caption</label><textarea class="fi" id="f-copy" rows="4" placeholder="Texto que acompaña la publicación...">${esc(it.copy||'')}</textarea></div>
+    <div class="mf"><label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-weight:600"><input type="checkbox" id="f-pub" ${it.pub?'checked':''}> Marcar como publicado</label></div>`,true);
 }
 
 /* PRODUCCIONES */
@@ -1254,7 +1255,7 @@ function doSave(){
   else if(modalMode==='edit-cal'){
     const nombre=gv('f-nom'); if(!nombre){toast('El nombre es requerido','err');return;}
     const it=(D.cal||[]).find(x=>x.id===editId);
-    if(it)Object.assign(it,{nombre,fecha:gv('f-fecha'),hora:gv('f-hora'),plats:getPlats(),pilar:gv('f-pilar'),resp:gv('f-resp'),link:gv('f-link'),copy:gv('f-copy')});
+    if(it)Object.assign(it,{nombre,fecha:gv('f-fecha'),hora:gv('f-hora'),plats:getPlats(),pilar:gv('f-pilar'),resp:gv('f-resp'),link:gv('f-link'),copy:gv('f-copy'),pub:!!(document.getElementById('f-pub')?.checked)});
     save();closeMod();renderCal();
   }
   else if(modalMode==='add-prod'){
