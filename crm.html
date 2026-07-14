@@ -148,6 +148,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .dp-univ-item:last-child{border-bottom:none;}
 .dp-univ-item.committed{color:var(--green);font-weight:700;}
 .dp-notas{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;padding:10px;outline:none;resize:vertical;min-height:80px;margin-top:8px;transition:border .15s;line-height:1.5;}
+/* Checklist del atleta */
+.lt-prog{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.lt-prog-bar{flex:1;height:6px;background:rgba(0,0,0,0.09);border-radius:99px;overflow:hidden;}
+.lt-prog-fill{height:100%;background:#22c55e;border-radius:99px;transition:width .2s;}
+.lt-prog-lbl{font-size:11px;font-weight:800;color:#64748b;min-width:30px;text-align:right;}
+.lt-list{display:flex;flex-direction:column;gap:6px;}
+.lt-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:#f8fafc;border:1px solid rgba(0,0,0,0.08);border-radius:9px;}
+.lt-item.done{background:rgba(34,197,94,0.07);border-color:rgba(34,197,94,0.2);}
+.lt-cb{width:20px;height:20px;flex-shrink:0;border-radius:6px;border:1.5px solid rgba(0,0,0,0.2);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;transition:all .15s;padding:0;font-weight:700;}
+.lt-cb.on{background:#22c55e;border-color:#22c55e;}
+.lt-label{flex:1;font-size:13px;color:#0f172a;line-height:1.35;}
+.lt-item.done .lt-label{text-decoration:line-through;color:#94a3b8;}
+.lt-del{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:16px;line-height:1;padding:0 3px;}
+.lt-del:hover{color:#ef4444;}
+.lt-add{margin-top:8px;width:100%;background:none;border:1px dashed rgba(0,0,0,0.16);border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;transition:all .15s;}
+.lt-add:hover{border-color:#22c55e;color:#0f172a;}
+.tag-task{background:rgba(100,116,139,0.1);color:#475569;border:1px solid rgba(100,116,139,0.18);}
+.tag-done{background:rgba(34,197,94,0.12);color:#16a34a;border:1px solid rgba(34,197,94,0.25);}
 .dp-notas:focus{border-color:rgba(255,255,255,0.15);}
 .dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;}
 .dp-ft{padding:15px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
@@ -679,6 +697,7 @@ function mkCard(a){
       ${a.nvs_program?`<span class="tag ${pc}">${esc(a.nvs_program)}</span>`:''}
       ${a.tipo?`<span class="tag tag-type">${esc(a.tipo)}</span>`:''}
       ${a.budget?`<span class="tag" style="background:rgba(170,255,0,0.08);color:var(--green);border:1px solid rgba(170,255,0,0.15)">💰 ${esc(a.budget)}</span>`:''}
+      ${taskBadge(a)}
     </div>
     <div class="card-ft">
       <div class="card-info">
@@ -774,6 +793,10 @@ function renderDP(a){
         ${a.notion_url?`<div class="dp-row"><span class="dp-rl">Notion</span><span class="dp-rv"><a href="${esc(a.notion_url)}" target="_blank">📎 Notion</a></span></div>`:''}
       </div>
       <div class="dp-sec">
+        <div class="dp-sec-lbl">✅ Checklist del atleta</div>
+        <div id="dp-tasks">${tasksHtml(a)}</div>
+      </div>
+      <div class="dp-sec">
         <div class="dp-sec-lbl">Notas</div>
         <textarea class="dp-notas" id="dp-notas-ta" onblur="saveNotas(${a.id})">${esc(a.notas||'')}</textarea>
       </div>
@@ -852,6 +875,67 @@ async function updateStatus(id,ne){
   const {error}=await sb.from('placements').update({commit_status:ne}).eq('id',id);
   if(!error){const a=ALL.find(x=>x.id===id);if(a){a.commit_status=ne;renderDP(a);}applyFilters();toast('Estado actualizado ✓','ok');}
   else toast('Error','err');
+}
+/* ── CHECKLIST DEL ATLETA (APL Placements) ── */
+// Plantilla base (misma para todos). Se puede ampliar; cada atleta puede tener tareas propias.
+const TASKS_TPL=[
+  {id:'duolingo',    label:'Demo Duolingo'},
+  {id:'sat',         label:'SAT'},
+  {id:'cartas_banco',label:'Cartas bancarias a la escuela'},
+  {id:'visa_f1',     label:'Visa F-1'},
+];
+function taskList(a){
+  const stored=Array.isArray(a.tasks)?a.tasks:[];
+  const byId={}; stored.forEach(t=>{if(t&&t.id)byId[t.id]=t;});
+  const list=TASKS_TPL.map(t=>({id:t.id,label:t.label,done:!!(byId[t.id]&&byId[t.id].done),tpl:true}));
+  stored.filter(t=>t&&t.id&&!TASKS_TPL.some(x=>x.id===t.id))
+        .forEach(t=>list.push({id:t.id,label:t.label||'(sin nombre)',done:!!t.done,tpl:false}));
+  return list;
+}
+function taskBadge(a){
+  const list=taskList(a), done=list.filter(t=>t.done).length, tot=list.length;
+  if(!tot) return '';
+  const all=done===tot;
+  return `<span class="tag ${all?'tag-done':'tag-task'}" title="Checklist del atleta">${all?'✅':'☑'} ${done}/${tot}</span>`;
+}
+function tasksHtml(a){
+  const id=a.id, list=taskList(a), done=list.filter(t=>t.done).length, tot=list.length;
+  const pct=tot?Math.round(done/tot*100):0;
+  return `
+    <div class="lt-prog"><div class="lt-prog-bar"><div class="lt-prog-fill" style="width:${pct}%"></div></div><span class="lt-prog-lbl">${done}/${tot}</span></div>
+    <div class="lt-list">
+      ${list.map(t=>`
+        <div class="lt-item${t.done?' done':''}">
+          <button class="lt-cb${t.done?' on':''}" onclick="toggleTask(${id},'${t.id}')" title="${t.done?'Marcar pendiente':'Marcar hecho'}">${t.done?'✓':''}</button>
+          <span class="lt-label">${esc(t.label)}</span>
+          ${t.tpl?'':`<button class="lt-del" onclick="delTask(${id},'${t.id}')" title="Quitar tarea">×</button>`}
+        </div>`).join('')}
+    </div>
+    <button class="lt-add" onclick="addTask(${id})">+ Agregar tarea</button>`;
+}
+function _fullTasks(a){ return taskList(a).map(t=>({id:t.id,label:t.label,done:t.done})); }
+async function _persistTasks(id,full){
+  const a=ALL.find(x=>x.id===id); if(a)a.tasks=full;
+  const box=q('#dp-tasks'); if(box&&a)box.innerHTML=tasksHtml(a);
+  render(); // refresca el badge de la tarjeta (este módulo no tiene realtime)
+  const {error}=await sb.from('placements').update({tasks:full}).eq('id',id);
+  if(error)toast('No se pudo guardar el checklist: '+error.message,'err');
+}
+function toggleTask(id,taskId){
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  const full=_fullTasks(a); const it=full.find(t=>t.id===taskId); if(it)it.done=!it.done;
+  _persistTasks(id,full);
+}
+function addTask(id){
+  const label=(prompt('Nueva tarea para este atleta:')||'').trim(); if(!label)return;
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  const full=_fullTasks(a); full.push({id:'c_'+Math.random().toString(36).slice(2,9),label,done:false});
+  _persistTasks(id,full);
+}
+function delTask(id,taskId){
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  const full=_fullTasks(a).filter(t=>t.id!==taskId);
+  _persistTasks(id,full);
 }
 async function saveNotas(id){
   const val=q('#dp-notas-ta')?.value||'';
