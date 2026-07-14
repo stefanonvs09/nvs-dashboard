@@ -125,7 +125,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 /* DETAIL PANEL */
 .dp-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:100;display:none;}
 .dp-ov.open{display:block;}
-.dp{position:fixed;top:0;right:-480px;width:450px;height:100vh;background:var(--sb);border-left:1px solid var(--b);z-index:101;transition:right .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
+.dp{position:fixed;top:0;right:-720px;width:min(660px,94vw);height:100vh;background:var(--sb);border-left:1px solid var(--b);z-index:101;transition:right .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
 .dp.open{right:0;}
 .dp-hd{padding:22px 20px 17px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:14px;flex-shrink:0;background:linear-gradient(160deg,#1e1e1e 0%,#171717 100%);}
 .dp-ava{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;color:#000;flex-shrink:0;box-shadow:0 8px 24px rgba(0,0,0,.55);}
@@ -134,7 +134,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .dp-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
 .dp-x{margin-left:auto;background:rgba(255,255,255,0.06);border:1px solid var(--b);color:var(--m2);font-size:17px;cursor:pointer;padding:4px 9px;line-height:1;transition:all .15s;border-radius:8px;flex-shrink:0;}
 .dp-x:hover{color:var(--txt);background:rgba(255,255,255,0.1);}
-.dp-body{flex:1;overflow-y:auto;padding:16px 20px;}
+.dp-body{flex:1;overflow-y:auto;padding:22px 28px;}
 .dp-sec{margin-bottom:18px;}
 .dp-sec-lbl{font-size:8px;font-weight:700;letter-spacing:1.8px;color:var(--m);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.04);}
 .dp-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.035);}
@@ -166,6 +166,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .lt-add:hover{border-color:#22c55e;color:#0f172a;}
 .tag-task{background:rgba(100,116,139,0.1);color:#475569;border:1px solid rgba(100,116,139,0.18);}
 .tag-done{background:rgba(34,197,94,0.12);color:#16a34a;border:1px solid rgba(34,197,94,0.25);}
+.lt-group{margin-bottom:16px;}
+.lt-group-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
+.lt-group-t{font-size:13px;font-weight:800;color:#0f172a;letter-spacing:.2px;}
+.lt-group-d{font-size:11px;color:#94a3b8;margin-top:1px;}
+.lt-group-c{font-size:11px;font-weight:800;color:#64748b;background:rgba(100,116,139,0.1);border-radius:99px;padding:3px 9px;flex-shrink:0;}
+.lt-group-c.ok{color:#16a34a;background:rgba(34,197,94,0.12);}
 .dp-notas:focus{border-color:rgba(255,255,255,0.15);}
 .dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;}
 .dp-ft{padding:15px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
@@ -876,20 +882,28 @@ async function updateStatus(id,ne){
   if(!error){const a=ALL.find(x=>x.id===id);if(a){a.commit_status=ne;renderDP(a);}applyFilters();toast('Estado actualizado ✓','ok');}
   else toast('Error','err');
 }
-/* ── CHECKLIST DEL ATLETA (APL Placements) ── */
-// Plantilla base (misma para todos). Se puede ampliar; cada atleta puede tener tareas propias.
+/* ── PROCESO DEL ATLETA (APL Placements) ── */
+// Fases del proceso. Se puede ampliar; cada atleta puede tener tareas propias.
+const TASK_GROUPS=[
+  {id:'onb',  label:'① Onboarding',           desc:'Arranque del atleta con New Vision'},
+  {id:'proc', label:'② Proceso / Aplicación',  desc:'Requisitos académicos y migratorios'},
+  {id:'extra',label:'➕ Otras tareas',          desc:''},
+];
 const TASKS_TPL=[
-  {id:'duolingo',    label:'Demo Duolingo'},
-  {id:'sat',         label:'SAT'},
-  {id:'cartas_banco',label:'Cartas bancarias a la escuela'},
-  {id:'visa_f1',     label:'Visa F-1'},
+  {id:'onb_call',    group:'onb', label:'Llamada de onboarding con Placement Coordinator'},
+  {id:'perfil',      group:'onb', label:'Creación del perfil (software)'},
+  {id:'highlights',  group:'onb', label:'Creación de highlights con Media Team'},
+  {id:'duolingo',    group:'proc',label:'Demo Duolingo'},
+  {id:'sat',         group:'proc',label:'SAT'},
+  {id:'cartas_banco',group:'proc',label:'Cartas bancarias a la escuela'},
+  {id:'visa_f1',     group:'proc',label:'Visa F-1'},
 ];
 function taskList(a){
   const stored=Array.isArray(a.tasks)?a.tasks:[];
   const byId={}; stored.forEach(t=>{if(t&&t.id)byId[t.id]=t;});
-  const list=TASKS_TPL.map(t=>({id:t.id,label:t.label,done:!!(byId[t.id]&&byId[t.id].done),tpl:true}));
+  const list=TASKS_TPL.map(t=>({id:t.id,label:t.label,group:t.group,done:!!(byId[t.id]&&byId[t.id].done),tpl:true}));
   stored.filter(t=>t&&t.id&&!TASKS_TPL.some(x=>x.id===t.id))
-        .forEach(t=>list.push({id:t.id,label:t.label||'(sin nombre)',done:!!t.done,tpl:false}));
+        .forEach(t=>list.push({id:t.id,label:t.label||'(sin nombre)',group:'extra',done:!!t.done,tpl:false}));
   return list;
 }
 function taskBadge(a){
@@ -901,17 +915,28 @@ function taskBadge(a){
 function tasksHtml(a){
   const id=a.id, list=taskList(a), done=list.filter(t=>t.done).length, tot=list.length;
   const pct=tot?Math.round(done/tot*100):0;
-  return `
-    <div class="lt-prog"><div class="lt-prog-bar"><div class="lt-prog-fill" style="width:${pct}%"></div></div><span class="lt-prog-lbl">${done}/${tot}</span></div>
-    <div class="lt-list">
-      ${list.map(t=>`
-        <div class="lt-item${t.done?' done':''}">
-          <button class="lt-cb${t.done?' on':''}" onclick="toggleTask(${id},'${t.id}')" title="${t.done?'Marcar pendiente':'Marcar hecho'}">${t.done?'✓':''}</button>
-          <span class="lt-label">${esc(t.label)}</span>
-          ${t.tpl?'':`<button class="lt-del" onclick="delTask(${id},'${t.id}')" title="Quitar tarea">×</button>`}
-        </div>`).join('')}
-    </div>
-    <button class="lt-add" onclick="addTask(${id})">+ Agregar tarea</button>`;
+  let html=`<div class="lt-prog"><div class="lt-prog-bar"><div class="lt-prog-fill" style="width:${pct}%"></div></div><span class="lt-prog-lbl">${done}/${tot}</span></div>`;
+  TASK_GROUPS.forEach(g=>{
+    const items=list.filter(t=>(t.group||'extra')===g.id);
+    if(!items.length) return;
+    const gdone=items.filter(t=>t.done).length, gall=gdone===items.length;
+    html+=`<div class="lt-group">
+      <div class="lt-group-hd">
+        <div><div class="lt-group-t">${g.label}</div>${g.desc?`<div class="lt-group-d">${g.desc}</div>`:''}</div>
+        <span class="lt-group-c${gall?' ok':''}">${gdone}/${items.length}</span>
+      </div>
+      <div class="lt-list">
+        ${items.map(t=>`
+          <div class="lt-item${t.done?' done':''}">
+            <button class="lt-cb${t.done?' on':''}" onclick="toggleTask(${id},'${t.id}')" title="${t.done?'Marcar pendiente':'Marcar hecho'}">${t.done?'✓':''}</button>
+            <span class="lt-label">${esc(t.label)}</span>
+            ${t.tpl?'':`<button class="lt-del" onclick="delTask(${id},'${t.id}')" title="Quitar tarea">×</button>`}
+          </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  html+=`<button class="lt-add" onclick="addTask(${id})">+ Agregar tarea</button>`;
+  return html;
 }
 function _fullTasks(a){ return taskList(a).map(t=>({id:t.id,label:t.label,done:t.done})); }
 async function _persistTasks(id,full){
