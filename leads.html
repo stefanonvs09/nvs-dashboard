@@ -400,24 +400,6 @@ body{background:#f8fafc;color:#0f172a;}
 /* Seguimiento inputs */
 .dp-inp{background:#f8fafc;border:1px solid rgba(0,0,0,0.09);color:#0f172a;border-radius:8px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;outline:none;}
 .dp-inp:focus{border-color:rgba(170,255,0,0.5);background:#fff;}
-/* Checklist del atleta */
-.lt-prog{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.lt-prog-bar{flex:1;height:6px;background:rgba(0,0,0,0.07);border-radius:99px;overflow:hidden;}
-.lt-prog-fill{height:100%;background:#22c55e;border-radius:99px;transition:width .2s;}
-.lt-prog-lbl{font-size:11px;font-weight:800;color:#64748b;min-width:30px;text-align:right;}
-.lt-list{display:flex;flex-direction:column;gap:6px;}
-.lt-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:#f8fafc;border:1px solid rgba(0,0,0,0.07);border-radius:9px;}
-.lt-item.done{background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.18);}
-.lt-cb{width:20px;height:20px;flex-shrink:0;border-radius:6px;border:1.5px solid rgba(0,0,0,0.2);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;transition:all .15s;padding:0;font-weight:700;}
-.lt-cb.on{background:#22c55e;border-color:#22c55e;}
-.lt-label{flex:1;font-size:13px;color:#0f172a;line-height:1.35;}
-.lt-item.done .lt-label{text-decoration:line-through;color:#94a3b8;}
-.lt-del{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:16px;line-height:1;padding:0 3px;}
-.lt-del:hover{color:#ef4444;}
-.lt-add{margin-top:8px;width:100%;background:none;border:1px dashed rgba(0,0,0,0.16);border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;transition:all .15s;}
-.lt-add:hover{border-color:#22c55e;color:#0f172a;}
-.tag-task{background:rgba(100,116,139,0.1);color:#475569;border:1px solid rgba(100,116,139,0.18);}
-.tag-done{background:rgba(34,197,94,0.12);color:#16a34a;border:1px solid rgba(34,197,94,0.25);}
 /* Modal form inputs */
 .msel,.minp,.mtarea{background:#f8fafc !important;border:1px solid rgba(0,0,0,0.09) !important;color:#0f172a !important;}
 .msel:focus,.minp:focus,.mtarea:focus{border-color:rgba(170,255,0,0.5) !important;}
@@ -1057,7 +1039,6 @@ function mkCard(a){
       ${a.fuente?`<span class="tag tag-src">${esc(a.fuente)}</span>`:''}
       ${a.recruiter?`<span class="tag tag-rec">👤 ${esc(a.recruiter)}</span>`:''}
       ${a.presupuesto?`<span class="tag tag-pais">💰 ${esc(a.presupuesto)}</span>`:''}
-      ${taskBadge(a)}
       ${a.duplicate_with?`<span class="tag tag-dup" title="También en: ${esc(a.duplicate_with)}">⚠ También: ${esc(a.duplicate_with)}</span>`:''}
     </div>
     ${segBadge(a)}
@@ -1135,10 +1116,6 @@ function openDP(id){
         <div class="dp-row" style="align-items:flex-start"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="flex:1"><div class="rec-chips">${recChipButtons((a.recruiter||'').trim(),'dp',id)}</div></span></div>
         <div class="dp-row"><span class="dp-rl">Fuente</span><span class="dp-rv">${esc(a.fuente)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Agregado</span><span class="dp-rv" style="color:var(--m2)">${(a.created_at||'').substring(0,10)}</span></div>
-      </div>
-      <div class="dp-sec">
-        <div class="dp-sec-lbl">✅ Checklist del atleta</div>
-        <div id="dp-tasks">${leadTasksHtml(a,id)}</div>
       </div>
       <div class="dp-sec">
         <div class="dp-sec-lbl">📅 Seguimiento</div>
@@ -1340,71 +1317,6 @@ async function sendToCRM(lead){
   const {error}=await sb.from('placements').insert(payload);
   if(!error)toast('✓ '+lead.nombre+' agregado al APL CRM','ok');
   else toast('Error al crear en CRM: '+error.message,'err');
-}
-/* ── CHECKLIST DEL ATLETA ── */
-// Plantilla base (misma para todos). Luego se amplía; los atletas pueden tener tareas propias.
-const LEAD_TASKS_TPL=[
-  {id:'duolingo',    label:'Demo Duolingo'},
-  {id:'sat',         label:'SAT'},
-  {id:'cartas_banco',label:'Cartas bancarias a la escuela'},
-  {id:'visa_f1',     label:'Visa F-1'},
-];
-function leadTaskList(a){
-  const stored=Array.isArray(a.tasks)?a.tasks:[];
-  const byId={}; stored.forEach(t=>{if(t&&t.id)byId[t.id]=t;});
-  const list=LEAD_TASKS_TPL.map(t=>({id:t.id,label:t.label,done:!!(byId[t.id]&&byId[t.id].done),tpl:true}));
-  stored.filter(t=>t&&t.id&&!LEAD_TASKS_TPL.some(x=>x.id===t.id))
-        .forEach(t=>list.push({id:t.id,label:t.label||'(sin nombre)',done:!!t.done,tpl:false}));
-  return list;
-}
-function taskBadge(a){
-  const list=leadTaskList(a), done=list.filter(t=>t.done).length, tot=list.length;
-  if(!tot) return '';
-  const all=done===tot;
-  return `<span class="tag ${all?'tag-done':'tag-task'}" title="Checklist del atleta">${all?'✅':'☑'} ${done}/${tot}</span>`;
-}
-function leadTasksHtml(a,id){
-  const list=leadTaskList(a), done=list.filter(t=>t.done).length, tot=list.length;
-  const pct=tot?Math.round(done/tot*100):0;
-  return `
-    <div class="lt-prog"><div class="lt-prog-bar"><div class="lt-prog-fill" style="width:${pct}%"></div></div><span class="lt-prog-lbl">${done}/${tot}</span></div>
-    <div class="lt-list">
-      ${list.map(t=>`
-        <div class="lt-item${t.done?' done':''}">
-          <button class="lt-cb${t.done?' on':''}" onclick="toggleLeadTask(${id},'${t.id}')" title="${t.done?'Marcar pendiente':'Marcar hecho'}">${t.done?'✓':''}</button>
-          <span class="lt-label">${esc(t.label)}</span>
-          ${t.tpl?'':`<button class="lt-del" onclick="delLeadTask(${id},'${t.id}')" title="Quitar tarea">×</button>`}
-        </div>`).join('')}
-    </div>
-    <button class="lt-add" onclick="addLeadTask(${id})">+ Agregar tarea</button>`;
-}
-function _fullTasks(a){ return leadTaskList(a).map(t=>({id:t.id,label:t.label,done:t.done})); }
-async function _persistTasks(id,full){
-  const a=ALL.find(x=>x.id===id); if(a)a.tasks=full;
-  const {error}=await sb.from('leads').update({tasks:full,updated_at:new Date().toISOString()}).eq('id',id);
-  if(error)toast('No se pudo guardar el checklist: '+error.message,'err');
-}
-function toggleLeadTask(id,taskId){
-  const a=ALL.find(x=>x.id===id); if(!a)return;
-  const full=_fullTasks(a); const it=full.find(t=>t.id===taskId); if(it)it.done=!it.done;
-  a.tasks=full;
-  const box=q('#dp-tasks'); if(box)box.innerHTML=leadTasksHtml(a,id);
-  _persistTasks(id,full);
-}
-function addLeadTask(id){
-  const label=(prompt('Nueva tarea para este atleta:')||'').trim(); if(!label)return;
-  const a=ALL.find(x=>x.id===id); if(!a)return;
-  const full=_fullTasks(a); full.push({id:'c_'+Math.random().toString(36).slice(2,9),label,done:false});
-  a.tasks=full;
-  const box=q('#dp-tasks'); if(box)box.innerHTML=leadTasksHtml(a,id);
-  _persistTasks(id,full);
-}
-function delLeadTask(id,taskId){
-  const a=ALL.find(x=>x.id===id); if(!a)return;
-  const full=_fullTasks(a).filter(t=>t.id!==taskId);
-  a.tasks=full;
-  const box=q('#dp-tasks'); if(box)box.innerHTML=leadTasksHtml(a,id);
-  _persistTasks(id,full);
 }
 async function saveNotas(id){
   const val=q('#dp-notas-ta')?.value||'';
