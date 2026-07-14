@@ -186,8 +186,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .sg-entry-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
 .sg-who{font-size:11px;font-weight:800;color:#0f172a;}
 .sg-when{font-size:11px;color:#94a3b8;flex:1;}
+.sg-edit{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:13px;line-height:1;padding:0 2px;}
+.sg-edit:hover{color:#0f172a;}
 .sg-del{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;}
 .sg-del:hover{color:#ef4444;}
+.sg-entry.editing{border-left-color:#f59e0b;background:#fffdf7;}
+.sg-edit-btns{display:flex;gap:7px;margin-top:7px;}
+.sg-btn.sm{width:auto;flex:1;padding:7px;font-size:11px;}
+.sg-btn.ghost{background:#e2e8f0;color:#334155;}
+.sg-btn.ghost:hover{background:#cbd5e1;}
 .sg-text{font-size:13px;color:#334155;line-height:1.45;white-space:pre-wrap;word-break:break-word;}
 .tag-follow{background:rgba(100,116,139,0.1);color:#475569;border:1px solid rgba(100,116,139,0.18);}
 .tag-stale{background:rgba(239,68,68,0.1);color:#dc2626;border:1px solid rgba(239,68,68,0.2);}
@@ -600,7 +607,7 @@ const ini   = n => (n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUp
 const esc   = s => (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const PROG_BG = {Standard:'rgba(255,255,255,0.7)',Scholarship:'rgba(45,212,191,0.85)',Premium:'rgba(251,191,36,0.85)'};
 
-let ALL=[], FLT=[], SF='', curView='kanban', openId=null, editId=null;
+let ALL=[], FLT=[], SF='', curView='kanban', openId=null, editId=null, sgEdit=null;
 
 /* AUTH */
 async function init(){
@@ -1020,16 +1027,27 @@ function activityHtml(a){
     ? `<div class="sg-last">Último seguimiento: <b>${_sgWhen(arr[0].ts).rel}</b> · ${_sgWhen(arr[0].ts).abs}${arr[0].by?` · por ${_sgName(arr[0].by)}`:''}</div>`
     : `<div class="sg-empty">Sin seguimiento registrado aún. Anota el primero abajo.</div>`;
   html+=`<div class="sg-add">
-    <textarea class="sg-ta" id="sg-input" placeholder="¿Qué se conversó y en qué quedaron? Ej: Llamada — quedó en enviar notas del SAT esta semana, sigue interesado en NJCAA."></textarea>
+    <textarea class="sg-ta" id="sg-input" placeholder="¿Qué se conversó y en qué quedaron? Ej: Llamada — quedó en enviar notas del SAT esta semana, sigue interesado en NJCAA." onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter')addActivity(${id})"></textarea>
     <button class="sg-btn" onclick="addActivity(${id})">+ Registrar seguimiento</button>
   </div>`;
   if(arr.length){
     html+=`<div class="sg-log">`+arr.map(e=>{
       const w=_sgWhen(e.ts);
+      if(sgEdit===e.id){
+        return `<div class="sg-entry editing">
+          <div class="sg-entry-hd"><span class="sg-who">${_sgName(e.by)}</span><span class="sg-when">${w.rel} · ${w.abs}</span></div>
+          <textarea class="sg-ta" id="sg-edit-input" onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter')saveEditActivity(${id},'${e.id}')">${esc(e.text)}</textarea>
+          <div class="sg-edit-btns">
+            <button class="sg-btn sm" onclick="saveEditActivity(${id},'${e.id}')">Guardar</button>
+            <button class="sg-btn sm ghost" onclick="cancelEditActivity(${id})">Cancelar</button>
+          </div>
+        </div>`;
+      }
       return `<div class="sg-entry">
         <div class="sg-entry-hd">
           <span class="sg-who">${_sgName(e.by)}</span>
-          <span class="sg-when" title="${w.abs} · ${w.hm}">${w.rel} · ${w.abs}</span>
+          <span class="sg-when" title="${w.abs} · ${w.hm}">${w.rel} · ${w.abs}${e.edited?' · editado':''}</span>
+          <button class="sg-edit" onclick="editActivity(${id},'${e.id}')" title="Editar">✏</button>
           <button class="sg-del" onclick="delActivity(${id},'${e.id}')" title="Borrar nota">×</button>
         </div>
         <div class="sg-text">${esc(e.text)}</div>
@@ -1037,6 +1055,28 @@ function activityHtml(a){
     }).join('')+`</div>`;
   }
   return html;
+}
+function editActivity(id,eid){
+  sgEdit=eid;
+  const a=ALL.find(x=>x.id===id), box=q('#dp-activity');
+  if(box&&a){ box.innerHTML=activityHtml(a); const ta=q('#sg-edit-input'); if(ta){ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length);} }
+}
+function cancelEditActivity(id){
+  sgEdit=null;
+  const a=ALL.find(x=>x.id===id), box=q('#dp-activity');
+  if(box&&a)box.innerHTML=activityHtml(a);
+}
+async function saveEditActivity(id,eid){
+  const ta=q('#sg-edit-input'); const text=(ta&&ta.value||'').trim();
+  if(!text){ if(ta)ta.focus(); return; }
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  const arr=Array.isArray(a.activity)?a.activity.slice():[];
+  const e=arr.find(x=>x.id===eid); if(e){ e.text=text; e.edited=new Date().toISOString(); }
+  a.activity=arr; sgEdit=null;
+  const box=q('#dp-activity'); if(box)box.innerHTML=activityHtml(a);
+  render();
+  const {error}=await sb.from('placements').update({activity:arr}).eq('id',id);
+  if(error)toast('No se pudo guardar la edición: '+error.message,'err'); else toast('Seguimiento actualizado ✓','ok');
 }
 async function addActivity(id){
   const el=q('#sg-input'); const text=(el&&el.value||'').trim();
