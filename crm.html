@@ -172,6 +172,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .lt-group-d{font-size:11px;color:#94a3b8;margin-top:1px;}
 .lt-group-c{font-size:11px;font-weight:800;color:#64748b;background:rgba(100,116,139,0.1);border-radius:99px;padding:3px 9px;flex-shrink:0;}
 .lt-group-c.ok{color:#16a34a;background:rgba(34,197,94,0.12);}
+/* Seguimiento (registro de actividad) */
+.sg-last{font-size:12px;color:#334155;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.16);border-radius:8px;padding:8px 11px;margin-bottom:10px;}
+.sg-last b{color:#16a34a;}
+.sg-empty{font-size:12px;color:#94a3b8;font-style:italic;margin-bottom:10px;}
+.sg-add{margin-bottom:12px;}
+.sg-ta{width:100%;background:#f8fafc;border:1px solid rgba(0,0,0,0.1);border-radius:9px;color:#0f172a;font-family:inherit;font-size:13px;line-height:1.45;padding:10px;outline:none;resize:vertical;min-height:56px;}
+.sg-ta:focus{border-color:#22c55e;background:#fff;}
+.sg-btn{margin-top:7px;width:100%;background:#0f172a;color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;transition:background .15s;}
+.sg-btn:hover{background:#1e293b;}
+.sg-log{display:flex;flex-direction:column;gap:8px;}
+.sg-entry{background:#f8fafc;border:1px solid rgba(0,0,0,0.07);border-left:3px solid #22c55e;border-radius:8px;padding:9px 11px;}
+.sg-entry-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.sg-who{font-size:11px;font-weight:800;color:#0f172a;}
+.sg-when{font-size:11px;color:#94a3b8;flex:1;}
+.sg-del{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;}
+.sg-del:hover{color:#ef4444;}
+.sg-text{font-size:13px;color:#334155;line-height:1.45;white-space:pre-wrap;word-break:break-word;}
+.tag-follow{background:rgba(100,116,139,0.1);color:#475569;border:1px solid rgba(100,116,139,0.18);}
+.tag-stale{background:rgba(239,68,68,0.1);color:#dc2626;border:1px solid rgba(239,68,68,0.2);}
+.tag-nofollow{background:rgba(245,158,11,0.1);color:#b45309;border:1px solid rgba(245,158,11,0.22);}
 .dp-notas:focus{border-color:rgba(255,255,255,0.15);}
 .dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;}
 .dp-ft{padding:15px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
@@ -704,6 +724,7 @@ function mkCard(a){
       ${a.tipo?`<span class="tag tag-type">${esc(a.tipo)}</span>`:''}
       ${a.budget?`<span class="tag" style="background:rgba(170,255,0,0.08);color:var(--green);border:1px solid rgba(170,255,0,0.15)">💰 ${esc(a.budget)}</span>`:''}
       ${taskBadge(a)}
+      ${followBadge(a)}
     </div>
     <div class="card-ft">
       <div class="card-info">
@@ -803,7 +824,11 @@ function renderDP(a){
         <div id="dp-tasks">${tasksHtml(a)}</div>
       </div>
       <div class="dp-sec">
-        <div class="dp-sec-lbl">Notas</div>
+        <div class="dp-sec-lbl">🗓 Seguimiento del atleta</div>
+        <div id="dp-activity">${activityHtml(a)}</div>
+      </div>
+      <div class="dp-sec">
+        <div class="dp-sec-lbl">Notas internas</div>
         <textarea class="dp-notas" id="dp-notas-ta" onblur="saveNotas(${a.id})">${esc(a.notas||'')}</textarea>
       </div>
     </div>
@@ -961,6 +986,81 @@ function delTask(id,taskId){
   const a=ALL.find(x=>x.id===id); if(!a)return;
   const full=_fullTasks(a).filter(t=>t.id!==taskId);
   _persistTasks(id,full);
+}
+/* ── SEGUIMIENTO DEL ATLETA (registro compartido) ── */
+function _sgName(email){ if(!email)return 'Equipo NVS'; const n=String(email).split('@')[0]; return n.charAt(0).toUpperCase()+n.slice(1); }
+function _sgWhen(ts){
+  if(!ts) return {rel:'',abs:'',hm:''};
+  const d=new Date(ts), now=new Date();
+  const a0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const b0=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const diff=Math.round((a0-b0)/86400000);
+  let rel;
+  if(diff<=0) rel='hoy';
+  else if(diff===1) rel='ayer';
+  else if(diff<30) rel='hace '+diff+' días';
+  else { const m=Math.round(diff/30); rel='hace '+m+' mes'+(m>1?'es':''); }
+  return {rel, abs:d.toLocaleDateString('es-PA',{day:'numeric',month:'short',year:'numeric'}), hm:d.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})};
+}
+function activityList(a){
+  const arr=Array.isArray(a.activity)?a.activity.slice():[];
+  arr.sort((x,y)=>String(y.ts||'').localeCompare(String(x.ts||'')));
+  return arr;
+}
+function followBadge(a){
+  const arr=activityList(a);
+  if(!arr.length) return `<span class="tag tag-nofollow" title="Aún sin seguimiento">🕒 Sin seg.</span>`;
+  const w=_sgWhen(arr[0].ts);
+  const diff=Math.round((new Date()-new Date(arr[0].ts))/86400000);
+  return `<span class="tag ${diff>14?'tag-stale':'tag-follow'}" title="Último seguimiento: ${w.abs} · ${_sgName(arr[0].by)}">🕒 ${w.rel}</span>`;
+}
+function activityHtml(a){
+  const id=a.id, arr=activityList(a);
+  let html= arr.length
+    ? `<div class="sg-last">Último seguimiento: <b>${_sgWhen(arr[0].ts).rel}</b> · ${_sgWhen(arr[0].ts).abs}${arr[0].by?` · por ${_sgName(arr[0].by)}`:''}</div>`
+    : `<div class="sg-empty">Sin seguimiento registrado aún. Anota el primero abajo.</div>`;
+  html+=`<div class="sg-add">
+    <textarea class="sg-ta" id="sg-input" placeholder="¿Qué se conversó y en qué quedaron? Ej: Llamada — quedó en enviar notas del SAT esta semana, sigue interesado en NJCAA."></textarea>
+    <button class="sg-btn" onclick="addActivity(${id})">+ Registrar seguimiento</button>
+  </div>`;
+  if(arr.length){
+    html+=`<div class="sg-log">`+arr.map(e=>{
+      const w=_sgWhen(e.ts);
+      return `<div class="sg-entry">
+        <div class="sg-entry-hd">
+          <span class="sg-who">${_sgName(e.by)}</span>
+          <span class="sg-when" title="${w.abs} · ${w.hm}">${w.rel} · ${w.abs}</span>
+          <button class="sg-del" onclick="delActivity(${id},'${e.id}')" title="Borrar nota">×</button>
+        </div>
+        <div class="sg-text">${esc(e.text)}</div>
+      </div>`;
+    }).join('')+`</div>`;
+  }
+  return html;
+}
+async function addActivity(id){
+  const el=q('#sg-input'); const text=(el&&el.value||'').trim();
+  if(!text){ if(el)el.focus(); return; }
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  let by='';
+  try{ const {data:{session}}=await sb.auth.getSession(); by=session&&session.user&&session.user.email||''; }catch(e){}
+  const arr=Array.isArray(a.activity)?a.activity.slice():[];
+  arr.push({id:'a_'+Math.random().toString(36).slice(2,9), ts:new Date().toISOString(), by, text});
+  a.activity=arr;
+  const box=q('#dp-activity'); if(box)box.innerHTML=activityHtml(a);
+  render();
+  const {error}=await sb.from('placements').update({activity:arr}).eq('id',id);
+  if(error)toast('No se pudo guardar el seguimiento: '+error.message,'err'); else toast('Seguimiento registrado ✓','ok');
+}
+async function delActivity(id,eid){
+  if(!confirm('¿Borrar esta nota de seguimiento?'))return;
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  const arr=(Array.isArray(a.activity)?a.activity:[]).filter(e=>e.id!==eid);
+  a.activity=arr;
+  const box=q('#dp-activity'); if(box)box.innerHTML=activityHtml(a);
+  render();
+  const {error}=await sb.from('placements').update({activity:arr}).eq('id',id);
+  if(error)toast('No se pudo borrar','err');
 }
 async function saveNotas(id){
   const val=q('#dp-notas-ta')?.value||'';
