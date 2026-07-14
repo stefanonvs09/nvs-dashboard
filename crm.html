@@ -199,6 +199,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .tag-follow{background:rgba(100,116,139,0.1);color:#475569;border:1px solid rgba(100,116,139,0.18);}
 .tag-stale{background:rgba(239,68,68,0.1);color:#dc2626;border:1px solid rgba(239,68,68,0.2);}
 .tag-nofollow{background:rgba(245,158,11,0.1);color:#b45309;border:1px solid rgba(245,158,11,0.22);}
+/* Recruiter chips */
+.rec-chips{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;}
+.rec-chip{background:#f1f5f9;border:1px solid rgba(0,0,0,0.1);color:#334155;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s;}
+.rec-chip:hover{border-color:#a78bfa;color:#0f172a;}
+.rec-chip.active{background:#7c3aed;border-color:#7c3aed;color:#fff;}
+.rec-chip.clear{background:none;border:none;color:#cbd5e1;padding:4px 6px;}
+.rec-chip.clear:hover{color:#ef4444;}
 .dp-notas:focus{border-color:rgba(255,255,255,0.15);}
 .dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;}
 .dp-ft{padding:15px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
@@ -822,7 +829,7 @@ function renderDP(a){
         <div class="dp-row"><span class="dp-rl">Fecha de Nac.</span><span class="dp-rv">${esc(a.fecha_nacimiento)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Equipo Actual</span><span class="dp-rv">${esc(a.current_team)||'—'}</span></div>
         <div class="dp-row"><span class="dp-rl">Major Deseada</span><span class="dp-rv">${esc(a.desired_major)||'—'}</span></div>
-        <div class="dp-row"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="color:var(--purple)">${esc(a.working_with)||'—'}</span></div>
+        <div class="dp-row" style="align-items:flex-start"><span class="dp-rl">Recruiter</span><span class="dp-rv" style="flex:1;max-width:none;text-align:right"><div class="rec-chips" id="dp-rec-chips">${recChips((a.working_with||'').trim(), a.id)}</div></span></div>
         ${a.digital_profile?`<div class="dp-row"><span class="dp-rl">Perfil Digital</span><span class="dp-rv"><a href="${esc(a.digital_profile)}" target="_blank">🎬 Ver perfil</a></span></div>`:''}
         ${a.notion_url?`<div class="dp-row"><span class="dp-rl">Notion</span><span class="dp-rv"><a href="${esc(a.notion_url)}" target="_blank">📎 Notion</a></span></div>`:''}
       </div>
@@ -1101,6 +1108,25 @@ async function delActivity(id,eid){
   render();
   const {error}=await sb.from('placements').update({activity:arr}).eq('id',id);
   if(error)toast('No se pudo borrar','err');
+}
+/* ── RECRUITER (botones, sin escribir) ── */
+const RECRUITERS=['Stefano Cano','Andrea Castillo','Julio Blanco','Otro'];
+function recChips(cur,id){
+  cur=(cur||'').trim();
+  const known=RECRUITERS.includes(cur);
+  let h=RECRUITERS.map(r=>`<button type="button" class="rec-chip${cur===r?' active':''}" onclick="assignRecruiter(${id},'${r.replace(/'/g,"\\'")}')">${esc(r)}</button>`).join('');
+  if(cur&&!known) h+=`<button type="button" class="rec-chip active" onclick="assignRecruiterOtro(${id})">${esc(cur)}</button>`;
+  if(cur) h+=`<button type="button" class="rec-chip clear" onclick="assignRecruiter(${id},'')" title="Quitar">×</button>`;
+  return h;
+}
+function assignRecruiterOtro(id){ const raw=prompt('Nombre del recruiter:'); if(raw===null)return; assignRecruiter(id, raw.trim()); }
+async function assignRecruiter(id,name){
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  a.working_with=name;
+  const box=q('#dp-rec-chips'); if(box)box.innerHTML=recChips(name,id);
+  render();
+  const {error}=await sb.from('placements').update({working_with:name}).eq('id',id);
+  if(error)toast('No se pudo asignar: '+error.message,'err'); else toast(name?`✓ Recruiter: ${name}`:'Recruiter quitado','ok');
 }
 async function saveNotas(id){
   const val=q('#dp-notas-ta')?.value||'';
