@@ -240,7 +240,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .assign-btn:hover{background:rgba(170,255,0,0.1);border-color:rgba(170,255,0,0.3);color:var(--green);}
 
 /* WEB LEADS REMINDER */
-.web-rem{padding:0 14px 10px;flex-shrink:0;}
+.web-rem{padding:0 14px 10px;flex-shrink:0;max-height:34vh;overflow-y:auto;}
 .web-rem-hd{font-size:10px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
 .web-rem-list{display:flex;flex-direction:column;gap:5px;}
 .web-rem-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(217,119,6,0.07);border:1px solid rgba(217,119,6,0.18);border-radius:9px;cursor:pointer;transition:background .15s;}
@@ -1360,6 +1360,7 @@ function renderWeb(){
         </div>
         <div class="web-rem-age ${isUrgent?'urgent':a._days>=2?'warn':'ok'}">${a._days===0?'Hoy':a._days+'d'}</div>
         ${wa?`<a class="web-rem-wa" href="https://wa.me/${wa}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp">💬</a>`:''}
+        <button class="web-rem-del" onclick="event.stopPropagation();delWebCard(${a.id})" title="Eliminar lead">🗑</button>
       </div>`;
     }).join('')}</div>`);
   }
