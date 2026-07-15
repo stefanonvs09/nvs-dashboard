@@ -526,8 +526,10 @@ const REC_BY_EMAIL={
 };
 const PLACEMENT_EMAILS=['andrea@playwithnewvision.com','julioblanco@playwithnewvision.com'];
 const ADMIN_EMAIL='stefano@playwithnewvision.com';
+const PROJECTS_ONLY_EMAILS=['nickyarauzdudley12@icloud.com']; // acceso solo al módulo de Proyectos
 /* Widgets que ve cada login. Disponibles: finance, projects, athletes, tasks, myleads, placement, reportes */
 function widgetsFor(em){
+  if(PROJECTS_ONLY_EMAILS.includes(em)) return ['projects'];                    // acceso restringido: solo Proyectos
   if(em===SD_EMAIL||em===IH_EMAIL) return ['finance'];                         // externos: solo financiero
   if(em===ADMIN_EMAIL) return ['finance','projects','athletes','tasks','reportes'];
   if(em===MARKETING_ACCOUNT) return ['projects','athletes','tasks'];
@@ -559,7 +561,10 @@ function buildNav(email){
   const isSD=em===SD_EMAIL, isIH=em===IH_EMAIL;
   const isMkt=MARKETING_EMAILS.includes(em);
   const isMktAccount=em===MARKETING_ACCOUNT;
-  const visible=isIH
+  const isProjOnly=PROJECTS_ONLY_EMAILS.includes(em);
+  const visible=isProjOnly
+    ? ALL_MODULES.filter(m=>m.id==='proyectos')
+    : isIH
     ? ALL_MODULES.filter(m=>IH_MODULES.includes(m.id))
     : isSD
       ? ALL_MODULES.filter(m=>SD_MODULES.includes(m.id))
