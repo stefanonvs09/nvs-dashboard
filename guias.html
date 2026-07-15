@@ -107,6 +107,27 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .step-link:hover{background:rgba(99,102,241,.15);color:#3730a3;}
 .step-link-green{color:#3a6b00;background:var(--green-dim);}
 .step-link-green:hover{background:rgba(170,255,0,.2);}
+/* Enlaces de Drive (Guía de pagos internacionales) */
+.gl-empty{padding:22px;text-align:center;color:#94a3b8;font-size:13px;background:var(--card2);border-radius:10px;}
+.gl-copyall-wrap{display:flex;justify-content:flex-end;margin-bottom:8px;}
+.gl-copyall{background:var(--green-dim);color:#3a6b00;border:1px solid rgba(170,255,0,.3);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;}
+.gl-copyall:hover{background:rgba(170,255,0,.22);}
+.gl-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:7px;}
+.gl-ico{font-size:15px;flex-shrink:0;}
+.gl-info{flex:1;min-width:0;}
+.gl-name{font-size:13px;font-weight:700;color:#0f172a;}
+.gl-url{font-size:11px;color:#4f46e5;text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gl-url:hover{text-decoration:underline;}
+.gl-btn{background:#f1f5f9;border:1px solid var(--border);color:#334155;border-radius:7px;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;flex-shrink:0;text-decoration:none;transition:all .15s;}
+.gl-btn:hover{background:#e2e8f0;color:#0f172a;}
+.gl-btn.del:hover{background:rgba(220,38,38,.1);color:#dc2626;border-color:rgba(220,38,38,.2);}
+.gl-add{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.gl-in{flex:1;min-width:180px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:#0f172a;outline:none;font-family:inherit;}
+.gl-in:focus{border-color:#22c55e;background:#fff;}
+.gl-add-btn{background:#0f172a;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.gl-add-btn:hover{background:#1e293b;}
+.gl-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .2s;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,.3);}
+.gl-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .step-fee{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:11px;font-weight:800;color:#92400e;background:rgba(245,158,11,.12);padding:4px 10px;border-radius:6px;}
 
 /* SECTION DIVIDER */
@@ -314,6 +335,9 @@ function renderContent(cat){
     wrap.innerHTML=renderExamenesSection();
   } else if(cat==='calendario'){
     wrap.innerHTML=renderCalendarioSection();
+  } else if(cat==='pagos'){
+    wrap.innerHTML=renderPagosSection();
+    loadGuiaLinks(GL_SECCION);
   } else {
     wrap.innerHTML=emptyState(cat);
   }
@@ -331,6 +355,83 @@ function emptyOtherCats(){
   return`<div style="margin-top:8px;padding:16px 20px;background:var(--card2);border-radius:12px;font-size:12px;color:var(--muted);text-align:center;">
     Más guías de Pagos se agregarán próximamente.
   </div>`;
+}
+
+/* ── GUÍA DE PAGOS INTERNACIONALES (enlaces de Drive) ── */
+const GL_SECCION='pagos_internacionales';
+let GL_LINKS=[];
+function glEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function renderPagosSection(){
+  return `
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(34,197,94,.12)">🌎</div>
+      <div>
+        <div class="guide-card-title">Guía de Pagos Internacionales</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00">Drive · Enlaces</span>
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5">Para enviar a atletas</span>
+        </div>
+      </div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-alert blue"><span class="guide-alert-icon">💳</span><div>Guarda aquí los documentos y enlaces de Drive sobre pagos internacionales (transferencias, métodos, instructivos) para tenerlos a la mano y enviarlos a los atletas. Los enlaces se comparten con todo el equipo.</div></div>
+      <div class="steps-title">ENLACES DE DRIVE</div>
+      <div id="gl-list"><div class="gl-empty">Cargando enlaces…</div></div>
+      <div class="gl-add">
+        <input class="gl-in" id="gl-name" placeholder="Nombre (ej: Instructivo transferencia SWIFT)">
+        <input class="gl-in" id="gl-url" placeholder="https://drive.google.com/..." onkeydown="if(event.key==='Enter')glAdd()">
+        <button class="gl-add-btn" onclick="glAdd()">+ Agregar enlace</button>
+      </div>
+    </div>
+  </div>`;
+}
+function glRender(links){
+  const box=document.getElementById('gl-list'); if(!box)return;
+  if(!links.length){ box.innerHTML=`<div class="gl-empty">Aún no hay enlaces. Agrega el primero abajo 👇</div>`; return; }
+  box.innerHTML=`<div class="gl-copyall-wrap"><button class="gl-copyall" onclick="glCopyAll()">📋 Copiar todos para enviar</button></div>`+
+    links.map(l=>`<div class="gl-item">
+      <span class="gl-ico">🔗</span>
+      <div class="gl-info"><div class="gl-name">${glEsc(l.name||l.url)}</div><a class="gl-url" href="${glEsc(l.url)}" target="_blank" rel="noopener">${glEsc(l.url)}</a></div>
+      <button class="gl-btn" onclick="glCopyOne('${l.id}')" title="Copiar enlace">📋</button>
+      <a class="gl-btn" href="${glEsc(l.url)}" target="_blank" rel="noopener" title="Abrir">↗</a>
+      <button class="gl-btn del" onclick="glDel('${l.id}')" title="Quitar">×</button>
+    </div>`).join('');
+}
+async function loadGuiaLinks(seccion){
+  try{
+    const {data}=await sb.from('nvs_guia_links').select('data').eq('seccion',seccion).maybeSingle();
+    GL_LINKS=Array.isArray(data&&data.data)?data.data:[];
+  }catch(e){ GL_LINKS=[]; }
+  glRender(GL_LINKS);
+}
+async function glSave(){
+  const {error}=await sb.from('nvs_guia_links').upsert({seccion:GL_SECCION,data:GL_LINKS,updated_at:new Date().toISOString()},{onConflict:'seccion'});
+  if(error)glToast('No se pudo guardar: '+error.message);
+}
+function glAdd(){
+  const name=(document.getElementById('gl-name').value||'').trim();
+  let url=(document.getElementById('gl-url').value||'').trim();
+  if(!url){document.getElementById('gl-url').focus();return;}
+  if(!/^https?:\/\//i.test(url)) url='https://'+url;
+  GL_LINKS.push({id:'l_'+Math.random().toString(36).slice(2,9),name,url});
+  document.getElementById('gl-name').value='';document.getElementById('gl-url').value='';
+  glRender(GL_LINKS); glSave(); glToast('Enlace agregado');
+}
+function glDel(id){
+  if(!confirm('¿Quitar este enlace?'))return;
+  GL_LINKS=GL_LINKS.filter(l=>l.id!==id);
+  glRender(GL_LINKS); glSave();
+}
+function glCopyOne(id){ const l=GL_LINKS.find(x=>x.id===id); if(!l)return; glCopyText(l.url); glToast('Enlace copiado'); }
+function glCopyAll(){ glCopyText(GL_LINKS.map(l=>`${l.name?l.name+': ':''}${l.url}`).join('\n')); glToast('Todos los enlaces copiados'); }
+function glCopyText(t){ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);} else { const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove(); } }
+let _glt;
+function glToast(msg){
+  let el=document.getElementById('gl-toast');
+  if(!el){el=document.createElement('div');el.id='gl-toast';el.className='gl-toast';document.body.appendChild(el);}
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(_glt);_glt=setTimeout(()=>el.classList.remove('show'),2000);
 }
 
 function renderOnboardingSection(){
