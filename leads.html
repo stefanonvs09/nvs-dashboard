@@ -226,6 +226,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .web-card{background:linear-gradient(155deg,#1b1b1b,#141414);border:1px solid rgba(255,255,255,0.07);border-left:3px solid var(--blue);border-radius:12px;padding:13px;cursor:pointer;transition:transform .28s cubic-bezier(.34,1.5,.64,1),box-shadow .2s;}
 .web-card:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(0,0,0,.65);}
 .web-card-nm{font-size:13px;font-weight:800;margin-bottom:5px;}
+.web-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px;}
+.web-del{background:none;border:none;color:var(--m2);cursor:pointer;font-size:14px;padding:0 2px;opacity:.5;flex-shrink:0;line-height:1;transition:all .15s;}
+.web-del:hover{opacity:1;color:var(--red);}
 .web-card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
 .web-card-contact{width:100%;padding:8px;border-radius:9px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;cursor:pointer;border:none;transition:all .18s;text-align:center;}
 .web-card-contact.pending{background:rgba(170,255,0,0.12);color:var(--green);border:1px solid rgba(170,255,0,0.25);}
@@ -1375,7 +1378,10 @@ function mkWebCard(a,isDone){
   const pais=a.pais?`<span class="tag tag-pais">${esc(a.pais)}</span>`:'';
   const inPipeline=isDone&&(a.recruiter||'').trim();
   return `<div class="web-card${inPipeline?' web-card-pipeline':''}" onclick="openDP(${a.id})">
-    <div class="web-card-nm">${esc(a.nombre)}${inPipeline?` <span style="font-size:9px;color:var(--green);font-weight:700">● Pipeline</span>`:''}</div>
+    <div class="web-card-hd">
+      <div class="web-card-nm" style="margin:0">${esc(a.nombre)}${inPipeline?` <span style="font-size:9px;color:var(--green);font-weight:700">● Pipeline</span>`:''}</div>
+      <button class="web-del" onclick="event.stopPropagation();delWebCard(${a.id})" title="Eliminar lead">🗑</button>
+    </div>
     <div class="web-card-meta">${sport}${pais}
       ${a.whatsapp?`<span class="tag" style="background:rgba(29,185,84,0.1);color:#1DB954;border:1px solid rgba(29,185,84,0.2)">📱 ${esc(a.whatsapp)}</span>`:''}
       ${a.email?`<span class="tag" style="background:rgba(255,255,255,0.05);color:var(--m3);border:1px solid var(--b)">${esc(a.email)}</span>`:''}
@@ -1407,6 +1413,17 @@ async function toggleContactado(id,isDone){
   const {error}=await sb.from('leads').update({estado:ne}).eq('id',id);
   if(!error){const a=ALL.find(x=>x.id===id);if(a)a.estado=ne;renderWeb();toast(isDone?'Marcado como pendiente':'¡Contactado! ✓','ok');}
   else toast('Error','err');
+}
+async function delWebCard(id){
+  const a=ALL.find(x=>x.id===id);
+  if(!confirm(`¿Eliminar este lead${a?' — '+a.nombre:''}?\nEsta acción no se puede deshacer.`))return;
+  const {error}=await sb.from('leads').delete().eq('id',id);
+  if(error){toast('Error al eliminar: '+error.message,'err');return;}
+  ALL=ALL.filter(x=>x.id!==id);
+  computeDupIds();
+  applyFilters();
+  renderWeb();
+  toast('Lead eliminado','ok');
 }
 
 /* ASIGNAR AL PIPELINE */
