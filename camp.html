@@ -296,6 +296,15 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
 
 /* ── AGENDA ── */
 .agenda-wrap{max-width:680px;}
+.ag-edit{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--sh-card);}
+.ag-edit-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:6px;}
+.ag-f{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.ag-f>span{font-size:10px;font-weight:800;letter-spacing:.5px;color:var(--m);text-transform:uppercase;}
+.ag-f input,.ag-f textarea{background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--txt);font-family:inherit;outline:none;resize:vertical;width:100%;box-sizing:border-box;}
+.ag-f input:focus,.ag-f textarea:focus{border-color:var(--green);}
+.ag-del{background:none;border:1px solid var(--b);border-radius:8px;color:var(--m);font-size:12px;font-weight:700;padding:7px 12px;cursor:pointer;transition:all .15s;}
+.ag-del:hover{border-color:#ef4444;color:#ef4444;}
+@media(max-width:640px){.ag-edit-grid{grid-template-columns:1fr;}}
 .ag-item{display:flex;gap:var(--sp4);margin-bottom:var(--sp3);}
 .ag-time{font-size:10px;font-weight:700;color:var(--m2);width:96px;flex-shrink:0;padding-top:14px;text-align:right;}
 .ag-connector{width:20px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:14px;}
@@ -895,14 +904,16 @@ let OFFLINE=false;
 async function initData(){
   if(!sb){OFFLINE=true;loadLocal();return;}
   try{
-    const [ar,cr]=await Promise.all([
+    const [ar,cr,mr]=await Promise.all([
       sb.from('nvs_camp_atletas').select('*').eq('camp_id',CAMP_ID).order('created_at'),
-      sb.from('nvs_camp_combine').select('*')
+      sb.from('nvs_camp_combine').select('*'),
+      sb.from('nvs_camps').select('agenda').eq('id',CAMP_ID).maybeSingle()
     ]);
     if(ar.error){throw ar.error;}
     DATA.athletes=ar.data&&ar.data.length>0?ar.data:[...DEMO_ATHLETES];
     DATA.combine={};
     if(!cr.error&&cr.data){cr.data.forEach(r=>{DATA.combine[r.atleta_id]=r.datos||{};});}
+    DATA.agenda=(mr&&!mr.error&&mr.data&&Array.isArray(mr.data.agenda)&&mr.data.agenda.length)?mr.data.agenda:defaultAgenda();
     // if DB empty, seed demo
     if(ar.data&&ar.data.length===0){
       await seedAthletes();
@@ -928,7 +939,8 @@ function loadLocal(){
     const sc=localStorage.getItem('campid_v2_combine');
     DATA.athletes=sa?JSON.parse(sa):[...DEMO_ATHLETES];
     DATA.combine=sc?JSON.parse(sc):{};
-  }catch(e){DATA={athletes:[...DEMO_ATHLETES],combine:{}};}
+    DATA.agenda=defaultAgenda();
+  }catch(e){DATA={athletes:[...DEMO_ATHLETES],combine:{},agenda:defaultAgenda()};}
 }
 
 function saveLocal(){
@@ -1355,41 +1367,58 @@ function buildTopCard(){
 }
 
 /* ─── AGENDA ─── */
-function renderAgenda(){
-  const items=AGENDA.map((ag,i)=>`
-    <div class="ag-item">
-      <div class="ag-time">${ag.time}</div>
-      <div class="ag-connector"><div class="ag-dot" style="background:${ag.color}"></div>${i<AGENDA.length-1?'<div class="ag-line"></div>':''}</div>
-      <div class="ag-card" style="--accent:${ag.color}">
-        <div class="ag-ttl">${ag.title}</div>
-        <div class="ag-desc">${ag.desc}</div>
-        <div class="ag-badges">${ag.tags.map(t=>`<span class="ag-badge">${t}</span>`).join('')}</div>
-      </div>
-    </div>`).join('');
-  const staff=['Andrea Castillo','Stefano Cano','Julio Blanco','Ximena Botello','Nicky Arauz','José Montilla'];
-  q('#content').innerHTML=`
-    <div class="page-hero">
-      <div class="page-hero-eyebrow">Logística del evento</div>
-      <div class="page-hero-ttl">Agenda del Camp</div>
+function defaultAgenda(){ return AGENDA.map(a=>({id:'ag_'+Math.random().toString(36).slice(2,9),fecha:'',hora:a.time,quien:'',que:a.title,como:a.desc})); }
+const escA=s=>esc(s).replace(/"/g,'&quot;');
+function fmtCampDate(d){ if(!d)return''; try{const dt=new Date(d+'T12:00:00'); return dt.toLocaleDateString('es-PA',{weekday:'short',day:'numeric',month:'short'});}catch(e){return d;} }
+function agendaViewRow(a,i,n){
+  const when=[a.fecha?fmtCampDate(a.fecha):'', a.hora||''].filter(Boolean).join(' · ');
+  return `<div class="ag-item">
+    <div class="ag-time">${esc(when)||'—'}</div>
+    <div class="ag-connector"><div class="ag-dot" style="background:#AAFF00"></div>${i<n-1?'<div class="ag-line"></div>':''}</div>
+    <div class="ag-card" style="--accent:#AAFF00">
+      <div class="ag-ttl">${esc(a.que)||'Actividad'}</div>
+      ${a.como?`<div class="ag-desc">${esc(a.como)}</div>`:''}
+      ${a.quien?`<div class="ag-badges"><span class="ag-badge">👤 ${esc(a.quien)}</span></div>`:''}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start" class="agenda-2col">
-      <div><div class="section-ttl" style="margin-bottom:16px">Programa del día</div><div class="agenda-wrap">${items}</div></div>
-      <div>
-        <div class="section-ttl" style="margin-bottom:14px">NVS Staff</div>
-        <div style="background:var(--card);border:1px solid var(--b);border-radius:16px;padding:16px 20px;margin-bottom:20px;box-shadow:var(--sh-card)">
-          ${staff.map(n=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b)">
-            <div style="width:30px;height:30px;border-radius:8px;background:rgba(170,255,0,0.1);border:1px solid rgba(170,255,0,0.2);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:11px;color:var(--green)">${inits(n)}</div>
-            <div style="font-size:12px;font-weight:700">${n}</div>
-          </div>`).join('')}
-        </div>
-        <div class="section-ttl" style="margin-bottom:14px">Coach Invitado</div>
-        <div style="background:var(--card);border:1px solid var(--b);border-radius:16px;padding:16px 20px;box-shadow:var(--sh-card)">
-          <div style="font-size:11px;font-weight:700">🇺🇸 Assistant Coach</div>
-          <div style="font-size:11px;font-weight:700;margin-top:4px">Missouri Baptist University</div>
-          <div style="font-size:10px;color:var(--m);margin-top:3px">Presente en el evento</div>
-        </div>
-      </div>
-    </div>`;
+  </div>`;
+}
+function agendaEditRow(a){
+  return `<div class="ag-edit">
+    <div class="ag-edit-grid">
+      <label class="ag-f"><span>📅 Cuándo — fecha</span><input type="date" value="${escA(a.fecha)}" onchange="agendaSet('${a.id}','fecha',this.value)"></label>
+      <label class="ag-f"><span>🕒 Hora</span><input type="text" placeholder="9:00–10:00" value="${escA(a.hora)}" onchange="agendaSet('${a.id}','hora',this.value)"></label>
+      <label class="ag-f"><span>👤 Quién lo hace</span><input type="text" placeholder="Responsable" value="${escA(a.quien)}" onchange="agendaSet('${a.id}','quien',this.value)"></label>
+    </div>
+    <label class="ag-f"><span>✅ Qué tiene que hacer</span><input type="text" placeholder="Actividad" value="${escA(a.que)}" onchange="agendaSet('${a.id}','que',this.value)"></label>
+    <label class="ag-f"><span>🛠 Cómo lo va a hacer</span><textarea rows="2" placeholder="Detalles / instrucciones" onchange="agendaSet('${a.id}','como',this.value)">${esc(a.como)}</textarea></label>
+    <button class="ag-del" onclick="agendaDel('${a.id}')">🗑 Quitar</button>
+  </div>`;
+}
+function renderAgenda(){
+  if(!Array.isArray(DATA.agenda))DATA.agenda=defaultAgenda();
+  const isStaff=ROLE==='staff';
+  const list=DATA.agenda;
+  let body;
+  if(isStaff){
+    body=(list.length?list.map(agendaEditRow).join(''):'<div style="color:var(--m);font-size:13px;padding:16px 0">Sin actividades. Agrega la primera.</div>')
+       +`<button class="btn-primary" style="margin-top:8px" onclick="agendaAdd()">+ Agregar actividad</button>`;
+  } else {
+    body=list.length?list.map((a,i)=>agendaViewRow(a,i,list.length)).join(''):'<div style="color:var(--m);font-size:13px">Agenda por confirmar.</div>';
+  }
+  q('#content').innerHTML=`
+    <div class="page-hero"><div class="page-hero-eyebrow">Logística del evento</div><div class="page-hero-ttl">Agenda del Camp</div></div>
+    ${isStaff?'<div style="font-size:12px;color:var(--m);margin-bottom:16px">✏️ Modo Staff — edita quién, cuándo, cómo y qué. Cada cambio se guarda solo.</div>':''}
+    <div class="agenda-wrap">${body}</div>`;
+}
+function agendaSet(id,field,val){ const a=(DATA.agenda||[]).find(x=>x.id===id); if(a){a[field]=val; dbSaveAgenda();} }
+function agendaAdd(){ if(!Array.isArray(DATA.agenda))DATA.agenda=[]; DATA.agenda.push({id:'ag_'+Math.random().toString(36).slice(2,9),fecha:'',hora:'',quien:'',que:'',como:''}); dbSaveAgenda(); renderAgenda(); }
+function agendaDel(id){ if(!confirm('¿Quitar esta actividad?'))return; DATA.agenda=(DATA.agenda||[]).filter(x=>x.id!==id); dbSaveAgenda(); renderAgenda(); }
+async function dbSaveAgenda(){
+  if(!sb){ toast('Sin conexión a la base','err'); return; }
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ toast('⚠ Entra como Staff para guardar','err'); return; }
+  const {error}=await sb.from('nvs_camps').upsert({id:CAMP_ID,agenda:DATA.agenda||[]},{onConflict:'id'});
+  if(error) toast('Error al guardar la agenda: '+error.message,'err'); else toast('Agenda guardada ✓','ok');
 }
 
 /* ─── ATHLETE VIEW ─── */
