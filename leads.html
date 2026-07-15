@@ -428,6 +428,9 @@ body{background:#f8fafc;color:#0f172a;}
 #dup-banner:hover{background:rgba(239,68,68,0.15);}
 .dup-banner-cta{margin-left:auto;font-weight:800;white-space:nowrap;}
 .card-dupe{display:inline-block;background:rgba(239,68,68,0.12);color:#dc2626;border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:800;margin:0 0 6px;cursor:pointer;}
+.dup-allbar{display:flex;align-items:center;gap:14px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.28);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:#334155;line-height:1.45;}
+.dup-all-btn{margin-left:auto;flex-shrink:0;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:background .15s;}
+.dup-all-btn:hover{background:#15803d;}
 /* Modal form inputs */
 .msel,.minp,.mtarea{background:#f8fafc !important;border:1px solid rgba(0,0,0,0.09) !important;color:#0f172a !important;}
 .msel:focus,.minp:focus,.mtarea:focus{border-color:rgba(170,255,0,0.5) !important;}
@@ -1031,7 +1034,14 @@ function renderDupes(){
   const groups=dupeGroups();
   if(q('#dup-count'))q('#dup-count').textContent=groups.length;
   if(!groups.length){ box.innerHTML=`<div class="dup-empty">🎉 No hay duplicados. Todo limpio.</div>`; return; }
-  box.innerHTML=groups.map((g,gi)=>{
+  const isConflict=g=>{const w=new Set(g.map(a=>(a.whatsapp||'').trim()).filter(Boolean));const e=new Set(g.map(a=>(a.email||'').trim().toLowerCase()).filter(Boolean));return w.size>1||e.size>1;};
+  const safe=groups.filter(g=>!isConflict(g));
+  const delCount=safe.reduce((n,g)=>n+g.length-1,0);
+  const bar = safe.length?`<div class="dup-allbar">
+      <span><b>${safe.length} grupo(s)</b> se pueden fusionar de una (elimina ${delCount} copia${delCount!==1?'s':''}). Conserva el de <b>estado más avanzado</b> con los datos más recientes; los grupos en ámbar se dejan para revisar a mano.</span>
+      <button class="dup-all-btn" onclick="mergeAllDupes()">⚡ Fusionar todos los seguros</button>
+    </div>`:'';
+  box.innerHTML=bar+groups.map((g,gi)=>{
     const key=_norm(g[0].nombre), kj=key.replace(/'/g,"\\'");
     const keepId=dupKeep[key]!==undefined?dupKeep[key]:g[0].id;
     const was=new Set(g.map(a=>(a.whatsapp||'').trim()).filter(Boolean));
@@ -1078,6 +1088,36 @@ async function mergeDupes(key){
   if(e2){toast('Error al eliminar copias: '+e2.message,'err');return;}
   delete dupKeep[key];
   toast(`✓ ${survivor.nombre}: fusionado (−${ids.length})`,'ok');
+  await loadData();
+  renderDupes();
+}
+async function mergeAllDupes(){
+  const all=dupeGroups();
+  const isConflict=g=>{const w=new Set(g.map(a=>(a.whatsapp||'').trim()).filter(Boolean));const e=new Set(g.map(a=>(a.email||'').trim().toLowerCase()).filter(Boolean));return w.size>1||e.size>1;};
+  const groups=all.filter(g=>!isConflict(g));
+  if(!groups.length){ toast('No hay grupos seguros para fusionar','ok'); return; }
+  const totalDel=groups.reduce((n,g)=>n+g.length-1,0);
+  const skipped=all.length-groups.length;
+  if(!confirm(`Fusionar automáticamente ${groups.length} grupo(s), eliminando ${totalDel} copia(s).\n\nEn cada grupo se conserva la fila de estado más avanzado y se le rellenan los datos más recientes.${skipped?`\n\n${skipped} grupo(s) en ámbar (contactos distintos) NO se tocan.`:''}\n\n¿Continuar?`)) return;
+  let done=0, del=0, fail=0;
+  for(const g of groups){
+    const survivor=g[0]; // dupeGroups ya ordena: mejor estado primero
+    const others=g.filter(a=>a.id!==survivor.id);
+    const byNew=[...g].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+    const fill=['deporte','whatsapp','email','pais','ciudad','edad','posicion','presupuesto','recruiter','seguimiento_fecha'];
+    const upd={};
+    fill.forEach(f=>{ if(survivor[f]===null||survivor[f]===undefined||survivor[f]===''){ const src=byNew.find(o=>o[f]!==null&&o[f]!==undefined&&o[f]!==''); if(src)upd[f]=src[f]; } });
+    const mergeText=f=>{ const parts=g.map(o=>(o[f]||'').toString().trim()).filter(Boolean); return [...new Set(parts)].join(' — '); };
+    const nt=mergeText('notas'); if(nt&&nt!==(survivor.notas||''))upd.notas=nt;
+    const sn=mergeText('seguimiento_nota'); if(sn&&sn!==(survivor.seguimiento_nota||''))upd.seguimiento_nota=sn;
+    upd.updated_at=new Date().toISOString();
+    if(Object.keys(upd).length>1){ const {error}=await sb.from('leads').update(upd).eq('id',survivor.id); if(error){fail++;continue;} }
+    const {error:e2}=await sb.from('leads').delete().in('id',others.map(o=>o.id));
+    if(e2){fail++;continue;}
+    done++; del+=others.length;
+  }
+  dupKeep={};
+  toast(`✓ ${done} grupos fusionados, ${del} copias eliminadas${fail?` · ${fail} con error`:''}`,'ok');
   await loadData();
   renderDupes();
 }
