@@ -873,7 +873,7 @@ function addPerfil(){
 }
 function renderTareas(){
   const board=document.getElementById('tareas-board');
-  board.style.display='block';
+  board.style.display='block';board.style.overflowY='auto';board.style.overflowX='hidden';
   if(!curPerfil){
     board.innerHTML=`<div class="perfiles-grid">
       ${D.perfiles.map(name=>{
@@ -888,7 +888,8 @@ function renderTareas(){
     return;
   }
   const cols=COL_ORDER.map(col=>{
-    const tasks=(D.tareas||[]).filter(t=>t.estado===col && t.persona===curPerfil);
+    const tasks=(D.tareas||[]).filter(t=>t.estado===col && t.persona===curPerfil)
+      .sort((a,b)=>{const da=a.due||'',db=b.due||'';if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return da.localeCompare(db);});
     return `
       <div class="col-wrap">
         <div class="col-head">
@@ -1464,9 +1465,9 @@ async function renderMediaAtletas(){
     }catch(e){ MA_PLACEMENTS=[]; }
   }
   D.mediaAtletas=D.mediaAtletas||{};
-  const isDone=p=>{const s=D.mediaAtletas[p.id]||{};return s.hl&&s.sign;};
+  const isDone=p=>{const s=D.mediaAtletas[p.id]||{};return s.hl&&s.sign&&s.commit;};
   const total=MA_PLACEMENTS.length, done=MA_PLACEMENTS.filter(isDone).length;
-  const sum=document.getElementById('ma-summary'); if(sum) sum.textContent=`${done}/${total} completos (highlight + sign)`;
+  const sum=document.getElementById('ma-summary'); if(sum) sum.textContent=`${done}/${total} completos (highlight + sign + commit)`;
   const term=(document.getElementById('ma-search')?.value||'').toLowerCase();
   let list=MA_PLACEMENTS.filter(p=>!term||(p.nombre||'').toLowerCase().includes(term)||(p.deporte||'').toLowerCase().includes(term));
   if(maFilter==='pend') list=list.filter(p=>!isDone(p));
@@ -1474,7 +1475,7 @@ async function renderMediaAtletas(){
   if(!list.length){ cont.innerHTML='<div style="padding:40px;text-align:center;color:var(--m);font-size:13px">'+(maFilter==='pend'?'¡Nada pendiente! 🎉':'Sin resultados.')+'</div>'; return; }
   cont.innerHTML=list.map(p=>{
     const s=D.mediaAtletas[p.id]||{};
-    return `<div class="ma-row${(s.hl&&s.sign)?' done':''}">
+    return `<div class="ma-row${(s.hl&&s.sign&&s.commit)?' done':''}">
       <div class="ma-name">${esc(p.nombre)}<span class="ma-sport">${esc(p.deporte||'')}</span></div>
       <div class="ma-deliv">
         <label class="sw"><input type="checkbox" ${s.hl?'checked':''} onchange="maToggle(${p.id},'hl',this.checked)"><span class="sw-track"></span></label>
@@ -1485,6 +1486,11 @@ async function renderMediaAtletas(){
         <label class="sw"><input type="checkbox" ${s.sign?'checked':''} onchange="maToggle(${p.id},'sign',this.checked)"><span class="sw-track"></span></label>
         <span class="ma-lbl${s.sign?' done':''}">📸 Sign (IG)</span>
         <input class="ma-link" value="${esc(s.signUrl||'')}" placeholder="link…" oninput="maSetUrl(${p.id},'signUrl',this.value)">
+      </div>
+      <div class="ma-deliv">
+        <label class="sw"><input type="checkbox" ${s.commit?'checked':''} onchange="maToggle(${p.id},'commit',this.checked)"><span class="sw-track"></span></label>
+        <span class="ma-lbl${s.commit?' done':''}">🏆 Commit</span>
+        <input class="ma-link" value="${esc(s.commitUrl||'')}" placeholder="link…" oninput="maSetUrl(${p.id},'commitUrl',this.value)">
       </div>
     </div>`;
   }).join('');
