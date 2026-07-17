@@ -107,6 +107,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
 .step-link:hover{background:rgba(99,102,241,.15);color:#3730a3;}
 .step-link-green{color:#3a6b00;background:var(--green-dim);}
 .step-link-green:hover{background:rgba(170,255,0,.2);}
+/* Visor de PDF (NVS Builder) */
+.pdf-viewer{width:100%;height:78vh;min-height:480px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#f8fafc;}
+.pdf-viewer iframe{width:100%;height:100%;border:none;display:block;}
 /* Enlaces de Drive (Guía de pagos internacionales) */
 .gl-empty{padding:22px;text-align:center;color:#94a3b8;font-size:13px;background:var(--card2);border-radius:10px;}
 .gl-copyall-wrap{display:flex;justify-content:flex-end;margin-bottom:8px;}
@@ -248,6 +251,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);}
           <span class="sb-cat-icon">📅</span> Calendario
           <span class="sb-cat-badge">NEW</span>
         </div>
+        <div class="sb-cat-item" id="cat-nvsbuilder" onclick="setCategory('nvsbuilder')">
+          <span class="sb-cat-icon">🛠️</span> NVS Builder
+          <span class="sb-cat-badge">NEW</span>
+        </div>
       </div>
     </div>
 
@@ -279,6 +286,7 @@ const CATS={
   general:   {label:'General',               sub:'Recursos y documentación general'},
   examenes:  {label:'Exámenes',              sub:'TOEFL, SAT, ACT, Duolingo — costos, fechas y requisitos para universidades de EE.UU.'},
   calendario:{label:'Calendario Atlético',   sub:'Fechas clave NCAA/NAIA, signing days, deadlines y periodos de reclutamiento'},
+  nvsbuilder:{label:'NVS Builder',            sub:'Guía de la plataforma de perfiles digitales'},
 };
 
 /* ── AUTH ── */
@@ -339,9 +347,39 @@ function renderContent(cat){
   } else if(cat==='pagos'){
     wrap.innerHTML=renderPagosSection();
     loadGuiaLinks(GL_SECCION);
+  } else if(cat==='nvsbuilder'){
+    wrap.innerHTML=renderNvsBuilderSection();
   } else {
     wrap.innerHTML=emptyState(cat);
   }
+}
+function renderNvsBuilderSection(){
+  const url='guia-equipo-nvs.pdf';
+  return `
+  <div class="guide-card">
+    <div class="guide-card-header">
+      <div class="guide-card-icon" style="background:rgba(170,255,0,.12)">🛠️</div>
+      <div>
+        <div class="guide-card-title">NVS Builder — Guía del Equipo</div>
+        <div class="guide-card-meta">
+          <span class="guide-tag" style="background:var(--green-dim);color:#3a6b00">Perfiles digitales</span>
+          <span class="guide-tag" style="background:rgba(99,102,241,.1);color:#4f46e5">PDF · 5 páginas</span>
+        </div>
+      </div>
+      <a class="guide-download-btn" href="${url}" download="Guia-Equipo-NVS.pdf">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar
+      </a>
+    </div>
+    <div class="guide-body">
+      <div class="guide-alert green"><span class="guide-alert-icon">📌</span><div>Guía de <strong>NVS Builder</strong>, la plataforma que usamos para armar los perfiles digitales de los atletas. Puedes verla aquí abajo, abrirla a pantalla completa o descargarla en PDF.</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <a class="step-link step-link-green" href="${url}" target="_blank" rel="noopener">🔎 Abrir a pantalla completa →</a>
+        <a class="step-link" href="${url}" download="Guia-Equipo-NVS.pdf">⬇ Descargar PDF →</a>
+      </div>
+      <div class="pdf-viewer"><iframe src="${url}#view=FitH" title="Guía NVS Builder"></iframe></div>
+    </div>
+  </div>`;
 }
 
 function emptyState(cat){
