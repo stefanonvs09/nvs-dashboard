@@ -650,7 +650,8 @@ function buildFilters(){
   };
   opts(ALL.map(a=>a.deporte),'#f-sport');
   opts(ALL.map(a=>a.start_year),'#f-year');
-  opts(ALL.map(a=>a.working_with).flatMap(w=>(w||'').split(',').map(s=>s.trim())),'#f-rec');
+  const VALID_RECS=['Stefano Cano','Andrea Castillo','Julio Blanco'];
+  opts(VALID_RECS.filter(r=>ALL.some(a=>recList(a.working_with).some(x=>x.toLowerCase()===r.toLowerCase()))),'#f-rec');
 }
 
 /* VIEW */
