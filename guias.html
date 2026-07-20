@@ -280,7 +280,7 @@ const CATS={
   todas:     {label:'Todas las Guías',       sub:'Recursos, procesos y documentación del equipo'},
   elegibilidad:{label:'Elegibilidad',         sub:'Requisitos y criterios para atletas'},
   visado:    {label:'Visado',                 sub:'Documentación y procesos de visa estudiantil para EE.UU.'},
-  onboarding:{label:'Onboarding',             sub:'Teléfono, banco y primeros pasos al llegar a EE.UU.'},
+  onboarding:{label:'Onboarding',             sub:'Proceso de onboarding para Placement Coordinators'},
   contratos: {label:'Contratos',              sub:'Modelos y guías de contratos NVS'},
   pagos:     {label:'Pagos',                  sub:'Procesos y métodos de pago'},
   general:   {label:'General',               sub:'Recursos y documentación general'},
@@ -332,14 +332,15 @@ function renderContent(cat){
   const wrap=document.getElementById('guides-wrap');
   if(cat==='visado'||cat==='todas'){
     wrap.innerHTML=renderVisadoGuide()+renderCanadaGuide()+renderMexicoGuide();
-    if(cat==='todas'){ wrap.innerHTML+=renderElegibilidadSection()+renderOnboardingSection()+renderContratosSection()+emptyOtherCats(); loadGuiaLinks('contratos'); }
+    if(cat==='todas'){ wrap.innerHTML+=renderElegibilidadSection()+renderLinksSection('onboarding')+renderContratosSection()+emptyOtherCats(); loadGuiaLinks('contratos'); loadGuiaLinks('onboarding'); }
   } else if(cat==='contratos'){
     wrap.innerHTML=renderContratosSection();
     loadGuiaLinks('contratos');
   } else if(cat==='elegibilidad'){
     wrap.innerHTML=renderElegibilidadSection();
   } else if(cat==='onboarding'){
-    wrap.innerHTML=renderOnboardingSection();
+    wrap.innerHTML=renderLinksSection('onboarding');
+    loadGuiaLinks('onboarding');
   } else if(cat==='examenes'){
     wrap.innerHTML=renderExamenesSection();
   } else if(cat==='calendario'){
@@ -405,6 +406,9 @@ const GL_META={
   contratos:{icon:'📄',iconBg:'rgba(99,102,241,.1)',title:'Contratos',
     tags:[['var(--green-dim)','#3a6b00','Drive · Enlaces'],['rgba(99,102,241,.1)','#4f46e5','Con ITMS y sin ITMS']],
     intro:'Enlaces de Drive con todos los contratos (con ITMS y sin ITMS). Agrégalos aquí para tenerlos a la mano y enviarlos. Se comparten con todo el equipo.'},
+  onboarding:{icon:'🎯',iconBg:'rgba(14,165,233,.12)',title:'Onboarding — Placement Coordinators',
+    tags:[['var(--green-dim)','#3a6b00','Drive · PDF'],['rgba(99,102,241,.1)','#4f46e5','Cómo se hace']],
+    intro:'Proceso de onboarding para los Placement Coordinators. Agrega aquí el enlace de Drive con el PDF del onboarding (cómo se hace, paso a paso) para tenerlo a la mano y compartirlo con el equipo.'},
 };
 function glEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function renderLinksSection(seccion){
