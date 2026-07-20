@@ -206,6 +206,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);displa
 .rec-chip.active{background:#7c3aed;border-color:#7c3aed;color:#fff;}
 .rec-chip.clear{background:none;border:none;color:#cbd5e1;padding:4px 6px;}
 .rec-chip.clear:hover{color:#ef4444;}
+.rec-chip.add{background:none;border:1px dashed rgba(0,0,0,0.2);color:#64748b;}
+.rec-chip.add:hover{border-color:#7c3aed;color:#7c3aed;background:none;}
 .dp-notas:focus{border-color:rgba(255,255,255,0.15);}
 .dp-sel{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer;}
 .dp-ft{padding:15px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;}
@@ -744,7 +746,7 @@ function mkCard(a){
       <div class="card-info">
         <div class="fam-dot" style="background:${famC};box-shadow:0 0 5px ${famC}" title="Familia: ${a.family_status||'—'}"></div>
         ${a.start_year?`<span>${esc(a.start_year)}</span>`:''}
-        ${a.working_with?`<span style="color:var(--purple);font-weight:700">👤 ${esc(a.working_with.split(',')[0].trim())}</span>`:''}
+        ${(()=>{const r=recList(a.working_with);return r.length?`<span style="color:var(--purple);font-weight:700">👤 ${esc(r[0])}${r.length>1?` +${r.length-1}`:''}</span>`:'';})()}
       </div>
       ${a.digital_profile?`<a class="btn-profile" href="${esc(a.digital_profile)}" target="_blank" onclick="event.stopPropagation()">🎬 Perfil</a>`:''}
     </div>
@@ -1111,22 +1113,37 @@ async function delActivity(id,eid){
 }
 /* ── RECRUITER (botones, sin escribir) ── */
 const RECRUITERS=['Stefano Cano','Andrea Castillo','Julio Blanco','Otro'];
+function recList(cur){ return (cur||'').split(',').map(s=>s.trim()).filter(Boolean); }
 function recChips(cur,id){
-  cur=(cur||'').trim();
-  const known=RECRUITERS.includes(cur);
-  let h=RECRUITERS.map(r=>`<button type="button" class="rec-chip${cur===r?' active':''}" onclick="assignRecruiter(${id},'${r.replace(/'/g,"\\'")}')">${esc(r)}</button>`).join('');
-  if(cur&&!known) h+=`<button type="button" class="rec-chip active" onclick="assignRecruiterOtro(${id})">${esc(cur)}</button>`;
-  if(cur) h+=`<button type="button" class="rec-chip clear" onclick="assignRecruiter(${id},'')" title="Quitar">×</button>`;
+  const list=recList(cur), lc=list.map(s=>s.toLowerCase());
+  let h=RECRUITERS.map(r=>`<button type="button" class="rec-chip${lc.includes(r.toLowerCase())?' active':''}" onclick="toggleRecruiter(${id},'${r.replace(/'/g,"\\'")}')">${esc(r)}</button>`).join('');
+  list.filter(n=>!RECRUITERS.some(r=>r.toLowerCase()===n.toLowerCase()))
+      .forEach(n=>{ h+=`<button type="button" class="rec-chip active" onclick="toggleRecruiter(${id},'${n.replace(/'/g,"\\'")}')">${esc(n)}</button>`; });
+  h+=`<button type="button" class="rec-chip add" onclick="addRecruiterOtro(${id})" title="Agregar otro recruiter">+ agregar</button>`;
+  if(list.length) h+=`<button type="button" class="rec-chip clear" onclick="clearRecruiters(${id})" title="Quitar todos">×</button>`;
   return h;
 }
-function assignRecruiterOtro(id){ const raw=prompt('Nombre del recruiter:'); if(raw===null)return; assignRecruiter(id, raw.trim()); }
-async function assignRecruiter(id,name){
+function addRecruiterOtro(id){ const raw=prompt('Nombre del recruiter a agregar:'); if(raw===null)return; const n=raw.trim(); if(n)toggleRecruiter(id,n); }
+async function toggleRecruiter(id,name){
   const a=ALL.find(x=>x.id===id); if(!a)return;
-  a.working_with=name;
-  const box=q('#dp-rec-chips'); if(box)box.innerHTML=recChips(name,id);
+  name=(name||'').trim(); if(!name)return;
+  const list=recList(a.working_with);
+  const i=list.findIndex(n=>n.toLowerCase()===name.toLowerCase());
+  if(i>=0) list.splice(i,1); else list.push(name);
+  const val=list.join(', ');
+  a.working_with=val;
+  const box=q('#dp-rec-chips'); if(box)box.innerHTML=recChips(val,id);
   render();
-  const {error}=await sb.from('placements').update({working_with:name}).eq('id',id);
-  if(error)toast('No se pudo asignar: '+error.message,'err'); else toast(name?`✓ Recruiter: ${name}`:'Recruiter quitado','ok');
+  const {error}=await sb.from('placements').update({working_with:val}).eq('id',id);
+  if(error)toast('No se pudo guardar: '+error.message,'err'); else toast(list.length?`✓ ${val}`:'Recruiter quitado','ok');
+}
+async function clearRecruiters(id){
+  const a=ALL.find(x=>x.id===id); if(!a)return;
+  a.working_with='';
+  const box=q('#dp-rec-chips'); if(box)box.innerHTML=recChips('',id);
+  render();
+  const {error}=await sb.from('placements').update({working_with:''}).eq('id',id);
+  if(error)toast('No se pudo guardar','err'); else toast('Recruiters quitados','ok');
 }
 async function saveNotas(id){
   const val=q('#dp-notas-ta')?.value||'';
