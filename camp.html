@@ -1305,7 +1305,7 @@ function renderAthletes(){
       ?`<img src="${esc(a.photo_url)}" style="width:30px;height:30px;border-radius:8px;object-fit:cover;margin-right:8px;flex-shrink:0;border:1.5px solid ${col}" onerror="this.style.display='none'">`
       :`<div class="ath-av-sm" style="background:${col}">${inits(a.nombre)}</div>`;
     return`<tr onclick="ROLE==='staff'?openCombineFor('${a.id}'):null">
-      <td><span class="ath-num">#${DATA.athletes.indexOf(a)+1}</span></td>
+      <td><span class="ath-num">#${a.numero!=null?a.numero:'—'}</span></td>
       <td style="display:flex;align-items:center;padding:11px 16px">${avHtml}<div><div class="ath-name">${esc(a.nombre)}</div><div style="font-size:10px;color:var(--m2);margin-top:1px">${esc(a.colegio||'')}</div></div></td>
       <td>${classBadge(a.ano)}</td>
       <td><span class="pos-badge">${esc(a.pos||'—')}</span></td>
@@ -1599,7 +1599,7 @@ function renderMyProfile(){
     <div class="ath-profile-card">
       ${photoBlock}
       <div style="flex:1;min-width:0">
-        <div style="font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:6px">Vista atleta</div>
+        <div style="font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:6px">Vista atleta${ath.numero!=null?` · N.º ${ath.numero}`:''}</div>
         <div class="ath-profile-name">${esc(ath.nombre)}</div>
         <div style="font-size:12px;color:var(--m);margin-top:6px;line-height:1.6">${classBadge(ath.ano)} · ${esc(ath.pos||'')} · ${esc(ath.colegio||'')}</div>
         <div style="margin-top:10px;font-size:11px;font-weight:700;color:${done===METRICS.length?'var(--green)':'var(--m)'}">${done===METRICS.length?'Combine completado':done>0?`${done}/${METRICS.length} pruebas registradas`:'Combine pendiente'}</div>
@@ -1890,6 +1890,12 @@ function openMod(id){
   setTimeout(()=>q('#m-nombre').focus(),80);
 }
 function closeMod(){q('#m-ov').classList.remove('open');q('#modal').classList.remove('open');EDIT_ID=null;PENDING_PHOTO=null;}
+/* Próximo número de dorsal libre (1..60), sin repetir, dentro del camp */
+function nextFreeNumber(){
+  const used=new Set((DATA.athletes||[]).map(a=>a.numero).filter(n=>n!=null));
+  for(let n=1;n<=60;n++) if(!used.has(n)) return n;
+  return null; /* camp lleno (60) */
+}
 async function saveAthlete(){
   const nombre=q('#m-nombre').value.trim();
   const ano=parseInt(q('#m-año').value);
@@ -1908,7 +1914,9 @@ async function saveAthlete(){
     const idx=DATA.athletes.findIndex(a=>a.id===EDIT_ID);
     target={...(idx>-1?DATA.athletes[idx]:{}),...athData,id:EDIT_ID};
   }else{
-    target={id:'a'+Date.now(),...athData}; isNew=true;
+    const numero=nextFreeNumber();
+    if(numero===null){toast('El camp ya tiene 60 atletas (máximo)','err');savingBtn.textContent='Guardar';savingBtn.disabled=false;return;}
+    target={id:'a'+Date.now(),numero,...athData}; isNew=true;
   }
   const ok=await dbUpsertAthlete(target);
   savingBtn.textContent='Guardar';savingBtn.disabled=false;
