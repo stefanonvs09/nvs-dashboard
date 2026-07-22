@@ -479,12 +479,15 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 }
 
 /* ─── ITINERARIO (pop-up familias) ─── */
-#itin-fab{position:fixed;right:20px;bottom:20px;z-index:1200;display:none;align-items:center;gap:8px;
-  background:var(--green);color:#060b18;border:none;border-radius:99px;padding:13px 20px;
-  font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:.3px;cursor:pointer;
-  box-shadow:0 8px 24px rgba(170,255,0,0.35),0 2px 8px rgba(0,0,0,0.18);transition:transform .2s,box-shadow .2s;}
-#itin-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(170,255,0,0.45),0 4px 12px rgba(0,0,0,0.22);}
-#itin-fab svg{width:17px;height:17px;flex-shrink:0;}
+#itin-fab{position:fixed;right:28px;bottom:28px;z-index:1200;display:none;align-items:center;gap:14px;
+  background:var(--green);color:#060b18;border:none;border-radius:99px;padding:22px 38px;
+  font-family:'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:.3px;cursor:pointer;
+  box-shadow:0 14px 40px rgba(170,255,0,0.45),0 4px 14px rgba(0,0,0,0.22);
+  transition:transform .2s,box-shadow .2s;animation:itinPulse 2.4s ease-in-out infinite;}
+#itin-fab:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 20px 50px rgba(170,255,0,0.55),0 6px 18px rgba(0,0,0,0.26);animation:none;}
+#itin-fab svg{width:30px;height:30px;flex-shrink:0;}
+@keyframes itinPulse{0%,100%{box-shadow:0 14px 40px rgba(170,255,0,0.40),0 4px 14px rgba(0,0,0,0.22);}
+  50%{box-shadow:0 14px 44px rgba(170,255,0,0.70),0 4px 14px rgba(0,0,0,0.22);}}
 #itin-ov{position:fixed;inset:0;background:rgba(4,8,20,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   z-index:1300;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 #itin-ov.open{opacity:1;pointer-events:auto;}
@@ -500,7 +503,9 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
   background:var(--card2);color:var(--m);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;}
 .itin-x:hover{background:var(--bg2);color:var(--txt);}
 .itin-body{padding:22px;overflow-y:auto;flex:1;}
-@media(max-width:480px){#itin-drawer{width:100vw;max-width:100vw;}#itin-fab{right:16px;bottom:16px;padding:12px 18px;}}
+@media(max-width:480px){#itin-drawer{width:100vw;max-width:100vw;}
+  #itin-fab{right:14px;left:14px;bottom:16px;justify-content:center;padding:20px 24px;font-size:20px;}
+  #itin-fab svg{width:26px;height:26px;}}
 </style>
 </head>
 <body>
@@ -621,7 +626,7 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 <!-- ITINERARIO (pop-up familias) -->
 <button id="itin-fab" onclick="openItinerary()" aria-label="Ver itinerario del camp">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-  Itinerario
+  Ver Itinerario
 </button>
 <div id="itin-ov" onclick="closeItinerary()"></div>
 <aside id="itin-drawer" role="dialog" aria-label="Itinerario del camp">
