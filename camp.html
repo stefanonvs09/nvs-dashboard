@@ -545,6 +545,17 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .din-dot.active{background:var(--green);transform:scale(1.35);}
 @media(max-width:480px){.din-card{padding:32px 22px;border-radius:20px;}.din-time{font-size:22px;}
   .din-nav{width:46px;height:46px;}.din-play{width:54px;height:54px;}.din-top{padding:16px 18px;}}
+
+/* ─── COMBINE: barra de navegación (salir / saltar atleta) ─── */
+.comb-nav{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.comb-back{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--b2);color:var(--txt);
+  border-radius:11px;padding:11px 18px;font-family:'Inter',sans-serif;font-weight:800;font-size:13px;cursor:pointer;transition:background .2s,border-color .2s;}
+.comb-back:hover{background:var(--bg2);border-color:var(--green);}
+.comb-stepper{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.comb-step{width:42px;height:42px;border-radius:11px;border:1px solid var(--b2);background:var(--card);color:var(--txt);
+  font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;}
+.comb-step:hover{background:var(--bg2);border-color:var(--green);}
+.comb-step-lbl{font-size:12px;font-weight:800;color:var(--m);min-width:78px;text-align:center;}
 </style>
 </head>
 <body>
@@ -1407,7 +1418,16 @@ function renderCombine(){
       <div class="metric-unit">${m.unit}</div>
       <div class="metric-dir ${m.dir==='low'?'dir-low':'dir-high'}">${m.dir==='low'?'↓ menor es mejor':'↑ mayor es mejor'}</div>
     </div>`;
+  const athIdx=DATA.athletes.findIndex(a=>a.id===COMBINE_ATH);
   q('#content').innerHTML=`
+    <div class="comb-nav">
+      <button class="comb-back" onclick="combineExit()">← Volver a Atletas</button>
+      ${ath?`<div class="comb-stepper">
+        <button class="comb-step" onclick="combineStep(-1)" title="Atleta anterior">◀</button>
+        <span class="comb-step-lbl">#${ath.numero!=null?ath.numero:'—'} · ${athIdx+1}/${DATA.athletes.length}</span>
+        <button class="comb-step" onclick="combineStep(1)" title="Siguiente atleta">▶</button>
+      </div>`:''}
+    </div>
     <div class="page-hero">
       <div class="page-hero-eyebrow">Evaluación física</div>
       <div class="page-hero-ttl">Combine</div>
@@ -1415,7 +1435,7 @@ function renderCombine(){
     </div>
     <div class="comb-select-wrap">
       <div class="comb-select-lbl">Atleta</div>
-      <select class="fi" onchange="COMBINE_ATH=this.value;renderCombine()" style="max-width:400px;margin-bottom:0">
+      <select class="fi" onchange="combineSelect(this.value)" style="max-width:400px;margin-bottom:0">
         <option value="">— Seleccionar atleta —</option>${options}
       </select>
       ${athInfo}
@@ -1429,13 +1449,42 @@ function renderCombine(){
     </div>`;
   if(EDIT_ID&&EDIT_ID!==COMBINE_ATH){COMBINE_ATH=EDIT_ID;renderCombine();EDIT_ID=null;}
 }
-async function saveCombine(){
-  if(!COMBINE_ATH)return;
+/* Lee los inputs actuales sin guardar en la base */
+function combineCapture(){
+  if(!COMBINE_ATH)return null;
   const vals={};
   METRICS.forEach(m=>{const el=document.getElementById('met-'+m.key);if(el&&el.value!=='')vals[m.key]=parseFloat(el.value);});
+  return vals;
+}
+async function saveCombine(){
+  if(!COMBINE_ATH)return;
+  const vals=combineCapture();
   DATA.combine[COMBINE_ATH]=vals;
   await dbUpsertCombine(COMBINE_ATH,vals);
   toast('Combine guardado','ok');
+}
+/* Salta a la atleta anterior/siguiente guardando lo escrito en segundo plano */
+function combineStep(dir){
+  const list=DATA.athletes; if(!list.length)return;
+  const prevId=COMBINE_ATH;
+  const vals=combineCapture();
+  if(prevId&&vals&&Object.keys(vals).length){ DATA.combine[prevId]=vals; dbUpsertCombine(prevId,vals).catch(()=>{}); }
+  let i=list.findIndex(a=>a.id===prevId);
+  i = i<0 ? 0 : (i+dir+list.length)%list.length;
+  COMBINE_ATH=list[i].id; EDIT_ID=null; renderCombine();
+}
+/* Cambia de atleta desde el desplegable, guardando lo escrito */
+function combineSelect(id){
+  const prevId=COMBINE_ATH;
+  const vals=combineCapture();
+  if(prevId&&prevId!==id&&vals&&Object.keys(vals).length){ DATA.combine[prevId]=vals; dbUpsertCombine(prevId,vals).catch(()=>{}); }
+  COMBINE_ATH=id; EDIT_ID=null; renderCombine();
+}
+/* Vuelve al roster guardando lo escrito */
+function combineExit(){
+  const vals=combineCapture();
+  if(COMBINE_ATH&&vals&&Object.keys(vals).length){ DATA.combine[COMBINE_ATH]=vals; dbUpsertCombine(COMBINE_ATH,vals).catch(()=>{}); }
+  setView('athletes');
 }
 
 /* ─── RANKINGS ─── */
