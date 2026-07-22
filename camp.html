@@ -477,6 +477,30 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
   .rank-tabs{gap:4px;}
   .rank-tab{font-size:10px;padding:5px 10px;}
 }
+
+/* ─── ITINERARIO (pop-up familias) ─── */
+#itin-fab{position:fixed;right:20px;bottom:20px;z-index:1200;display:none;align-items:center;gap:8px;
+  background:var(--green);color:#060b18;border:none;border-radius:99px;padding:13px 20px;
+  font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:.3px;cursor:pointer;
+  box-shadow:0 8px 24px rgba(170,255,0,0.35),0 2px 8px rgba(0,0,0,0.18);transition:transform .2s,box-shadow .2s;}
+#itin-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(170,255,0,0.45),0 4px 12px rgba(0,0,0,0.22);}
+#itin-fab svg{width:17px;height:17px;flex-shrink:0;}
+#itin-ov{position:fixed;inset:0;background:rgba(4,8,20,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  z-index:1300;opacity:0;pointer-events:none;transition:opacity .3s ease;}
+#itin-ov.open{opacity:1;pointer-events:auto;}
+#itin-drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;z-index:1301;
+  background:var(--bg);border-left:1px solid var(--b2);box-shadow:-24px 0 60px rgba(0,0,0,0.18);
+  transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+#itin-drawer.open{transform:translateX(0);}
+.itin-hd{padding:22px 22px 18px;border-bottom:1px solid var(--b);background:var(--card);flex-shrink:0;position:relative;}
+.itin-eyebrow{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--green-dk);margin-bottom:6px;}
+.itin-ttl{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.3px;color:var(--txt);line-height:1.05;}
+.itin-sub{font-size:11px;color:var(--m);margin-top:6px;}
+.itin-x{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:10px;border:1px solid var(--b2);
+  background:var(--card2);color:var(--m);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;}
+.itin-x:hover{background:var(--bg2);color:var(--txt);}
+.itin-body{padding:22px;overflow-y:auto;flex:1;}
+@media(max-width:480px){#itin-drawer{width:100vw;max-width:100vw;}#itin-fab{right:16px;bottom:16px;padding:12px 18px;}}
 </style>
 </head>
 <body>
@@ -593,6 +617,22 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
     <button onclick="hidePinModal()" style="background:none;border:none;font-size:12px;color:var(--m2);cursor:pointer;font-family:'Inter',sans-serif;font-weight:600">Cancelar</button>
   </div>
 </div>
+
+<!-- ITINERARIO (pop-up familias) -->
+<button id="itin-fab" onclick="openItinerary()" aria-label="Ver itinerario del camp">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  Itinerario
+</button>
+<div id="itin-ov" onclick="closeItinerary()"></div>
+<aside id="itin-drawer" role="dialog" aria-label="Itinerario del camp">
+  <div class="itin-hd">
+    <button class="itin-x" onclick="closeItinerary()" aria-label="Cerrar">×</button>
+    <div class="itin-eyebrow">Logística del evento</div>
+    <div class="itin-ttl">Itinerario del Camp</div>
+    <div class="itin-sub" id="itin-sub">ID Camp · Flag Football · Panamá 2026</div>
+  </div>
+  <div class="itin-body"><div class="agenda-wrap" id="itin-list"></div></div>
+</aside>
 
 <!-- SIDEBAR OVERLAY (mobile) -->
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
@@ -870,6 +910,7 @@ async function selectCamp(id){
   document.getElementById('camp-screen').style.display='none';
   const rs=document.getElementById('role-screen');
   rs.style.display='flex';rs.style.opacity='0';
+  setItinFab(true);
   requestAnimationFrame(()=>{
     rs.style.transition='opacity .35s ease';rs.style.opacity='1';
     stagger('#role-screen .rs-main-btn','anim-scale-in',0.22,0);
@@ -1060,18 +1101,21 @@ async function enterAs(role){
     buildNav(ATHLETE_NAV);
     setView('my-profile');
   }
+  setItinFab(role!=='staff');
 }
 function switchRole(){
   ROLE='';ATH_ME=null;
   document.getElementById('app').style.display='none';
   document.getElementById('role-screen').style.display='flex';
   closeSidebar();
+  setItinFab(true);
 }
 function goToCampSelector(){
   ROLE='';ATH_ME=null;
   document.getElementById('app').style.display='none';
   document.getElementById('role-screen').style.display='none';
   closeSidebar();
+  setItinFab(false);
   renderCampSelector();
 }
 
@@ -1410,6 +1454,19 @@ function renderAgenda(){
     ${isStaff?'<div style="font-size:12px;color:var(--m);margin-bottom:16px">✏️ Modo Staff — edita quién, cuándo, cómo y qué. Cada cambio se guarda solo.</div>':''}
     <div class="agenda-wrap">${body}</div>`;
 }
+/* ─── ITINERARIO (pop-up familias) ─── */
+function setItinFab(show){ const f=document.getElementById('itin-fab'); if(f)f.style.display=show?'flex':'none'; if(!show)closeItinerary(); }
+function renderItinerary(){
+  const list=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
+  const sub=document.getElementById('itin-sub');
+  if(sub&&CAMP_OBJ)sub.textContent=[CAMP_OBJ.nombre,CAMP_OBJ.deporte,CAMP_OBJ.ubicacion].filter(Boolean).join(' · ');
+  const el=document.getElementById('itin-list');
+  if(el)el.innerHTML=list.length?list.map((a,i)=>agendaViewRow(a,i,list.length)).join(''):'<div style="color:var(--m);font-size:13px">Agenda por confirmar.</div>';
+}
+function openItinerary(){ renderItinerary(); document.getElementById('itin-ov').classList.add('open'); document.getElementById('itin-drawer').classList.add('open'); }
+function closeItinerary(){ document.getElementById('itin-ov')?.classList.remove('open'); document.getElementById('itin-drawer')?.classList.remove('open'); }
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeItinerary();});
+
 function agendaSet(id,field,val){ const a=(DATA.agenda||[]).find(x=>x.id===id); if(a){a[field]=val; dbSaveAgenda();} }
 function agendaAdd(){ if(!Array.isArray(DATA.agenda))DATA.agenda=[]; DATA.agenda.push({id:'ag_'+Math.random().toString(36).slice(2,9),fecha:'',hora:'',quien:'',que:'',como:''}); dbSaveAgenda(); renderAgenda(); }
 function agendaDel(id){ if(!confirm('¿Quitar esta actividad?'))return; DATA.agenda=(DATA.agenda||[]).filter(x=>x.id!==id); dbSaveAgenda(); renderAgenda(); }
