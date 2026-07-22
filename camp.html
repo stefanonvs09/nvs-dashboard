@@ -478,34 +478,51 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
   .rank-tab{font-size:10px;padding:5px 10px;}
 }
 
-/* ─── ITINERARIO (pop-up familias) ─── */
-#itin-fab{position:fixed;right:28px;bottom:28px;z-index:1200;display:none;align-items:center;gap:14px;
-  background:var(--green);color:#060b18;border:none;border-radius:99px;padding:22px 38px;
-  font-family:'Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:.3px;cursor:pointer;
-  box-shadow:0 14px 40px rgba(170,255,0,0.45),0 4px 14px rgba(0,0,0,0.22);
-  transition:transform .2s,box-shadow .2s;animation:itinPulse 2.4s ease-in-out infinite;}
-#itin-fab:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 20px 50px rgba(170,255,0,0.55),0 6px 18px rgba(0,0,0,0.26);animation:none;}
-#itin-fab svg{width:30px;height:30px;flex-shrink:0;}
-@keyframes itinPulse{0%,100%{box-shadow:0 14px 40px rgba(170,255,0,0.40),0 4px 14px rgba(0,0,0,0.22);}
-  50%{box-shadow:0 14px 44px rgba(170,255,0,0.70),0 4px 14px rgba(0,0,0,0.22);}}
-#itin-ov{position:fixed;inset:0;background:rgba(4,8,20,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  z-index:1300;opacity:0;pointer-events:none;transition:opacity .3s ease;}
-#itin-ov.open{opacity:1;pointer-events:auto;}
-#itin-drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;z-index:1301;
-  background:var(--bg);border-left:1px solid var(--b2);box-shadow:-24px 0 60px rgba(0,0,0,0.18);
-  transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
-#itin-drawer.open{transform:translateX(0);}
-.itin-hd{padding:22px 22px 18px;border-bottom:1px solid var(--b);background:var(--card);flex-shrink:0;position:relative;}
-.itin-eyebrow{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--green-dk);margin-bottom:6px;}
-.itin-ttl{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.3px;color:var(--txt);line-height:1.05;}
-.itin-sub{font-size:11px;color:var(--m);margin-top:6px;}
-.itin-x{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:10px;border:1px solid var(--b2);
-  background:var(--card2);color:var(--m);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;}
-.itin-x:hover{background:var(--bg2);color:var(--txt);}
-.itin-body{padding:22px;overflow-y:auto;flex:1;}
-@media(max-width:480px){#itin-drawer{width:100vw;max-width:100vw;}
-  #itin-fab{right:14px;left:14px;bottom:16px;justify-content:center;padding:20px 24px;font-size:20px;}
-  #itin-fab svg{width:26px;height:26px;}}
+/* ─── DINÁMICA DEL EVENTO (landing familias) ─── */
+.rs-dynamic-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;
+  background:rgba(170,255,0,0.10);color:var(--green-dk);border:1.5px solid rgba(170,255,0,0.45);border-radius:14px;
+  padding:15px 26px;font-family:'Inter',sans-serif;font-weight:800;font-size:15px;letter-spacing:.2px;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s;}
+.rs-dynamic-btn:hover{background:rgba(170,255,0,0.18);border-color:var(--green);transform:translateY(-2px);}
+.rs-dynamic-btn svg{width:19px;height:19px;flex-shrink:0;}
+
+#din-ov{position:fixed;inset:0;z-index:1300;display:none;flex-direction:column;
+  background:radial-gradient(1200px 600px at 50% -10%,rgba(170,255,0,0.10),transparent 60%),var(--bg);}
+#din-ov.open{display:flex;}
+.din-top{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;flex-shrink:0;}
+.din-brand{display:flex;flex-direction:column;gap:3px;}
+.din-eyebrow{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--green-dk);}
+.din-camp{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.3px;color:var(--txt);line-height:1;}
+.din-x{width:44px;height:44px;border-radius:12px;border:1px solid var(--b2);background:var(--card);color:var(--m);
+  font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;flex-shrink:0;}
+.din-x:hover{background:var(--bg2);color:var(--txt);}
+.din-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 24px 4px;text-align:center;position:relative;overflow:hidden;}
+.din-step{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--m2);margin-bottom:18px;}
+.din-card{width:100%;max-width:720px;background:var(--card);border:1px solid var(--b);border-left:6px solid var(--green);
+  border-radius:24px;padding:44px 40px;box-shadow:var(--sh-modal);animation:dinIn .5s cubic-bezier(.2,.7,.3,1);}
+@keyframes dinIn{from{opacity:0;transform:translateY(24px) scale(.98);}to{opacity:1;transform:none;}}
+.din-time{display:inline-block;background:var(--green);color:#060b18;font-family:'Anton',sans-serif;font-size:26px;
+  letter-spacing:.5px;padding:8px 20px;border-radius:99px;margin-bottom:22px;}
+.din-ttl{font-family:'Anton',sans-serif;font-size:clamp(30px,6vw,52px);letter-spacing:.5px;color:var(--txt);line-height:1.02;margin-bottom:16px;}
+.din-desc{font-size:clamp(15px,2.4vw,20px);color:var(--m);line-height:1.55;max-width:600px;margin:0 auto;}
+.din-who{margin-top:20px;display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--green-dk);
+  background:rgba(170,255,0,0.10);border:1px solid rgba(170,255,0,0.35);padding:7px 16px;border-radius:99px;}
+.din-progress{width:100%;max-width:720px;height:5px;background:var(--b2);border-radius:99px;overflow:hidden;margin-top:30px;}
+.din-progress-fill{height:100%;background:var(--green);width:0;border-radius:99px;}
+.din-progress-fill.run{transition:width linear;}
+.din-ctrls{display:flex;align-items:center;justify-content:center;gap:16px;padding:20px 24px 28px;flex-shrink:0;}
+.din-nav{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--b2);background:var(--card);color:var(--txt);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;flex-shrink:0;}
+.din-nav:hover{background:var(--bg2);border-color:var(--green);}
+.din-nav svg{width:22px;height:22px;}
+.din-play{width:60px;height:60px;background:var(--green);color:#060b18;border-color:var(--green);}
+.din-play:hover{background:var(--green-dk);}
+.din-play svg{width:26px;height:26px;}
+.din-dots{display:flex;gap:8px;align-items:center;justify-content:center;padding-bottom:20px;flex-wrap:wrap;flex-shrink:0;}
+.din-dot{width:9px;height:9px;border-radius:50%;background:var(--b2);cursor:pointer;transition:background .2s,transform .2s;padding:0;border:none;}
+.din-dot.active{background:var(--green);transform:scale(1.35);}
+@media(max-width:480px){.din-card{padding:32px 22px;border-radius:20px;}.din-time{font-size:22px;}
+  .din-nav{width:46px;height:46px;}.din-play{width:54px;height:54px;}.din-top{padding:16px 18px;}}
 </style>
 </head>
 <body>
@@ -583,6 +600,10 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Soy Atleta — Ver mis resultados
     </button>
+    <button class="rs-dynamic-btn" onclick="openDinamica()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Ver dinámica del evento
+    </button>
     <button class="rs-other-camps" onclick="goToCampSelector()">Ver todos los camps →</button>
   </div>
   <div class="rs-bottom-bar">
@@ -623,21 +644,27 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
   </div>
 </div>
 
-<!-- ITINERARIO (pop-up familias) -->
-<button id="itin-fab" onclick="openItinerary()" aria-label="Ver itinerario del camp">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-  Ver Itinerario
-</button>
-<div id="itin-ov" onclick="closeItinerary()"></div>
-<aside id="itin-drawer" role="dialog" aria-label="Itinerario del camp">
-  <div class="itin-hd">
-    <button class="itin-x" onclick="closeItinerary()" aria-label="Cerrar">×</button>
-    <div class="itin-eyebrow">Logística del evento</div>
-    <div class="itin-ttl">Itinerario del Camp</div>
-    <div class="itin-sub" id="itin-sub">ID Camp · Flag Football · Panamá 2026</div>
+<!-- DINÁMICA DEL EVENTO (presentación auto para familias) -->
+<div id="din-ov" role="dialog" aria-label="Dinámica del evento">
+  <div class="din-top">
+    <div class="din-brand">
+      <div class="din-eyebrow">Dinámica del evento</div>
+      <div class="din-camp" id="din-camp">ID Camp Panamá 2026</div>
+    </div>
+    <button class="din-x" onclick="closeDinamica()" aria-label="Cerrar">×</button>
   </div>
-  <div class="itin-body"><div class="agenda-wrap" id="itin-list"></div></div>
-</aside>
+  <div class="din-stage">
+    <div class="din-step" id="din-step"></div>
+    <div id="din-card-wrap"></div>
+    <div class="din-progress"><div class="din-progress-fill" id="din-fill"></div></div>
+  </div>
+  <div class="din-ctrls">
+    <button class="din-nav" onclick="dinPrev()" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <button class="din-nav din-play" id="din-play" onclick="dinTogglePlay()" aria-label="Pausar/Reproducir"></button>
+    <button class="din-nav" onclick="dinNext()" aria-label="Siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div>
+  <div class="din-dots" id="din-dots"></div>
+</div>
 
 <!-- SIDEBAR OVERLAY (mobile) -->
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
@@ -915,7 +942,6 @@ async function selectCamp(id){
   document.getElementById('camp-screen').style.display='none';
   const rs=document.getElementById('role-screen');
   rs.style.display='flex';rs.style.opacity='0';
-  setItinFab(true);
   requestAnimationFrame(()=>{
     rs.style.transition='opacity .35s ease';rs.style.opacity='1';
     stagger('#role-screen .rs-main-btn','anim-scale-in',0.22,0);
@@ -1106,21 +1132,18 @@ async function enterAs(role){
     buildNav(ATHLETE_NAV);
     setView('my-profile');
   }
-  setItinFab(role!=='staff');
 }
 function switchRole(){
   ROLE='';ATH_ME=null;
   document.getElementById('app').style.display='none';
   document.getElementById('role-screen').style.display='flex';
   closeSidebar();
-  setItinFab(true);
 }
 function goToCampSelector(){
   ROLE='';ATH_ME=null;
   document.getElementById('app').style.display='none';
   document.getElementById('role-screen').style.display='none';
   closeSidebar();
-  setItinFab(false);
   renderCampSelector();
 }
 
@@ -1460,17 +1483,70 @@ function renderAgenda(){
     <div class="agenda-wrap">${body}</div>`;
 }
 /* ─── ITINERARIO (pop-up familias) ─── */
-function setItinFab(show){ const f=document.getElementById('itin-fab'); if(f)f.style.display=show?'flex':'none'; if(!show)closeItinerary(); }
-function renderItinerary(){
-  const list=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
-  const sub=document.getElementById('itin-sub');
-  if(sub&&CAMP_OBJ)sub.textContent=[CAMP_OBJ.nombre,CAMP_OBJ.deporte,CAMP_OBJ.ubicacion].filter(Boolean).join(' · ');
-  const el=document.getElementById('itin-list');
-  if(el)el.innerHTML=list.length?list.map((a,i)=>agendaViewRow(a,i,list.length)).join(''):'<div style="color:var(--m);font-size:13px">Agenda por confirmar.</div>';
+/* ─── DINÁMICA DEL EVENTO (presentación auto para familias) ─── */
+const DIN_MS=5000;              /* tiempo por tarjeta */
+let DIN_LIST=[], DIN_I=0, DIN_TIMER=null, DIN_PLAYING=true;
+const DIN_ICON_PLAY='<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
+const DIN_ICON_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+function openDinamica(){
+  DIN_LIST=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
+  const c=document.getElementById('din-camp');
+  if(c&&CAMP_OBJ)c.textContent=CAMP_OBJ.nombre;
+  DIN_I=0; DIN_PLAYING=true;
+  document.getElementById('din-ov').classList.add('open');
+  dinRenderDots(); dinShow(0); dinPlay();
 }
-function openItinerary(){ renderItinerary(); document.getElementById('itin-ov').classList.add('open'); document.getElementById('itin-drawer').classList.add('open'); }
-function closeItinerary(){ document.getElementById('itin-ov')?.classList.remove('open'); document.getElementById('itin-drawer')?.classList.remove('open'); }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeItinerary();});
+function closeDinamica(){ dinStop(); document.getElementById('din-ov').classList.remove('open'); }
+function dinRenderDots(){
+  const d=document.getElementById('din-dots');
+  d.innerHTML=DIN_LIST.map((_,i)=>`<button class="din-dot${i===DIN_I?' active':''}" onclick="dinGo(${i})" aria-label="Ir a ${i+1}"></button>`).join('');
+}
+function dinShow(i){
+  if(!DIN_LIST.length)return;
+  DIN_I=(i+DIN_LIST.length)%DIN_LIST.length;
+  const a=DIN_LIST[DIN_I];
+  const when=[a.fecha?fmtCampDate(a.fecha):'', a.hora||''].filter(Boolean).join(' · ')||'—';
+  document.getElementById('din-step').textContent=`Momento ${DIN_I+1} de ${DIN_LIST.length}`;
+  document.getElementById('din-card-wrap').innerHTML=`
+    <div class="din-card">
+      <div class="din-time">${esc(when)}</div>
+      <div class="din-ttl">${esc(a.que)||'Actividad'}</div>
+      ${a.como?`<div class="din-desc">${esc(a.como)}</div>`:''}
+      ${a.quien?`<div class="din-who">👤 ${esc(a.quien)}</div>`:''}
+    </div>`;
+  [...document.querySelectorAll('.din-dot')].forEach((el,k)=>el.classList.toggle('active',k===DIN_I));
+  dinArmProgress();
+}
+function dinArmProgress(){
+  const f=document.getElementById('din-fill');
+  f.classList.remove('run'); f.style.width='0';
+  void f.offsetWidth;   /* reinicia la animación */
+  if(DIN_PLAYING){ f.style.transitionDuration=DIN_MS+'ms'; f.classList.add('run'); f.style.width='100%'; }
+}
+function dinPlay(){
+  DIN_PLAYING=true;
+  document.getElementById('din-play').innerHTML=DIN_ICON_PAUSE;
+  dinArmProgress();
+  clearInterval(DIN_TIMER);
+  DIN_TIMER=setInterval(()=>dinShow(DIN_I+1),DIN_MS);
+}
+function dinStop(){
+  DIN_PLAYING=false;
+  clearInterval(DIN_TIMER); DIN_TIMER=null;
+  const p=document.getElementById('din-play'); if(p)p.innerHTML=DIN_ICON_PLAY;
+  const f=document.getElementById('din-fill'); if(f){f.classList.remove('run');}
+}
+function dinTogglePlay(){ DIN_PLAYING?dinStop():dinPlay(); }
+function dinNext(){ dinShow(DIN_I+1); if(DIN_PLAYING)dinPlay(); }
+function dinPrev(){ dinShow(DIN_I-1); if(DIN_PLAYING)dinPlay(); }
+function dinGo(i){ dinShow(i); if(DIN_PLAYING)dinPlay(); }
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('din-ov').classList.contains('open'))return;
+  if(e.key==='Escape')closeDinamica();
+  else if(e.key==='ArrowRight')dinNext();
+  else if(e.key==='ArrowLeft')dinPrev();
+  else if(e.key===' '){e.preventDefault();dinTogglePlay();}
+});
 
 function agendaSet(id,field,val){ const a=(DATA.agenda||[]).find(x=>x.id===id); if(a){a[field]=val; dbSaveAgenda();} }
 function agendaAdd(){ if(!Array.isArray(DATA.agenda))DATA.agenda=[]; DATA.agenda.push({id:'ag_'+Math.random().toString(36).slice(2,9),fecha:'',hora:'',quien:'',que:'',como:''}); dbSaveAgenda(); renderAgenda(); }
