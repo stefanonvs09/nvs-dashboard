@@ -119,6 +119,13 @@ body{background:var(--bg);color:var(--txt);overflow:hidden;}
   margin-bottom:20px;
 }
 .rs-camp-badge svg{opacity:.75;flex-shrink:0;}
+.rs-location{display:inline-flex;align-items:center;gap:8px;margin:-8px 0 22px;max-width:340px;
+  color:rgba(255,255,255,0.72);font-size:12px;font-weight:600;text-decoration:none;line-height:1.4;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:99px;padding:9px 16px;
+  transition:background .2s,border-color .2s,color .2s;}
+.rs-location:hover{background:rgba(170,255,0,0.10);border-color:rgba(170,255,0,0.4);color:#fff;}
+.rs-location svg{flex-shrink:0;color:var(--green);}
+.rs-location strong{color:var(--green);font-weight:800;white-space:nowrap;}
 .rs-other-camps{
   margin-top:14px;background:none;border:none;
   font-size:11px;font-weight:600;color:rgba(255,255,255,0.32);
@@ -662,6 +669,10 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
       <span>ID Camp Panama 2026</span>
     </div>
+    <a class="rs-location" href="https://www.google.com/maps/dir/?api=1&destination=COS+Sports+Plaza%2C+Metro+Park%2C+Panama+City%2C+Panama" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Cancha de flag · COS Sports Plaza — <strong>Cómo llegar</strong></span>
+    </a>
     <button class="rs-main-btn" onclick="enterAs('athlete')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Soy Atleta — Ver mis resultados
