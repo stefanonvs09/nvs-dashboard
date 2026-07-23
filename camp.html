@@ -556,6 +556,17 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
   font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;}
 .comb-step:hover{background:var(--bg2);border-color:var(--green);}
 .comb-step-lbl{font-size:12px;font-weight:800;color:var(--m);min-width:78px;text-align:center;}
+
+/* ─── ESTADO DE REGISTRO (check-in / completa) ─── */
+.reg-badge{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:7px 14px;font-family:'Inter',sans-serif;
+  font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;transition:all .18s;border:1.5px solid;line-height:1;}
+.reg-off{background:transparent;border-color:var(--b2);color:var(--m);}
+.reg-off:hover{border-color:var(--green);color:var(--green-dk);background:rgba(170,255,0,0.06);}
+.reg-on{background:rgba(170,255,0,0.14);border-color:var(--green);color:var(--green-dk);}
+.reg-on:hover{background:rgba(170,255,0,0.22);}
+.reg-done{background:var(--green);border-color:var(--green);color:#0a1200;box-shadow:0 0 14px rgba(170,255,0,0.40);}
+.reg-done:hover{filter:brightness(1.05);}
+.row-reg td{background:rgba(170,255,0,0.05);}
 </style>
 </head>
 <body>
@@ -1368,9 +1379,16 @@ function renderAthletes(){
     const avHtml=a.photo_url
       ?`<img src="${esc(a.photo_url)}" style="width:30px;height:30px;border-radius:8px;object-fit:cover;margin-right:8px;flex-shrink:0;border:1.5px solid ${col}" onerror="this.style.display='none'">`
       :`<div class="ath-av-sm" style="background:${col}">${inits(a.nombre)}</div>`;
-    return`<tr onclick="ROLE==='staff'?openCombineFor('${a.id}'):null">
+    const st=a.registrado?(done===METRICS.length?'done':'on'):'off';
+    const regCell = st==='off'
+      ? `<button class="reg-badge reg-off" onclick="event.stopPropagation();toggleRegistro('${a.id}')" title="Marcar llegada / kit entregado">Registrar</button>`
+      : st==='on'
+      ? `<button class="reg-badge reg-on" onclick="event.stopPropagation();toggleRegistro('${a.id}')" title="Registrada — clic para quitar">✓ Registrada</button>`
+      : `<button class="reg-badge reg-done" onclick="event.stopPropagation();toggleRegistro('${a.id}')" title="Completa: registrada + combine — clic para quitar registro">★ Completa</button>`;
+    return`<tr class="${a.registrado?'row-reg':''}" onclick="ROLE==='staff'?openCombineFor('${a.id}'):null">
       <td><span class="ath-num">#${a.numero!=null?a.numero:'—'}</span></td>
       <td style="display:flex;align-items:center;padding:11px 16px">${avHtml}<div><div class="ath-name">${esc(a.nombre)}</div><div style="font-size:10px;color:var(--m2);margin-top:1px">${esc(a.colegio||'')}</div></div></td>
+      <td>${regCell}</td>
       <td>${classBadge(a.ano)}</td>
       <td><span class="pos-badge">${esc(a.pos||'—')}</span></td>
       <td style="font-size:11px;color:var(--m2)">${esc(a.ciudad||'—')}</td>
@@ -1386,15 +1404,29 @@ function renderAthletes(){
     <div class="page-hero">
       <div class="page-hero-eyebrow">Roster del camp</div>
       <div class="page-hero-ttl">Atletas</div>
-      <div class="page-hero-sub">${DATA.athletes.length} jugadoras registradas · Haz clic en una fila para ingresar su combine</div>
+      <div class="page-hero-sub">${DATA.athletes.filter(x=>x.registrado).length} registradas de ${DATA.athletes.length} · Toca "Registrar" cuando la atleta llega y recibe su kit</div>
     </div>
     <div class="filter-bar">${filterBtns}</div>
     <div class="tbl-wrap"><div class="tbl-scroll"><table class="tbl">
-      <thead><tr><th>#</th><th>Nombre</th><th>Clase</th><th>Posición</th><th>Ciudad</th><th>Combine</th>${ROLE==='staff'?'<th></th>':''}</tr></thead>
-      <tbody>${rows||`<tr><td colspan="7"><div class="empty"><div class="empty-ico">👥</div><div class="empty-ttl">Sin atletas</div></div></td></tr>`}</tbody>
+      <thead><tr><th>#</th><th>Nombre</th><th>Registro</th><th>Clase</th><th>Posición</th><th>Ciudad</th><th>Combine</th>${ROLE==='staff'?'<th></th>':''}</tr></thead>
+      <tbody>${rows||`<tr><td colspan="8"><div class="empty"><div class="empty-ico">👥</div><div class="empty-ttl">Sin atletas</div></div></td></tr>`}</tbody>
     </table></div></div>`;
 }
 function setClassFilter(cl){CLASS_FILTER=cl;renderAthletes();}
+function rerenderCurrent(){
+  if(VIEW==='athletes') renderAthletes();
+  else if(VIEW==='combine') renderCombine();
+  else if(VIEW==='dashboard') renderDashboard();
+}
+/* Check-in: marca/desmarca que la atleta llegó y recibió su kit */
+async function toggleRegistro(id){
+  const a=DATA.athletes.find(x=>x.id===id); if(!a)return;
+  a.registrado=!a.registrado;
+  rerenderCurrent();                 // respuesta inmediata
+  const ok=await dbUpsertAthlete(a);
+  if(ok) toast(a.registrado?`✓ ${a.nombre.split(' ')[0]} registrada`:'Registro quitado','ok');
+  else { a.registrado=!a.registrado; rerenderCurrent(); }   // revertir si falla
+}
 function openCombineFor(id){EDIT_ID=id;setView('combine');}
 
 /* ─── COMBINE ─── */
@@ -1402,6 +1434,13 @@ function renderCombine(){
   const options=DATA.athletes.map(a=>`<option value="${a.id}"${COMBINE_ATH===a.id?' selected':''}>${esc(a.nombre)} — ${CLASS_LABEL[CLASS_MAP[a.ano]]||a.ano}</option>`).join('');
   const ath=DATA.athletes.find(a=>a.id===COMBINE_ATH);
   const c=ath?(DATA.combine[ath.id]||{}):{};
+  const cdone=ath?METRICS.filter(m=>c[m.key]!==undefined&&c[m.key]!=='').length:0;
+  const cst=ath?(ath.registrado?(cdone===METRICS.length?'done':'on'):'off'):null;
+  const regBtn=ath?(cst==='off'
+    ?`<button class="reg-badge reg-off" onclick="toggleRegistro('${ath.id}')" title="Marcar llegada / kit entregado">Registrar llegada</button>`
+    :cst==='on'
+    ?`<button class="reg-badge reg-on" onclick="toggleRegistro('${ath.id}')" title="Registrada — clic para quitar">✓ Registrada</button>`
+    :`<button class="reg-badge reg-done" onclick="toggleRegistro('${ath.id}')" title="Completa — clic para quitar registro">★ Completa</button>`):'';
   const athInfo=ath?`
     <div class="comb-ath-info">
       <div class="comb-av" style="background:${classColor(ath.ano)}">${inits(ath.nombre)}</div>
@@ -1422,6 +1461,7 @@ function renderCombine(){
   q('#content').innerHTML=`
     <div class="comb-nav">
       <button class="comb-back" onclick="combineExit()">← Volver a Atletas</button>
+      ${regBtn}
       ${ath?`<div class="comb-stepper">
         <button class="comb-step" onclick="combineStep(-1)" title="Atleta anterior">◀</button>
         <span class="comb-step-lbl">#${ath.numero!=null?ath.numero:'—'} · ${athIdx+1}/${DATA.athletes.length}</span>
