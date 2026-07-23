@@ -567,6 +567,28 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .reg-done{background:var(--green);border-color:var(--green);color:#0a1200;box-shadow:0 0 14px rgba(170,255,0,0.40);}
 .reg-done:hover{filter:brightness(1.05);}
 .row-reg td{background:rgba(170,255,0,0.05);}
+
+/* ─── STAFF · PROCESOS ─── */
+.stf-grp-ttl{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--m2);margin-bottom:12px;}
+.stf-list{display:flex;flex-direction:column;gap:10px;}
+.stf-card{display:flex;align-items:flex-start;gap:14px;background:var(--card);border:1px solid var(--b);border-radius:16px;padding:14px 16px;box-shadow:var(--sh-card);}
+.stf-av{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#0a1200;font-weight:800;font-size:14px;font-family:'Anton',sans-serif;}
+.stf-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px;}
+.stf-row1{display:flex;align-items:center;gap:10px;}
+.stf-name{flex:1;min-width:0;background:transparent;border:none;border-bottom:1.5px solid transparent;color:var(--txt);font-family:'Inter',sans-serif;font-weight:800;font-size:15px;padding:2px 0;outline:none;transition:border-color .2s;}
+.stf-name:focus{border-bottom-color:var(--green);}
+.stf-name::placeholder{color:var(--m2);font-weight:600;}
+.stf-rol{flex-shrink:0;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:99px;}
+.rol-admin{background:rgba(139,92,246,0.14);color:#8b5cf6;border:1px solid rgba(139,92,246,0.3);}
+.rol-staff{background:rgba(170,255,0,0.12);color:var(--green-dk);border:1px solid rgba(170,255,0,0.3);}
+.stf-mail{font-size:12px;color:var(--m);text-decoration:none;word-break:break-all;}
+.stf-mail:hover{color:var(--green-dk);text-decoration:underline;}
+.stf-mail-in{background:transparent;border:1px dashed var(--b2);border-radius:8px;color:var(--txt);font-size:12px;padding:5px 8px;outline:none;font-family:'Inter',sans-serif;}
+.stf-func{background:var(--card2);border:1px solid var(--b);border-radius:10px;color:var(--txt);font-size:13px;padding:9px 12px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s;}
+.stf-func:focus{border-color:var(--green);}
+.stf-func::placeholder{color:var(--m2);}
+.stf-del{flex-shrink:0;width:30px;height:30px;border-radius:9px;border:1px solid var(--b);background:var(--card2);color:var(--m2);font-size:14px;cursor:pointer;transition:all .2s;}
+.stf-del:hover{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,0.08);}
 </style>
 </head>
 <body>
@@ -847,6 +869,7 @@ const STAFF_NAV=[
   {id:'combine',  label:'Combine'},
   {id:'rankings', label:'Rankings'},
   {id:'agenda',   label:'Agenda'},
+  {id:'procesos', label:'Staff · Procesos'},
 ];
 const ATHLETE_NAV=[
   {id:'my-profile',label:'Mi Perfil'},
@@ -865,6 +888,25 @@ const AGENDA=[
   {time:'2:20–2:30',  title:'Cierre',          desc:'Cierre del evento.',color:'#3b82f6',tags:['Cierre']},
   {time:'2:30–3:00',  title:'Networking & Activaciones',desc:'Networking y activaciones con los patrocinadores.',color:'#f97316',tags:['Networking']},
 ];
+/* Equipo del evento (Staff · Procesos) — seed por defecto */
+const STAFF_SEED=[
+  {id:'st_admin_stefano',nombre:'Stefano',email:'stefano@playwithnewvision.com',rol:'admin',funcion:'Dirección general'},
+  {id:'st_admin_andrea',nombre:'Andrea Castillo',email:'',rol:'admin',funcion:''},
+  {id:'st_admin_andy',nombre:'Andy',email:'',rol:'admin',funcion:''},
+  {id:'st_1',nombre:'Marie Baloy',email:'mariebaloy23@gmail.com',rol:'staff',funcion:''},
+  {id:'st_2',nombre:'Juan Pablo',email:'juanpablosg19@gmail.com',rol:'staff',funcion:''},
+  {id:'st_3',nombre:'Jaén',email:'jjaen2900@gmail.com',rol:'staff',funcion:''},
+  {id:'st_4',nombre:'Noah Carrión',email:'carrionnoah11b@gmail.com',rol:'staff',funcion:''},
+  {id:'st_5',nombre:'N. Arauz Dudley',email:'narauzdudley@gmail.com',rol:'staff',funcion:''},
+  {id:'st_6',nombre:'Nicky Arauz Dudley',email:'nickyarauzdudley12@icloud.com',rol:'staff',funcion:''},
+  {id:'st_7',nombre:'JD Maitín',email:'jdmaitin68@gmail.com',rol:'staff',funcion:''},
+  {id:'st_8',nombre:'Juan Diego Julio',email:'diegoajulio@gmail.com',rol:'staff',funcion:''},
+  {id:'st_9',nombre:'Juan Diego Julio',email:'juandiegojulioa@gmail.com',rol:'staff',funcion:''},
+  {id:'st_10',nombre:'Ariel Ching',email:'arielchingnvs@gmail.com',rol:'staff',funcion:''},
+  {id:'st_11',nombre:'Marketing NVS',email:'marketing@playwithnewvision.com',rol:'staff',funcion:''},
+  {id:'st_12',nombre:'José Montilla',email:'josemmontilla23@gmail.com',rol:'staff',funcion:''},
+];
+function defaultStaff(){ return STAFF_SEED.map(s=>({...s})); }
 /* Qué debe llevar cada atleta (visible en el landing) */
 const LLEVAR=[
   {ico:'🥾',txt:'Tacos'},
@@ -1054,13 +1096,14 @@ async function initData(){
     const [ar,cr,mr]=await Promise.all([
       sb.from('nvs_camp_atletas').select('*').eq('camp_id',CAMP_ID).order('created_at'),
       sb.from('nvs_camp_combine').select('*'),
-      sb.from('nvs_camps').select('agenda').eq('id',CAMP_ID).maybeSingle()
+      sb.from('nvs_camps').select('agenda,staff').eq('id',CAMP_ID).maybeSingle()
     ]);
     if(ar.error){throw ar.error;}
     DATA.athletes=ar.data&&ar.data.length>0?ar.data:[...DEMO_ATHLETES];
     DATA.combine={};
     if(!cr.error&&cr.data){cr.data.forEach(r=>{DATA.combine[r.atleta_id]=r.datos||{};});}
     DATA.agenda=(mr&&!mr.error&&mr.data&&Array.isArray(mr.data.agenda)&&mr.data.agenda.length)?mr.data.agenda:defaultAgenda();
+    DATA.staff=(mr&&!mr.error&&mr.data&&Array.isArray(mr.data.staff)&&mr.data.staff.length)?mr.data.staff:defaultStaff();
     // if DB empty, seed demo
     if(ar.data&&ar.data.length===0){
       await seedAthletes();
@@ -1087,7 +1130,8 @@ function loadLocal(){
     DATA.athletes=sa?JSON.parse(sa):[...DEMO_ATHLETES];
     DATA.combine=sc?JSON.parse(sc):{};
     DATA.agenda=defaultAgenda();
-  }catch(e){DATA={athletes:[...DEMO_ATHLETES],combine:{},agenda:defaultAgenda()};}
+    DATA.staff=defaultStaff();
+  }catch(e){DATA={athletes:[...DEMO_ATHLETES],combine:{},agenda:defaultAgenda(),staff:defaultStaff()};}
 }
 
 function saveLocal(){
@@ -1230,8 +1274,8 @@ function buildNav(items){
 }
 function setView(v){
   VIEW=v;
-  const titles={dashboard:'Dashboard',athletes:'Atletas',combine:'Combine',rankings:'Rankings',agenda:'Agenda','my-profile':'Mi Perfil'};
-  const crumbs={dashboard:'Resumen operativo',athletes:'Roster del camp',combine:'Evaluación física',rankings:'Clasificación general',agenda:'Logística del evento','my-profile':'Vista atleta'};
+  const titles={dashboard:'Dashboard',athletes:'Atletas',combine:'Combine',rankings:'Rankings',agenda:'Agenda',procesos:'Staff · Procesos','my-profile':'Mi Perfil'};
+  const crumbs={dashboard:'Resumen operativo',athletes:'Roster del camp',combine:'Evaluación física',rankings:'Clasificación general',agenda:'Logística del evento',procesos:'Equipo del evento','my-profile':'Vista atleta'};
   document.getElementById('view-title').textContent=titles[v]||v;
   document.getElementById('view-crumb').textContent=crumbs[v]||'NVS · Flag Football ID Camp';
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
@@ -1249,6 +1293,7 @@ function setView(v){
     else if(v==='combine')  renderCombine();
     else if(v==='rankings') renderRankings();
     else if(v==='agenda')   renderAgenda();
+    else if(v==='procesos') renderProcesos();
     else if(v==='my-profile') renderMyProfile();
     requestAnimationFrame(animSection);
   },160);
@@ -1712,6 +1757,47 @@ async function dbSaveAgenda(){
   if(!session){ toast('⚠ Entra como Staff para guardar','err'); return; }
   const {error}=await sb.from('nvs_camps').upsert({id:CAMP_ID,agenda:DATA.agenda||[]},{onConflict:'id'});
   if(error) toast('Error al guardar la agenda: '+error.message,'err'); else toast('Agenda guardada ✓','ok');
+}
+
+/* ─── STAFF · PROCESOS ─── */
+function renderProcesos(){
+  if(!Array.isArray(DATA.staff))DATA.staff=defaultStaff();
+  const admins=DATA.staff.filter(s=>s.rol==='admin');
+  const staff=DATA.staff.filter(s=>s.rol!=='admin');
+  const asignados=DATA.staff.filter(s=>(s.funcion||'').trim()).length;
+  const card=s=>`<div class="stf-card">
+    <div class="stf-av" style="background:${s.rol==='admin'?'#8b5cf6':classColor(2028)}">${inits(s.nombre||s.email||'?')}</div>
+    <div class="stf-main">
+      <div class="stf-row1">
+        <input class="stf-name" placeholder="Nombre" value="${escA(s.nombre)}" onchange="staffSet('${s.id}','nombre',this.value)">
+        <span class="stf-rol ${s.rol==='admin'?'rol-admin':'rol-staff'}">${s.rol==='admin'?'Admin':'Staff'}</span>
+      </div>
+      ${s.email?`<a class="stf-mail" href="mailto:${escA(s.email)}">${esc(s.email)}</a>`:`<input class="stf-mail-in" placeholder="Correo (opcional)" value="" onchange="staffSet('${s.id}','email',this.value)">`}
+      <input class="stf-func" placeholder="¿En qué se va a dedicar en el evento?" value="${escA(s.funcion)}" onchange="staffSet('${s.id}','funcion',this.value)">
+    </div>
+    <button class="stf-del" onclick="staffDel('${s.id}')" title="Quitar">✕</button>
+  </div>`;
+  q('#content').innerHTML=`
+    <div class="page-hero">
+      <div class="page-hero-eyebrow">Equipo del evento</div>
+      <div class="page-hero-ttl">Staff · Procesos</div>
+      <div class="page-hero-sub">${asignados} de ${DATA.staff.length} con función asignada · Escribe el nombre y en qué se dedica cada uno. Se guarda solo.</div>
+    </div>
+    <div class="stf-grp-ttl">👑 Admins</div>
+    <div class="stf-list">${admins.map(card).join('')||'<div style="color:var(--m);font-size:13px">—</div>'}</div>
+    <div class="stf-grp-ttl" style="margin-top:22px">🎽 Staff del evento</div>
+    <div class="stf-list">${staff.map(card).join('')||'<div style="color:var(--m);font-size:13px">Sin staff aún.</div>'}</div>
+    <button class="btn-primary" style="margin-top:16px" onclick="staffAdd()">+ Agregar persona</button>`;
+}
+function staffSet(id,field,val){ const s=(DATA.staff||[]).find(x=>x.id===id); if(s){ s[field]=val; dbSaveStaff(); if(field==='nombre'||field==='email')renderProcesos(); } }
+function staffAdd(){ if(!Array.isArray(DATA.staff))DATA.staff=[]; DATA.staff.push({id:'st_'+Math.random().toString(36).slice(2,9),nombre:'',email:'',rol:'staff',funcion:''}); dbSaveStaff(); renderProcesos(); }
+function staffDel(id){ if(!confirm('¿Quitar a esta persona de la lista?\\n(No borra su acceso, solo la saca de Procesos.)'))return; DATA.staff=(DATA.staff||[]).filter(x=>x.id!==id); dbSaveStaff(); renderProcesos(); }
+async function dbSaveStaff(){
+  if(!sb){ toast('Sin conexión a la base','err'); return; }
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ toast('⚠ Entra como Staff para guardar','err'); return; }
+  const {error}=await sb.from('nvs_camps').upsert({id:CAMP_ID,staff:DATA.staff||[]},{onConflict:'id'});
+  if(error) toast('Error al guardar: '+error.message,'err'); else toast('Guardado ✓','ok');
 }
 
 /* ─── ATHLETE VIEW ─── */
