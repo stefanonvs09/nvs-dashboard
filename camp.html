@@ -1065,25 +1065,11 @@ async function selectCamp(id){
   });
 }
 
-/* ─── DEMO DATA ─── */
+/* ─── DEMO DATA (ficticia — respaldo si un camp está vacío; SIN datos reales de menores) ─── */
 const DEMO_ATHLETES=[
-  {id:'ath-001',camp_id:CAMP_ID,nombre:'Ana Victoria Yuil',               ano:2028,pos:'WR',colegio:'Colegio Nuestra Señora de Lourdes', ciudad:'Panamá',tel:'64951988',email:'avictoriayuil@gmail.com',       cedula:'',  equipo:'Grizzlies / Gators / Vikingos',talla:'S', condicion:'Ninguna',photo_url:''},
-  {id:'ath-002',camp_id:CAMP_ID,nombre:'Ismahelys Noemí Miller Pérez',    ano:2026,pos:'DB',colegio:'Centro Bilingüe Vista Alegre',      ciudad:'Panamá',tel:'66492964',email:'millerismahelys3@gmail.com',     cedula:'', equipo:'Spartans',                    talla:'S', condicion:'Ninguna',photo_url:''},
-  {id:'ath-003',camp_id:CAMP_ID,nombre:'Andrea Nicole Muñoz Diaz',        ano:2028,pos:'DB',colegio:'Colegio Nuestra Señora de Lourdes', ciudad:'Panamá',tel:'67774705',email:'ericmunoz73@gmail.com',          cedula:'',  equipo:'Alley Academy / Balboa Dragons',talla:'M', condicion:'Ninguna',photo_url:''},
-  {id:'ath-004',camp_id:CAMP_ID,nombre:'Issa Marie Ortiz Cano',           ano:2027,pos:'WR',colegio:'Instituto Técnico Don Bosco',       ciudad:'Panamá',tel:'66748421',email:'issa.ortiz@institutotecnicodonbosco.edu.pa',cedula:'',equipo:'Grizzlies / Spartans',talla:'S',condicion:'Ninguna',photo_url:''},
-  {id:'ath-005',camp_id:CAMP_ID,nombre:'Mía Edward',                      ano:2028,pos:'QB',colegio:'Academia Bilingüe de San Lorenzo',  ciudad:'Panamá',tel:'64303832',email:'lricord18@gmail.com',            cedula:'',  equipo:'Grizzlies',                   talla:'S', condicion:'Ninguna',photo_url:''},
-  {id:'ath-006',camp_id:CAMP_ID,nombre:'Ana Cristina Perez',              ano:2027,pos:'DB',colegio:'Colegio Episcopal de Panamá',       ciudad:'Panamá',tel:'67893497',email:'perezanacristina1001@gmail.com', cedula:'',  equipo:'Cardinals Panamá',            talla:'XS',condicion:'Ninguna',photo_url:''},
-  {id:'ath-007',camp_id:CAMP_ID,nombre:'Andrea Guillén',                  ano:2028,pos:'QB',colegio:'Instituto Episcopal San Cristóbal', ciudad:'Panamá',tel:'60759196',email:'andreavguillenn@gmail.com',       cedula:'', equipo:'Saints Panamá',               talla:'S', condicion:'Ninguna',photo_url:''},
-  {id:'ath-008',camp_id:CAMP_ID,nombre:'Lucía Victoria Rodríguez Osorio', ano:2028,pos:'QB',colegio:'Balboa Academy',                   ciudad:'Panamá',tel:'68978908',email:'luciavictoriaro@icloud.com',       cedula:'',  equipo:'Alley',                       talla:'M', condicion:'Ninguna',photo_url:''},
-  {id:'ath-009',camp_id:CAMP_ID,nombre:'Catalina Isabel Pazmiño Calvo',   ano:2028,pos:'DB',colegio:'El Colegio de Panamá',             ciudad:'Panamá',tel:'67964956',email:'catapazmino0508@gmail.com',        cedula:'',  equipo:'Saints',                      talla:'S', condicion:'Ninguna',photo_url:''},
-  {id:'ath-010',camp_id:CAMP_ID,nombre:'Alejandra Sofia Duncan Lu',        ano:2029,pos:'DB',colegio:'La Salle de Margarita',            ciudad:'Colón', tel:'64800042',email:'alu487825@gmail.com',              cedula:'',  equipo:'Black Lions',                 talla:'M', condicion:'Ninguna',photo_url:''},
-  {id:'ath-011',camp_id:CAMP_ID,nombre:'Marjorie Nicole Ledezma Ortiz',   ano:2027,pos:'DB',colegio:'Colegio Abel Bravo',               ciudad:'Colón', tel:'62474060',email:'marjorienicole1310@gmail.com',      cedula:'',  equipo:'Black Lions',                 talla:'M', condicion:'Ninguna',photo_url:''},
-  {id:'ath-012',camp_id:CAMP_ID,nombre:'Lia Victoria Romero',             ano:2028,pos:'WR',colegio:'Academia Bilingüe San Lorenzo',    ciudad:'Panamá',tel:'62444497',email:'bolivarr757@gmail.com',            cedula:'',  equipo:'Alley Academy',               talla:'S', condicion:'Ninguna',photo_url:''},
-  {id:'ath-013',camp_id:CAMP_ID,nombre:'Alanis Lucia Vega Serrano',       ano:2027,pos:'WR',colegio:'Alaf International',              ciudad:'',      tel:'60288045',email:'alanislucia955@gmail.com',        cedula:'', equipo:'Believers',                   talla:'M', condicion:'Ninguna',photo_url:''},
-  {id:'ath-014',camp_id:CAMP_ID,nombre:'Andrea Castillo',                 ano:2026,pos:'',colegio:'',ciudad:'',tel:'',email:'',cedula:'',equipo:'',talla:'',condicion:'Ninguna',photo_url:''},
-  {id:'ath-015',camp_id:CAMP_ID,nombre:'Ariel Chin',                      ano:2026,pos:'',colegio:'',ciudad:'',tel:'',email:'',cedula:'',equipo:'',talla:'',condicion:'Ninguna',photo_url:''},
-  {id:'ath-016',camp_id:CAMP_ID,nombre:'Ximena Botello',                  ano:2026,pos:'',colegio:'',ciudad:'',tel:'',email:'',cedula:'',equipo:'',talla:'',condicion:'Ninguna',photo_url:''},
-  {id:'ath-017',camp_id:CAMP_ID,nombre:'José Monti',                      ano:2026,pos:'',colegio:'',ciudad:'',tel:'',email:'',cedula:'',equipo:'',talla:'',condicion:'Ninguna',photo_url:''},
+  {id:'ath-demo-1',camp_id:CAMP_ID,nombre:'Atleta Demo 1',ano:2028,pos:'WR',colegio:'',ciudad:'',tel:'',email:'',cedula:'',equipo:'',talla:'',condicion:'Ninguna',photo_url:''},
+  {id:'ath-demo-2',camp_id:CAMP_ID,nombre:'Atleta Demo 2',ano:2027,pos:'QB',colegio:'',ciudad:'',tel:'',email:'',cedula:'',equipo:'',talla:'',condicion:'Ninguna',photo_url:''},
+  {id:'ath-demo-3',camp_id:CAMP_ID,nombre:'Atleta Demo 3',ano:2029,pos:'DB',colegio:'',ciudad:'',tel:'',email:'',cedula:'',equipo:'',talla:'',condicion:'Ninguna',photo_url:''},
 ];
 
 /* ─── DATA LAYER ─── */
@@ -1099,15 +1085,11 @@ async function initData(){
       sb.from('nvs_camps').select('agenda,staff').eq('id',CAMP_ID).maybeSingle()
     ]);
     if(ar.error){throw ar.error;}
-    DATA.athletes=ar.data&&ar.data.length>0?ar.data:[...DEMO_ATHLETES];
+    DATA.athletes=ar.data&&ar.data.length>0?ar.data:[];   /* camp vacío → roster vacío (no sembrar demo real) */
     DATA.combine={};
     if(!cr.error&&cr.data){cr.data.forEach(r=>{DATA.combine[r.atleta_id]=r.datos||{};});}
     DATA.agenda=(mr&&!mr.error&&mr.data&&Array.isArray(mr.data.agenda)&&mr.data.agenda.length)?mr.data.agenda:defaultAgenda();
     DATA.staff=(mr&&!mr.error&&mr.data&&Array.isArray(mr.data.staff)&&mr.data.staff.length)?mr.data.staff:defaultStaff();
-    // if DB empty, seed demo
-    if(ar.data&&ar.data.length===0){
-      await seedAthletes();
-    }
   }catch(e){
     OFFLINE=true;
     loadLocal();
@@ -1151,9 +1133,12 @@ async function dbUpsertAthlete(a){
 }
 
 async function dbDeleteAthlete(id){
-  if(!sb||OFFLINE){saveLocal();return;}
+  if(!sb||OFFLINE){saveLocal();return true;}
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ toast('⚠ Entra como Staff para eliminar','err'); return false; }
   const {error}=await sb.from('nvs_camp_atletas').delete().eq('id',id);
-  if(error){saveLocal();}
+  if(error){ toast('Error al eliminar: '+error.message,'err'); return false; }
+  return true;
 }
 
 async function dbUpsertCombine(athId,datos){
@@ -1190,7 +1175,6 @@ function closeSidebar(){
 }
 
 /* ─── PIN ─── */
-const STAFF_PIN='NVS2025';
 function showPinModal(){
   const ov=document.getElementById('pin-ov');
   ov.style.display='flex';
@@ -1200,23 +1184,7 @@ function showPinModal(){
   document.getElementById('pin-err').textContent='';
   setTimeout(()=>{(em||inp).focus();},80);
 }
-function hidePinModal(){document.getElementById('pin-ov').style.display='none';}
-function checkPin(){
-  const val=document.getElementById('pin-input').value;
-  if(val===STAFF_PIN){
-    hidePinModal();
-    if(_pendingAfterPin){_pendingAfterPin();_pendingAfterPin=null;}
-    else{enterAs('staff');}
-  }
-  else{
-    const err=document.getElementById('pin-err');
-    err.textContent='Código incorrecto';
-    const inp=document.getElementById('pin-input');
-    inp.value='';inp.focus();
-    inp.style.borderColor='#ef4444';
-    setTimeout(()=>{inp.style.borderColor='var(--b2)';err.textContent='';},2000);
-  }
-}
+function hidePinModal(){document.getElementById('pin-ov').style.display='none'; _pendingAfterPin=null;}
 async function staffLogin(){
   const email=(document.getElementById('staff-email').value||'').trim();
   const pass=document.getElementById('pin-input').value;
@@ -1226,8 +1194,9 @@ async function staffLogin(){
   if(!sb){ err.textContent='Sin conexión a la base'; return; }
   const {error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){ err.textContent='Correo o contraseña incorrectos'; return; }
+  const pending=_pendingAfterPin;      /* capturar antes de que hidePinModal lo limpie */
   hidePinModal();
-  if(_pendingAfterPin){_pendingAfterPin();_pendingAfterPin=null;}
+  if(pending){ pending(); }
   else{ enterAs('staff'); }
 }
 
@@ -1422,7 +1391,7 @@ function renderAthletes(){
     const dotClass=done===METRICS.length?'dot-done':done>0?'dot-part':'dot-none';
     const col=classColor(a.ano);
     const avHtml=a.photo_url
-      ?`<img src="${esc(a.photo_url)}" style="width:30px;height:30px;border-radius:8px;object-fit:cover;margin-right:8px;flex-shrink:0;border:1.5px solid ${col}" onerror="this.style.display='none'">`
+      ?`<img src="${escA(a.photo_url)}" style="width:30px;height:30px;border-radius:8px;object-fit:cover;margin-right:8px;flex-shrink:0;border:1.5px solid ${col}" onerror="this.style.display='none'">`
       :`<div class="ath-av-sm" style="background:${col}">${inits(a.nombre)}</div>`;
     const st=a.registrado?(done===METRICS.length?'done':'on'):'off';
     const regCell = st==='off'
@@ -1464,18 +1433,23 @@ function rerenderCurrent(){
   else if(VIEW==='dashboard') renderDashboard();
 }
 /* Check-in: marca/desmarca que la atleta llegó y recibió su kit */
+const REG_INFLIGHT=new Set();
 async function toggleRegistro(id){
+  if(REG_INFLIGHT.has(id))return;                 // evita doble-clic / carreras
   const a=DATA.athletes.find(x=>x.id===id); if(!a)return;
+  REG_INFLIGHT.add(id);
   a.registrado=!a.registrado;
   rerenderCurrent();                 // respuesta inmediata
   const ok=await dbUpsertAthlete(a);
   if(ok) toast(a.registrado?`✓ ${a.nombre.split(' ')[0]} registrada`:'Registro quitado','ok');
   else { a.registrado=!a.registrado; rerenderCurrent(); }   // revertir si falla
+  REG_INFLIGHT.delete(id);
 }
 function openCombineFor(id){EDIT_ID=id;setView('combine');}
 
 /* ─── COMBINE ─── */
 function renderCombine(){
+  if(EDIT_ID){COMBINE_ATH=EDIT_ID;EDIT_ID=null;}   /* fijar atleta antes de pintar (evita doble render) */
   const options=DATA.athletes.map(a=>`<option value="${a.id}"${COMBINE_ATH===a.id?' selected':''}>${esc(a.nombre)} — ${CLASS_LABEL[CLASS_MAP[a.ano]]||a.ano}</option>`).join('');
   const ath=DATA.athletes.find(a=>a.id===COMBINE_ATH);
   const c=ath?(DATA.combine[ath.id]||{}):{};
@@ -1532,7 +1506,6 @@ function renderCombine(){
       </div>
       ${ath?`<button class="btn-primary" onclick="saveCombine()" style="padding:12px 32px;font-size:13px">Guardar datos del combine</button>`:''}
     </div>`;
-  if(EDIT_ID&&EDIT_ID!==COMBINE_ATH){COMBINE_ATH=EDIT_ID;renderCombine();EDIT_ID=null;}
 }
 /* Lee los inputs actuales sin guardar en la base */
 function combineCapture(){
@@ -1545,8 +1518,9 @@ async function saveCombine(){
   if(!COMBINE_ATH)return;
   const vals=combineCapture();
   DATA.combine[COMBINE_ATH]=vals;
-  await dbUpsertCombine(COMBINE_ATH,vals);
-  toast('Combine guardado','ok');
+  const ok=await dbUpsertCombine(COMBINE_ATH,vals);
+  if(ok) toast('Combine guardado ✓','ok');
+  /* si falla, dbUpsertCombine ya mostró el error — no lo pisamos con un falso éxito */
 }
 /* Salta a la atleta anterior/siguiente guardando lo escrito en segundo plano */
 function combineStep(dir){
@@ -1789,7 +1763,7 @@ function renderProcesos(){
     <div class="stf-list">${staff.map(card).join('')||'<div style="color:var(--m);font-size:13px">Sin staff aún.</div>'}</div>
     <button class="btn-primary" style="margin-top:16px" onclick="staffAdd()">+ Agregar persona</button>`;
 }
-function staffSet(id,field,val){ const s=(DATA.staff||[]).find(x=>x.id===id); if(s){ s[field]=val; dbSaveStaff(); if(field==='nombre'||field==='email')renderProcesos(); } }
+function staffSet(id,field,val){ const s=(DATA.staff||[]).find(x=>x.id===id); if(s){ s[field]=val; dbSaveStaff(); } }
 function staffAdd(){ if(!Array.isArray(DATA.staff))DATA.staff=[]; DATA.staff.push({id:'st_'+Math.random().toString(36).slice(2,9),nombre:'',email:'',rol:'staff',funcion:''}); dbSaveStaff(); renderProcesos(); }
 function staffDel(id){ if(!confirm('¿Quitar a esta persona de la lista?\\n(No borra su acceso, solo la saca de Procesos.)'))return; DATA.staff=(DATA.staff||[]).filter(x=>x.id!==id); dbSaveStaff(); renderProcesos(); }
 async function dbSaveStaff(){
@@ -1820,7 +1794,7 @@ function renderMyProfile(){
   const ath=DATA.athletes.find(a=>a.id===ATH_ME);
   if(!ath){ATH_ME=null;renderMyProfile();return;}
   const c=DATA.combine[ath.id]||{};
-  const done=METRICS.filter(m=>c[m.key]!==undefined).length;
+  const done=METRICS.filter(m=>c[m.key]!==undefined&&c[m.key]!=='').length;
   const statCards=METRICS.map(mt=>{
     const v=c[mt.key];
     if(v===undefined)return`<div class="ath-stat-card"><div class="ath-stat-val" style="font-size:20px;color:var(--m2)">—</div><div class="ath-stat-lbl">${mt.label}</div><div class="ath-stat-rank" style="color:var(--m2)">Pendiente</div></div>`;
@@ -1834,7 +1808,7 @@ function renderMyProfile(){
     </div>`;
   }).join('');
   const photoBlock=ath.photo_url
-    ?`<div style="width:110px;height:110px;border-radius:18px;overflow:hidden;flex-shrink:0;border:3px solid ${classColor(ath.ano)};box-shadow:0 8px 32px rgba(0,0,0,0.5)"><img src="${esc(ath.photo_url)}" style="width:100%;height:100%;object-fit:cover"></div>`
+    ?`<div style="width:110px;height:110px;border-radius:18px;overflow:hidden;flex-shrink:0;border:3px solid ${classColor(ath.ano)};box-shadow:0 8px 32px rgba(0,0,0,0.5)"><img src="${escA(ath.photo_url)}" style="width:100%;height:100%;object-fit:cover"></div>`
     :`<div class="ath-profile-av" style="background:${classColor(ath.ano)};border:3px solid ${classColor(ath.ano)}">${inits(ath.nombre)}</div>`;
   q('#content').innerHTML=`
     <div class="ath-profile-card">
@@ -2157,7 +2131,7 @@ async function saveAthlete(){
   }else{
     const numero=nextFreeNumber();
     if(numero===null){toast('El camp ya tiene 60 atletas (máximo)','err');savingBtn.textContent='Guardar';savingBtn.disabled=false;return;}
-    target={id:'a'+Date.now(),numero,...athData}; isNew=true;
+    target={id:'a'+Date.now()+'_'+Math.random().toString(36).slice(2,8),numero,...athData}; isNew=true;
   }
   const ok=await dbUpsertAthlete(target);
   savingBtn.textContent='Guardar';savingBtn.disabled=false;
@@ -2170,11 +2144,14 @@ async function saveAthlete(){
 }
 async function delAth(id){
   if(!confirm('¿Eliminar esta atleta?'))return;
+  const backup=DATA.athletes.find(a=>a.id===id);
+  const backupCombine=DATA.combine[id];
   DATA.athletes=DATA.athletes.filter(a=>a.id!==id);
   delete DATA.combine[id];
-  await dbDeleteAthlete(id);
-  toast('Eliminada','ok');
   renderAthletes();
+  const ok=await dbDeleteAthlete(id);
+  if(ok){ toast('Eliminada','ok'); }
+  else if(backup){ DATA.athletes.push(backup); if(backupCombine)DATA.combine[id]=backupCombine; renderAthletes(); }  /* revertir si falló */
 }
 
 /* ─── SERVICE WORKER ─── */
