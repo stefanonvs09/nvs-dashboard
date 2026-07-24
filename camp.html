@@ -742,13 +742,7 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
       <div class="din-eyebrow">Dinámica del evento</div>
       <div class="din-camp" id="din-camp">ID Camp Panamá 2026</div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-      <button class="din-pdf" onclick="downloadItinerarioPDF()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar PDF
-      </button>
-      <button class="din-x" onclick="closeDinamica()" aria-label="Cerrar">×</button>
-    </div>
+    <button class="din-x" onclick="closeDinamica()" aria-label="Cerrar">×</button>
   </div>
   <div class="din-stage">
     <div class="din-step" id="din-step"></div>
@@ -1665,7 +1659,13 @@ function renderAgenda(){
   }
   q('#content').innerHTML=`
     <div class="page-hero"><div class="page-hero-eyebrow">Logística del evento</div><div class="page-hero-ttl">Agenda del Camp</div></div>
-    ${isStaff?'<div style="font-size:12px;color:var(--m);margin-bottom:16px">✏️ Modo Staff — edita quién, cuándo, cómo y qué. Cada cambio se guarda solo.</div>':''}
+    ${isStaff?`<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="font-size:12px;color:var(--m)">✏️ Modo Staff — edita quién, cuándo, cómo y qué. Cada cambio se guarda solo.</div>
+      <button class="din-pdf" onclick="downloadAgendaPDF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar PDF
+      </button>
+    </div>`:''}
     <div class="agenda-wrap">${body}</div>`;
 }
 /* ─── ITINERARIO (pop-up familias) ─── */
@@ -1696,45 +1696,54 @@ function openDinamica(){
   dinRenderDots(); dinShow(0); dinPlay();
 }
 function closeDinamica(){ dinStop(); document.getElementById('din-ov').classList.remove('open'); }
-/* Descarga el itinerario (solo hora + actividad, igual que ven las familias) como PDF con diseño */
-function downloadItinerarioPDF(){
+/* Descarga el itinerario del STAFF (detalle completo: hora + actividad + quién/cómo). Solo lo usa el staff logueado. */
+function downloadAgendaPDF(){
   const JS=window.jspdf&&window.jspdf.jsPDF;
   if(!JS){ toast('No se pudo cargar el generador de PDF (revisa tu conexión)','err'); return; }
-  const list=publicAgenda();
+  const list=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
   const clean=s=>(s||'').replace(/[–—]/g,'-');   /* jsPDF: normaliza guiones largos */
   const doc=new JS({unit:'pt',format:'a4'});
   const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
+  const CX=190, CW=W-40-CX;
   const drawHeader=()=>{
     doc.setFillColor(6,11,24); doc.rect(0,0,W,150,'F');
     doc.setFillColor(170,255,0); doc.rect(0,150,W,6,'F');
     doc.setTextColor(170,255,0); doc.setFont('helvetica','bold'); doc.setFontSize(10);
-    doc.text('NEW VISION SPORTS', 40, 52, {charSpace:2});
-    doc.setTextColor(255,255,255); doc.setFontSize(27);
-    doc.text('Itinerario del Camp', 40, 92);
+    doc.text('NEW VISION SPORTS  ·  STAFF', 40, 50, {charSpace:2});
+    doc.setTextColor(255,255,255); doc.setFontSize(25);
+    doc.text('Itinerario del Staff', 40, 88);
     doc.setTextColor(148,163,184); doc.setFont('helvetica','normal'); doc.setFontSize(11);
     const sub=clean(CAMP_OBJ?[CAMP_OBJ.nombre,CAMP_OBJ.ubicacion].filter(Boolean).join(' · '):'ID Camp Panama 2026');
-    doc.text(sub, 40, 118);
+    doc.text(sub+'  ·  Quien hace que', 40, 114);
   };
   const drawFooter=()=>{
     doc.setTextColor(148,163,184); doc.setFont('helvetica','normal'); doc.setFontSize(9);
-    doc.text('COS Sports Plaza, Panama  ·  playwithnewvision.com', 40, H-32);
+    doc.text('Documento interno del staff  ·  COS Sports Plaza, Panama', 40, H-30);
   };
-  drawHeader(); let y=196;
+  drawHeader(); let y=190;
   list.forEach((a,i)=>{
     const when=clean([a.fecha?fmtCampDate(a.fecha):'', a.hora||''].filter(Boolean).join(' · '))||'-';
-    const lines=doc.splitTextToSize(clean(a.que||'Actividad'), W-80-155);
-    const rowH=Math.max(42, 20+lines.length*17);
-    if(y+rowH>H-70){ drawFooter(); doc.addPage(); drawHeader(); y=196; }
-    if(i%2===0){ doc.setFillColor(244,247,250); doc.rect(40,y-20,W-80,rowH-8,'F'); }
-    doc.setFillColor(170,255,0); doc.rect(40,y-20,4,rowH-8,'F');
-    doc.setTextColor(88,132,0); doc.setFont('helvetica','bold'); doc.setFontSize(12);
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    const titleLines=doc.splitTextToSize(clean(a.que||'Actividad'), CW);
+    const detail=[a.quien?('Responsable: '+a.quien):'', a.como||''].filter(Boolean).join('  -  ');
+    doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    const detailLines=detail?doc.splitTextToSize(clean(detail), CW):[];
+    const rowH=16 + titleLines.length*16 + (detailLines.length?detailLines.length*13+4:0) + 12;
+    if(y+rowH>H-55){ drawFooter(); doc.addPage(); drawHeader(); y=190; }
+    if(i%2===0){ doc.setFillColor(244,247,250); doc.rect(40,y-14,W-80,rowH-8,'F'); }
+    doc.setFillColor(170,255,0); doc.rect(40,y-14,4,rowH-8,'F');
+    doc.setTextColor(88,132,0); doc.setFont('helvetica','bold'); doc.setFontSize(11.5);
     doc.text(when, 56, y);
-    doc.setTextColor(15,23,42); doc.setFont('helvetica','bold'); doc.setFontSize(14);
-    doc.text(lines, 195, y);
+    doc.setTextColor(15,23,42); doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text(titleLines, CX, y);
+    if(detailLines.length){
+      doc.setTextColor(90,100,115); doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      doc.text(detailLines, CX, y+titleLines.length*16+2);
+    }
     y+=rowH;
   });
   drawFooter();
-  doc.save('Itinerario-ID-Camp-Panama-2026.pdf');
+  doc.save('Itinerario-Staff-ID-Camp-Panama-2026.pdf');
   toast('PDF descargado ✓','ok');
 }
 function dinRenderDots(){
