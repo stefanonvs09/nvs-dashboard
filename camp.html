@@ -1669,13 +1669,26 @@ function renderAgenda(){
     <div class="agenda-wrap">${body}</div>`;
 }
 /* ─── ITINERARIO (pop-up familias) ─── */
+/* Agenda "pública": colapsa el desglose interno del staff en una línea por bloque.
+   Ej: "Combine — 40yd", "Combine — L Drill"... → una sola "Combine". Igual con "Drills — ...". */
+function publicAgenda(){
+  const src=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
+  const out=[];
+  for(const a of src){
+    const base=(a.que||'Actividad').split(/\s[—–-]\s/)[0].trim();
+    const prev=out[out.length-1];
+    if(prev&&prev.que.toLowerCase()===base.toLowerCase()) continue;   /* colapsa consecutivos del mismo bloque */
+    out.push({fecha:a.fecha||'', hora:a.hora||'', que:base});
+  }
+  return out;
+}
 /* ─── DINÁMICA DEL EVENTO (presentación auto para familias) ─── */
 const DIN_MS=5000;              /* tiempo por tarjeta */
 let DIN_LIST=[], DIN_I=0, DIN_TIMER=null, DIN_PLAYING=true;
 const DIN_ICON_PLAY='<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
 const DIN_ICON_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
 function openDinamica(){
-  DIN_LIST=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
+  DIN_LIST=publicAgenda();
   const c=document.getElementById('din-camp');
   if(c&&CAMP_OBJ)c.textContent=CAMP_OBJ.nombre;
   DIN_I=0; DIN_PLAYING=true;
@@ -1687,7 +1700,7 @@ function closeDinamica(){ dinStop(); document.getElementById('din-ov').classList
 function downloadItinerarioPDF(){
   const JS=window.jspdf&&window.jspdf.jsPDF;
   if(!JS){ toast('No se pudo cargar el generador de PDF (revisa tu conexión)','err'); return; }
-  const list=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
+  const list=publicAgenda();
   const clean=s=>(s||'').replace(/[–—]/g,'-');   /* jsPDF: normaliza guiones largos */
   const doc=new JS({unit:'pt',format:'a4'});
   const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
