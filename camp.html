@@ -591,7 +591,7 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .stf-mail{font-size:12px;color:var(--m);text-decoration:none;word-break:break-all;}
 .stf-mail:hover{color:var(--green-dk);text-decoration:underline;}
 .stf-mail-in{background:transparent;border:1px dashed var(--b2);border-radius:8px;color:var(--txt);font-size:12px;padding:5px 8px;outline:none;font-family:'Inter',sans-serif;}
-.stf-func{background:var(--card2);border:1px solid var(--b);border-radius:10px;color:var(--txt);font-size:13px;padding:9px 12px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s;}
+.stf-func{width:100%;box-sizing:border-box;background:var(--card2);border:1px solid var(--b);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.5;padding:11px 13px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s;min-height:76px;resize:vertical;}
 .stf-func:focus{border-color:var(--green);}
 .stf-func::placeholder{color:var(--m2);}
 .stf-del{flex-shrink:0;width:30px;height:30px;border-radius:9px;border:1px solid var(--b);background:var(--card2);color:var(--m2);font-size:14px;cursor:pointer;transition:all .2s;}
@@ -1679,12 +1679,11 @@ function dinShow(i){
   const a=DIN_LIST[DIN_I];
   const when=[a.fecha?fmtCampDate(a.fecha):'', a.hora||''].filter(Boolean).join(' · ')||'—';
   document.getElementById('din-step').textContent=`Momento ${DIN_I+1} de ${DIN_LIST.length}`;
+  /* Familias: solo hora + nombre de la actividad. NO se muestra el detalle interno (como) ni el responsable (quien). */
   document.getElementById('din-card-wrap').innerHTML=`
     <div class="din-card">
       <div class="din-time">${esc(when)}</div>
       <div class="din-ttl">${esc(a.que)||'Actividad'}</div>
-      ${a.como?`<div class="din-desc">${esc(a.como)}</div>`:''}
-      ${a.quien?`<div class="din-who">👤 ${esc(a.quien)}</div>`:''}
     </div>`;
   [...document.querySelectorAll('.din-dot')].forEach((el,k)=>el.classList.toggle('active',k===DIN_I));
   dinArmProgress();
@@ -1758,7 +1757,7 @@ function renderProcesos(){
         <span class="stf-rol ${s.rol==='admin'?'rol-admin':'rol-staff'}">${s.rol==='admin'?'Admin':'Staff'}</span>
       </div>
       ${s.email?`<a class="stf-mail" href="mailto:${escA(s.email)}">${esc(s.email)}</a>`:`<input class="stf-mail-in" placeholder="Correo (opcional)" value="" onchange="staffSet('${s.id}','email',this.value)">`}
-      <input class="stf-func" placeholder="¿En qué se va a dedicar en el evento?" value="${escA(s.funcion)}" onchange="staffSet('${s.id}','funcion',this.value)">
+      <textarea class="stf-func" rows="3" placeholder="¿En qué se va a dedicar en el evento? (puedes escribir varias líneas)" onchange="staffSet('${s.id}','funcion',this.value)">${esc(s.funcion)}</textarea>
     </div>
     <button class="stf-del" onclick="staffDel('${s.id}')" title="Quitar">✕</button>
   </div>`;
