@@ -17,6 +17,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -525,6 +526,13 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
 .din-x{width:44px;height:44px;border-radius:12px;border:1px solid var(--b2);background:var(--card);color:var(--m);
   font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;flex-shrink:0;}
 .din-x:hover{background:var(--bg2);color:var(--txt);}
+.din-pdf{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:12px;
+  background:var(--green);color:#060b18;border:none;font-family:'Inter',sans-serif;font-weight:800;font-size:13px;
+  cursor:pointer;transition:filter .2s,transform .2s;box-shadow:0 4px 16px rgba(170,255,0,0.3);}
+.din-pdf:hover{filter:brightness(1.05);transform:translateY(-1px);}
+.din-pdf svg{width:17px;height:17px;flex-shrink:0;}
+.din-pdf:disabled{opacity:.6;cursor:default;}
+@media(max-width:480px){.din-pdf{padding:0 13px;font-size:12px;height:40px;}.din-pdf svg{width:15px;height:15px;}}
 .din-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 24px 4px;text-align:center;position:relative;overflow:hidden;}
 .din-step{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--m2);margin-bottom:18px;}
 .din-card{width:100%;max-width:720px;background:var(--card);border:1px solid var(--b);border-left:6px solid var(--green);
@@ -734,7 +742,13 @@ select.fi{cursor:pointer;-webkit-appearance:none;appearance:none;}
       <div class="din-eyebrow">Dinámica del evento</div>
       <div class="din-camp" id="din-camp">ID Camp Panamá 2026</div>
     </div>
-    <button class="din-x" onclick="closeDinamica()" aria-label="Cerrar">×</button>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <button class="din-pdf" onclick="downloadItinerarioPDF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar PDF
+      </button>
+      <button class="din-x" onclick="closeDinamica()" aria-label="Cerrar">×</button>
+    </div>
   </div>
   <div class="din-stage">
     <div class="din-step" id="din-step"></div>
@@ -1669,6 +1683,47 @@ function openDinamica(){
   dinRenderDots(); dinShow(0); dinPlay();
 }
 function closeDinamica(){ dinStop(); document.getElementById('din-ov').classList.remove('open'); }
+/* Descarga el itinerario (solo hora + actividad, igual que ven las familias) como PDF con diseño */
+function downloadItinerarioPDF(){
+  const JS=window.jspdf&&window.jspdf.jsPDF;
+  if(!JS){ toast('No se pudo cargar el generador de PDF (revisa tu conexión)','err'); return; }
+  const list=(Array.isArray(DATA.agenda)&&DATA.agenda.length)?DATA.agenda:defaultAgenda();
+  const clean=s=>(s||'').replace(/[–—]/g,'-');   /* jsPDF: normaliza guiones largos */
+  const doc=new JS({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
+  const drawHeader=()=>{
+    doc.setFillColor(6,11,24); doc.rect(0,0,W,150,'F');
+    doc.setFillColor(170,255,0); doc.rect(0,150,W,6,'F');
+    doc.setTextColor(170,255,0); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text('NEW VISION SPORTS', 40, 52, {charSpace:2});
+    doc.setTextColor(255,255,255); doc.setFontSize(27);
+    doc.text('Itinerario del Camp', 40, 92);
+    doc.setTextColor(148,163,184); doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    const sub=clean(CAMP_OBJ?[CAMP_OBJ.nombre,CAMP_OBJ.ubicacion].filter(Boolean).join(' · '):'ID Camp Panama 2026');
+    doc.text(sub, 40, 118);
+  };
+  const drawFooter=()=>{
+    doc.setTextColor(148,163,184); doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text('COS Sports Plaza, Panama  ·  playwithnewvision.com', 40, H-32);
+  };
+  drawHeader(); let y=196;
+  list.forEach((a,i)=>{
+    const when=clean([a.fecha?fmtCampDate(a.fecha):'', a.hora||''].filter(Boolean).join(' · '))||'-';
+    const lines=doc.splitTextToSize(clean(a.que||'Actividad'), W-80-155);
+    const rowH=Math.max(42, 20+lines.length*17);
+    if(y+rowH>H-70){ drawFooter(); doc.addPage(); drawHeader(); y=196; }
+    if(i%2===0){ doc.setFillColor(244,247,250); doc.rect(40,y-20,W-80,rowH-8,'F'); }
+    doc.setFillColor(170,255,0); doc.rect(40,y-20,4,rowH-8,'F');
+    doc.setTextColor(88,132,0); doc.setFont('helvetica','bold'); doc.setFontSize(12);
+    doc.text(when, 56, y);
+    doc.setTextColor(15,23,42); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    doc.text(lines, 195, y);
+    y+=rowH;
+  });
+  drawFooter();
+  doc.save('Itinerario-ID-Camp-Panama-2026.pdf');
+  toast('PDF descargado ✓','ok');
+}
 function dinRenderDots(){
   const d=document.getElementById('din-dots');
   d.innerHTML=DIN_LIST.map((_,i)=>`<button class="din-dot${i===DIN_I?' active':''}" onclick="dinGo(${i})" aria-label="Ir a ${i+1}"></button>`).join('');
